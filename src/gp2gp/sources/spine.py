@@ -6,7 +6,11 @@ from dateutil import parser
 from gp2gp.models.spine import Message
 
 
-def read_spine_csv_gz(input_file: BinaryIO) -> Iterator[str]:
+def _parse_error_code(error):
+    return None if error == "NONE" else int(error)
+
+
+def read_spine_csv_gz(input_file: BinaryIO) -> Iterator[Message]:
     with gzip.open(input_file, "rt") as f:
         input_csv = csv.DictReader(f)
         for row in input_csv:
@@ -14,4 +18,9 @@ def read_spine_csv_gz(input_file: BinaryIO) -> Iterator[str]:
                 time=parser.isoparse(row["_time"]),
                 conversation_id=row["conversationID"],
                 guid=row["GUID"],
+                interaction_id=row["interactionID"],
+                from_party_ods=row["fromNACS"],
+                to_party_ods=row["toNACS"],
+                message_ref=row["messageRef"],
+                error_code=_parse_error_code(row["jdiEvent"]),
             )

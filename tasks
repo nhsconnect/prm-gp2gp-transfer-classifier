@@ -11,6 +11,9 @@ case "${command}" in
   format)
       tox -e format
       ;;
+  typecheck)
+      tox -e mypy
+      ;;
   clean)
       find ./tests -type f -name "*.pyc" -delete
       find ./tests -type d -name "__pycache__" -delete
