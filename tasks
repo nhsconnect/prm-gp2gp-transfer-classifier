@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -Eeo pipefail
+
+command="$1"
+
+case "${command}" in
+  test)
+      tox -e py37
+      ;;
+  format)
+      tox -e format
+      ;;
+  clean)
+      find ./tests -type f -name "*.pyc" -delete
+      find ./tests -type d -name "__pycache__" -delete
+      find ./src -type f -name "*.pyc" -delete
+      find ./src -type d -name "__pycache__" -delete
+      find ./src -type f -path "*.egg-info*" -delete
+      find ./src -type d -path "*.egg-info" -delete
+      rm -rf build/ dist/ .pytest_cache/
+      ;;
+  devenv)
+      tox --recreate --devenv venv
+      ;;
+  *)
+      echo "Invalid command: '${command}'"
+      exit 1
+      ;;
+esac
+
+set +e

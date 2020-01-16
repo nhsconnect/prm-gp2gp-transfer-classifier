@@ -1,0 +1,10 @@
+.DS_Store
+.idea/
+
+build/
+dist/
+venv/
+.mypy_cache/
+*.pyc
+gp2gp_data_pipeline.egg-info
+.tox
