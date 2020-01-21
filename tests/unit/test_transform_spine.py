@@ -23,7 +23,7 @@ def _build_message(conversation_id=None, time=None):
     )
 
 
-def test_transform_messages_to_conversations_produces_correct_number_of_conversations():
+def test_transform_messages_to_conversations_produces_correct_conversations():
     message_one = _build_message(conversation_id="abc")
     message_two = _build_message(conversation_id="xyz")
     messages = [message_one, message_two]
@@ -35,7 +35,7 @@ def test_transform_messages_to_conversations_produces_correct_number_of_conversa
     assert list(actual) == expected
 
 
-def test_transform_messages_to_conversations_produces_correct_number_of_messages_within_conversations():
+def test_transform_messages_to_conversations_produces_correct_messages_within_conversations():
     message_one = _build_message(conversation_id="abc")
     message_two = _build_message(conversation_id="abc")
     messages = [message_one, message_two]

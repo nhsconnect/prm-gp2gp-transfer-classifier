@@ -11,6 +11,9 @@ case "${command}" in
   format)
       tox -e format
       ;;
+  lint)
+      tox -e flake8
+      ;;
   typecheck)
       tox -e mypy
       ;;
@@ -29,6 +32,7 @@ case "${command}" in
   precommit)
       ./tasks format
       ./tasks typecheck
+      ./tasks lint
       ./tasks test
       ;;
   *)
