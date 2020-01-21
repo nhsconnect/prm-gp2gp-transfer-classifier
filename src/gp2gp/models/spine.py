@@ -1,4 +1,4 @@
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, List
 from datetime import datetime
 
 
@@ -11,3 +11,8 @@ class Message(NamedTuple):
     to_party_ods: str
     message_ref: str
     error_code: Optional[int]
+
+
+class Conversation(NamedTuple):
+    id: str
+    messages: List[Message]

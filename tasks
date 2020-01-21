@@ -26,6 +26,11 @@ case "${command}" in
   devenv)
       tox --recreate --devenv venv
       ;;
+  precommit)
+      ./tasks format
+      ./tasks typecheck
+      ./tasks test
+      ;;
   *)
       echo "Invalid command: '${command}'"
       exit 1
