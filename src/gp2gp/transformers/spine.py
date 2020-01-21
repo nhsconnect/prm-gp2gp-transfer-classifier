@@ -4,7 +4,7 @@ from typing import Iterator, Dict, List
 from gp2gp.models.spine import Conversation, Message
 
 
-def transform_messages_to_conversations(messages: Iterator[Message]) -> Iterator[Conversation]:
+def group_into_conversations(messages: Iterator[Message]) -> Iterator[Conversation]:
     conversations: Dict[str, List[Message]] = defaultdict(list)
 
     for message in messages:

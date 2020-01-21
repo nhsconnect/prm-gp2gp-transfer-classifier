@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from gp2gp.models.spine import Conversation, Message
-from gp2gp.transformers.spine import transform_messages_to_conversations
+from gp2gp.transformers.spine import group_into_conversations
 
 
 A_DATETIME = datetime(year=2020, month=6, day=6)
@@ -23,37 +23,37 @@ def _build_message(conversation_id=None, time=None):
     )
 
 
-def test_transform_messages_to_conversations_produces_correct_conversations():
+def test_group_into_conversations_produces_correct_conversations():
     message_one = _build_message(conversation_id="abc")
     message_two = _build_message(conversation_id="xyz")
     messages = [message_one, message_two]
 
     expected = [Conversation("abc", [message_one]), Conversation("xyz", [message_two])]
 
-    actual = transform_messages_to_conversations(messages)
+    actual = group_into_conversations(messages)
 
     assert list(actual) == expected
 
 
-def test_transform_messages_to_conversations_produces_correct_messages_within_conversations():
+def test_group_into_conversations_produces_correct_messages_within_conversations():
     message_one = _build_message(conversation_id="abc")
     message_two = _build_message(conversation_id="abc")
     messages = [message_one, message_two]
 
     expected = [Conversation("abc", [message_one, message_two])]
 
-    actual = transform_messages_to_conversations(messages)
+    actual = group_into_conversations(messages)
 
     assert list(actual) == expected
 
 
-def test_transform_messages_to_conversations_sorts_messages_within_conversations():
+def test_group_into_conversations_sorts_messages_within_conversations():
     message_one = _build_message(conversation_id="abc", time=datetime(year=2020, month=6, day=6))
     message_two = _build_message(conversation_id="abc", time=datetime(year=2020, month=6, day=5))
     messages = [message_one, message_two]
 
     expected = [Conversation("abc", [message_two, message_one])]
 
-    actual = transform_messages_to_conversations(messages)
+    actual = group_into_conversations(messages)
 
     assert list(actual) == expected
