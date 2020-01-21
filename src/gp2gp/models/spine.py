@@ -16,3 +16,9 @@ class Message(NamedTuple):
 class Conversation(NamedTuple):
     id: str
     messages: List[Message]
+
+
+class ParsedConversation(NamedTuple):
+    id: str
+    request_completed: Message
+    request_completed_ack: Message
