@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Iterator, Dict, List
+from typing import Iterator, Dict, List, Optional
 
 from gp2gp.models.spine import Conversation, ParsedConversation, Message
 
@@ -21,7 +21,7 @@ def group_into_conversations(messages: Iterator[Message]) -> Iterator[Conversati
     )
 
 
-def parse_conversation(conversation: Conversation) -> ParsedConversation:
+def parse_conversation(conversation: Conversation) -> Optional[ParsedConversation]:
     parser = SpineConversationParser(conversation)
     return parser.parse()
 
@@ -47,6 +47,8 @@ class SpineConversationParser:
 
     def parse(self):
         req_started_message = next(self._messages)
+        if req_started_message.interaction_id != EHR_REQUEST_STARTED:
+            return None
         req_completed_message = self._advance_until_interaction(EHR_REQUEST_COMPLETED)
         final_ack = self._advance_until_acknowledgment_of(req_completed_message)
         return ParsedConversation(

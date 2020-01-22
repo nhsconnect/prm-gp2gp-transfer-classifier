@@ -42,7 +42,7 @@ def test_group_into_conversations_sorts_messages_within_conversations():
     assert list(actual) == expected
 
 
-def test_parse_conversation():
+def test_parse_conversation_parses_a_complete_conversation():
     request_started_message = Message(
         time=datetime(2019, 12, 31, 18, 44, 46, 647000, tzinfo=tzutc()),
         conversation_id="F8DAFCAA-5012-427B-BDB4-354256A4874B",
@@ -99,6 +99,31 @@ def test_parse_conversation():
         request_completed=request_completed_message,
         request_completed_ack=request_completed_ack_message,
     )
+    actual = parse_conversation(conversation)
+
+    assert actual == expected
+
+
+def test_parse_conversation_returns_none_when_start_omitted():
+    request_completed_ack_message = Message(
+        time=datetime(2019, 12, 31, 19, 36, 52, 995000, tzinfo=tzutc()),
+        conversation_id="F8DAFCAA-5012-427B-BDB4-354256A4874B",
+        guid="209520E3-D6D5-4343-BA8F-AF857A8F9652",
+        interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
+        from_party_ods="G85055",
+        to_party_ods="",
+        message_ref="54F949C0-DC7F-4EBC-8AE2-72BF2D0AF4EE",
+        error_code=None,
+    )
+
+    messages = [
+        request_completed_ack_message,
+    ]
+
+    conversation = Conversation("F8DAFCAA-5012-427B-BDB4-354256A4874B", messages)
+
+    expected = None
+
     actual = parse_conversation(conversation)
 
     assert actual == expected
