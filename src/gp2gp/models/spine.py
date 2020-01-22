@@ -22,4 +22,4 @@ class ParsedConversation(NamedTuple):
     id: str
     request_started: Message
     request_completed: Message
-    request_completed_ack: Message
+    request_completed_ack: Optional[Message]
