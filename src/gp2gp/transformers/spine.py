@@ -1,12 +1,14 @@
 from collections import defaultdict
 from typing import Iterator, Dict, List, Optional
 
-from gp2gp.models.spine import Conversation, ParsedConversation, Message
-
-
-EHR_REQUEST_STARTED = "urn:nhs:names:services:gp2gp/RCMR_IN010000UK05"
-EHR_REQUEST_COMPLETED = "urn:nhs:names:services:gp2gp/RCMR_IN030000UK06"
-APP_ACKNOWLEDGEMENT = "urn:nhs:names:services:gp2gp/MCCI_IN010000UK13"
+from gp2gp.models.spine import (
+    Conversation,
+    ParsedConversation,
+    Message,
+    EHR_REQUEST_STARTED,
+    EHR_REQUEST_COMPLETED,
+    APPLICATION_ACK,
+)
 
 
 def group_into_conversations(messages: Iterator[Message]) -> Iterator[Conversation]:
@@ -36,7 +38,7 @@ class SpineConversationParser:
 
     def _advance_until_acknowledgment_of(self, message):
         return self._advance_until(
-            lambda m: m.interaction_id == APP_ACKNOWLEDGEMENT and m.message_ref == message.guid
+            lambda m: m.interaction_id == APPLICATION_ACK and m.message_ref == message.guid
         )
 
     def _advance_until(self, func):

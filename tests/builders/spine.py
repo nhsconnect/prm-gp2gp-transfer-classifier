@@ -29,10 +29,10 @@ def build_message(**kwargs):
     return Message(
         time=kwargs.get("time", a_datetime()),
         conversation_id=kwargs.get("conversation_id", a_string(36)),
-        guid=a_string(36),
-        interaction_id=a_string(17),
-        from_party_ods=a_string(6),
-        to_party_ods=a_string(6),
-        message_ref=a_string(36),
-        error_code=None,
+        guid=kwargs.get("guid", a_string(36)),
+        interaction_id=kwargs.get("interaction_id", a_string(17)),
+        from_party_ods=kwargs.get("from_party_ods", a_string(6)),
+        to_party_ods=kwargs.get("to_party_ods", a_string(6)),
+        message_ref=kwargs.get("message_ref", "NotProvided"),
+        error_code=kwargs.get("error_code", None),
     )
