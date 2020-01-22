@@ -19,8 +19,8 @@ def test_group_into_conversations_produces_correct_conversations():
 
 
 def test_group_into_conversations_produces_correct_messages_within_conversations():
-    message_one = build_message(conversation_id="abc")
-    message_two = build_message(conversation_id="abc")
+    message_one = build_message(conversation_id="abc", time=datetime(year=2020, month=6, day=5))
+    message_two = build_message(conversation_id="abc", time=datetime(year=2020, month=6, day=6))
     messages = [message_one, message_two]
 
     expected = [Conversation("abc", [message_one, message_two])]
