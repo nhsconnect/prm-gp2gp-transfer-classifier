@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.tz import tzutc
 
 from gp2gp.models.spine import Conversation, ParsedConversation, Message

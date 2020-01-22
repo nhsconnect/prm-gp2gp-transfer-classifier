@@ -11,6 +11,9 @@ case "${command}" in
   format)
       tox -e format
       ;;
+  check-format)
+      tox -e check-format
+      ;;
   lint)
       tox -e flake8
       ;;
@@ -29,8 +32,8 @@ case "${command}" in
   devenv)
       tox --recreate --devenv venv
       ;;
-  precommit)
-      ./tasks format
+  validate)
+      ./tasks check-format
       ./tasks typecheck
       ./tasks lint
       ./tasks test
