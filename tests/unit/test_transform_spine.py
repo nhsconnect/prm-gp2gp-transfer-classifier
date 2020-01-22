@@ -95,6 +95,7 @@ def test_parse_conversation():
 
     expected = ParsedConversation(
         id="F8DAFCAA-5012-427B-BDB4-354256A4874B",
+        request_started=request_started_message,
         request_completed=request_completed_message,
         request_completed_ack=request_completed_ack_message,
     )

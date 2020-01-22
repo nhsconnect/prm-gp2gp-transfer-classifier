@@ -28,7 +28,7 @@ def parse_conversation(conversation: Conversation) -> ParsedConversation:
 
 class SpineConversationParser:
     def __init__(self, conversation: Conversation):
-        self.id = conversation.id
+        self._id = conversation.id
         self._messages = iter(conversation.messages)
 
     def _advance_until_interaction(self, interaction_id):
@@ -46,8 +46,12 @@ class SpineConversationParser:
         return next_message
 
     def parse(self):
+        req_started_message = next(self._messages)
         req_completed_message = self._advance_until_interaction(EHR_REQUEST_COMPLETED)
         final_ack = self._advance_until_acknowledgment_of(req_completed_message)
         return ParsedConversation(
-            self.id, request_completed=req_completed_message, request_completed_ack=final_ack
+            self._id,
+            request_started=req_started_message,
+            request_completed=req_completed_message,
+            request_completed_ack=final_ack,
         )
