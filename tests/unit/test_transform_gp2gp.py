@@ -41,3 +41,15 @@ def test_build_transfer_extracts_requesting_practice_ods():
     expected = "A12345"
     actual = transfer.requesting_practice_ods
     assert actual == expected
+
+
+def test_build_transfer_extracts_sending_practice_ods():
+    conversation = build_parsed_conversation(
+        id="1234", request_started=build_message(to_party_ods="A12377")
+    )
+
+    transfer = build_transfer(conversation)
+
+    expected = "A12377"
+    actual = transfer.sending_practice_ods
+    assert actual == expected

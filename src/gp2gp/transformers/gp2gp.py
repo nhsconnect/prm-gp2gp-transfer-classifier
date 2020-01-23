@@ -10,9 +10,14 @@ def _extract_requesting_practice_ods(conversation):
     return conversation.request_started.from_party_ods
 
 
+def _extract_sending_practice_ods(conversation):
+    return conversation.request_started.to_party_ods
+
+
 def build_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_calculate_sla(conversation),
         requesting_practice_ods=_extract_requesting_practice_ods(conversation),
+        sending_practice_ods=_extract_sending_practice_ods(conversation),
     )
