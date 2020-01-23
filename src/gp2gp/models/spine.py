@@ -13,7 +13,7 @@ class Message(NamedTuple):
     interaction_id: str
     from_party_ods: str
     to_party_ods: str
-    message_ref: str
+    message_ref: Optional[str]
     error_code: Optional[int]
 
 

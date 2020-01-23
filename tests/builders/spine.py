@@ -33,6 +33,6 @@ def build_message(**kwargs):
         interaction_id=kwargs.get("interaction_id", a_string(17)),
         from_party_ods=kwargs.get("from_party_ods", a_string(6)),
         to_party_ods=kwargs.get("to_party_ods", a_string(6)),
-        message_ref=kwargs.get("message_ref", "NotProvided"),
+        message_ref=kwargs.get("message_ref", None),
         error_code=kwargs.get("error_code", None),
     )

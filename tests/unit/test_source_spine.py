@@ -60,7 +60,7 @@ def test_read_spine_csv_gz():
                 interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
                 from_nacs="C84063",
                 to_nacs="C84065",
-                message_ref="3802F7D7-EDA8-483F-AFE1-E1C615116B89",
+                message_ref="NotProvided",
                 jdi_event="NONE",
                 raw="",
             ),
@@ -87,7 +87,7 @@ def test_read_spine_csv_gz():
             interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
             from_party_ods="C84063",
             to_party_ods="C84065",
-            message_ref="3802F7D7-EDA8-483F-AFE1-E1C615116B89",
+            message_ref=None,
             error_code=None,
         ),
         Message(
