@@ -14,10 +14,15 @@ def _extract_sending_practice_ods(conversation):
     return conversation.request_started.to_party_ods
 
 
+def _extract_error_code(conversation):
+    return conversation.request_completed_ack.error_code
+
+
 def build_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_calculate_sla(conversation),
         requesting_practice_ods=_extract_requesting_practice_ods(conversation),
         sending_practice_ods=_extract_sending_practice_ods(conversation),
+        error_code=_extract_error_code(conversation),
     )

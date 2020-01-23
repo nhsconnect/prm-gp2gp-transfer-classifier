@@ -32,9 +32,7 @@ def test_build_transfer_produces_sla_of_successful_conversation():
 
 
 def test_build_transfer_extracts_requesting_practice_ods():
-    conversation = build_parsed_conversation(
-        id="1234", request_started=build_message(from_party_ods="A12345")
-    )
+    conversation = build_parsed_conversation(request_started=build_message(from_party_ods="A12345"))
 
     transfer = build_transfer(conversation)
 
@@ -44,12 +42,20 @@ def test_build_transfer_extracts_requesting_practice_ods():
 
 
 def test_build_transfer_extracts_sending_practice_ods():
-    conversation = build_parsed_conversation(
-        id="1234", request_started=build_message(to_party_ods="A12377")
-    )
+    conversation = build_parsed_conversation(request_started=build_message(to_party_ods="A12377"))
 
     transfer = build_transfer(conversation)
 
     expected = "A12377"
     actual = transfer.sending_practice_ods
+    assert actual == expected
+
+
+def test_build_transfer_extracts_error_code():
+    conversation = build_parsed_conversation(request_completed_ack=build_message(error_code=99))
+
+    transfer = build_transfer(conversation)
+
+    expected = 99
+    actual = transfer.error_code
     assert actual == expected
