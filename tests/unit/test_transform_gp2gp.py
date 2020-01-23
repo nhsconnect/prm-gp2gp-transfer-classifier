@@ -29,3 +29,15 @@ def test_build_transfer_produces_sla_of_successful_conversation():
     expected = timedelta(hours=1, minutes=10)
     actual = transfer.sla_duration
     assert actual == expected
+
+
+def test_build_transfer_extracts_requesting_practice_ods():
+    conversation = build_parsed_conversation(
+        id="1234", request_started=build_message(from_party_ods="A12345")
+    )
+
+    transfer = build_transfer(conversation)
+
+    expected = "A12345"
+    actual = transfer.requesting_practice_ods
+    assert actual == expected
