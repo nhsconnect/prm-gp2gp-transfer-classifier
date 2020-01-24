@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from gp2gp.models.gp2gp import Transfer
+from gp2gp.models.gp2gp import Transfer, ERROR_SUPPRESSED
 from gp2gp.models.spine import ParsedConversation
 
 
@@ -30,5 +30,9 @@ def derive_transfer(conversation: ParsedConversation) -> Transfer:
     )
 
 
+def _is_successful(transfer):
+    return transfer.error_code is None or transfer.error_code == ERROR_SUPPRESSED
+
+
 def filter_failed_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]:
-    return (t for t in transfers if t.error_code is None)
+    return (t for t in transfers if _is_successful(t))

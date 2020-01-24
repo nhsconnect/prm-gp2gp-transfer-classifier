@@ -71,3 +71,14 @@ def test_filter_failed_transfers_excludes_failed():
     expected = []
 
     assert list(actual) == expected
+
+
+def test_filter_failed_transfers_does_not_exclude_suppressions():
+    suppressed_transfer = build_transfer(error_code=15)
+    transfers = [suppressed_transfer]
+
+    actual = filter_failed_transfers(transfers)
+
+    expected = [suppressed_transfer]
+
+    assert list(actual) == expected

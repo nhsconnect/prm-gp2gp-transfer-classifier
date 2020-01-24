@@ -1,6 +1,8 @@
 from datetime import timedelta
 from typing import NamedTuple, Optional
 
+ERROR_SUPPRESSED = 15
+
 
 class Transfer(NamedTuple):
     conversation_id: str
