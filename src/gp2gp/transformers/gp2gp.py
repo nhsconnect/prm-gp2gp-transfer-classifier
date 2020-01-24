@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from gp2gp.models.gp2gp import Transfer
 from gp2gp.models.spine import ParsedConversation
 
@@ -18,7 +20,7 @@ def _extract_error_code(conversation):
     return conversation.request_completed_ack.error_code
 
 
-def build_transfer(conversation: ParsedConversation) -> Transfer:
+def derive_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_calculate_sla(conversation),
@@ -26,3 +28,7 @@ def build_transfer(conversation: ParsedConversation) -> Transfer:
         sending_practice_ods=_extract_sending_practice_ods(conversation),
         error_code=_extract_error_code(conversation),
     )
+
+
+def filter_failed_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]:
+    return (t for t in transfers if t.error_code is None)

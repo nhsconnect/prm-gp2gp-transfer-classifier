@@ -1,13 +1,14 @@
 from datetime import datetime, timedelta
 
-from gp2gp.transformers.gp2gp import build_transfer
+from gp2gp.transformers.gp2gp import derive_transfer, filter_failed_transfers
+from tests.builders.gp2gp import build_transfer
 from tests.builders.spine import build_parsed_conversation, build_message
 
 
 def test_build_transfer_extracts_conversation_id():
     conversation = build_parsed_conversation(id="1234")
 
-    transfer = build_transfer(conversation)
+    transfer = derive_transfer(conversation)
 
     expected = "1234"
     actual = transfer.conversation_id
@@ -24,7 +25,7 @@ def test_build_transfer_produces_sla_of_successful_conversation():
         ),
     )
 
-    transfer = build_transfer(conversation)
+    transfer = derive_transfer(conversation)
 
     expected = timedelta(hours=1, minutes=10)
     actual = transfer.sla_duration
@@ -34,7 +35,7 @@ def test_build_transfer_produces_sla_of_successful_conversation():
 def test_build_transfer_extracts_requesting_practice_ods():
     conversation = build_parsed_conversation(request_started=build_message(from_party_ods="A12345"))
 
-    transfer = build_transfer(conversation)
+    transfer = derive_transfer(conversation)
 
     expected = "A12345"
     actual = transfer.requesting_practice_ods
@@ -44,7 +45,7 @@ def test_build_transfer_extracts_requesting_practice_ods():
 def test_build_transfer_extracts_sending_practice_ods():
     conversation = build_parsed_conversation(request_started=build_message(to_party_ods="A12377"))
 
-    transfer = build_transfer(conversation)
+    transfer = derive_transfer(conversation)
 
     expected = "A12377"
     actual = transfer.sending_practice_ods
@@ -54,8 +55,19 @@ def test_build_transfer_extracts_sending_practice_ods():
 def test_build_transfer_extracts_error_code():
     conversation = build_parsed_conversation(request_completed_ack=build_message(error_code=99))
 
-    transfer = build_transfer(conversation)
+    transfer = derive_transfer(conversation)
 
     expected = 99
     actual = transfer.error_code
     assert actual == expected
+
+
+def test_filter_failed_transfers_excludes_failed():
+    failed_transfer = build_transfer(error_code=99)
+    transfers = [failed_transfer]
+
+    actual = filter_failed_transfers(transfers)
+
+    expected = []
+
+    assert list(actual) == expected

@@ -1,7 +1,7 @@
 import random
 import string
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def a_string(length=10, characters=string.ascii_letters + string.digits):
@@ -21,3 +21,7 @@ def a_datetime():
         minute=an_integer(0, 59),
         second=an_integer(0, 59),
     )
+
+
+def a_duration():
+    return timedelta(seconds=an_integer(10, 604800))
