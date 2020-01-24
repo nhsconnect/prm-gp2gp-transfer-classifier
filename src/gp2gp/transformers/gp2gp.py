@@ -45,3 +45,7 @@ def _is_successful(transfer):
 
 def filter_failed_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]:
     return (t for t in transfers if _is_successful(t))
+
+
+def filter_pending_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]:
+    return (t for t in transfers if not t.pending)
