@@ -21,7 +21,7 @@ case "${command}" in
       tox -e mypy
       ;;
   check-deps)
-      tox -e safety
+      tox -e check-deps
       ;;
   clean)
       find ./tests -type f -name "*.pyc" -delete
