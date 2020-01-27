@@ -16,6 +16,7 @@ case "${command}" in
       ;;
   lint)
       tox -e flake8
+      tox -e bandit
       ;;
   typecheck)
       tox -e mypy
