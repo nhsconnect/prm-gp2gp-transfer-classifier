@@ -1,9 +1,10 @@
-import gzip
-from typing import Iterator, BinaryIO
 import csv
+import gzip
+from typing import BinaryIO, Iterator
+
 from dateutil import parser
 
-from gp2gp.models.spine import Message
+from prmdata.spine.models import Message
 
 
 def _parse_error_code(error):

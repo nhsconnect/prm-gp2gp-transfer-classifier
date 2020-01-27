@@ -1,5 +1,5 @@
-from typing import NamedTuple, Optional, List
 from datetime import datetime
+from typing import NamedTuple, Optional, List
 
 EHR_REQUEST_STARTED = "urn:nhs:names:services:gp2gp/RCMR_IN010000UK05"
 EHR_REQUEST_COMPLETED = "urn:nhs:names:services:gp2gp/RCMR_IN030000UK06"

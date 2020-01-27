@@ -1,13 +1,13 @@
 from collections import defaultdict
 from typing import Iterator, Dict, List, Optional
 
-from gp2gp.models.spine import (
+from prmdata.spine.models import (
+    Message,
     Conversation,
     ParsedConversation,
-    Message,
+    APPLICATION_ACK,
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
-    APPLICATION_ACK,
 )
 
 

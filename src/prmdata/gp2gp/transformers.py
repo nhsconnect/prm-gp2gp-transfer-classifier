@@ -1,7 +1,7 @@
 from typing import Iterable
 
-from gp2gp.models.gp2gp import Transfer, ERROR_SUPPRESSED
-from gp2gp.models.spine import ParsedConversation
+from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED
+from prmdata.spine.models import ParsedConversation
 
 
 def _calculate_sla(conversation):

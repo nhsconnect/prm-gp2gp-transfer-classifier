@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from gp2gp.transformers.gp2gp import (
+from prmdata.gp2gp.transformers import (
     derive_transfer,
     filter_failed_transfers,
     filter_pending_transfers,
@@ -11,7 +11,6 @@ from tests.builders.spine import build_parsed_conversation, build_message
 
 def test_derive_transfer_extracts_conversation_id():
     conversation = build_parsed_conversation(id="1234")
-
     transfer = derive_transfer(conversation)
 
     expected = "1234"

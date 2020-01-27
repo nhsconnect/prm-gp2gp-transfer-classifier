@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from gp2gp.models.spine import (
-    Conversation,
-    ParsedConversation,
+from prmdata.spine.models import (
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
+    Conversation,
+    ParsedConversation,
 )
-from gp2gp.transformers.spine import group_into_conversations, parse_conversation
+from prmdata.spine.transformers import group_into_conversations, parse_conversation
 from tests.builders.spine import build_message
 
 

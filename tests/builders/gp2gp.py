@@ -1,4 +1,4 @@
-from gp2gp.models.gp2gp import Transfer
+from prmdata.gp2gp.models import Transfer
 from tests.builders.common import a_string, a_duration
 
 
