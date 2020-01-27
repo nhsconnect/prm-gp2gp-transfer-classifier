@@ -20,6 +20,9 @@ case "${command}" in
   typecheck)
       tox -e mypy
       ;;
+  check-deps)
+      tox -e safety
+      ;;
   clean)
       find ./tests -type f -name "*.pyc" -delete
       find ./tests -type d -name "__pycache__" -delete
