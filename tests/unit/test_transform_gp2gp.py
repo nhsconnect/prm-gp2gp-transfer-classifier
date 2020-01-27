@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
 
-from gp2gp.transformers.gp2gp import derive_transfer, filter_failed_transfers, filter_pending_transfers
+from gp2gp.transformers.gp2gp import (
+    derive_transfer,
+    filter_failed_transfers,
+    filter_pending_transfers,
+)
 from tests.builders.gp2gp import build_transfer
 from tests.builders.spine import build_parsed_conversation, build_message
 
@@ -98,9 +102,7 @@ def test_derive_transfer_doesnt_extract_error_code_given_pending_request_complet
 
 def test_derive_transfer_flags_pending_request_completed_as_pending():
     conversation = build_parsed_conversation(
-        request_started=build_message(),
-        request_completed=None,
-        request_completed_ack=None
+        request_started=build_message(), request_completed=None, request_completed_ack=None
     )
 
     transfer = derive_transfer(conversation)
