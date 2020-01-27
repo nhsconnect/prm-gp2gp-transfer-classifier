@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED
+from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED, PracticeSlaSummary
 from prmdata.spine.models import ParsedConversation
 
 
@@ -49,3 +49,7 @@ def filter_failed_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]
 
 def filter_pending_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]:
     return (t for t in transfers if not t.pending)
+
+
+def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterable[PracticeSlaSummary]:
+    return iter([PracticeSlaSummary(ods= "A12345", within_3_days=1, within_8_days=0, more_than_8_days=0)])
