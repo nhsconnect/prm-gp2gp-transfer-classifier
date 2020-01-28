@@ -1,12 +1,6 @@
 from datetime import datetime, timedelta
 
-from prmdata.gp2gp.models import PracticeSlaSummary
-from prmdata.gp2gp.transformers import (
-    derive_transfer,
-    filter_failed_transfers,
-    filter_pending_transfers,
-    calculate_sla_by_practice)
-from tests.builders.gp2gp import build_transfer
+from prmdata.gp2gp.transformers import derive_transfer
 from tests.builders.spine import build_parsed_conversation, build_message
 
 
@@ -138,68 +132,3 @@ def test_derive_transfer_flags_completed_conversation_as_not_pending():
     expected = False
     actual = transfer.pending
     assert actual == expected
-
-
-def test_filter_failed_transfers_excludes_failed():
-    failed_transfer = build_transfer(error_code=99)
-    transfers = [failed_transfer]
-
-    actual = filter_failed_transfers(transfers)
-
-    expected = []
-
-    assert list(actual) == expected
-
-
-def test_filter_failed_transfers_doesnt_exclude_suppressions():
-    suppressed_transfer = build_transfer(error_code=15)
-    transfers = [suppressed_transfer]
-
-    actual = filter_failed_transfers(transfers)
-
-    expected = [suppressed_transfer]
-
-    assert list(actual) == expected
-
-
-def test_filter_pending_transfers_excludes_pending():
-    pending_transfer = build_transfer(pending=True)
-
-    transfers = [pending_transfer]
-
-    actual = filter_pending_transfers(transfers)
-    expected = []
-
-    assert list(actual) == expected
-
-
-def test_filter_pending_transfers_doesnt_exclude_completed():
-    pending_transfer = build_transfer(pending=True)
-    completed_transfer = build_transfer(pending=False)
-
-    transfers = [pending_transfer, completed_transfer]
-
-    actual = filter_pending_transfers(transfers)
-    expected = [completed_transfer]
-
-    assert list(actual) == expected
-
-
-def test_calculate_sla_by_practice_returns_correct_requesting_practice_ods_code():
-    transfer = build_transfer(requesting_practice_ods="A12345")
-
-    actual = calculate_sla_by_practice([transfer])
-    actual_ods = [practice.ods for practice in actual]
-    expected = ["A12345"]
-
-    assert actual_ods == expected
-
-
-def test_calculate_sla_by_practice_returns_correct_practice_sla_summary_for_one_transfer():
-    transfer = build_transfer(sla_duration=timedelta(hours=1, minutes=10))
-
-    actual = list(calculate_sla_by_practice([transfer]))
-    actual_within_3_day_count = actual[0].within_3_days
-    expected = 1
-
-    assert actual_within_3_day_count == expected

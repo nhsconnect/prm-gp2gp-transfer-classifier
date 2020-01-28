@@ -15,9 +15,9 @@ class Transfer(NamedTuple):
 
 
 class SlaBand(Enum):
-    WITHIN_3_DAYS: auto()
-    WITHIN_8_DAYS: auto()
-    MORE_THAN_8_DAYS: auto()
+    WITHIN_3_DAYS = auto()
+    WITHIN_8_DAYS = auto()
+    MORE_THAN_8_DAYS = auto()
 
 
 class PracticeSlaSummary(NamedTuple):

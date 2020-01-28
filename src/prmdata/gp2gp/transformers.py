@@ -52,4 +52,6 @@ def filter_pending_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer
 
 
 def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterable[PracticeSlaSummary]:
-    return iter([PracticeSlaSummary(ods= "A12345", within_3_days=1, within_8_days=0, more_than_8_days=0)])
+    return iter(
+        [PracticeSlaSummary(ods="A12345", within_3_days=1, within_8_days=0, more_than_8_days=0)]
+    )
