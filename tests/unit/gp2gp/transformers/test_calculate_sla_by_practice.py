@@ -1,5 +1,4 @@
 from collections import Counter
-from datetime import timedelta
 from typing import Set, Iterable
 
 from prmdata.gp2gp.models import PracticeSlaSummary
@@ -21,11 +20,12 @@ def test_calculate_sla_by_practice_given_single_transfer():
     _assert_has_ods_codes(actual, {"A12345"})
 
 
-def test_calculate_sla_by_practice_returns_correct_practice_sla_summary_for_one_transfer():
-    transfer = build_transfer(sla_duration=timedelta(hours=1, minutes=10))
+def test_calculate_sla_by_practice_given_two_transfers_from_different_practices():
+    transfers = [
+        build_transfer(requesting_practice_ods="A12345"),
+        build_transfer(requesting_practice_ods="X67890"),
+    ]
 
-    actual = list(calculate_sla_by_practice([transfer]))
-    actual_within_3_day_count = actual[0].within_3_days
-    expected = 1
+    actual = calculate_sla_by_practice(transfers)
 
-    assert actual_within_3_day_count == expected
+    _assert_has_ods_codes(actual, {"A12345", "X67890"})

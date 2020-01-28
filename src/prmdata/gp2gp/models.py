@@ -22,6 +22,3 @@ class SlaBand(Enum):
 
 class PracticeSlaSummary(NamedTuple):
     ods: str
-    within_3_days: int
-    within_8_days: int
-    more_than_8_days: int
