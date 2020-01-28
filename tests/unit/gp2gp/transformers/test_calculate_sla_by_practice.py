@@ -29,3 +29,14 @@ def test_calculate_sla_by_practice_given_two_transfers_from_different_practices(
     actual = calculate_sla_by_practice(transfers)
 
     _assert_has_ods_codes(actual, {"A12345", "X67890"})
+
+
+def test_calculate_sla_by_practice_given_two_transfers_from_the_same_practice():
+    transfers = [
+        build_transfer(requesting_practice_ods="A12345"),
+        build_transfer(requesting_practice_ods="A12345"),
+    ]
+
+    actual = calculate_sla_by_practice(transfers)
+
+    _assert_has_ods_codes(actual, {"A12345"})
