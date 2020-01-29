@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 from typing import Iterator, Dict, List, Optional, Iterable
 
 from prmdata.spine.models import (
@@ -63,3 +64,9 @@ class SpineConversationParser:
             request_completed=req_completed_message,
             request_completed_ack=final_ack,
         )
+
+
+def filter_conversations_by_request_started_time(
+    conversations: Iterable[ParsedConversation], from_time: datetime, to_time: datetime
+) -> Iterator[ParsedConversation]:
+    return iter(conversations)

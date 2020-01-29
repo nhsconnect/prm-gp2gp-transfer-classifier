@@ -20,12 +20,15 @@ def _assert_first_summary_has_sla_counts(
     beyond_8_days: int,
 ):
     first_summary = next(practices)
+
+    expected_slas = (within_3_days, within_8_days, beyond_8_days)
+
     actual_slas = (
         first_summary.within_3_days,
         first_summary.within_8_days,
         first_summary.beyond_8_days,
     )
-    expected_slas = (within_3_days, within_8_days, beyond_8_days)
+
     assert actual_slas == expected_slas
 
 
@@ -98,12 +101,13 @@ def test_calculate_sla_by_practice_calculates_sla_given_multiple_transfers_for_2
             requesting_practice_ods="B12345", sla_duration=timedelta(days=5, hours=1, minutes=10)
         ),
     ]
-    actual = calculate_sla_by_practice(transfers)
-    actual_sorted = sorted(actual, key=lambda p: p.ods)
 
     expected = [
         PracticeSlaSummary(ods="A12345", within_3_days=1, within_8_days=0, beyond_8_days=1),
         PracticeSlaSummary(ods="B12345", within_3_days=0, within_8_days=2, beyond_8_days=1),
     ]
+
+    actual = calculate_sla_by_practice(transfers)
+    actual_sorted = sorted(actual, key=lambda p: p.ods)
 
     assert actual_sorted == expected
