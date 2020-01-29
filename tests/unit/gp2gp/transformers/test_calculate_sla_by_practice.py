@@ -83,7 +83,7 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_beyond_8_da
     _assert_first_summary_has_sla_counts(actual, within_3_days=0, within_8_days=0, beyond_8_days=1)
 
 
-def test_calculate_sla_by_practice_calculates_sla_given_multiple_transfers_for_2_practices():
+def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practices():
     transfers = [
         build_transfer(
             requesting_practice_ods="A12345", sla_duration=timedelta(days=8, hours=1, minutes=10)
