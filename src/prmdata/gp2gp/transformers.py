@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import timedelta
-from typing import Iterable, Iterator, Counter, DefaultDict
+from typing import Iterable, Iterator, Counter, DefaultDict, Set
 
 from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED, PracticeSlaSummary, SlaBand
 from prmdata.spine.models import ParsedConversation
@@ -85,3 +85,9 @@ def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[Practic
         )
         for ods, counts in practice_counts.items()
     )
+
+
+def filter_practices(
+    summaries: Iterable[PracticeSlaSummary], ods_codes: Set[str]
+) -> Iterator[PracticeSlaSummary]:
+    return iter(summaries)

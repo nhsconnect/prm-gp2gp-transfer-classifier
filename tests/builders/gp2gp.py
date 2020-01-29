@@ -1,5 +1,5 @@
-from prmdata.gp2gp.models import Transfer
-from tests.builders.common import a_string, a_duration
+from prmdata.gp2gp.models import Transfer, PracticeSlaSummary
+from tests.builders.common import a_string, a_duration, an_integer
 
 
 def build_transfer(**kwargs):
@@ -10,4 +10,13 @@ def build_transfer(**kwargs):
         sending_practice_ods=kwargs.get("sending_practice_ods", a_string(6)),
         error_code=kwargs.get("error_code", None),
         pending=kwargs.get("pending", False),
+    )
+
+
+def build_practice_summary(**kwargs):
+    return PracticeSlaSummary(
+        ods=kwargs.get("ods", a_string(6)),
+        within_3_days=kwargs.get("within_3_days", an_integer()),
+        within_8_days=kwargs.get("within_8_days", an_integer()),
+        beyond_8_days=kwargs.get("beyond_8_days", an_integer()),
     )
