@@ -93,3 +93,19 @@ def test_filter_conversations_by_request_started_time_accepts_conversation_on_ra
     actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
 
     assert list(actual) == expected
+
+
+def test_filter_conversations_by_request_started_time_rejects_conversation_on_range_end():
+    from_time = datetime(year=2020, month=6, day=1)
+    to_time = datetime(year=2020, month=7, day=1)
+    parsed_conversations = [
+        build_parsed_conversation(
+            request_started=build_message(time=datetime(year=2020, month=7, day=1))
+        )
+    ]
+
+    expected = []
+
+    actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
+
+    assert list(actual) == expected
