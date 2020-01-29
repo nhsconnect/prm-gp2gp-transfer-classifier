@@ -72,5 +72,5 @@ def filter_conversations_by_request_started_time(
     return (
         conversation
         for conversation in conversations
-        if from_time < conversation.request_started.time < to_time
+        if from_time <= conversation.request_started.time < to_time
     )
