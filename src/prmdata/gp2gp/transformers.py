@@ -1,7 +1,12 @@
-from typing import Iterable
+from collections import defaultdict
+from datetime import timedelta
+from typing import Iterable, Iterator, Counter, DefaultDict
 
-from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED, PracticeSlaSummary
+from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED, PracticeSlaSummary, SlaBand
 from prmdata.spine.models import ParsedConversation
+
+
+THREE_DAYS_IN_SECONDS = 259200
 
 
 def _calculate_sla(conversation):
@@ -43,23 +48,36 @@ def _is_successful(transfer):
     return transfer.error_code is None or transfer.error_code == ERROR_SUPPRESSED
 
 
-def filter_failed_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]:
+def filter_failed_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
     return (t for t in transfers if _is_successful(t))
 
 
-def filter_pending_transfers(transfers: Iterable[Transfer]) -> Iterable[Transfer]:
+def filter_pending_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
     return (t for t in transfers if not t.pending)
 
 
-def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterable[PracticeSlaSummary]:
-    return iter(
-        {
-            PracticeSlaSummary(
-                ods=transfer.requesting_practice_ods,
-                within_3_days=1,
-                within_8_days=0,
-                beyond_8_days=0,
-            )
-            for transfer in transfers
-        }
+def _assign_to_sla_band(sla_duration: timedelta):
+    if sla_duration.total_seconds() <= THREE_DAYS_IN_SECONDS:
+        return SlaBand.WITHIN_3_DAYS
+    else:
+        return SlaBand.WITHIN_8_DAYS
+
+
+def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[PracticeSlaSummary]:
+    practice_counts: DefaultDict[str, Counter] = defaultdict(Counter)
+
+    for transfer in transfers:
+        ods = transfer.requesting_practice_ods
+        if transfer.sla_duration is not None:
+            sla_band = _assign_to_sla_band(transfer.sla_duration)
+            practice_counts[ods][sla_band] += 1
+
+    return (
+        PracticeSlaSummary(
+            ods,
+            within_3_days=counts[SlaBand.WITHIN_3_DAYS],
+            within_8_days=counts[SlaBand.WITHIN_8_DAYS],
+            beyond_8_days=0,
+        )
+        for ods, counts in practice_counts.items()
     )

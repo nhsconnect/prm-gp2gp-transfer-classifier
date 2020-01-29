@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Iterator, Dict, List, Optional
+from typing import Iterator, Dict, List, Optional, Iterable
 
 from prmdata.spine.models import (
     Message,
@@ -11,7 +11,7 @@ from prmdata.spine.models import (
 )
 
 
-def group_into_conversations(messages: Iterator[Message]) -> Iterator[Conversation]:
+def group_into_conversations(messages: Iterable[Message]) -> Iterator[Conversation]:
     conversations: Dict[str, List[Message]] = defaultdict(list)
 
     for message in messages:
