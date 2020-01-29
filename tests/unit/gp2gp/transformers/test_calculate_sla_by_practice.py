@@ -71,3 +71,10 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_8_da
     actual = calculate_sla_by_practice([transfer])
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=0, within_8_days=1, beyond_8_days=0)
+
+
+def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_beyond_8_days():
+    transfer = build_transfer(sla_duration=timedelta(days=8, hours=1, minutes=10))
+    actual = calculate_sla_by_practice([transfer])
+
+    _assert_first_summary_has_sla_counts(actual, within_3_days=0, within_8_days=0, beyond_8_days=1)

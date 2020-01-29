@@ -7,6 +7,7 @@ from prmdata.spine.models import ParsedConversation
 
 
 THREE_DAYS_IN_SECONDS = 259200
+EIGHT_DAYS_IN_SECONDS = 691200
 
 
 def _calculate_sla(conversation):
@@ -57,10 +58,13 @@ def filter_pending_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer
 
 
 def _assign_to_sla_band(sla_duration: timedelta):
-    if sla_duration.total_seconds() <= THREE_DAYS_IN_SECONDS:
+    sla_duration_in_seconds = sla_duration.total_seconds()
+    if sla_duration_in_seconds <= THREE_DAYS_IN_SECONDS:
         return SlaBand.WITHIN_3_DAYS
-    else:
+    elif sla_duration_in_seconds <= EIGHT_DAYS_IN_SECONDS:
         return SlaBand.WITHIN_8_DAYS
+    else:
+        return SlaBand.BEYOND_8_DAYS
 
 
 def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[PracticeSlaSummary]:
@@ -77,7 +81,7 @@ def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[Practic
             ods,
             within_3_days=counts[SlaBand.WITHIN_3_DAYS],
             within_8_days=counts[SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=0,
+            beyond_8_days=counts[SlaBand.BEYOND_8_DAYS],
         )
         for ods, counts in practice_counts.items()
     )
