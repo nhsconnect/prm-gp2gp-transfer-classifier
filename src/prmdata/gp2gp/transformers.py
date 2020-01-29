@@ -90,4 +90,4 @@ def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[Practic
 def filter_practices(
     summaries: Iterable[PracticeSlaSummary], ods_codes: Set[str]
 ) -> Iterator[PracticeSlaSummary]:
-    return iter(summaries)
+    return (summary for summary in summaries if summary.ods in ods_codes)

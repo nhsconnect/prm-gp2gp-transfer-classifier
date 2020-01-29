@@ -13,3 +13,16 @@ def test_filter_practices_doesnt_remove_practice_matching_supplied_ods_code():
     actual = filter_practices(practices, ods_codes)
 
     assert list(actual) == expected
+
+
+def test_filter_practices_removes_practice_not_matching_supplied_ods_code():
+    ods_code = "A12345"
+    ods_codes = {ods_code}
+    practice_summary = build_practice_summary(ods="X67890")
+    practices = [practice_summary]
+
+    expected = []
+
+    actual = filter_practices(practices, ods_codes)
+
+    assert list(actual) == expected
