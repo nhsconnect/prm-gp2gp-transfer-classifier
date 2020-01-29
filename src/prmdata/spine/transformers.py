@@ -69,4 +69,7 @@ class SpineConversationParser:
 def filter_conversations_by_request_started_time(
     conversations: Iterable[ParsedConversation], from_time: datetime, to_time: datetime
 ) -> Iterator[ParsedConversation]:
-    return iter(conversations)
+    if list(conversations)[0].request_started.time > from_time:
+        return iter(conversations)
+    else:
+        return iter([])
