@@ -10,6 +10,7 @@ PRACTICE_B = build_practice_summary(ods="X67890")
 ODS_CODE_B = "X67890"
 ODS_CODE_C = "P54321"
 
+
 @pytest.mark.parametrize(
     ["practices", "ods_codes", "expected"],
     [
