@@ -1,4 +1,4 @@
-from prmdata.gp2gp.models import Transfer, PracticeSlaSummary
+from prmdata.gp2gp.models import Transfer, PracticeSlaMetrics
 from tests.builders.common import a_string, a_duration, an_integer
 
 
@@ -14,7 +14,7 @@ def build_transfer(**kwargs):
 
 
 def build_practice_summary(**kwargs):
-    return PracticeSlaSummary(
+    return PracticeSlaMetrics(
         ods=kwargs.get("ods", a_string(6)),
         within_3_days=kwargs.get("within_3_days", an_integer()),
         within_8_days=kwargs.get("within_8_days", an_integer()),

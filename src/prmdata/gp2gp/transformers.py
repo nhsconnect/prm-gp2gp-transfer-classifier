@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import timedelta
 from typing import Iterable, Iterator, Counter, DefaultDict, Set
 
-from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED, PracticeSlaSummary, SlaBand
+from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED, PracticeSlaMetrics, SlaBand
 from prmdata.spine.models import ParsedConversation
 
 
@@ -67,7 +67,7 @@ def _assign_to_sla_band(sla_duration: timedelta):
         return SlaBand.BEYOND_8_DAYS
 
 
-def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[PracticeSlaSummary]:
+def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[PracticeSlaMetrics]:
     practice_counts: DefaultDict[str, Counter] = defaultdict(Counter)
 
     for transfer in transfers:
@@ -77,7 +77,7 @@ def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[Practic
             practice_counts[ods][sla_band] += 1
 
     return (
-        PracticeSlaSummary(
+        PracticeSlaMetrics(
             ods,
             within_3_days=counts[SlaBand.WITHIN_3_DAYS],
             within_8_days=counts[SlaBand.WITHIN_8_DAYS],
@@ -88,6 +88,6 @@ def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[Practic
 
 
 def filter_practices(
-    summaries: Iterable[PracticeSlaSummary], ods_codes: Set[str]
-) -> Iterator[PracticeSlaSummary]:
+    summaries: Iterable[PracticeSlaMetrics], ods_codes: Set[str]
+) -> Iterator[PracticeSlaMetrics]:
     return (summary for summary in summaries if summary.ods in ods_codes)

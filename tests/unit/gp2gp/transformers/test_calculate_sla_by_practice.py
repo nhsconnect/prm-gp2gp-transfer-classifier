@@ -2,19 +2,19 @@ from collections import Counter
 from datetime import timedelta
 from typing import Set, Iterator
 
-from prmdata.gp2gp.models import PracticeSlaSummary
+from prmdata.gp2gp.models import PracticeSlaMetrics
 from prmdata.gp2gp.transformers import calculate_sla_by_practice
 from tests.builders.gp2gp import build_transfer
 
 
-def _assert_has_ods_codes(practices: Iterator[PracticeSlaSummary], expected: Set[str]):
+def _assert_has_ods_codes(practices: Iterator[PracticeSlaMetrics], expected: Set[str]):
     actual_counts = Counter((practice.ods for practice in practices))
     expected_counts = Counter(expected)
     assert actual_counts == expected_counts
 
 
 def _assert_first_summary_has_sla_counts(
-    practices: Iterator[PracticeSlaSummary],
+    practices: Iterator[PracticeSlaMetrics],
     within_3_days: int,
     within_8_days: int,
     beyond_8_days: int,
@@ -103,8 +103,8 @@ def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practice
     ]
 
     expected = [
-        PracticeSlaSummary(ods="A12345", within_3_days=1, within_8_days=0, beyond_8_days=1),
-        PracticeSlaSummary(ods="B12345", within_3_days=0, within_8_days=2, beyond_8_days=1),
+        PracticeSlaMetrics(ods="A12345", within_3_days=1, within_8_days=0, beyond_8_days=1),
+        PracticeSlaMetrics(ods="B12345", within_3_days=0, within_8_days=2, beyond_8_days=1),
     ]
 
     actual = calculate_sla_by_practice(transfers)

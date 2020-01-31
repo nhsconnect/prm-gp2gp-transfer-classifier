@@ -20,7 +20,7 @@ class SlaBand(Enum):
     BEYOND_8_DAYS = auto()
 
 
-class PracticeSlaSummary(NamedTuple):
+class PracticeSlaMetrics(NamedTuple):
     ods: str
     within_3_days: int
     within_8_days: int
