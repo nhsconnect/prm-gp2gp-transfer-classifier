@@ -1,4 +1,4 @@
-from prmdata.spine.models import Message, ParsedConversation
+from gp2gp.spine.models import Message, ParsedConversation
 from tests.builders.common import a_string, a_datetime
 
 

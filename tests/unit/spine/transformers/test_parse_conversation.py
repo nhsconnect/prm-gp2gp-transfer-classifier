@@ -1,11 +1,11 @@
-from prmdata.spine.models import (
+from gp2gp.spine.models import (
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
     Conversation,
     ParsedConversation,
 )
-from prmdata.spine.transformers import parse_conversation
+from gp2gp.spine.transformers import parse_conversation
 from tests.builders.spine import build_message
 
 

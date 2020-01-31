@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from prmdata.spine.models import Conversation
-from prmdata.spine.transformers import group_into_conversations
+from gp2gp.spine.models import Conversation
+from gp2gp.spine.transformers import group_into_conversations
 from tests.builders.spine import build_message
 
 

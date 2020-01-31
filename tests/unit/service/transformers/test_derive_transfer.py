@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from prmdata.gp2gp.transformers import derive_transfer
+from gp2gp.service.transformers import derive_transfer
 from tests.builders.spine import build_parsed_conversation, build_message
 
 

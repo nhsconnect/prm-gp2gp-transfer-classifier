@@ -2,8 +2,8 @@ from collections import defaultdict
 from datetime import timedelta
 from typing import Iterable, Iterator, Counter, DefaultDict, Set
 
-from prmdata.gp2gp.models import Transfer, ERROR_SUPPRESSED, PracticeSlaMetrics, SlaBand
-from prmdata.spine.models import ParsedConversation
+from gp2gp.service.models import Transfer, ERROR_SUPPRESSED, PracticeSlaMetrics, SlaBand
+from gp2gp.spine.models import ParsedConversation
 
 
 THREE_DAYS_IN_SECONDS = 259200

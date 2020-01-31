@@ -2,8 +2,8 @@ from collections import Counter
 from datetime import timedelta
 from typing import Set, Iterator
 
-from prmdata.gp2gp.models import PracticeSlaMetrics
-from prmdata.gp2gp.transformers import calculate_sla_by_practice
+from gp2gp.service.models import PracticeSlaMetrics
+from gp2gp.service.transformers import calculate_sla_by_practice
 from tests.builders.gp2gp import build_transfer
 
 

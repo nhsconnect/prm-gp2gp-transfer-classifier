@@ -1,4 +1,4 @@
-from prmdata.gp2gp.models import Transfer, PracticeSlaMetrics
+from gp2gp.service.models import Transfer, PracticeSlaMetrics
 from tests.builders.common import a_string, a_duration, an_integer
 
 

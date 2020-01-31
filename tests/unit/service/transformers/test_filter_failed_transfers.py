@@ -1,4 +1,4 @@
-from prmdata.gp2gp.transformers import filter_failed_transfers
+from gp2gp.service.transformers import filter_failed_transfers
 from tests.builders.gp2gp import build_transfer
 
 

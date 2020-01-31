@@ -1,6 +1,6 @@
 import pytest
 
-from prmdata.gp2gp.transformers import filter_practices
+from gp2gp.service.transformers import filter_practices
 from tests.builders.gp2gp import build_practice_summary
 
 

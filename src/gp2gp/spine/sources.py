@@ -4,7 +4,7 @@ from typing import BinaryIO, Iterator
 
 from dateutil import parser
 
-from prmdata.spine.models import Message
+from gp2gp.spine.models import Message
 
 
 def _parse_error_code(error):

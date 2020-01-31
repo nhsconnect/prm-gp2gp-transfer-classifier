@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Iterator, Dict, List, Optional, Iterable
 
-from prmdata.spine.models import (
+from gp2gp.spine.models import (
     Message,
     Conversation,
     ParsedConversation,
