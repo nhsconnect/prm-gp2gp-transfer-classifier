@@ -4,7 +4,13 @@ from typing import Set, Iterable
 
 from freezegun import freeze_time
 
-from gp2gp.dashboard.models import PracticeSummary, TimeToIntegrateSla
+from gp2gp.dashboard.models import (
+    PracticeSummary,
+    TimeToIntegrateSla,
+    MonthlyMetrics,
+    RequestorMetrics,
+    ServiceDashboardData,
+)
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
 from tests.builders.service import build_practice_sla_metrics
 
@@ -83,3 +89,49 @@ def test_dashboard_data_has_correct_requestor_sla_metrics_given_single_practice(
     time_to_integrate_sla = actual.practices[0].metrics[0].requestor.time_to_integrate_sla
 
     assert time_to_integrate_sla == expected_requestor_sla_metrics
+
+
+@freeze_time(datetime(year=2020, month=1, day=2, hour=23, second=42))
+def test_dashboard_data_has_correct_requestor_sla_metrics_given_two_practices():
+    sla_metrics = [
+        build_practice_sla_metrics(ods="A12345", within_3_days=1, within_8_days=0, beyond_8_days=2),
+        build_practice_sla_metrics(ods="Z98765", within_3_days=0, within_8_days=5, beyond_8_days=2),
+    ]
+
+    expected = ServiceDashboardData(
+        generated_on=datetime(year=2020, month=1, day=2, hour=23, second=42),
+        practices=[
+            PracticeSummary(
+                ods="A12345",
+                metrics=[
+                    MonthlyMetrics(
+                        year=2020,
+                        month=1,
+                        requestor=RequestorMetrics(
+                            time_to_integrate_sla=TimeToIntegrateSla(
+                                within_3_days=1, within_8_days=0, beyond_8_days=2
+                            )
+                        ),
+                    )
+                ],
+            ),
+            PracticeSummary(
+                ods="Z98765",
+                metrics=[
+                    MonthlyMetrics(
+                        year=2020,
+                        month=1,
+                        requestor=RequestorMetrics(
+                            time_to_integrate_sla=TimeToIntegrateSla(
+                                within_3_days=0, within_8_days=5, beyond_8_days=2
+                            )
+                        ),
+                    )
+                ],
+            ),
+        ],
+    )
+
+    actual = construct_service_dashboard_data(sla_metrics, 2020, 1)
+
+    assert actual == expected

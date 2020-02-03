@@ -26,7 +26,9 @@ def construct_service_dashboard_data(
                         month=month,
                         requestor=RequestorMetrics(
                             time_to_integrate_sla=TimeToIntegrateSla(
-                                within_3_days=1, within_8_days=0, beyond_8_days=2
+                                within_3_days=practice.within_3_days,
+                                within_8_days=practice.within_8_days,
+                                beyond_8_days=practice.beyond_8_days,
                             )
                         ),
                     )
