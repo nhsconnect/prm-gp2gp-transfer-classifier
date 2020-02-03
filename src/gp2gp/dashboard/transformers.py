@@ -1,14 +1,18 @@
 from datetime import datetime
 from typing import Iterable
 
-from gp2gp.dashboard.models import ServiceDashboardData, PracticeSummary
+from gp2gp.dashboard.models import ServiceDashboardData, PracticeSummary, MonthlyMetrics
 from gp2gp.service.models import PracticeSlaMetrics
 
 
 def construct_service_dashboard_data(
-    sla_metrics: Iterable[PracticeSlaMetrics],
+    sla_metrics: Iterable[PracticeSlaMetrics], year: int
 ) -> ServiceDashboardData:
+
     return ServiceDashboardData(
         generated_on=datetime.now(),
-        practices=[PracticeSummary(ods=practice.ods) for practice in sla_metrics],
+        practices=[
+            PracticeSummary(ods=practice.ods, metrics=[MonthlyMetrics(year=year)])
+            for practice in sla_metrics
+        ],
     )
