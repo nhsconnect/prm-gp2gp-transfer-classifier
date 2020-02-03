@@ -4,7 +4,7 @@ from typing import Set, Iterable
 
 from freezegun import freeze_time
 
-from gp2gp.dashboard.models import PracticeSummary
+from gp2gp.dashboard.models import PracticeSummary, TimeToIntegrateSla
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
 from tests.builders.service import build_practice_sla_metrics
 
@@ -70,3 +70,16 @@ def test_dashboard_data_has_correct_month_given_a_single_practice():
     actual = construct_service_dashboard_data(sla_metrics, A_YEAR, 11)
 
     assert actual.practices[0].metrics[0].month == expected_month
+
+
+def test_dashboard_data_has_correct_requestor_sla_metrics_given_single_practice():
+    sla_metrics = [build_practice_sla_metrics(within_3_days=1, within_8_days=0, beyond_8_days=2)]
+
+    expected_requestor_sla_metrics = TimeToIntegrateSla(
+        within_3_days=1, within_8_days=0, beyond_8_days=2
+    )
+
+    actual = construct_service_dashboard_data(sla_metrics, A_YEAR, A_MONTH)
+    time_to_integrate_sla = actual.practices[0].metrics[0].requestor.time_to_integrate_sla
+
+    assert time_to_integrate_sla == expected_requestor_sla_metrics
