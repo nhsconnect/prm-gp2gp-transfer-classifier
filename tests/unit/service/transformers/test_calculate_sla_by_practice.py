@@ -4,7 +4,7 @@ from typing import Set, Iterator
 
 from gp2gp.service.models import PracticeSlaMetrics
 from gp2gp.service.transformers import calculate_sla_by_practice
-from tests.builders.gp2gp import build_transfer
+from tests.builders.service import build_transfer
 
 
 def _assert_has_ods_codes(practices: Iterator[PracticeSlaMetrics], expected: Set[str]):

@@ -1,7 +1,7 @@
 import pytest
 
 from gp2gp.service.transformers import filter_practices
-from tests.builders.gp2gp import build_practice_summary
+from tests.builders.service import build_practice_summary
 
 
 PRACTICE_A = build_practice_summary(ods="A12345")

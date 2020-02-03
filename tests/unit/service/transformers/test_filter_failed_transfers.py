@@ -1,5 +1,5 @@
 from gp2gp.service.transformers import filter_failed_transfers
-from tests.builders.gp2gp import build_transfer
+from tests.builders.service import build_transfer
 
 
 def test_filter_failed_transfers_excludes_failed():
