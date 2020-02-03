@@ -9,5 +9,6 @@ def construct_service_dashboard_data(
     sla_metrics: Iterable[PracticeSlaMetrics],
 ) -> ServiceDashboardData:
     return ServiceDashboardData(
-        generated_on=datetime.now(), practices=[PracticeSummary(ods="A12345")]
+        generated_on=datetime.now(),
+        practices=[PracticeSummary(ods=practice.ods) for practice in sla_metrics],
     )
