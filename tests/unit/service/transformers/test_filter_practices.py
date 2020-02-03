@@ -1,12 +1,12 @@
 import pytest
 
 from gp2gp.service.transformers import filter_practices
-from tests.builders.service import build_practice_summary
+from tests.builders.service import build_practice_sla_metrics
 
 
-PRACTICE_A = build_practice_summary(ods="A12345")
+PRACTICE_A = build_practice_sla_metrics(ods="A12345")
 ODS_CODE_A = "A12345"
-PRACTICE_B = build_practice_summary(ods="X67890")
+PRACTICE_B = build_practice_sla_metrics(ods="X67890")
 ODS_CODE_B = "X67890"
 ODS_CODE_C = "P54321"
 

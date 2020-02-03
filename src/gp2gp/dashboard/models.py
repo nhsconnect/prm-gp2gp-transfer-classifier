@@ -4,6 +4,7 @@ from typing import NamedTuple, List
 
 class MonthlyMetrics(NamedTuple):
     year: int
+    month: int
 
 
 class PracticeSummary(NamedTuple):

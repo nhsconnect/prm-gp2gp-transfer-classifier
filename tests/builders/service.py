@@ -13,7 +13,7 @@ def build_transfer(**kwargs):
     )
 
 
-def build_practice_summary(**kwargs):
+def build_practice_sla_metrics(**kwargs):
     return PracticeSlaMetrics(
         ods=kwargs.get("ods", a_string(6)),
         within_3_days=kwargs.get("within_3_days", an_integer()),
