@@ -1,28 +1,34 @@
+from dataclasses import dataclass
 from datetime import datetime
-from typing import NamedTuple, List
+from typing import List
 
 
-class TimeToIntegrateSla(NamedTuple):
+@dataclass
+class TimeToIntegrateSla:
     within_3_days: int
     within_8_days: int
     beyond_8_days: int
 
 
-class RequestorMetrics(NamedTuple):
+@dataclass
+class RequestorMetrics:
     time_to_integrate_sla: TimeToIntegrateSla
 
 
-class MonthlyMetrics(NamedTuple):
+@dataclass
+class MonthlyMetrics:
     year: int
     month: int
     requestor: RequestorMetrics
 
 
-class PracticeSummary(NamedTuple):
+@dataclass
+class PracticeSummary:
     ods: str
     metrics: List[MonthlyMetrics]
 
 
-class ServiceDashboardData(NamedTuple):
+@dataclass
+class ServiceDashboardData:
     generated_on: datetime
     practices: List[PracticeSummary]
