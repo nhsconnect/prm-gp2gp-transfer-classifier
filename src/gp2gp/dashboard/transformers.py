@@ -5,7 +5,7 @@ from gp2gp.dashboard.models import (
     ServiceDashboardData,
     PracticeSummary,
     MonthlyMetrics,
-    RequestorMetrics,
+    RequesterMetrics,
     TimeToIntegrateSla,
 )
 from gp2gp.service.models import PracticeSlaMetrics
@@ -24,7 +24,7 @@ def construct_service_dashboard_data(
                     MonthlyMetrics(
                         year=year,
                         month=month,
-                        requestor=RequestorMetrics(
+                        requester=RequesterMetrics(
                             time_to_integrate_sla=TimeToIntegrateSla(
                                 within_3_days=practice.within_3_days,
                                 within_8_days=practice.within_8_days,

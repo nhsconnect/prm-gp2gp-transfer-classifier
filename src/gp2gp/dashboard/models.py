@@ -11,7 +11,7 @@ class TimeToIntegrateSla:
 
 
 @dataclass
-class RequestorMetrics:
+class RequesterMetrics:
     time_to_integrate_sla: TimeToIntegrateSla
 
 
@@ -19,7 +19,7 @@ class RequestorMetrics:
 class MonthlyMetrics:
     year: int
     month: int
-    requestor: RequestorMetrics
+    requester: RequesterMetrics
 
 
 @dataclass

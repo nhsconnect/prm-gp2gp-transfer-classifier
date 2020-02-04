@@ -6,7 +6,7 @@ from gp2gp.dashboard.models import (
     ServiceDashboardData,
     PracticeSummary,
     MonthlyMetrics,
-    RequestorMetrics,
+    RequesterMetrics,
     TimeToIntegrateSla,
 )
 
@@ -45,7 +45,7 @@ def test_write_service_dashboard_json_correctly_serializes_practices():
                     MonthlyMetrics(
                         year=2020,
                         month=1,
-                        requestor=RequestorMetrics(
+                        requester=RequesterMetrics(
                             time_to_integrate_sla=TimeToIntegrateSla(
                                 within_3_days=1, within_8_days=0, beyond_8_days=2
                             )
@@ -67,7 +67,7 @@ def test_write_service_dashboard_json_correctly_serializes_practices():
                         {
                             "year": 2020,
                             "month": 1,
-                            "requestor": {
+                            "requester": {
                                 "timeToIntegrateSla": {
                                     "within3Days": 1,
                                     "within8Days": 0,
