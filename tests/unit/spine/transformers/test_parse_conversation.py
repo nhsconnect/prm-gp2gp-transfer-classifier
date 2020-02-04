@@ -1,7 +1,7 @@
 from gp2gp.spine.models import (
-    EHR_REQUEST_STARTED,
-    EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
+    EHR_REQUEST_COMPLETED,
+    EHR_REQUEST_STARTED,
     Conversation,
     ParsedConversation,
 )

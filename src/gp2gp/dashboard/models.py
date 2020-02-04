@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import NamedTuple, List
+from typing import List, NamedTuple
 
 
 class TimeToIntegrateSla(NamedTuple):

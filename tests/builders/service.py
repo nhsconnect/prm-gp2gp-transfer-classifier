@@ -1,5 +1,5 @@
-from gp2gp.service.models import Transfer, PracticeSlaMetrics
-from tests.builders.common import a_string, a_duration, an_integer
+from gp2gp.service.models import PracticeSlaMetrics, Transfer
+from tests.builders.common import a_duration, a_string, an_integer
 
 
 def build_transfer(**kwargs):

@@ -3,7 +3,6 @@ import gzip
 from typing import BinaryIO, Iterator
 
 from dateutil import parser
-
 from gp2gp.spine.models import Message
 
 

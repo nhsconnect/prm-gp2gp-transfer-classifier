@@ -1,14 +1,14 @@
 from collections import defaultdict
 from datetime import datetime
-from typing import Iterator, Dict, List, Optional, Iterable
+from typing import Dict, Iterable, Iterator, List, Optional
 
 from gp2gp.spine.models import (
-    Message,
-    Conversation,
-    ParsedConversation,
     APPLICATION_ACK,
-    EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
+    EHR_REQUEST_STARTED,
+    Conversation,
+    Message,
+    ParsedConversation,
 )
 
 

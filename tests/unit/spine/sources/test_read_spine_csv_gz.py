@@ -1,9 +1,10 @@
-from io import BytesIO
 import gzip
 from datetime import datetime
+from io import BytesIO
+
 from dateutil import tz
-from gp2gp.spine.sources import read_spine_csv_gz
 from gp2gp.spine.models import Message
+from gp2gp.spine.sources import read_spine_csv_gz
 
 _SPINE_CSV_FIELDS = [
     "_time",

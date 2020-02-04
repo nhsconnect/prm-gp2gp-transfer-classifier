@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from gp2gp.service.transformers import derive_transfer
-from tests.builders.spine import build_parsed_conversation, build_message
+from tests.builders.spine import build_message, build_parsed_conversation
 
 
 def test_derive_transfer_extracts_conversation_id():

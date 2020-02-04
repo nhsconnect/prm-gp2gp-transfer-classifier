@@ -1,8 +1,6 @@
 import pytest
-
 from gp2gp.service.transformers import filter_practices
 from tests.builders.service import build_practice_sla_metrics
-
 
 PRACTICE_A = build_practice_sla_metrics(ods="A12345")
 ODS_CODE_A = "A12345"

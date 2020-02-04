@@ -1,6 +1,6 @@
 from datetime import timedelta
-from typing import NamedTuple, Optional
 from enum import Enum, auto
+from typing import NamedTuple, Optional
 
 ERROR_SUPPRESSED = 15
 

@@ -1,6 +1,6 @@
 from collections import Counter
 from datetime import timedelta
-from typing import Set, Iterator
+from typing import Iterator, Set
 
 from gp2gp.service.models import PracticeSlaMetrics
 from gp2gp.service.transformers import calculate_sla_by_practice

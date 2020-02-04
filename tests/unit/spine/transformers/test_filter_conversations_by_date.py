@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from gp2gp.spine.transformers import filter_conversations_by_request_started_time
-from tests.builders.spine import build_parsed_conversation, build_message
+from tests.builders.spine import build_message, build_parsed_conversation
 
 
 def test_filter_conversations_by_request_started_time_keeps_conversation_within_range():

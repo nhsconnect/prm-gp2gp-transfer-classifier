@@ -2,10 +2,10 @@ from datetime import datetime
 from typing import Iterable
 
 from gp2gp.dashboard.models import (
-    ServiceDashboardData,
-    PracticeSummary,
     MonthlyMetrics,
+    PracticeSummary,
     RequestorMetrics,
+    ServiceDashboardData,
     TimeToIntegrateSla,
 )
 from gp2gp.service.models import PracticeSlaMetrics

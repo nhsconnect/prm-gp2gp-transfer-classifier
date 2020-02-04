@@ -1,15 +1,14 @@
 from collections import Counter
 from datetime import datetime
-from typing import Set, Iterable
+from typing import Iterable, Set
 
 from freezegun import freeze_time
-
 from gp2gp.dashboard.models import (
-    PracticeSummary,
-    TimeToIntegrateSla,
     MonthlyMetrics,
+    PracticeSummary,
     RequestorMetrics,
     ServiceDashboardData,
+    TimeToIntegrateSla,
 )
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
 from tests.builders.service import build_practice_sla_metrics
