@@ -2,6 +2,7 @@ from collections import Counter
 from datetime import datetime
 from typing import Set, Iterable
 
+from dateutil.tz.tz import tzutc
 from freezegun import freeze_time
 
 from gp2gp.dashboard.models import (
@@ -24,11 +25,11 @@ def _assert_has_ods_codes(practices: Iterable[PracticeSummary], expected: Set[st
     assert actual_counts == expected_counts
 
 
-@freeze_time(datetime(year=2019, month=6, day=2, hour=23, second=42))
+@freeze_time(datetime(year=2019, month=6, day=2, hour=23, second=42), tz_offset=0)
 def test_dashboard_data_has_correct_generated_on_given_time():
     sla_metrics = []
 
-    expected_generated_on = datetime(year=2019, month=6, day=2, hour=23, second=42)
+    expected_generated_on = datetime(year=2019, month=6, day=2, hour=23, second=42, tzinfo=tzutc())
 
     actual = construct_service_dashboard_data(sla_metrics, A_YEAR, A_MONTH)
 
@@ -91,7 +92,7 @@ def test_dashboard_data_has_correct_requester_sla_metrics_given_single_practice(
     assert time_to_integrate_sla == expected_requester_sla_metrics
 
 
-@freeze_time(datetime(year=2020, month=1, day=2, hour=23, second=42))
+@freeze_time(datetime(year=2020, month=1, day=2, hour=23, second=42), tz_offset=0)
 def test_dashboard_data_has_correct_requester_sla_metrics_given_two_practices():
     sla_metrics = [
         build_practice_sla_metrics(ods="A12345", within_3_days=1, within_8_days=0, beyond_8_days=2),
@@ -99,7 +100,7 @@ def test_dashboard_data_has_correct_requester_sla_metrics_given_two_practices():
     ]
 
     expected = ServiceDashboardData(
-        generated_on=datetime(year=2020, month=1, day=2, hour=23, second=42),
+        generated_on=datetime(year=2020, month=1, day=2, hour=23, second=42, tzinfo=tzutc()),
         practices=[
             PracticeSummary(
                 ods="A12345",

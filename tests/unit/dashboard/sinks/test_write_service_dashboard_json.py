@@ -2,6 +2,8 @@ import json
 from datetime import datetime
 from io import StringIO
 
+from dateutil.tz import tzutc
+
 from gp2gp.dashboard.models import (
     ServiceDashboardData,
     PracticeSummary,
@@ -22,13 +24,13 @@ def _assert_output_file_contains(outfile: StringIO, expected: str):
 def test_write_service_dashboard_json_correctly_serializes_generated_on():
     dashboard_data = ServiceDashboardData(
         generated_on=datetime(
-            year=2020, month=1, day=1, hour=11, minute=0, second=7, microsecond=1
+            year=2020, month=1, day=1, hour=11, minute=0, second=7, microsecond=1, tzinfo=tzutc()
         ),
         practices=[],
     )
     outfile = StringIO()
 
-    expected = json.dumps({"generatedOn": "2020-01-01T11:00:07.000001", "practices": []})
+    expected = json.dumps({"generatedOn": "2020-01-01T11:00:07.000001+00:00", "practices": []})
 
     write_service_dashboard_json(dashboard_data, outfile)
 
@@ -37,7 +39,7 @@ def test_write_service_dashboard_json_correctly_serializes_generated_on():
 
 def test_write_service_dashboard_json_correctly_serializes_practices():
     dashboard_data = ServiceDashboardData(
-        generated_on=datetime(year=2020, month=1, day=1),
+        generated_on=datetime(year=2020, month=1, day=1, tzinfo=tzutc()),
         practices=[
             PracticeSummary(
                 ods="A12345",
@@ -59,7 +61,7 @@ def test_write_service_dashboard_json_correctly_serializes_practices():
 
     expected = json.dumps(
         {
-            "generatedOn": "2020-01-01T00:00:00",
+            "generatedOn": "2020-01-01T00:00:00+00:00",
             "practices": [
                 {
                     "ods": "A12345",

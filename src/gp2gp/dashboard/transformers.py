@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Iterable
 
+from dateutil.tz import tzutc
+
 from gp2gp.dashboard.models import (
     ServiceDashboardData,
     PracticeSummary,
@@ -16,7 +18,7 @@ def construct_service_dashboard_data(
 ) -> ServiceDashboardData:
 
     return ServiceDashboardData(
-        generated_on=datetime.now(),
+        generated_on=datetime.now(tzutc()),
         practices=[
             PracticeSummary(
                 ods=practice.ods,

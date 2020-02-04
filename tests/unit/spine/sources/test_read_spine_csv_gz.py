@@ -1,7 +1,7 @@
 from io import BytesIO
 import gzip
 from datetime import datetime
-from dateutil import tz
+from dateutil.tz import tzutc
 from gp2gp.spine.sources import read_spine_csv_gz
 from gp2gp.spine.models import Message
 
@@ -81,7 +81,7 @@ def test_read_spine_csv_gz():
     actual = read_spine_csv_gz(buffer)
     expected = [
         Message(
-            time=datetime(2019, 12, 31, 23, 37, 55, 334000, tz.UTC),
+            time=datetime(2019, 12, 31, 23, 37, 55, 334000, tzutc()),
             conversation_id="3802F7D7-EDA8-483F-AFE1-E1C615116B89",
             guid="915E57C0-2C26-11EA-B3D8-48DF371F5668",
             interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
@@ -91,7 +91,7 @@ def test_read_spine_csv_gz():
             error_code=None,
         ),
         Message(
-            time=datetime(2019, 12, 31, 22, 16, 2, 249000, tz.UTC),
+            time=datetime(2019, 12, 31, 22, 16, 2, 249000, tzutc()),
             conversation_id="CD9DF846-AD3F-4FA6-A47A-12D32117127A",
             guid="2DCC8689-008B-423A-9D40-937AF235BCAF",
             interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
