@@ -14,6 +14,7 @@ _SPINE_CSV_FIELDS = [
     "toNACS",
     "messageRef",
     "jdiEvent",
+    "_raw",
 ]
 
 
