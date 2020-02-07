@@ -34,7 +34,7 @@ def _is_pending(conversation):
     return conversation.request_completed_ack is None
 
 
-def derive_transfer(conversation: ParsedConversation) -> Transfer:
+def _derive_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_calculate_sla(conversation),
@@ -43,6 +43,10 @@ def derive_transfer(conversation: ParsedConversation) -> Transfer:
         error_code=_extract_error_code(conversation),
         pending=_is_pending(conversation),
     )
+
+
+def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Transfer]:
+    return (_derive_transfer(c) for c in conversations)
 
 
 def _is_successful(transfer):

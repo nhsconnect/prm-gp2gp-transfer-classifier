@@ -13,7 +13,7 @@ from gp2gp.spine.transformers import (
     filter_conversations_by_request_started_time,
 )
 from gp2gp.service.transformers import (
-    derive_transfer,
+    derive_transfers,
     filter_failed_transfers,
     filter_pending_transfers,
     calculate_sla_by_practice,
@@ -48,11 +48,6 @@ def parse_conversations(conversations):
         gp2gp_conversation = parse_conversation(conversation)
         if gp2gp_conversation is not None:
             yield gp2gp_conversation
-
-
-def derive_transfers(conversations):
-    for conversation in conversations:
-        yield derive_transfer(conversation)
 
 
 def process_messages(messages, start, end, practice_ods_codes):
