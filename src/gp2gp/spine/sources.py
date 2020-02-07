@@ -1,6 +1,6 @@
 import csv
 import gzip
-from typing import BinaryIO, Iterator
+from typing import BinaryIO, Iterator, List
 
 from dateutil import parser
 
@@ -13,6 +13,12 @@ def _parse_error_code(error):
 
 def _parse_message_ref(ref):
     return None if ref == "NotProvided" else ref
+
+
+def read_spine_csv_gz_files(input_file_paths: List[str]) -> Iterator[Message]:
+    for file_path in input_file_paths:
+        with open(file_path, "rb") as f:
+            yield from read_spine_csv_gz(f)
 
 
 def read_spine_csv_gz(input_file: BinaryIO) -> Iterator[Message]:

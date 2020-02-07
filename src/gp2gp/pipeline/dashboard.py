@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 
-from gp2gp.spine.sources import read_spine_csv_gz
+from gp2gp.spine.sources import read_spine_csv_gz_files
 from gp2gp.spine.transformers import (
     group_into_conversations,
     parse_conversation,
@@ -35,12 +35,6 @@ def parse_dashboard_pipeline_arguments(args):
     parser.add_argument("--input-files", type=_list_str)
     parser.add_argument("--output-file", type=str)
     return parser.parse_args(args)
-
-
-def read_messages(filepaths):
-    for filepath in filepaths:
-        with open(filepath, "rb") as f:
-            yield from read_spine_csv_gz(f)
 
 
 def parse_conversations(conversations):
@@ -80,7 +74,7 @@ def main():
 
     output_file_path = args.output_file
 
-    spine_messages = read_messages(args.input_files)
+    spine_messages = read_spine_csv_gz_files(args.input_files)
     service_dashboard_data = process_messages(
         spine_messages, metric_month, next_month, args.ods_codes
     )
