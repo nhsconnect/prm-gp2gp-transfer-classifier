@@ -32,7 +32,8 @@ def parse_dashboard_pipeline_arguments(args):
     parser.add_argument("--month", type=int)
     parser.add_argument("--year", type=int)
     parser.add_argument("--ods-codes", type=_list_str)
-    parser.add_argument("--spine-files", type=_list_str)
+    parser.add_argument("--input-files", type=_list_str)
+    parser.add_argument("--output-file", type=str)
     return parser.parse_args(args)
 
 
@@ -71,11 +72,8 @@ def process_messages(messages, start, end, practice_ods_codes):
     return dashboard_data
 
 
-def write_service_dashboard_jsonfile(dashboard_data, month):
-    month_name = month.strftime("%b").lower()
-    year = month.strftime("%Y")
-    output_filepath = f"dashboard_{month_name}_{year}.json"
-    with open(output_filepath, "w") as f:
+def write_service_dashboard_json_file(dashboard_data, output_file_path):
+    with open(output_file_path, "w") as f:
         write_service_dashboard_json(dashboard_data, f)
 
 
@@ -85,9 +83,11 @@ def main():
     metric_month = datetime(args.year, args.month, 1, tzinfo=tzutc())
     next_month = metric_month + relativedelta(months=1)
 
-    spine_messages = read_messages(args.spine_files)
+    output_file_path = args.output_file
+
+    spine_messages = read_messages(args.input_files)
     service_dashboard_data = process_messages(
         spine_messages, metric_month, next_month, args.ods_codes
     )
 
-    write_service_dashboard_jsonfile(service_dashboard_data, metric_month)
+    write_service_dashboard_json_file(service_dashboard_data, output_file_path)

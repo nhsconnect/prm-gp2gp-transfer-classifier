@@ -1,5 +1,4 @@
 import json
-import os
 import subprocess
 import gzip
 import shutil
@@ -43,13 +42,12 @@ def test_service_dashboard_pipeline(datadir):
     month = 12
     year = 2019
 
-    os.chdir(datadir)
-
     pipeline_command = f"\
         gp2gp-dashboard-pipeline --month {month}\
         --year {year}\
         --ods-codes {practice_ods_codes_str}\
-        --spine-files {input_file_paths_str}\
+        --input-files {input_file_paths_str}\
+        --output-file {output_file_path}\
     "
 
     process = subprocess.Popen(pipeline_command, shell=True)
