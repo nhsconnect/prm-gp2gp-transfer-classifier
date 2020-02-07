@@ -1,0 +1,16 @@
+[
+  {
+    "ods": "A12345",
+    "metrics": [
+      {
+        "year": 2019,
+        "month": 12,
+        "requester": {
+          "timeToIntegrateSla": {
+            "within3Days": 1, "within8Days": 0, "beyond8Days": 0
+          }
+        }
+      }
+    ]
+  }
+]

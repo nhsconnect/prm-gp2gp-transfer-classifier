@@ -6,4 +6,5 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=["python-dateutil~=2.8"],
+    entry_points={"console_scripts": ["gp2gp-dashboard-pipeline=gp2gp.pipeline.dashboard:main"]},
 )

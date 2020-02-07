@@ -1,0 +1,4 @@
+"_time",conversationID,GUID,interactionID,fromNACS,toNACS,messageRef,jdiEvent,"_raw"
+"2019-12-30T18:02:29.985+0000","abc","abc","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",A12345,B56789,NotProvided,NONE,
+"2019-12-30T18:03:21.908+0000","abc","abc_1","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",B56789,A12345,NotProvided,NONE,
+"2019-12-30T18:03:23.982+0000","abc","abc_2","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",B56789,A12345,"abc",NONE,
