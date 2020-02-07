@@ -2,7 +2,7 @@ import gzip
 from io import BytesIO
 
 
-def build_csv_contents(header, rows):
+def _build_csv_contents(header, rows):
     def build_line(values):
         return ",".join(values)
 
@@ -12,7 +12,7 @@ def build_csv_contents(header, rows):
     return "\n".join([header_line] + row_lines)
 
 
-def build_gzip_buffer(contents):
+def _build_gzip_buffer(contents):
     buffer = BytesIO()
     with gzip.open(buffer, "wt") as f:
         f.write(contents)
@@ -21,6 +21,6 @@ def build_gzip_buffer(contents):
 
 
 def build_gzip_csv(header, rows):
-    contents = build_csv_contents(header, rows)
-    buffer = build_gzip_buffer(contents)
+    contents = _build_csv_contents(header, rows)
+    buffer = _build_gzip_buffer(contents)
     return buffer.getvalue()

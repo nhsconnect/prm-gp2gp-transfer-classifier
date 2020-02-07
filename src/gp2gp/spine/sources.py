@@ -18,10 +18,10 @@ def _parse_message_ref(ref):
 def read_spine_csv_gz_files(input_file_paths: List[str]) -> Iterator[Message]:
     for file_path in input_file_paths:
         with open(file_path, "rb") as f:
-            yield from read_spine_csv_gz(f)
+            yield from _read_spine_csv_gz(f)
 
 
-def read_spine_csv_gz(input_file: BinaryIO) -> Iterator[Message]:
+def _read_spine_csv_gz(input_file: BinaryIO) -> Iterator[Message]:
     with gzip.open(input_file, "rt") as f:
         input_csv = csv.DictReader(f)
         for row in input_csv:
