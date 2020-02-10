@@ -10,11 +10,11 @@ from tests.builders.spine import build_message
 
 
 def test_parse_conversation_parses_a_complete_conversation():
-    request_started_message = build_message(interaction_id=EHR_REQUEST_STARTED,)
+    request_started_message = build_message(interaction_id=EHR_REQUEST_STARTED)
     request_completed_message = build_message(
         guid="54F949C0-DC7F-4EBC-8AE2-72BF2D0AF4EE", interaction_id=EHR_REQUEST_COMPLETED,
     )
-    request_started_ack_message = build_message(interaction_id=APPLICATION_ACK,)
+    request_started_ack_message = build_message(interaction_id=APPLICATION_ACK)
     request_completed_ack_message = build_message(
         interaction_id=APPLICATION_ACK, message_ref="54F949C0-DC7F-4EBC-8AE2-72BF2D0AF4EE",
     )
@@ -40,9 +40,7 @@ def test_parse_conversation_parses_a_complete_conversation():
 
 
 def test_parse_conversation_returns_none_when_start_omitted():
-    request_completed_ack_message = build_message(
-        interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
-    )
+    request_completed_ack_message = build_message(interaction_id=APPLICATION_ACK)
     messages = [request_completed_ack_message]
 
     conversation = Conversation("F8DAFCAA-5012-427B-BDB4-354256A4874B", messages)
@@ -55,15 +53,9 @@ def test_parse_conversation_returns_none_when_start_omitted():
 
 
 def test_parse_conversation_parses_incomplete_conversation():
-    request_started_message = build_message(
-        interaction_id="urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",
-    )
-    request_completed_message = build_message(
-        interaction_id="urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",
-    )
-    request_started_ack_message = build_message(
-        interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
-    )
+    request_started_message = build_message(interaction_id=EHR_REQUEST_STARTED)
+    request_completed_message = build_message(interaction_id=EHR_REQUEST_COMPLETED)
+    request_started_ack_message = build_message(interaction_id=APPLICATION_ACK)
 
     messages = [
         request_started_message,
