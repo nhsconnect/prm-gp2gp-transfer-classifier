@@ -42,7 +42,7 @@ def test_write_service_dashboard_json_correctly_serializes_practices():
         generated_on=datetime(year=2020, month=1, day=1, tzinfo=tzutc()),
         practices=[
             PracticeSummary(
-                ods="A12345",
+                ods_code="A12345",
                 metrics=[
                     MonthlyMetrics(
                         year=2020,
@@ -64,7 +64,7 @@ def test_write_service_dashboard_json_correctly_serializes_practices():
             "generatedOn": "2020-01-01T00:00:00+00:00",
             "practices": [
                 {
-                    "ods": "A12345",
+                    "odsCode": "A12345",
                     "metrics": [
                         {
                             "year": 2020,

@@ -8,8 +8,8 @@ ERROR_SUPPRESSED = 15
 class Transfer(NamedTuple):
     conversation_id: str
     sla_duration: Optional[timedelta]
-    requesting_practice_ods: str
-    sending_practice_ods: str
+    requesting_practice_ods_code: str
+    sending_practice_ods_code: str
     error_code: Optional[int]
     pending: bool
 
@@ -21,7 +21,7 @@ class SlaBand(Enum):
 
 
 class PracticeSlaMetrics(NamedTuple):
-    ods: str
+    ods_code: str
     within_3_days: int
     within_8_days: int
     beyond_8_days: int

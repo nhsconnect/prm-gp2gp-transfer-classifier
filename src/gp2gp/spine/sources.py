@@ -30,8 +30,8 @@ def _read_spine_csv_gz(input_file: BinaryIO) -> Iterator[Message]:
                 conversation_id=row["conversationID"],
                 guid=row["GUID"],
                 interaction_id=row["interactionID"],
-                from_party_ods=row["fromNACS"],
-                to_party_ods=row["toNACS"],
+                from_party_ods_code=row["fromNACS"],
+                to_party_ods_code=row["toNACS"],
                 message_ref=_parse_message_ref(row["messageRef"]),
                 error_code=_parse_error_code(row["jdiEvent"]),
             )

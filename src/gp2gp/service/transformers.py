@@ -16,12 +16,12 @@ def _calculate_sla(conversation):
     return conversation.request_completed_ack.time - conversation.request_completed.time
 
 
-def _extract_requesting_practice_ods(conversation):
-    return conversation.request_started.from_party_ods
+def _extract_requesting_practice_ods_code(conversation):
+    return conversation.request_started.from_party_ods_code
 
 
-def _extract_sending_practice_ods(conversation):
-    return conversation.request_started.to_party_ods
+def _extract_sending_practice_ods_code(conversation):
+    return conversation.request_started.to_party_ods_code
 
 
 def _extract_error_code(conversation):
@@ -38,8 +38,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_calculate_sla(conversation),
-        requesting_practice_ods=_extract_requesting_practice_ods(conversation),
-        sending_practice_ods=_extract_sending_practice_ods(conversation),
+        requesting_practice_ods_code=_extract_requesting_practice_ods_code(conversation),
+        sending_practice_ods_code=_extract_sending_practice_ods_code(conversation),
         error_code=_extract_error_code(conversation),
         pending=_is_pending(conversation),
     )
@@ -75,23 +75,23 @@ def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[Practic
     practice_counts: DefaultDict[str, Counter] = defaultdict(Counter)
 
     for transfer in transfers:
-        ods = transfer.requesting_practice_ods
+        ods_code = transfer.requesting_practice_ods_code
         if transfer.sla_duration is not None:
             sla_band = _assign_to_sla_band(transfer.sla_duration)
-            practice_counts[ods][sla_band] += 1
+            practice_counts[ods_code][sla_band] += 1
 
     return (
         PracticeSlaMetrics(
-            ods,
+            ods_code,
             within_3_days=counts[SlaBand.WITHIN_3_DAYS],
             within_8_days=counts[SlaBand.WITHIN_8_DAYS],
             beyond_8_days=counts[SlaBand.BEYOND_8_DAYS],
         )
-        for ods, counts in practice_counts.items()
+        for ods_code, counts in practice_counts.items()
     )
 
 
 def filter_practices(
     summaries: Iterable[PracticeSlaMetrics], ods_codes: Set[str]
 ) -> Iterator[PracticeSlaMetrics]:
-    return (summary for summary in summaries if summary.ods in ods_codes)
+    return (summary for summary in summaries if summary.ods_code in ods_codes)

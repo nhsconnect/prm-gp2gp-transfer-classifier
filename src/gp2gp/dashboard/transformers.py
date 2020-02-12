@@ -21,7 +21,7 @@ def construct_service_dashboard_data(
         generated_on=datetime.now(tzutc()),
         practices=[
             PracticeSummary(
-                ods=practice.ods,
+                ods_code=practice.ods_code,
                 metrics=[
                     MonthlyMetrics(
                         year=year,

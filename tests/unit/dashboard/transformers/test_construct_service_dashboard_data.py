@@ -20,7 +20,7 @@ A_MONTH = 3
 
 
 def _assert_has_ods_codes(practices: Iterable[PracticeSummary], expected: Set[str]):
-    actual_counts = Counter((practice.ods for practice in practices))
+    actual_counts = Counter((practice.ods_code for practice in practices))
     expected_counts = Counter(expected)
     assert actual_counts == expected_counts
 
@@ -36,31 +36,31 @@ def test_dashboard_data_has_correct_generated_on_given_time():
     assert actual.generated_on == expected_generated_on
 
 
-def test_dashboard_data_has_correct_ods_given_a_single_practice():
-    sla_metrics = [build_practice_sla_metrics(ods="A12345")]
+def test_dashboard_data_has_correct_ods_code_given_a_single_practice():
+    sla_metrics = [build_practice_sla_metrics(ods_code="A12345")]
 
-    expected_ods = "A12345"
+    expected_ods_codes = "A12345"
 
     actual = construct_service_dashboard_data(sla_metrics, A_YEAR, A_MONTH)
 
-    assert actual.practices[0].ods == expected_ods
+    assert actual.practices[0].ods_code == expected_ods_codes
 
 
-def test_dashboard_data_has_correct_ods_given_two_practices():
+def test_dashboard_data_has_correct_ods_code_given_two_practices():
     sla_metrics = [
-        build_practice_sla_metrics(ods="A12345"),
-        build_practice_sla_metrics(ods="Z56789"),
+        build_practice_sla_metrics(ods_code="A12345"),
+        build_practice_sla_metrics(ods_code="Z56789"),
     ]
 
-    expected_ods = {"A12345", "Z56789"}
+    expected_ods_codes = {"A12345", "Z56789"}
 
     actual = construct_service_dashboard_data(sla_metrics, year=A_YEAR, month=A_MONTH)
 
-    _assert_has_ods_codes(actual.practices, expected_ods)
+    _assert_has_ods_codes(actual.practices, expected_ods_codes)
 
 
 def test_dashboard_data_has_correct_year_given_a_single_practice():
-    sla_metrics = [build_practice_sla_metrics(ods="A12345")]
+    sla_metrics = [build_practice_sla_metrics(ods_code="A12345")]
 
     expected_year = 2019
 
@@ -70,7 +70,7 @@ def test_dashboard_data_has_correct_year_given_a_single_practice():
 
 
 def test_dashboard_data_has_correct_month_given_a_single_practice():
-    sla_metrics = [build_practice_sla_metrics(ods="A12345")]
+    sla_metrics = [build_practice_sla_metrics(ods_code="A12345")]
 
     expected_month = 11
 
@@ -95,15 +95,19 @@ def test_dashboard_data_has_correct_requester_sla_metrics_given_single_practice(
 @freeze_time(datetime(year=2020, month=1, day=2, hour=23, second=42), tz_offset=0)
 def test_dashboard_data_has_correct_requester_sla_metrics_given_two_practices():
     sla_metrics = [
-        build_practice_sla_metrics(ods="A12345", within_3_days=1, within_8_days=0, beyond_8_days=2),
-        build_practice_sla_metrics(ods="Z98765", within_3_days=0, within_8_days=5, beyond_8_days=2),
+        build_practice_sla_metrics(
+            ods_code="A12345", within_3_days=1, within_8_days=0, beyond_8_days=2
+        ),
+        build_practice_sla_metrics(
+            ods_code="Z98765", within_3_days=0, within_8_days=5, beyond_8_days=2
+        ),
     ]
 
     expected = ServiceDashboardData(
         generated_on=datetime(year=2020, month=1, day=2, hour=23, second=42, tzinfo=tzutc()),
         practices=[
             PracticeSummary(
-                ods="A12345",
+                ods_code="A12345",
                 metrics=[
                     MonthlyMetrics(
                         year=2020,
@@ -117,7 +121,7 @@ def test_dashboard_data_has_correct_requester_sla_metrics_given_two_practices():
                 ],
             ),
             PracticeSummary(
-                ods="Z98765",
+                ods_code="Z98765",
                 metrics=[
                     MonthlyMetrics(
                         year=2020,
