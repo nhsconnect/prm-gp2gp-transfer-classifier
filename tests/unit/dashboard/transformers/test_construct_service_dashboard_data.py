@@ -2,7 +2,7 @@ from collections import Counter
 from datetime import datetime
 from typing import Set, Iterable
 
-from dateutil.tz.tz import tzutc
+from dateutil.tz import tzutc
 from freezegun import freeze_time
 
 from gp2gp.dashboard.models import (
