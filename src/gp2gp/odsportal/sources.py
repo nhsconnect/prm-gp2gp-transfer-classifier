@@ -20,7 +20,7 @@ class OdsPortalException(Exception):
         self.status_code = status_code
 
 
-def fetch_practice_data(client=requests, url=ODS_PORTAL_SEARCH_URL, params=SEARCH_PARAMS):
+def fetch_practice_data(client, url=ODS_PORTAL_SEARCH_URL, params=SEARCH_PARAMS):
     next_page = "Next-Page"
     response = client.get(url, params)
     if response.status_code != 200:
@@ -37,3 +37,8 @@ def fetch_practice_data(client=requests, url=ODS_PORTAL_SEARCH_URL, params=SEARC
 
 def construct_practice_list(response: List[dict]):
     return [PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in response]
+
+
+def get_practice_list(client=requests):
+    practice_data = fetch_practice_data(client)
+    return construct_practice_list(practice_data)
