@@ -14,9 +14,18 @@ SEARCH_PARAMS = {
 }
 
 
+class OdsPortalException(Exception):
+    def __init__(self, message, status_code):
+        super(OdsPortalException, self).__init__(message)
+        self.status_code = status_code
+
+
 def fetch_practice_data(client=requests, url=ODS_PORTAL_SEARCH_URL, params=SEARCH_PARAMS):
     next_page = "Next-Page"
     response = client.get(url, params)
+    if response.status_code != 200:
+        raise OdsPortalException("Unable to fetch practice data", response.status_code)
+
     practice_data = json.loads(response.content)["Organisations"]
 
     while next_page in response.headers:
