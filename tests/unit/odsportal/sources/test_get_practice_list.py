@@ -5,7 +5,7 @@ from gp2gp.odsportal.sources import get_practice_list
 from tests.builders.odsportal import build_mock_response
 
 
-def test_returns_practice_list_for_single_practive():
+def test_returns_practice_list_for_single_practice():
     mock_client = MagicMock()
     mock_client.get.return_value = build_mock_response(
         b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}'
@@ -16,5 +16,3 @@ def test_returns_practice_list_for_single_practive():
     expected = [PracticeDetails(ods_code="A12345", name="GP Practice")]
 
     assert actual == expected
-
-

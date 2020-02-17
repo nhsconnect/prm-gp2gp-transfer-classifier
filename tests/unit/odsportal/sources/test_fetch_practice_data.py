@@ -34,7 +34,9 @@ def test_returns_combined_list_of_practices_given_several_pages_query():
         url_2: build_mock_response(
             b'{"Organisations": [{"Name": "GP Practice 2", "OrgId": "B64573"}]}', url_3
         ),
-        url_3: build_mock_response(b'{"Organisations": [{"Name": "GP Practice 3", "OrgId": "Y23467"}]}'),
+        url_3: build_mock_response(
+            b'{"Organisations": [{"Name": "GP Practice 3", "OrgId": "Y23467"}]}'
+        ),
     }
 
     mock_client.get.side_effect = lambda *args: pages[args[0]]
