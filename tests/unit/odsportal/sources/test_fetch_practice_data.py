@@ -2,6 +2,14 @@ from unittest.mock import MagicMock
 from gp2gp.odsportal.sources import fetch_practice_data
 
 
+def _mock_response(content, next_page=None):
+    mock_response = MagicMock()
+    mock_response.content = content
+    if next_page is not None:
+        mock_response.headers = {"Next-Page": next_page}
+    return mock_response
+
+
 def test_returns_a_list_of_practices():
     mock_client = MagicMock()
     mock_response = MagicMock()
@@ -18,24 +26,23 @@ def test_returns_a_list_of_practices():
 
 
 def test_returns_combined_list_of_practices_given_several_pages_query():
-    next_page = {"Next-Page": "https://test.link"}
     mock_client = MagicMock()
-    mock_response_1 = MagicMock()
-    mock_response_2 = MagicMock()
-    mock_response_3 = MagicMock()
 
-    binary_content_page_1 = b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}'
-    binary_content_page_2 = b'{"Organisations": [{"Name": "GP Practice 2", "OrgId": "B64573"}]}'
-    binary_content_page_3 = b'{"Organisations": [{"Name": "GP Practice 3", "OrgId": "Y23467"}]}'
+    url_1 = "https://test.link/1"
+    url_2 = "https://test.link/2"
+    url_3 = "https://test.link/3"
 
-    mock_response_1.content = binary_content_page_1
-    mock_response_2.content = binary_content_page_2
-    mock_response_3.content = binary_content_page_3
+    pages = {
+        url_1: _mock_response(
+            b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}', url_2
+        ),
+        url_2: _mock_response(
+            b'{"Organisations": [{"Name": "GP Practice 2", "OrgId": "B64573"}]}', url_3
+        ),
+        url_3: _mock_response(b'{"Organisations": [{"Name": "GP Practice 3", "OrgId": "Y23467"}]}'),
+    }
 
-    mock_response_1.headers = next_page
-    mock_response_2.headers = next_page
-
-    mock_client.get.side_effect = [mock_response_1, mock_response_2, mock_response_3]
+    mock_client.get.side_effect = lambda *args: pages[args[0]]
 
     expected = [
         {"Name": "GP Practice", "OrgId": "A12345"},
@@ -43,6 +50,6 @@ def test_returns_combined_list_of_practices_given_several_pages_query():
         {"Name": "GP Practice 3", "OrgId": "Y23467"},
     ]
 
-    actual = fetch_practice_data(mock_client)
+    actual = fetch_practice_data(mock_client, url_1)
 
     assert actual == expected
