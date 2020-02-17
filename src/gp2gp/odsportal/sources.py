@@ -1,5 +1,9 @@
 import json
+from typing import List
+
 import requests
+
+from gp2gp.odsportal.models import PracticeDetails
 
 ODS_PORTAL_SEARCH_URL = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
 SEARCH_PARAMS = {
@@ -20,3 +24,7 @@ def fetch_practice_data(client=requests, url=ODS_PORTAL_SEARCH_URL, params=SEARC
         practice_data += json.loads(response.content)["Organisations"]
 
     return practice_data
+
+
+def construct_practice_list(response: List[dict]):
+    return [PracticeDetails(ods_code=response[0]["OrgId"], name=response[0]["Name"])]
