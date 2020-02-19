@@ -8,7 +8,7 @@ from tests.builders.odsportal import build_mock_response
 def test_returns_a_list_of_practices():
     mock_client = MagicMock()
     mock_response = build_mock_response(
-        b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}'
+        content=b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}'
     )
 
     mock_client.get.side_effect = [mock_response]
@@ -31,13 +31,15 @@ def test_returns_combined_list_of_practices_given_several_pages_query():
 
     pages = {
         url_1: build_mock_response(
-            b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}', url_2
+            content=b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}',
+            next_page=url_2,
         ),
         url_2: build_mock_response(
-            b'{"Organisations": [{"Name": "GP Practice 2", "OrgId": "B64573"}]}', url_3
+            content=b'{"Organisations": [{"Name": "GP Practice 2", "OrgId": "B64573"}]}',
+            next_page=url_3,
         ),
         url_3: build_mock_response(
-            b'{"Organisations": [{"Name": "GP Practice 3", "OrgId": "Y23467"}]}'
+            content=b'{"Organisations": [{"Name": "GP Practice 3", "OrgId": "Y23467"}]}'
         ),
     }
 
@@ -56,14 +58,35 @@ def test_returns_combined_list_of_practices_given_several_pages_query():
     assert actual == expected
 
 
-def test_throws_custom_exception_when_status_code_is_not_200():
+def test_throws_ods_portal_exception_when_status_code_is_not_200():
     mock_client = MagicMock()
-    mock_response = MagicMock()
-    mock_response.status_code = 500
+    mock_response = build_mock_response(status_code=500)
 
     mock_client.get.side_effect = [mock_response]
 
     fetcher = OdsPracticeDataFetcher(mock_client)
+
+    with pytest.raises(OdsPortalException):
+        fetcher.fetch_practice_data()
+
+
+def test_throws_ods_portal_exception_when_status_code_is_not_200_on_paginated_request():
+    mock_client = MagicMock()
+
+    url_1 = "https://test.link/1"
+    url_2 = "https://test.link/2"
+
+    pages = {
+        url_1: build_mock_response(
+            content=b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}',
+            next_page=url_2,
+        ),
+        url_2: build_mock_response(status_code=500),
+    }
+
+    mock_client.get.side_effect = lambda *args: pages[args[0]]
+
+    fetcher = OdsPracticeDataFetcher(mock_client, search_url=url_1)
 
     with pytest.raises(OdsPortalException):
         fetcher.fetch_practice_data()
