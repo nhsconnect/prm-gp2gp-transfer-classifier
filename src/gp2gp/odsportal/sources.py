@@ -6,7 +6,7 @@ import requests
 from gp2gp.odsportal.models import PracticeDetails
 
 ODS_PORTAL_SEARCH_URL = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
-SEARCH_PARAMS = {
+DEFAULT_SEARCH_PARAMS = {
     "PrimaryRoleId": "RO177",
     "Status": "Active",
     "NonPrimaryRoleId": "RO76",
@@ -20,25 +20,32 @@ class OdsPortalException(Exception):
         self.status_code = status_code
 
 
-def fetch_practice_data(client, url=ODS_PORTAL_SEARCH_URL, params=SEARCH_PARAMS):
-    next_page = "Next-Page"
-    response = client.get(url, params)
-    if response.status_code != 200:
-        raise OdsPortalException("Unable to fetch practice data", response.status_code)
+class OdsPracticeDataFetcher:
+    def __init__(self, client=requests, search_url=ODS_PORTAL_SEARCH_URL):
+        self._search_url = search_url
+        self._client = client
 
-    practice_data = json.loads(response.content)["Organisations"]
+    def fetch_practice_data(self, params=None):
+        if params is None:
+            params = DEFAULT_SEARCH_PARAMS
+        next_page = "Next-Page"
+        response = self._client.get(self._search_url, params)
 
-    while next_page in response.headers:
-        response = client.get(response.headers[next_page])
+        if response.status_code != 200:
+            raise OdsPortalException("Unable to fetch practice data", response.status_code)
+
+        practice_data = []
         practice_data += json.loads(response.content)["Organisations"]
 
-    return practice_data
+        while next_page in response.headers:
+            response = self._client.get(response.headers[next_page])
+            practice_data += json.loads(response.content)["Organisations"]
+
+        return practice_data
 
 
-def construct_practice_list(response: List[dict]):
+def construct_practice_list(data_fetcher=None) -> List[PracticeDetails]:
+    if data_fetcher is None:
+        data_fetcher = OdsPracticeDataFetcher()
+    response = data_fetcher.fetch_practice_data()
     return [PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in response]
-
-
-def get_practice_list(client=requests):
-    practice_data = fetch_practice_data(client)
-    return construct_practice_list(practice_data)

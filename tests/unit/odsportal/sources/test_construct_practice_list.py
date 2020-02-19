@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.odsportal.sources import construct_practice_list
 from tests.builders.common import a_string
@@ -19,8 +21,10 @@ def _build_practice_data(**kwargs):
 
 def test_returns_single_practice():
     response_data = [_build_practice_data(name="GP Practice", org_id="A12345")]
+    mock_fetcher = MagicMock()
+    mock_fetcher.fetch_practice_data.return_value = response_data
 
-    actual = construct_practice_list(response_data)
+    actual = construct_practice_list(data_fetcher=mock_fetcher)
 
     expected = [PracticeDetails(ods_code="A12345", name="GP Practice")]
 
@@ -32,8 +36,10 @@ def test_returns_two_practices():
         _build_practice_data(name="GP Practice", org_id="A12345"),
         _build_practice_data(name="Another GP Practice", org_id="B56789"),
     ]
+    mock_fetcher = MagicMock()
+    mock_fetcher.fetch_practice_data.return_value = response_data
 
-    actual = construct_practice_list(response_data)
+    actual = construct_practice_list(data_fetcher=mock_fetcher)
 
     expected = [
         PracticeDetails(ods_code="A12345", name="GP Practice"),
