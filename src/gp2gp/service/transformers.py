@@ -1,7 +1,8 @@
-from collections import defaultdict
 from datetime import timedelta
-from typing import Iterable, Iterator, Counter, DefaultDict, Set
+from typing import Iterable, Iterator
+from warnings import warn
 
+from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.models import Transfer, ERROR_SUPPRESSED, PracticeSlaMetrics, SlaBand
 from gp2gp.spine.models import ParsedConversation
 
@@ -71,14 +72,20 @@ def _assign_to_sla_band(sla_duration: timedelta):
         return SlaBand.BEYOND_8_DAYS
 
 
-def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[PracticeSlaMetrics]:
-    practice_counts: DefaultDict[str, Counter] = defaultdict(Counter)
+def calculate_sla_by_practice(
+    practice_list: Iterable[PracticeDetails], transfers: Iterable[Transfer]
+) -> Iterator[PracticeSlaMetrics]:
+    default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
+    practice_counts = {p.ods_code: default_sla.copy() for p in practice_list}
 
     for transfer in transfers:
         ods_code = transfer.requesting_practice_ods_code
         if transfer.sla_duration is not None:
-            sla_band = _assign_to_sla_band(transfer.sla_duration)
-            practice_counts[ods_code][sla_band] += 1
+            if ods_code in practice_counts:
+                sla_band = _assign_to_sla_band(transfer.sla_duration)
+                practice_counts[ods_code][sla_band] += 1
+            else:
+                warn(f"Unexpected ODS code found: {ods_code}", RuntimeWarning)
 
     return (
         PracticeSlaMetrics(
@@ -89,9 +96,3 @@ def calculate_sla_by_practice(transfers: Iterable[Transfer]) -> Iterator[Practic
         )
         for ods_code, counts in practice_counts.items()
     )
-
-
-def filter_practices(
-    summaries: Iterable[PracticeSlaMetrics], ods_codes: Set[str]
-) -> Iterator[PracticeSlaMetrics]:
-    return (summary for summary in summaries if summary.ods_code in ods_codes)

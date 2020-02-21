@@ -36,6 +36,7 @@ class OdsPracticeDataFetcher:
     def _iterate_practice_data(self, params):
         response = self._client.get(self._search_url, params)
         yield from self._process_practice_data_response(response)
+
         while NEXT_PAGE_HEADER in response.headers:
             response = self._client.get(response.headers[NEXT_PAGE_HEADER])
             yield from self._process_practice_data_response(response)

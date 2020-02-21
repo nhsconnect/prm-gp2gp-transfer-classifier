@@ -1,3 +1,4 @@
+import json
 import sys
 from datetime import datetime
 
@@ -6,6 +7,7 @@ from argparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 
+from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.spine.sources import read_spine_csv_gz_files
 from gp2gp.spine.transformers import (
     group_into_conversations,
@@ -17,7 +19,6 @@ from gp2gp.service.transformers import (
     filter_failed_transfers,
     filter_pending_transfers,
     calculate_sla_by_practice,
-    filter_practices,
 )
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
 from gp2gp.dashboard.sinks import write_service_dashboard_json
@@ -31,7 +32,7 @@ def parse_dashboard_pipeline_arguments(args):
     parser = ArgumentParser(description="GP2GP Service dashboard data pipeline")
     parser.add_argument("--month", type=int)
     parser.add_argument("--year", type=int)
-    parser.add_argument("--ods-codes", type=_list_str)
+    parser.add_argument("--practice-list-file", type=str)
     parser.add_argument("--input-files", type=_list_str)
     parser.add_argument("--output-file", type=str)
     return parser.parse_args(args)
@@ -44,7 +45,7 @@ def parse_conversations(conversations):
             yield gp2gp_conversation
 
 
-def process_messages(messages, start, end, practice_ods_codes):
+def process_messages(messages, start, end, practice_list):
     conversations = group_into_conversations(messages)
     parsed_conversations = parse_conversations(conversations)
     conversations_started_in_range = filter_conversations_by_request_started_time(
@@ -53,10 +54,9 @@ def process_messages(messages, start, end, practice_ods_codes):
     transfers = derive_transfers(conversations_started_in_range)
     successful_transfers = filter_failed_transfers(transfers)
     completed_transfers = filter_pending_transfers(successful_transfers)
-    sla_metrics = calculate_sla_by_practice(completed_transfers)
-    sla_metrics_filtered = filter_practices(sla_metrics, practice_ods_codes)
+    sla_metrics = calculate_sla_by_practice(practice_list, completed_transfers)
     dashboard_data = construct_service_dashboard_data(
-        sla_metrics_filtered, year=start.year, month=start.month
+        sla_metrics, year=start.year, month=start.month
     )
     return dashboard_data
 
@@ -73,10 +73,17 @@ def main():
     next_month = metric_month + relativedelta(months=1)
 
     output_file_path = args.output_file
+    practice_list = None
+
+    with open(args.practice_list_file) as f:
+        data = f.read()
+        practice_list = [
+            PracticeDetails(ods_code=p["ods_code"], name=p["name"]) for p in json.loads(data)
+        ]
 
     spine_messages = read_spine_csv_gz_files(args.input_files)
     service_dashboard_data = process_messages(
-        spine_messages, metric_month, next_month, args.ods_codes
+        spine_messages, metric_month, next_month, practice_list
     )
 
     write_service_dashboard_json_file(service_dashboard_data, output_file_path)

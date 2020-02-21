@@ -32,20 +32,20 @@ def test_service_dashboard_pipeline(datadir):
     input_file_paths = _gzip_files(
         [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
     )
+    practice_list_file_path = datadir / "practice_list.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
     output_file_path = datadir / "dashboard_dec_2019.json"
+
     expected_practices = _read_json(datadir / "expected_practices_dec_2019.json")
 
-    practice_ods_codes = ["A12345", "Z45678"]
-    practice_ods_codes_str = _csv_join(practice_ods_codes)
     month = 12
     year = 2019
 
     pipeline_command = f"\
         gp2gp-dashboard-pipeline --month {month}\
         --year {year}\
-        --ods-codes {practice_ods_codes_str}\
+        --practice-list-file {practice_list_file_path}\
         --input-files {input_file_paths_str}\
         --output-file {output_file_path}\
     "

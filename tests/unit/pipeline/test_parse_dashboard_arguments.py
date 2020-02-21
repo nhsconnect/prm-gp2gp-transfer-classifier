@@ -9,8 +9,8 @@ def test_parse_dashboard_arguments():
         "6",
         "--year",
         "2019",
-        "--ods-codes",
-        "a12345,b56789",
+        "--practice-list-file",
+        "data/practice-list.json",
         "--input-files",
         "data/jun.csv,data/july.csv",
         "--output-file",
@@ -20,7 +20,7 @@ def test_parse_dashboard_arguments():
     expected = Namespace(
         month=6,
         year=2019,
-        ods_codes=["a12345", "b56789"],
+        practice_list_file="data/practice-list.json",
         input_files=["data/jun.csv", "data/july.csv"],
         output_file="data/jun-dashboard-data.json",
     )
