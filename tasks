@@ -42,6 +42,9 @@ case "${command}" in
       ./tasks lint
       ./tasks test
       ;;
+  dojo-validate)
+      dojo "./tasks validate"
+      ;;
   *)
       echo "Invalid command: '${command}'"
       exit 1
