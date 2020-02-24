@@ -1,9 +1,10 @@
 import json
-from typing import List
+from datetime import datetime
 
 import requests
+from dateutil.tz import tzutc
 
-from gp2gp.odsportal.models import PracticeDetails
+from gp2gp.odsportal.models import PracticeDetails, PracticeList
 
 ODS_PORTAL_SEARCH_URL = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
 DEFAULT_SEARCH_PARAMS = {
@@ -48,8 +49,11 @@ class OdsPracticeDataFetcher:
         return json.loads(response.content)["Organisations"]
 
 
-def construct_practice_list(data_fetcher=None) -> List[PracticeDetails]:
+def construct_practice_list(data_fetcher=None) -> PracticeList:
     if data_fetcher is None:
         data_fetcher = OdsPracticeDataFetcher()
     response = data_fetcher.fetch_practice_data()
-    return [PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in response]
+    return PracticeList(
+        generated_on=datetime.now(tzutc()),
+        practices=[PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in response],
+    )

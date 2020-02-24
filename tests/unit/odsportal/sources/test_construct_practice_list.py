@@ -1,4 +1,8 @@
+from datetime import datetime
 from unittest.mock import MagicMock
+
+from dateutil.tz import tzutc
+from freezegun import freeze_time
 
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.odsportal.sources import construct_practice_list
@@ -19,12 +23,22 @@ def _build_practice_data(**kwargs):
     }
 
 
+@freeze_time(datetime(year=2019, month=6, day=2, hour=23, second=42), tz_offset=0)
+def test_practice_list_data_has_correct_generated_on_given_time():
+    expected_generated_on = datetime(year=2019, month=6, day=2, hour=23, second=42, tzinfo=tzutc())
+
+    mock_fetcher = MagicMock()
+    actual = construct_practice_list(data_fetcher=mock_fetcher)
+
+    assert actual.generated_on == expected_generated_on
+
+
 def test_returns_single_practice():
     response_data = [_build_practice_data(name="GP Practice", org_id="A12345")]
     mock_fetcher = MagicMock()
     mock_fetcher.fetch_practice_data.return_value = response_data
 
-    actual = construct_practice_list(data_fetcher=mock_fetcher)
+    actual = construct_practice_list(data_fetcher=mock_fetcher).practices
 
     expected = [PracticeDetails(ods_code="A12345", name="GP Practice")]
 
@@ -39,7 +53,7 @@ def test_returns_two_practices():
     mock_fetcher = MagicMock()
     mock_fetcher.fetch_practice_data.return_value = response_data
 
-    actual = construct_practice_list(data_fetcher=mock_fetcher)
+    actual = construct_practice_list(data_fetcher=mock_fetcher).practices
 
     expected = [
         PracticeDetails(ods_code="A12345", name="GP Practice"),
