@@ -73,12 +73,12 @@ def main():
     next_month = metric_month + relativedelta(months=1)
 
     output_file_path = args.output_file
-    practice_list = None
 
     with open(args.practice_list_file) as f:
         data = f.read()
         practice_list = [
-            PracticeDetails(ods_code=p["ods_code"], name=p["name"]) for p in json.loads(data)
+            PracticeDetails(ods_code=p["odsCode"], name=p["name"])
+            for p in json.loads(data)["practices"]
         ]
 
     spine_messages = read_spine_csv_gz_files(args.input_files)
