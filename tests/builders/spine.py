@@ -24,33 +24,6 @@ def build_message(**kwargs):
     )
 
 
-SPINE_CSV_FIELDS = [
-    "_time",
-    "conversationID",
-    "GUID",
-    "interactionID",
-    "fromNACS",
-    "toNACS",
-    "messageRef",
-    "jdiEvent",
-    "_raw",
-]
-
-
-def build_spine_csv_row(**kwargs):
-    return [
-        kwargs.get("time", a_datetime().isoformat()),
-        kwargs.get("conversation_id", a_string(36)),
-        kwargs.get("guid", a_string(36)),
-        kwargs.get("interaction_id", a_string(17)),
-        kwargs.get("from_nacs", a_string(6)),
-        kwargs.get("to_nacs", a_string(6)),
-        kwargs.get("message_ref", "NotProvided"),
-        kwargs.get("jdi_event", "NONE"),
-        kwargs.get("raw", ""),
-    ]
-
-
 def build_spine_item(**kwargs):
     return {
         "_time": kwargs.get("time", a_datetime().isoformat()),
