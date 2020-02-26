@@ -1,5 +1,6 @@
 import json
 import sys
+from dataclasses import asdict
 from datetime import datetime
 
 from argparse import ArgumentParser
@@ -8,8 +9,8 @@ from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 
 from gp2gp.io.csv import read_gzip_csv_files
-from gp2gp.io.file import write_to_text_file
-from gp2gp.io.json import serialize_as_json
+from gp2gp.io.dictionary import camelize_dict
+from gp2gp.io.json import write_json_file
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.spine.sources import construct_messages_from_splunk_items
 from gp2gp.spine.transformers import (
@@ -64,8 +65,9 @@ def process_messages(messages, start, end, practice_list):
 
 
 def write_service_dashboard_json_file(dashboard_data, output_file_path):
-    content = serialize_as_json(dashboard_data)
-    write_to_text_file(content, output_file_path)
+    content_dict = asdict(dashboard_data)
+    camelized_dict = camelize_dict(content_dict)
+    write_json_file(camelized_dict, output_file_path)
 
 
 def read_spine_csv_gz_files(file_paths):
