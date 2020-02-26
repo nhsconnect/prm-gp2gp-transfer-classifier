@@ -1,9 +1,8 @@
-import csv
-import gzip
-from typing import BinaryIO, Iterator, List
+from typing import Iterator, List, Iterable
 
 from dateutil import parser
 
+from gp2gp.io.csv import read_gzip_csv
 from gp2gp.spine.models import Message
 
 
@@ -17,17 +16,11 @@ def _parse_message_ref(ref):
 
 def read_spine_csv_gz_files(input_file_paths: List[str]) -> Iterator[Message]:
     for file_path in input_file_paths:
-        with open(file_path, "rb") as f:
-            yield from _read_spine_csv_gz(f)
+        items = read_gzip_csv(file_path)
+        yield from construct_messages_from_splunk_items(items)
 
 
-def _read_spine_csv_gz(input_file: BinaryIO) -> Iterator[Message]:
-    with gzip.open(input_file, "rt") as f:
-        input_csv = csv.DictReader(f)
-        yield from construct_messages_from_splunk_items(input_csv)
-
-
-def construct_messages_from_splunk_items(items: Iterator[dict]) -> Iterator[Message]:
+def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Message]:
     for item in items:
         yield Message(
             time=parser.isoparse(item["_time"]),
