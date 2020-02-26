@@ -24,14 +24,18 @@ def read_spine_csv_gz_files(input_file_paths: List[str]) -> Iterator[Message]:
 def _read_spine_csv_gz(input_file: BinaryIO) -> Iterator[Message]:
     with gzip.open(input_file, "rt") as f:
         input_csv = csv.DictReader(f)
-        for row in input_csv:
-            yield Message(
-                time=parser.isoparse(row["_time"]),
-                conversation_id=row["conversationID"],
-                guid=row["GUID"],
-                interaction_id=row["interactionID"],
-                from_party_ods_code=row["fromNACS"],
-                to_party_ods_code=row["toNACS"],
-                message_ref=_parse_message_ref(row["messageRef"]),
-                error_code=_parse_error_code(row["jdiEvent"]),
-            )
+        yield from construct_messages_from_splunk_items(input_csv)
+
+
+def construct_messages_from_splunk_items(items: Iterator[dict]) -> Iterator[Message]:
+    for item in items:
+        yield Message(
+            time=parser.isoparse(item["_time"]),
+            conversation_id=item["conversationID"],
+            guid=item["GUID"],
+            interaction_id=item["interactionID"],
+            from_party_ods_code=item["fromNACS"],
+            to_party_ods_code=item["toNACS"],
+            message_ref=_parse_message_ref(item["messageRef"]),
+            error_code=_parse_error_code(item["jdiEvent"]),
+        )

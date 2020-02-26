@@ -49,3 +49,17 @@ def build_spine_csv_row(**kwargs):
         kwargs.get("jdi_event", "NONE"),
         kwargs.get("raw", ""),
     ]
+
+
+def build_spine_item(**kwargs):
+    return {
+        "_time": kwargs.get("time", a_datetime().isoformat()),
+        "conversationID": kwargs.get("conversation_id", a_string(36)),
+        "GUID": kwargs.get("guid", a_string(36)),
+        "interactionID": kwargs.get("interaction_id", a_string(17)),
+        "fromNACS": kwargs.get("from_nacs", a_string(6)),
+        "toNACS": kwargs.get("to_nacs", a_string(6)),
+        "messageRef": kwargs.get("message_ref", "NotProvided"),
+        "jdiEvent": kwargs.get("jdi_event", "NONE"),
+        "_raw": kwargs.get("raw", ""),
+    }
