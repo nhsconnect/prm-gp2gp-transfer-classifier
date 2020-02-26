@@ -21,7 +21,7 @@ from gp2gp.service.transformers import (
     calculate_sla_by_practice,
 )
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
-from gp2gp.dashboard.sinks import write_service_dashboard_json
+from gp2gp.io.json import write_as_json
 
 
 def _list_str(values):
@@ -63,7 +63,7 @@ def process_messages(messages, start, end, practice_list):
 
 def write_service_dashboard_json_file(dashboard_data, output_file_path):
     with open(output_file_path, "w") as f:
-        write_service_dashboard_json(dashboard_data, f)
+        write_as_json(dashboard_data, f)
 
 
 def main():

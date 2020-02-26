@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List
 
-from gp2gp.io.write_as_json import serialize_as_json
+from gp2gp.io.json import serialize_as_json
 
 
 def test_serialize_single_string_property():

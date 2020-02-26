@@ -2,7 +2,7 @@ import json
 from dataclasses import dataclass
 from io import StringIO
 
-from gp2gp.io.write_as_json import write_as_json
+from gp2gp.io.json import write_as_json
 
 
 def _assert_output_file_contains(outfile: StringIO, expected: str):
