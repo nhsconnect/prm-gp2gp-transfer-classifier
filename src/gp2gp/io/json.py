@@ -1,7 +1,7 @@
 import json
 from dataclasses import asdict
 from datetime import datetime
-from typing import List, Mapping, TextIO
+from typing import List, Mapping
 
 
 def _camelize(string):
@@ -27,8 +27,3 @@ def serialize_as_json(obj):
     data_dict = asdict(obj)
     camelcase_data_dict = _camelize_dict(data_dict)
     return json.dumps(camelcase_data_dict, default=_serialize_datetime)
-
-
-def write_as_json(obj, outfile: TextIO):
-    json_output = serialize_as_json(obj)
-    outfile.write(json_output)

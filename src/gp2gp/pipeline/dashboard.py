@@ -7,6 +7,8 @@ from argparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 
+from gp2gp.io.file import write_to_text_file
+from gp2gp.io.json import serialize_as_json
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.spine.sources import read_spine_csv_gz_files
 from gp2gp.spine.transformers import (
@@ -21,7 +23,6 @@ from gp2gp.service.transformers import (
     calculate_sla_by_practice,
 )
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
-from gp2gp.io.json import write_as_json
 
 
 def _list_str(values):
@@ -62,8 +63,8 @@ def process_messages(messages, start, end, practice_list):
 
 
 def write_service_dashboard_json_file(dashboard_data, output_file_path):
-    with open(output_file_path, "w") as f:
-        write_as_json(dashboard_data, f)
+    content = serialize_as_json(dashboard_data)
+    write_to_text_file(content, output_file_path)
 
 
 def main():
