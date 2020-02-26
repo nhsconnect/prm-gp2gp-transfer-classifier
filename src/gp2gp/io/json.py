@@ -13,3 +13,9 @@ def write_json_file(content: dict, file_path: str):
     json_string = json.dumps(content, default=_serialize_datetime)
     path = Path(file_path)
     path.write_text(json_string)
+
+
+def read_json_file(file_path: str) -> dict:
+    path = Path(file_path)
+    json_string = path.read_text()
+    return json.loads(json_string)

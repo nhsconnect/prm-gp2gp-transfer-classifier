@@ -86,7 +86,7 @@ def main():
     with open(args.practice_list_file) as f:
         data = f.read()
         practice_list = [
-            PracticeDetails(ods_code=p["odsCode"], name=p["name"])
+            PracticeDetails(ods_code=p["ods_code"], name=p["name"])
             for p in json.loads(data)["practices"]
         ]
 
