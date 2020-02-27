@@ -1,4 +1,3 @@
-import json
 import sys
 from dataclasses import asdict
 from datetime import datetime

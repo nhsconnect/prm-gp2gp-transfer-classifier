@@ -3,6 +3,7 @@ from datetime import datetime
 
 import requests
 from dateutil.tz import tzutc
+from dateutil import parser
 
 from gp2gp.odsportal.models import PracticeDetails, PracticeList
 
@@ -56,4 +57,14 @@ def construct_practice_list(data_fetcher=None) -> PracticeList:
     return PracticeList(
         generated_on=datetime.now(tzutc()),
         practices=[PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in response],
+    )
+
+
+def construct_practice_list_from_dict(data: dict) -> PracticeList:
+
+    return PracticeList(
+        generated_on=parser.isoparse(data["generated_on"]),
+        practices=[
+            PracticeDetails(ods_code=p["ods_code"], name=p["name"]) for p in data["practices"]
+        ],
     )
