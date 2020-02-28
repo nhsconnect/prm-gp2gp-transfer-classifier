@@ -51,16 +51,6 @@ class OdsPracticeDataFetcher:
         return json.loads(response.content)["Organisations"]
 
 
-def construct_practice_list(data_fetcher=None) -> PracticeList:
-    if data_fetcher is None:
-        data_fetcher = OdsPracticeDataFetcher()
-    response = data_fetcher.fetch_practice_data()
-    return PracticeList(
-        generated_on=datetime.now(tzutc()),
-        practices=[PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in response],
-    )
-
-
 def construct_practice_list_from_dict(data: dict) -> PracticeList:
     return PracticeList(
         generated_on=parser.isoparse(data["generated_on"]),
