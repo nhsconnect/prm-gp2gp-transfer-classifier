@@ -19,8 +19,7 @@ from gp2gp.spine.transformers import (
 )
 from gp2gp.service.transformers import (
     derive_transfers,
-    filter_failed_transfers,
-    filter_pending_transfers,
+    filter_for_successful_transfers,
     calculate_sla_by_practice,
 )
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
@@ -54,8 +53,7 @@ def process_messages(messages, start, end, practice_list):
         parsed_conversations, start, end
     )
     transfers = derive_transfers(conversations_started_in_range)
-    successful_transfers = filter_failed_transfers(transfers)
-    completed_transfers = filter_pending_transfers(successful_transfers)
+    completed_transfers = filter_for_successful_transfers(transfers)
     sla_metrics = calculate_sla_by_practice(practice_list, completed_transfers)
     dashboard_data = construct_service_dashboard_data(
         sla_metrics, year=start.year, month=start.month

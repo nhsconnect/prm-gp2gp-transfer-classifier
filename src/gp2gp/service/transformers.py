@@ -3,7 +3,13 @@ from typing import Iterable, Iterator
 from warnings import warn
 
 from gp2gp.odsportal.models import PracticeDetails
-from gp2gp.service.models import Transfer, ERROR_SUPPRESSED, PracticeSlaMetrics, SlaBand
+from gp2gp.service.models import (
+    Transfer,
+    ERROR_SUPPRESSED,
+    PracticeSlaMetrics,
+    SlaBand,
+    SuccessfulTransfer,
+)
 from gp2gp.spine.models import ParsedConversation
 
 
@@ -50,16 +56,21 @@ def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Tr
     return (_derive_transfer(c) for c in conversations)
 
 
-def _is_successful(transfer):
+def is_successful(transfer):
     return transfer.error_code is None or transfer.error_code == ERROR_SUPPRESSED
 
 
-def filter_failed_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
-    return (t for t in transfers if _is_successful(t))
-
-
-def filter_pending_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
-    return (t for t in transfers if not t.pending)
+def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[SuccessfulTransfer]:
+    return (
+        SuccessfulTransfer(
+            conversation_id=t.conversation_id,
+            sla_duration=t.sla_duration,
+            requesting_practice_ods_code=t.requesting_practice_ods_code,
+            sending_practice_ods_code=t.sending_practice_ods_code,
+        )
+        for t in transfers
+        if is_successful(t) and not t.pending and t.sla_duration is not None
+    )
 
 
 def _assign_to_sla_band(sla_duration: timedelta):
@@ -73,19 +84,18 @@ def _assign_to_sla_band(sla_duration: timedelta):
 
 
 def calculate_sla_by_practice(
-    practice_list: Iterable[PracticeDetails], transfers: Iterable[Transfer]
+    practice_list: Iterable[PracticeDetails], transfers: Iterable[SuccessfulTransfer]
 ) -> Iterator[PracticeSlaMetrics]:
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
     practice_counts = {p.ods_code: default_sla.copy() for p in practice_list}
 
     for transfer in transfers:
         ods_code = transfer.requesting_practice_ods_code
-        if transfer.sla_duration is not None:
-            if ods_code in practice_counts:
-                sla_band = _assign_to_sla_band(transfer.sla_duration)
-                practice_counts[ods_code][sla_band] += 1
-            else:
-                warn(f"Unexpected ODS code found: {ods_code}", RuntimeWarning)
+        if ods_code in practice_counts:
+            sla_band = _assign_to_sla_band(transfer.sla_duration)
+            practice_counts[ods_code][sla_band] += 1
+        else:
+            warn(f"Unexpected ODS code found: {ods_code}", RuntimeWarning)
 
     return (
         PracticeSlaMetrics(
