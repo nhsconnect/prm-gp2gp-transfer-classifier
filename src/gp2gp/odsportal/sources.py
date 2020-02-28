@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from typing import Iterable
 
 import requests
 from dateutil.tz import tzutc
@@ -61,10 +62,16 @@ def construct_practice_list(data_fetcher=None) -> PracticeList:
 
 
 def construct_practice_list_from_dict(data: dict) -> PracticeList:
-
     return PracticeList(
         generated_on=parser.isoparse(data["generated_on"]),
         practices=[
             PracticeDetails(ods_code=p["ods_code"], name=p["name"]) for p in data["practices"]
         ],
+    )
+
+
+def construct_practice_list_from_ods_portal_response(data: Iterable[dict]) -> PracticeList:
+    return PracticeList(
+        generated_on=datetime.now(tzutc()),
+        practices=[PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in data],
     )
