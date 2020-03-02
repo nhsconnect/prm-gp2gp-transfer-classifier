@@ -41,3 +41,15 @@ These generally work by running a command in a virtual environment configured vi
 ### Dependency Scanning
 
 `./tasks check-deps`
+
+### ODS Portal Pipeline
+This pipeline will fetch ODS codes and names of all active GP practices and save to json file.
+
+To run the ODS Portal pipeline first create virtual dev environment:
+
+`./tasks devenv`
+
+Then run the pipeline command:
+
+`ods-portal-pipeline --output-file "<output-file>.json"`
+
