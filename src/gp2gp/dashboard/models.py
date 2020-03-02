@@ -25,6 +25,7 @@ class MonthlyMetrics:
 @dataclass
 class PracticeSummary:
     ods_code: str
+    name: str
     metrics: List[MonthlyMetrics]
 
 

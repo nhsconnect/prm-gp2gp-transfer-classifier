@@ -22,6 +22,7 @@ def construct_service_dashboard_data(
         practices=[
             PracticeSummary(
                 ods_code=practice.ods_code,
+                name=practice.name,
                 metrics=[
                     MonthlyMetrics(
                         year=year,
