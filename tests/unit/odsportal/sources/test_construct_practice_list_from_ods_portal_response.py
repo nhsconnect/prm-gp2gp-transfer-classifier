@@ -55,3 +55,14 @@ def test_returns_multiple_practices():
     actual = construct_practice_list_from_ods_portal_response(response_data)
 
     assert actual.practices == expected_practices
+
+
+def test_returns_unique_practices_in_practice_list():
+    response_data = [
+        _build_practice_data(name="GP Practice", org_id="A12345"),
+        _build_practice_data(name="Another GP Practice", org_id="A12345"),
+    ]
+
+    actual = construct_practice_list_from_ods_portal_response(response_data).practices
+
+    assert len(actual) == 1

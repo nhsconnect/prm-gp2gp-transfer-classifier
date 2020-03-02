@@ -88,6 +88,16 @@ def test_groups_by_ods_code_given_single_practice_and_transfers_from_the_same_pr
     _assert_has_ods_codes(actual, {"A12345"})
 
 
+def test_contains_practice_name():
+    expected_name = "A Practice"
+    practices = [PracticeDetails(ods_code=a_string(), name=expected_name)]
+    transfers = []
+
+    actual_name = list(calculate_sla_by_practice(practices, transfers))[0].name
+
+    assert actual_name == expected_name
+
+
 def test_returns_practice_sla_metrics_placeholder_given_a_list_with_one_practice_and_no_metrics():
     practice_list = [PracticeDetails(ods_code="A12345", name=a_string())]
     transfers = []
@@ -128,8 +138,8 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_beyond_8_da
 
 def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practices():
     practice_list = [
-        PracticeDetails(ods_code="A12345", name=a_string()),
-        PracticeDetails(ods_code="B12345", name=a_string()),
+        PracticeDetails(ods_code="A12345", name="A Practice"),
+        PracticeDetails(ods_code="B12345", name="Another Practice"),
     ]
     transfers = [
         build_transfer(
@@ -155,8 +165,16 @@ def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practice
     ]
 
     expected = [
-        PracticeSlaMetrics(ods_code="A12345", within_3_days=1, within_8_days=0, beyond_8_days=1),
-        PracticeSlaMetrics(ods_code="B12345", within_3_days=0, within_8_days=2, beyond_8_days=1),
+        PracticeSlaMetrics(
+            ods_code="A12345", name="A Practice", within_3_days=1, within_8_days=0, beyond_8_days=1
+        ),
+        PracticeSlaMetrics(
+            ods_code="B12345",
+            name="Another Practice",
+            within_3_days=0,
+            within_8_days=2,
+            beyond_8_days=1,
+        ),
     ]
 
     actual = calculate_sla_by_practice(practice_list, transfers)

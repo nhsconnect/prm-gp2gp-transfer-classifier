@@ -29,6 +29,7 @@ class SlaBand(Enum):
 
 class PracticeSlaMetrics(NamedTuple):
     ods_code: str
+    name: str
     within_3_days: int
     within_8_days: int
     beyond_8_days: int

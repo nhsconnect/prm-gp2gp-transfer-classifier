@@ -86,6 +86,7 @@ def _assign_to_sla_band(sla_duration: timedelta):
 def calculate_sla_by_practice(
     practice_list: Iterable[PracticeDetails], transfers: Iterable[SuccessfulTransfer]
 ) -> Iterator[PracticeSlaMetrics]:
+
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
     practice_counts = {p.ods_code: default_sla.copy() for p in practice_list}
 
@@ -99,10 +100,11 @@ def calculate_sla_by_practice(
 
     return (
         PracticeSlaMetrics(
-            ods_code,
-            within_3_days=counts[SlaBand.WITHIN_3_DAYS],
-            within_8_days=counts[SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=counts[SlaBand.BEYOND_8_DAYS],
+            p.ods_code,
+            p.name,
+            within_3_days=practice_counts[p.ods_code][SlaBand.WITHIN_3_DAYS],
+            within_8_days=practice_counts[p.ods_code][SlaBand.WITHIN_8_DAYS],
+            beyond_8_days=practice_counts[p.ods_code][SlaBand.BEYOND_8_DAYS],
         )
-        for ods_code, counts in practice_counts.items()
+        for p in practice_list
     )
