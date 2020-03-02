@@ -10,7 +10,7 @@ from dateutil.tz import tzutc
 from gp2gp.io.csv import read_gzip_csv_files
 from gp2gp.io.dictionary import camelize_dict
 from gp2gp.io.json import write_json_file, read_json_file
-from gp2gp.odsportal.models import PracticeDetails
+from gp2gp.odsportal.sources import construct_practice_list_from_dict
 from gp2gp.spine.sources import construct_messages_from_splunk_items
 from gp2gp.spine.transformers import (
     group_into_conversations,
@@ -81,9 +81,7 @@ def main():
     output_file_path = args.output_file
 
     practice_data = read_json_file(args.practice_list_file)
-    practice_list = [
-        PracticeDetails(ods_code=p["ods_code"], name=p["name"]) for p in practice_data["practices"]
-    ]
+    practice_list = construct_practice_list_from_dict(practice_data).practices
 
     spine_messages = read_spine_csv_gz_files(args.input_files)
     service_dashboard_data = process_messages(
