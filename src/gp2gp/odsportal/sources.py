@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Iterable, Dict
+from typing import Iterable
 
 import requests
 from dateutil.tz import tzutc
@@ -70,8 +70,4 @@ def construct_practice_list_from_ods_portal_response(data: Iterable[dict]) -> Pr
 
 
 def _remove_duplicated_practices(raw_practices: Iterable[dict]) -> Iterable[dict]:
-    unique_practices: Dict[str, dict] = {}
-    for obj in raw_practices:
-        if obj["OrgId"] not in unique_practices:
-            unique_practices[obj["OrgId"]] = obj
-    return unique_practices.values()
+    return {obj["OrgId"]: obj for obj in raw_practices}.values()
