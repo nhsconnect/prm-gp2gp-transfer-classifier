@@ -1,0 +1,14 @@
+[
+    {
+      "ods_code": "A12345",
+      "name": "Test GP"
+    },
+     {
+      "ods_code": "B12345",
+      "name": "Test GP 2"
+    },
+     {
+      "ods_code": "C12345",
+      "name": "Test GP 3"
+    }
+]
