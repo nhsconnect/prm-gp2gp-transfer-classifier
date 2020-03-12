@@ -6,7 +6,7 @@ import requests
 from dateutil.tz import tzutc
 from dateutil import parser
 
-from gp2gp.odsportal.models import PracticeDetails, PracticeList
+from gp2gp.odsportal.models import PracticeDetails, PracticeMetadata
 
 ODS_PORTAL_SEARCH_URL = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
 DEFAULT_SEARCH_PARAMS = {
@@ -51,8 +51,8 @@ class OdsPracticeDataFetcher:
         return json.loads(response.content)["Organisations"]
 
 
-def construct_practice_list_from_dict(data: dict) -> PracticeList:
-    return PracticeList(
+def construct_practice_list_from_dict(data: dict) -> PracticeMetadata:
+    return PracticeMetadata(
         generated_on=parser.isoparse(data["generated_on"]),
         practices=[
             PracticeDetails(ods_code=p["ods_code"], name=p["name"]) for p in data["practices"]
@@ -60,10 +60,10 @@ def construct_practice_list_from_dict(data: dict) -> PracticeList:
     )
 
 
-def construct_practice_list_from_ods_portal_response(data: Iterable[dict]) -> PracticeList:
+def construct_practice_list_from_ods_portal_response(data: Iterable[dict]) -> PracticeMetadata:
     unique_practices = _remove_duplicated_practices(data)
 
-    return PracticeList(
+    return PracticeMetadata(
         generated_on=datetime.now(tzutc()),
         practices=[PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in unique_practices],
     )

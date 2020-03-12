@@ -10,6 +10,6 @@ class PracticeDetails:
 
 
 @dataclass
-class PracticeList:
+class PracticeMetadata:
     generated_on: datetime
     practices: List[PracticeDetails]

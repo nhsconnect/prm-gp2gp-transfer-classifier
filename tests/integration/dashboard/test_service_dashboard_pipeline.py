@@ -32,12 +32,14 @@ def test_service_dashboard_pipeline(datadir):
     input_file_paths = _gzip_files(
         [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
     )
-    practice_list_file_path = datadir / "practice_list.json"
+    practice_metadata_file_path = datadir / "practice_metadata.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
-    output_file_path = datadir / "dashboard_dec_2019.json"
+    practice_metrics_output_file_path = datadir / "practice_metrics_dec_2019.json"
+    practice_metadata_output_file_path = datadir / "practice_metadata_dec_2019.json"
 
-    expected_practices = _read_json(datadir / "expected_practices_dec_2019.json")
+    expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
+    expected_practice_metadata = _read_json(datadir / "expected_practice_metadata_dec_2019.json")
 
     month = 12
     year = 2019
@@ -45,14 +47,17 @@ def test_service_dashboard_pipeline(datadir):
     pipeline_command = f"\
         gp2gp-dashboard-pipeline --month {month}\
         --year {year}\
-        --practice-list-file {practice_list_file_path}\
+        --practice-list-file {practice_metadata_file_path}\
         --input-files {input_file_paths_str}\
-        --output-file {output_file_path}\
+        --practice-metrics-output-file {practice_metrics_output_file_path}\
+        --practice-metadata-output-file {practice_metadata_output_file_path}\
     "
 
     process = subprocess.Popen(pipeline_command, shell=True)
     process.wait()
 
-    actual = _read_json(output_file_path)
+    actual_practice_metrics = _read_json(practice_metrics_output_file_path)
+    actual_practice_metadata = _read_json(practice_metadata_output_file_path)
 
-    assert actual["practices"] == expected_practices
+    assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
+    assert actual_practice_metadata["practices"] == expected_practice_metadata["practices"]

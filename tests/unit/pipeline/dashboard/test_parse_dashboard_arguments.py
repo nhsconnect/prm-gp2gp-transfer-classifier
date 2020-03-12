@@ -13,8 +13,10 @@ def test_parse_dashboard_arguments():
         "data/practice-list.json",
         "--input-files",
         "data/jun.csv,data/july.csv",
-        "--output-file",
-        "data/jun-dashboard-data.json",
+        "--practice-metrics-output-file",
+        "data/jun-practice-metrics.json",
+        "--practice-metadata-output-file",
+        "data/jun-practice-metadata.json",
     ]
 
     expected = Namespace(
@@ -22,7 +24,8 @@ def test_parse_dashboard_arguments():
         year=2019,
         practice_list_file="data/practice-list.json",
         input_files=["data/jun.csv", "data/july.csv"],
-        output_file="data/jun-dashboard-data.json",
+        practice_metrics_output_file="data/jun-practice-metrics.json",
+        practice_metadata_output_file="data/jun-practice-metadata.json",
     )
 
     actual = parse_dashboard_pipeline_arguments(args)

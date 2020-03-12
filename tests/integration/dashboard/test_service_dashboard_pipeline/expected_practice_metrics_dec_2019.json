@@ -1,0 +1,22 @@
+{
+  "generatedOn": "2020-02-24 16:51:21.353977",
+  "practices": [
+    {
+      "odsCode": "A12345",
+      "name": "Test GP",
+      "metrics": [
+        {
+          "year": 2019,
+          "month": 12,
+          "requester": {
+            "timeToIntegrateSla": {
+              "within3Days": 1,
+              "within8Days": 0,
+              "beyond8Days": 0
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
