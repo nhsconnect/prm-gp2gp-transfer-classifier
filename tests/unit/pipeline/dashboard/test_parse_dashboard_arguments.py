@@ -1,4 +1,4 @@
-from gp2gp.pipeline.dashboard import parse_dashboard_pipeline_arguments
+from gp2gp.pipeline.dashboard.main import parse_dashboard_pipeline_arguments
 
 from argparse import Namespace
 
