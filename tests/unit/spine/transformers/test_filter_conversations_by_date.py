@@ -1,12 +1,15 @@
 from datetime import datetime
 
+from gp2gp.date.range import DateTimeRange
 from gp2gp.spine.transformers import filter_conversations_by_request_started_time
 from tests.builders.spine import build_parsed_conversation, build_message
 
 
 def test_filter_conversations_by_request_started_time_keeps_conversation_within_range():
-    from_time = datetime(year=2020, month=6, day=1)
-    to_time = datetime(year=2020, month=7, day=1)
+    date_range = DateTimeRange(
+        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    )
+
     parsed_conversations = [
         build_parsed_conversation(
             request_started=build_message(time=datetime(year=2020, month=6, day=6))
@@ -15,14 +18,15 @@ def test_filter_conversations_by_request_started_time_keeps_conversation_within_
 
     expected = parsed_conversations
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversation_before_range():
-    from_time = datetime(year=2020, month=6, day=1)
-    to_time = datetime(year=2020, month=7, day=1)
+    date_range = DateTimeRange(
+        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    )
     parsed_conversations = [
         build_parsed_conversation(
             request_started=build_message(time=datetime(year=2020, month=5, day=28))
@@ -31,14 +35,15 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_befor
 
     expected = []
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversation_after_range():
-    from_time = datetime(year=2020, month=6, day=1)
-    to_time = datetime(year=2020, month=7, day=1)
+    date_range = DateTimeRange(
+        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    )
     parsed_conversations = [
         build_parsed_conversation(
             request_started=build_message(time=datetime(year=2020, month=7, day=28))
@@ -47,14 +52,15 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_after
 
     expected = []
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversations_outside_of_range():
-    from_time = datetime(year=2020, month=6, day=1)
-    to_time = datetime(year=2020, month=7, day=1)
+    date_range = DateTimeRange(
+        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    )
 
     conversation_within_range = build_parsed_conversation(
         request_started=build_message(time=datetime(year=2020, month=6, day=15))
@@ -74,14 +80,15 @@ def test_filter_conversations_by_request_started_time_rejects_conversations_outs
 
     expected = [conversation_within_range]
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_accepts_conversation_on_range_start():
-    from_time = datetime(year=2020, month=6, day=1)
-    to_time = datetime(year=2020, month=7, day=1)
+    date_range = DateTimeRange(
+        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    )
     parsed_conversations = [
         build_parsed_conversation(
             request_started=build_message(time=datetime(year=2020, month=6, day=1))
@@ -90,14 +97,15 @@ def test_filter_conversations_by_request_started_time_accepts_conversation_on_ra
 
     expected = parsed_conversations
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversation_on_range_end():
-    from_time = datetime(year=2020, month=6, day=1)
-    to_time = datetime(year=2020, month=7, day=1)
+    date_range = DateTimeRange(
+        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    )
     parsed_conversations = [
         build_parsed_conversation(
             request_started=build_message(time=datetime(year=2020, month=7, day=1))
@@ -106,6 +114,6 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_on_ra
 
     expected = []
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, from_time, to_time)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
 
     assert list(actual) == expected

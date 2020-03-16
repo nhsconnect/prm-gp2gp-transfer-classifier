@@ -1,7 +1,7 @@
 from collections import defaultdict
-from datetime import datetime
 from typing import Iterator, Dict, List, Optional, Iterable
 
+from gp2gp.date.range import DateTimeRange
 from gp2gp.spine.models import (
     Message,
     Conversation,
@@ -67,10 +67,10 @@ class SpineConversationParser:
 
 
 def filter_conversations_by_request_started_time(
-    conversations: Iterable[ParsedConversation], from_time: datetime, to_time: datetime
+    conversations: Iterable[ParsedConversation], time_range: DateTimeRange
 ) -> Iterator[ParsedConversation]:
     return (
         conversation
         for conversation in conversations
-        if from_time <= conversation.request_started.time < to_time
+        if time_range.contains(conversation.request_started.time)
     )

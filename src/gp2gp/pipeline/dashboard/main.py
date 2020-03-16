@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
+from gp2gp.date.range import DateTimeRange
 
 from gp2gp.io.csv import read_gzip_csv_files
 from gp2gp.io.dictionary import camelize_dict
@@ -46,6 +47,7 @@ def main():
 
     metric_month = datetime(args.year, args.month, 1, tzinfo=tzutc())
     next_month = metric_month + relativedelta(months=1)
+    time_range = DateTimeRange(metric_month, next_month)
 
     practice_metrics_output_file_path = args.practice_metrics_output_file
     practice_metadata_output_file_path = args.practice_metadata_output_file
@@ -57,7 +59,7 @@ def main():
 
     spine_messages = read_spine_csv_gz_files(args.input_files)
     service_dashboard_data = calculate_dashboard_data(
-        spine_messages, metric_month, next_month, practice_metadata.practices
+        spine_messages, time_range, practice_metadata.practices
     )
 
     write_service_dashboard_json_file(service_dashboard_data, practice_metrics_output_file_path)
