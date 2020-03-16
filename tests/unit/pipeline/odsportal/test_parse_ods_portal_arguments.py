@@ -9,7 +9,10 @@ def test_parse_ods_portal_arguments():
         "data/practice-list.json",
     ]
 
-    expected = Namespace(output_file="data/practice-list.json", search_url=None)
+    expected = Namespace(
+        output_file="data/practice-list.json",
+        search_url="https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations",
+    )
 
     actual = parse_ods_portal_pipeline_arguments(args)
 

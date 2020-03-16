@@ -60,7 +60,7 @@ def construct_practice_list_from_dict(data: dict) -> PracticeMetadata:
     )
 
 
-def construct_practice_list_from_ods_portal_response(data: Iterable[dict]) -> PracticeMetadata:
+def construct_practice_metadata_from_ods_portal_response(data: Iterable[dict]) -> PracticeMetadata:
     unique_practices = _remove_duplicated_practices(data)
 
     return PracticeMetadata(
