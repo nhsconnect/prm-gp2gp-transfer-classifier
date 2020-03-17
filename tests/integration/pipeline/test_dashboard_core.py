@@ -17,7 +17,7 @@ from gp2gp.pipeline.dashboard.core import calculate_dashboard_data
 
 
 @freeze_time(datetime(year=2020, month=1, day=15, hour=23, second=42), tz_offset=0)
-def test_foobar():
+def test_calculates_correct_metrics_given_a_successful_transfer():
     time_range = DateTimeRange(
         start=datetime(2019, 12, 1, tzinfo=UTC), end=datetime(2020, 1, 1, tzinfo=UTC)
     )
