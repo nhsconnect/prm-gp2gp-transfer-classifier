@@ -59,7 +59,7 @@ def main():
 
     spine_messages = read_spine_csv_gz_files(args.input_files)
     service_dashboard_data = calculate_dashboard_data(
-        spine_messages, time_range, practice_metadata.practices
+        spine_messages, practice_metadata.practices, time_range
     )
 
     write_service_dashboard_json_file(service_dashboard_data, practice_metrics_output_file_path)

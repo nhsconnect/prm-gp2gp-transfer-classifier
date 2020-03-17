@@ -1,5 +1,6 @@
 from typing import Iterable, List
 
+from gp2gp.dashboard.models import ServiceDashboardData
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
@@ -25,9 +26,9 @@ def _parse_conversations(conversations):
 
 def calculate_dashboard_data(
     spine_messages: Iterable[Message],
-    time_range: DateTimeRange,
     practice_list: List[PracticeDetails],
-):
+    time_range: DateTimeRange,
+) -> ServiceDashboardData:
     conversations = group_into_conversations(spine_messages)
     parsed_conversations = _parse_conversations(conversations)
     conversations_started_in_range = filter_conversations_by_request_started_time(
