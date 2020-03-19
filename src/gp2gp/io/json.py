@@ -19,3 +19,8 @@ def read_json_file(file_path: str) -> dict:
     path = Path(file_path)
     json_string = path.read_text()
     return json.loads(json_string)
+
+
+def upload_json_object(s3object, data):
+    test_data = bytes(json.dumps(data).encode("UTF-8"))
+    s3object.put(Body=test_data, ContentType="application/json")
