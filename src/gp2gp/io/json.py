@@ -21,6 +21,7 @@ def read_json_file(file_path: str) -> dict:
     return json.loads(json_string)
 
 
-def upload_json_object(s3object, data):
-    test_data = bytes(json.dumps(data).encode("UTF-8"))
-    s3object.put(Body=test_data, ContentType="application/json")
+def upload_json_object(content: dict, s3_object):
+    json_string = json.dumps(content, default=_serialize_datetime)
+    body = bytes(json_string.encode("UTF-8"))
+    s3_object.put(Body=body, ContentType="application/json")
