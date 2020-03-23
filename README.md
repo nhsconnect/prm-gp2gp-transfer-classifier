@@ -26,9 +26,13 @@ These generally work by running a command in a virtual environment configured vi
 - Python 3
 - [Tox](https://tox.readthedocs.io/en/latest/#)
 
-### Running the tests
+### Running the unit and integration tests
 
 `./tasks test`
+
+### Running the end to end tests
+
+`./tasks e2e-test`
 
 ### Running tests, linting, and type checking
 
@@ -53,3 +57,16 @@ Then run the pipeline command:
 
 `ods-portal-pipeline --output-file "<output-file>.json"`
 
+### Dashboard Pipeline
+
+This pipeline will derive GP2GP metrics and metadata for practices produced by the ODS Portal Pipeline. It does this by performing a number of transformations on GP2GP messages provided by NMS.
+ 
+The following examples show how to run this pipeline.
+
+Example 1 - Outputting to file
+ 
+`gp2gp-dashboard-pipeline --month 6 --year 2019 --practice-list-file "data/practice-list.json" --input-files "data/jun.csv,data/july.csv" --practice-metrics-output-file "data/jun-practice-metrics.json" --practice-metadata-output-file "data/jun-practice-metadata.json"`
+
+Example 2 - Outputting to S3
+
+`gp2gp-dashboard-pipeline --month 6 --year 2019 --practice-list-file "data/practice-list.json" --input-files "data/jun.csv,data/july.csv" --output-bucket "example-bucket" --practice-metrics-output-key "jun-practice-metrics.json" --practice-metadata-output-key "jun-practice-metadata.json"`
