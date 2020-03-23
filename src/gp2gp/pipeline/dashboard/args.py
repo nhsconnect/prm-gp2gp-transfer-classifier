@@ -12,6 +12,7 @@ def parse_dashboard_pipeline_arguments(argument_list):
     parser.add_argument("--practice-list-file", type=str)
     parser.add_argument("--input-files", type=_list_str)
     parser.add_argument("--output-bucket", type=str)
+    parser.add_argument("--s3-endpoint-url", type=str)
 
     metrics_output_group = parser.add_mutually_exclusive_group(required=True)
     metadata_output_group = parser.add_mutually_exclusive_group(required=True)

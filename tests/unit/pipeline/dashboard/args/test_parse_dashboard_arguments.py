@@ -31,6 +31,7 @@ def test_parse_arguments_with_local_files():
         output_bucket=None,
         practice_metrics_output_key=None,
         practice_metadata_output_key=None,
+        s3_endpoint_url=None,
     )
 
     actual = parse_dashboard_pipeline_arguments(args)
@@ -54,6 +55,8 @@ def test_parse_arguments_with_s3_upload():
         "jun-practice-metrics.json",
         "--practice-metadata-output-key",
         "jun-practice-metadata.json",
+        "--s3-endpoint-url",
+        "https://localhost:6789",
     ]
 
     expected = Namespace(
@@ -64,6 +67,7 @@ def test_parse_arguments_with_s3_upload():
         output_bucket="test-bucket",
         practice_metrics_output_key="jun-practice-metrics.json",
         practice_metadata_output_key="jun-practice-metadata.json",
+        s3_endpoint_url="https://localhost:6789",
         practice_metrics_output_file=None,
         practice_metadata_output_file=None,
     )

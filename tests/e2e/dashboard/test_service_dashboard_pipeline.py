@@ -1,14 +1,17 @@
 import json
 import gzip
+import logging
 import shutil
 from io import BytesIO
+from os import getenv
 
 import boto3
-import pytest
 from botocore.config import Config
 
 from tests.builders.common import a_string
 from subprocess import PIPE, Popen
+
+logger = logging.getLogger(__name__)
 
 
 def _read_json(path):
@@ -77,9 +80,7 @@ def test_with_local_files(datadir):
     assert actual_practice_metadata["practices"] == expected_practice_metadata["practices"]
 
 
-@pytest.mark.skip(reason="feature not yet implemented")
 def test_with_s3_output(datadir):
-
     minio_data_dir = datadir / "minio"
     minio_address = "localhost:9001"
     minio_access_key = a_string()
@@ -127,18 +128,29 @@ def test_with_s3_output(datadir):
     month = 12
     year = 2019
 
-    try:
-        pipeline_command = f"\
-            gp2gp-dashboard-pipeline --month {month}\
-            --year {year}\
-            --practice-list-file {practice_metadata_file_path}\
-            --input-files {input_file_paths_str}\
-            --output-bucket {output_bucket}\
-            --practice-metrics-output-key {practice_metrics_output_key} \
-            --practice-metadata-output-key {practice_metadata_output_key} \
-        "
+    pipeline_env = {
+        "AWS_ACCESS_KEY_ID": minio_access_key,
+        "AWS_SECRET_ACCESS_KEY": minio_secret_key,
+        "AWS_DEFAULT_REGION": minio_region,
+        "PATH": getenv("PATH"),
+    }
 
-        pipeline_process = Popen(pipeline_command, shell=True)
+    pipeline_command = f"\
+        gp2gp-dashboard-pipeline --month {month}\
+        --year {year}\
+        --practice-list-file {practice_metadata_file_path}\
+        --input-files {input_file_paths_str}\
+        --output-bucket {output_bucket_name}\
+        --practice-metrics-output-key {practice_metrics_output_key} \
+        --practice-metadata-output-key {practice_metadata_output_key} \
+        --s3-endpoint-url http://{minio_address} \
+    "
+    pipeline_process = Popen(
+        pipeline_command, shell=True, env=pipeline_env, stdout=PIPE, stderr=PIPE
+    )
+
+    try:
+
         pipeline_process.wait()
 
         actual_practice_metrics = _read_s3_json(output_bucket, practice_metrics_output_key)
@@ -151,3 +163,9 @@ def test_with_s3_output(datadir):
         output_bucket.delete()
         minio_process.terminate()
         minio_process.wait()
+        if minio_process.returncode != 0:
+            logger.error(f"Minio stdout: {minio_process.stdout.read()}")
+            logger.error(f"Minio stderr: {minio_process.stderr.read()}")
+        if pipeline_process.returncode != 0:
+            logger.error(f"Pipeline stdout: {pipeline_process.stdout.read()}")
+            logger.error(f"Pipeline stderr: {pipeline_process.stderr.read()}")

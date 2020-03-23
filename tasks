@@ -2,53 +2,55 @@
 
 set -Eeo pipefail
 
-command="$1"
-
-case "${command}" in
-  test)
-      tox -e py37
-      ;;
-  format)
-      tox -e format
-      ;;
-  check-format)
-      tox -e check-format
-      ;;
-  lint)
-      tox -e flake8
-      tox -e bandit
-      ;;
-  typecheck)
-      tox -e mypy
-      ;;
-  check-deps)
-      tox -e check-deps
-      ;;
-  clean)
-      find ./tests -type f -name "*.pyc" -delete
-      find ./tests -type d -name "__pycache__" -delete
-      find ./src -type f -name "*.pyc" -delete
-      find ./src -type d -name "__pycache__" -delete
-      find ./src -type f -path "*.egg-info*" -delete
-      find ./src -type d -path "*.egg-info" -delete
-      rm -rf build/ dist/ .pytest_cache/
-      ;;
-  devenv)
-      tox --recreate --devenv venv
-      ;;
-  validate)
-      ./tasks check-format
-      ./tasks typecheck
-      ./tasks lint
-      ./tasks test
-      ;;
-  dojo-validate)
-      dojo "./tasks validate"
-      ;;
-  *)
-      echo "Invalid command: '${command}'"
-      exit 1
-      ;;
-esac
+for command in "$@"
+do
+  echo "--- ${command} ---"
+  case "${command}" in
+    test)
+        tox -e py37
+        ;;
+    e2e-test)
+        tox -e e2e
+        ;;
+    format)
+        tox -e format
+        ;;
+    check-format)
+        tox -e check-format
+        ;;
+    lint)
+        tox -e flake8
+        tox -e bandit
+        ;;
+    typecheck)
+        tox -e mypy
+        ;;
+    check-deps)
+        tox -e check-deps
+        ;;
+    clean)
+        find ./tests -type f -name "*.pyc" -delete
+        find ./tests -type d -name "__pycache__" -delete
+        find ./src -type f -name "*.pyc" -delete
+        find ./src -type d -name "__pycache__" -delete
+        find ./src -type f -path "*.egg-info*" -delete
+        find ./src -type d -path "*.egg-info" -delete
+        rm -rf build/ dist/ .pytest_cache/
+        ;;
+    devenv)
+        tox --recreate --devenv venv
+        ;;
+    validate)
+        ./tasks check-format typecheck lint test
+        ;;
+    dojo-validate)
+        dojo "./tasks validate e2e-test"
+        ;;
+    *)
+        echo "Invalid command: '${command}'"
+        exit 1
+        ;;
+  esac
+done
 
 set +e
