@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Iterator, Dict, List, Optional, Iterable
+from typing import Iterator, Dict, List, Iterable
 
 from gp2gp.date.range import DateTimeRange
 from gp2gp.spine.models import (
@@ -24,9 +24,13 @@ def group_into_conversations(messages: Iterable[Message]) -> Iterator[Conversati
     )
 
 
-def parse_conversation(conversation: Conversation) -> Optional[ParsedConversation]:
+def parse_conversation(conversation: Conversation) -> ParsedConversation:
     parser = SpineConversationParser(conversation)
     return parser.parse()
+
+
+class ConversationMissingStart(Exception):
+    pass
 
 
 class SpineConversationParser:
@@ -55,7 +59,7 @@ class SpineConversationParser:
     def parse(self):
         req_started_message = self._get_next_or_none()
         if req_started_message.interaction_id != EHR_REQUEST_STARTED:
-            return None
+            raise ConversationMissingStart()
         req_completed_message = self._advance_until_interaction(EHR_REQUEST_COMPLETED)
         final_ack = self._advance_until_acknowledgment_of(req_completed_message)
         return ParsedConversation(

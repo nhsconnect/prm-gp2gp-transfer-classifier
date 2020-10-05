@@ -1,3 +1,5 @@
+import pytest
+
 from gp2gp.spine.models import (
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
@@ -6,11 +8,11 @@ from gp2gp.spine.models import (
     Conversation,
     ParsedConversation,
 )
-from gp2gp.spine.transformers import parse_conversation
+from gp2gp.spine.transformers import parse_conversation, ConversationMissingStart
 from tests.builders.spine import build_message
 
 
-def test_parse_conversation_parses_a_complete_conversation():
+def test_parses_a_complete_conversation():
     request_started_message = build_message(interaction_id=EHR_REQUEST_STARTED)
     request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK)
@@ -39,20 +41,17 @@ def test_parse_conversation_parses_a_complete_conversation():
     assert actual == expected
 
 
-def test_parse_conversation_returns_none_when_start_omitted():
+def test_throws_conversation_missing_start_exception_when_conversation_start_omitted():
     request_completed_ack_message = build_message(interaction_id=APPLICATION_ACK)
     messages = [request_completed_ack_message]
 
     conversation = Conversation("a-conversation-id", messages)
 
-    expected = None
-
-    actual = parse_conversation(conversation)
-
-    assert actual == expected
+    with pytest.raises(ConversationMissingStart):
+        parse_conversation(conversation)
 
 
-def test_parse_conversation_parses_incomplete_conversation():
+def test_parses_incomplete_conversation():
     request_started_message = build_message(interaction_id=EHR_REQUEST_STARTED)
     request_completed_message = build_message(interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK)
@@ -76,7 +75,7 @@ def test_parse_conversation_parses_incomplete_conversation():
     assert actual == expected
 
 
-def test_parse_conversation_parses_conversation_with_large_messages():
+def test_parses_conversation_with_large_messages():
     request_started_message = build_message(interaction_id=EHR_REQUEST_STARTED)
     request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK)

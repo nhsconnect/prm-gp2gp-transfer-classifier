@@ -14,14 +14,16 @@ from gp2gp.spine.transformers import (
     parse_conversation,
     group_into_conversations,
     filter_conversations_by_request_started_time,
+    ConversationMissingStart,
 )
 
 
 def _parse_conversations(conversations):
     for conversation in conversations:
-        gp2gp_conversation = parse_conversation(conversation)
-        if gp2gp_conversation is not None:
-            yield gp2gp_conversation
+        try:
+            yield parse_conversation(conversation)
+        except ConversationMissingStart:
+            pass
 
 
 def calculate_dashboard_data(
