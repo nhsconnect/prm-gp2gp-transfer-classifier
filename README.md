@@ -25,6 +25,7 @@ These generally work by running a command in a virtual environment configured vi
 
 - Python 3
 - [Tox](https://tox.readthedocs.io/en/latest/#)
+- [Minio](https://github.com/minio/minio)
 
 ### Running the unit and integration tests
 
@@ -65,8 +66,8 @@ The following examples show how to run this pipeline.
 
 Example 1 - Outputting to file
  
-`gp2gp-dashboard-pipeline --month 6 --year 2019 --practice-list-file "data/practice-list.json" --input-files "data/jun.csv,data/july.csv" --practice-metrics-output-file "data/jun-practice-metrics.json" --practice-metadata-output-file "data/jun-practice-metadata.json"`
+`gp2gp-dashboard-pipeline --month 6 --year 2019 --practice-list-file "data/practice-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --practice-metrics-output-file "data/jun-practice-metrics.json" --practice-metadata-output-file "data/jun-practice-metadata.json"`
 
 Example 2 - Outputting to S3
 
-`gp2gp-dashboard-pipeline --month 6 --year 2019 --practice-list-file "data/practice-list.json" --input-files "data/jun.csv,data/july.csv" --output-bucket "example-bucket" --practice-metrics-output-key "jun-practice-metrics.json" --practice-metadata-output-key "jun-practice-metadata.json"`
+`gp2gp-dashboard-pipeline --month 6 --year 2019 --practice-list-file "data/practice-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket" --practice-metrics-output-key "jun-practice-metrics.json" --practice-metadata-output-key "jun-practice-metadata.json"`

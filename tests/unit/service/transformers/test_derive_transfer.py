@@ -41,7 +41,9 @@ def test_derive_transfers_produces_sla_of_successful_conversation():
 def test_derive_transfers_produces_no_sla_given_pending_ehr_completed():
     conversations = [
         build_parsed_conversation(
-            request_started=build_message(), request_completed=None, request_completed_ack=None,
+            request_started=build_message(),
+            request_completed=None,
+            request_completed_ack=None,
         )
     ]
 

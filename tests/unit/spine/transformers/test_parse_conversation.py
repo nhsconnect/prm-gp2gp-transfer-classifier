@@ -15,7 +15,8 @@ def test_parse_conversation_parses_a_complete_conversation():
     request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK)
     request_completed_ack_message = build_message(
-        interaction_id=APPLICATION_ACK, message_ref="abc-1",
+        interaction_id=APPLICATION_ACK,
+        message_ref="abc-1",
     )
 
     messages = [
@@ -82,7 +83,8 @@ def test_parse_conversation_parses_conversation_with_large_messages():
     common_p2p_message = build_message(guid="abc-2", interaction_id=COMMON_POINT_TO_POINT)
     common_p2p_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc-2")
     request_completed_ack_message = build_message(
-        interaction_id=APPLICATION_ACK, message_ref="abc-1",
+        interaction_id=APPLICATION_ACK,
+        message_ref="abc-1",
     )
 
     messages = [

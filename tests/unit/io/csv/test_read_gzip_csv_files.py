@@ -39,7 +39,8 @@ def test_loads_two_files(fs):
     fs.create_file(
         file_path_two,
         contents=build_gzip_csv(
-            header=["id", "message"], rows=[["D", "D message"], ["E", "E message"]],
+            header=["id", "message"],
+            rows=[["D", "D message"], ["E", "E message"]],
         ),
     )
 
