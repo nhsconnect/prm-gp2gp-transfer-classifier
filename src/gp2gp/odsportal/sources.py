@@ -6,13 +6,18 @@ import requests
 from dateutil.tz import tzutc
 from dateutil import parser
 
-from gp2gp.odsportal.models import PracticeDetails, PracticeMetadata
+from gp2gp.odsportal.models import OrganisationDetails, OrganisationMetadata
 
 ODS_PORTAL_SEARCH_URL = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
-DEFAULT_SEARCH_PARAMS = {
+PRACTICE_SEARCH_PARAMS = {
     "PrimaryRoleId": "RO177",
     "Status": "Active",
     "NonPrimaryRoleId": "RO76",
+    "Limit": "1000",
+}
+CCG_SEARCH_PARAMS = {
+    "PrimaryRoleId": "RO98",
+    "Status": "Active",
     "Limit": "1000",
 }
 
@@ -25,18 +30,16 @@ class OdsPortalException(Exception):
         self.status_code = status_code
 
 
-class OdsPracticeDataFetcher:
+class OdsDataFetcher:
     def __init__(self, client=requests, search_url=ODS_PORTAL_SEARCH_URL):
         self._search_url = search_url
         self._client = client
 
-    def fetch_practice_data(self, params=None):
-        if params is None:
-            params = DEFAULT_SEARCH_PARAMS
-        response_data = list(self._iterate_practice_data(params))
+    def fetch_organisation_data(self, params):
+        response_data = list(self._iterate_organisation_data(params))
         return response_data
 
-    def _iterate_practice_data(self, params):
+    def _iterate_organisation_data(self, params):
         response = self._client.get(self._search_url, params)
         yield from self._process_practice_data_response(response)
 
@@ -47,27 +50,35 @@ class OdsPracticeDataFetcher:
     @classmethod
     def _process_practice_data_response(cls, response):
         if response.status_code != 200:
-            raise OdsPortalException("Unable to fetch practice data", response.status_code)
+            raise OdsPortalException("Unable to fetch organisation data", response.status_code)
         return json.loads(response.content)["Organisations"]
 
 
-def construct_practice_list_from_dict(data: dict) -> PracticeMetadata:
-    return PracticeMetadata(
+def construct_organisation_list_from_dict(data: dict) -> OrganisationMetadata:
+    return OrganisationMetadata(
         generated_on=parser.isoparse(data["generated_on"]),
         practices=[
-            PracticeDetails(ods_code=p["ods_code"], name=p["name"]) for p in data["practices"]
+            OrganisationDetails(ods_code=p["ods_code"], name=p["name"]) for p in data["practices"]
         ],
+        ccgs=[],
     )
 
 
-def construct_practice_metadata_from_ods_portal_response(data: Iterable[dict]) -> PracticeMetadata:
-    unique_practices = _remove_duplicated_practices(data)
+def construct_organisation_metadata_from_ods_portal_response(
+    practiceData: Iterable[dict],
+    ccgData: Iterable[dict],
+) -> OrganisationMetadata:
+    unique_practices = _remove_duplicated_organisations(practiceData)
+    unique_ccgs = _remove_duplicated_organisations(ccgData)
 
-    return PracticeMetadata(
+    return OrganisationMetadata(
         generated_on=datetime.now(tzutc()),
-        practices=[PracticeDetails(ods_code=p["OrgId"], name=p["Name"]) for p in unique_practices],
+        practices=[
+            OrganisationDetails(ods_code=p["OrgId"], name=p["Name"]) for p in unique_practices
+        ],
+        ccgs=[OrganisationDetails(ods_code=c["OrgId"], name=c["Name"]) for c in unique_ccgs],
     )
 
 
-def _remove_duplicated_practices(raw_practices: Iterable[dict]) -> Iterable[dict]:
-    return {obj["OrgId"]: obj for obj in raw_practices}.values()
+def _remove_duplicated_organisations(raw_organisations: Iterable[dict]) -> Iterable[dict]:
+    return {obj["OrgId"]: obj for obj in raw_organisations}.values()

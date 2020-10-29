@@ -11,7 +11,7 @@ from gp2gp.dashboard.models import (
     TimeToIntegrateSla,
 )
 from gp2gp.date.range import DateTimeRange
-from gp2gp.odsportal.models import PracticeDetails
+from gp2gp.odsportal.models import OrganisationDetails
 from tests.builders.spine import build_message
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data
 
@@ -72,7 +72,9 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         ehr_request_completed_acknowledged_on=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
     )
 
-    practice_list = [PracticeDetails(ods_code=requesting_ods_code, name=requesting_practice_name)]
+    practice_list = [
+        OrganisationDetails(ods_code=requesting_ods_code, name=requesting_practice_name)
+    ]
 
     expected = ServiceDashboardData(
         generated_on=datetime(year=2020, month=1, day=15, hour=23, second=42, tzinfo=UTC),

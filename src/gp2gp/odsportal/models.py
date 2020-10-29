@@ -4,12 +4,13 @@ from typing import List
 
 
 @dataclass
-class PracticeDetails:
+class OrganisationDetails:
     ods_code: str
     name: str
 
 
 @dataclass
-class PracticeMetadata:
+class OrganisationMetadata:
     generated_on: datetime
-    practices: List[PracticeDetails]
+    practices: List[OrganisationDetails]
+    ccgs: List[OrganisationDetails]

@@ -1,11 +1,14 @@
 from unittest.mock import MagicMock
 import pytest
 
-from gp2gp.odsportal.sources import OdsPracticeDataFetcher, OdsPortalException
+from gp2gp.odsportal.sources import OdsDataFetcher, OdsPortalException
 from tests.builders.odsportal import build_mock_response
+from typing import Dict
+
+MOCK_PARAMS: Dict[str, str] = {}
 
 
-def test_returns_a_list_of_practices():
+def test_returns_a_list_of_organisations():
     mock_client = MagicMock()
     mock_response = build_mock_response(
         content=b'{"Organisations": [{"Name": "GP Practice", "OrgId": "A12345"}]}'
@@ -13,16 +16,16 @@ def test_returns_a_list_of_practices():
 
     mock_client.get.side_effect = [mock_response]
 
-    fetcher = OdsPracticeDataFetcher(mock_client)
+    fetcher = OdsDataFetcher(mock_client)
 
     expected = [{"Name": "GP Practice", "OrgId": "A12345"}]
 
-    actual = fetcher.fetch_practice_data()
+    actual = fetcher.fetch_organisation_data(MOCK_PARAMS)
 
     assert actual == expected
 
 
-def test_returns_combined_list_of_practices_given_several_pages_query():
+def test_returns_combined_list_of_organisations_given_several_pages_query():
     mock_client = MagicMock()
 
     url_1 = "https://test.link/1"
@@ -45,7 +48,7 @@ def test_returns_combined_list_of_practices_given_several_pages_query():
 
     mock_client.get.side_effect = lambda *args: pages[args[0]]
 
-    fetcher = OdsPracticeDataFetcher(mock_client, search_url=url_1)
+    fetcher = OdsDataFetcher(mock_client, search_url=url_1)
 
     expected = [
         {"Name": "GP Practice", "OrgId": "A12345"},
@@ -53,7 +56,7 @@ def test_returns_combined_list_of_practices_given_several_pages_query():
         {"Name": "GP Practice 3", "OrgId": "Y23467"},
     ]
 
-    actual = fetcher.fetch_practice_data(url_1)
+    actual = fetcher.fetch_organisation_data(MOCK_PARAMS)
 
     assert actual == expected
 
@@ -64,10 +67,10 @@ def test_throws_ods_portal_exception_when_status_code_is_not_200():
 
     mock_client.get.side_effect = [mock_response]
 
-    fetcher = OdsPracticeDataFetcher(mock_client)
+    fetcher = OdsDataFetcher(mock_client)
 
     with pytest.raises(OdsPortalException):
-        fetcher.fetch_practice_data()
+        fetcher.fetch_organisation_data(MOCK_PARAMS)
 
 
 def test_throws_ods_portal_exception_when_status_code_is_not_200_on_paginated_request():
@@ -86,7 +89,7 @@ def test_throws_ods_portal_exception_when_status_code_is_not_200_on_paginated_re
 
     mock_client.get.side_effect = lambda *args: pages[args[0]]
 
-    fetcher = OdsPracticeDataFetcher(mock_client, search_url=url_1)
+    fetcher = OdsDataFetcher(mock_client, search_url=url_1)
 
     with pytest.raises(OdsPortalException):
-        fetcher.fetch_practice_data()
+        fetcher.fetch_organisation_data(MOCK_PARAMS)

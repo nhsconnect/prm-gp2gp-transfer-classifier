@@ -2,7 +2,7 @@ from datetime import timedelta
 from typing import Iterable, Iterator
 from warnings import warn
 
-from gp2gp.odsportal.models import PracticeDetails
+from gp2gp.odsportal.models import OrganisationDetails
 from gp2gp.service.models import (
     Transfer,
     ERROR_SUPPRESSED,
@@ -84,7 +84,7 @@ def _assign_to_sla_band(sla_duration: timedelta):
 
 
 def calculate_sla_by_practice(
-    practice_list: Iterable[PracticeDetails], transfers: Iterable[SuccessfulTransfer]
+    practice_list: Iterable[OrganisationDetails], transfers: Iterable[SuccessfulTransfer]
 ) -> Iterator[PracticeSlaMetrics]:
 
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
