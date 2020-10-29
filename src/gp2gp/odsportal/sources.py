@@ -60,7 +60,7 @@ def construct_organisation_list_from_dict(data: dict) -> OrganisationMetadata:
         practices=[
             OrganisationDetails(ods_code=p["ods_code"], name=p["name"]) for p in data["practices"]
         ],
-        ccgs=[],
+        ccgs=[OrganisationDetails(ods_code=c["ods_code"], name=c["name"]) for c in data["ccgs"]],
     )
 
 

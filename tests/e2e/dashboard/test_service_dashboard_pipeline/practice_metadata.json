@@ -1,9 +1,10 @@
 {
-  "generated_on":"2020-02-24 16:51:21.353977",
-  "practices":[
+  "generated_on": "2020-02-24 16:51:21.353977",
+  "practices": [
     {
       "ods_code": "A12345",
       "name": "Test GP"
     }
-  ]
+  ],
+  "ccgs": []
 }
