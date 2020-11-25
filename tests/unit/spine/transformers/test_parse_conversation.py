@@ -34,6 +34,7 @@ def test_parses_a_complete_conversation():
         id="abc-0",
         request_started=request_started_message,
         request_completed=request_completed_message,
+        intermediate_messages=[request_started_ack_message],
         request_completed_ack=request_completed_ack_message,
     )
     actual = parse_conversation(conversation)
@@ -68,6 +69,7 @@ def test_parses_incomplete_conversation():
         id="abc-0",
         request_started=request_started_message,
         request_completed=request_completed_message,
+        intermediate_messages=[request_started_ack_message],
         request_completed_ack=None,
     )
     actual = parse_conversation(conversation)
@@ -101,6 +103,11 @@ def test_parses_conversation_with_large_messages():
         id="abc-0",
         request_started=request_started_message,
         request_completed=request_completed_message,
+        intermediate_messages=[
+            request_started_ack_message,
+            common_p2p_message,
+            common_p2p_ack_message,
+        ],
         request_completed_ack=request_completed_ack_message,
     )
     actual = parse_conversation(conversation)

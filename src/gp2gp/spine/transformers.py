@@ -38,19 +38,14 @@ class SpineConversationParser:
         self._id = conversation.id
         self._messages = iter(conversation.messages)
 
-    def _advance_until_interaction(self, interaction_id):
-        return self._advance_until(lambda m: m.interaction_id == interaction_id)
+    def _is_request_completed(self, message):
+        return message.interaction_id == EHR_REQUEST_COMPLETED
 
-    def _advance_until_acknowledgment_of(self, message):
-        return self._advance_until(
-            lambda m: m.interaction_id == APPLICATION_ACK and m.message_ref == message.guid
+    def _is_final_ack(self, message, req_completed_message):
+        return (
+            message.interaction_id == APPLICATION_ACK
+            and message.message_ref == req_completed_message.guid  # noqa: W503
         )
-
-    def _advance_until(self, func):
-        next_message = self._get_next_or_none()
-        while next_message is not None and not func(next_message):
-            next_message = self._get_next_or_none()
-        return next_message
 
     def _get_next_or_none(self):
         next_message = next(self._messages, None)
@@ -60,12 +55,25 @@ class SpineConversationParser:
         req_started_message = self._get_next_or_none()
         if req_started_message.interaction_id != EHR_REQUEST_STARTED:
             raise ConversationMissingStart()
-        req_completed_message = self._advance_until_interaction(EHR_REQUEST_COMPLETED)
-        final_ack = self._advance_until_acknowledgment_of(req_completed_message)
+        req_completed_message = None
+        final_ack = None
+        intermediate_messages = []
+
+        next_message = self._get_next_or_none()
+        while next_message is not None:
+            if self._is_request_completed(next_message):
+                req_completed_message = next_message
+            elif self._is_final_ack(next_message, req_completed_message):
+                final_ack = next_message
+            else:
+                intermediate_messages.append(next_message)
+            next_message = self._get_next_or_none()
+
         return ParsedConversation(
             self._id,
             request_started=req_started_message,
             request_completed=req_completed_message,
+            intermediate_messages=intermediate_messages,
             request_completed_ack=final_ack,
         )
 

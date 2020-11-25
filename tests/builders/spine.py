@@ -7,6 +7,7 @@ def build_parsed_conversation(**kwargs):
         id=kwargs.get("id", a_string(36)),
         request_started=kwargs.get("request_started", build_message()),
         request_completed=kwargs.get("request_completed", build_message()),
+        intermediate_messages=[],
         request_completed_ack=kwargs.get("request_completed_ack", build_message()),
     )
 

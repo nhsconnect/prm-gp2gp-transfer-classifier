@@ -27,4 +27,5 @@ class ParsedConversation(NamedTuple):
     id: str
     request_started: Message
     request_completed: Message
+    intermediate_messages: List[Message]
     request_completed_ack: Optional[Message]
