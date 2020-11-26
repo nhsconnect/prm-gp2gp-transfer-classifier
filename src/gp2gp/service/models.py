@@ -10,7 +10,7 @@ class Transfer(NamedTuple):
     sla_duration: Optional[timedelta]
     requesting_practice_ods_code: str
     sending_practice_ods_code: str
-    error_code: Optional[int]
+    final_error_code: Optional[int]
     pending: bool
 
 

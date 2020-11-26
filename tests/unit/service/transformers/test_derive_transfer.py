@@ -101,7 +101,7 @@ def test_derive_transfers_extracts_error_code():
 
     expected_errors = [99]
 
-    _assert_attributes("error_code", actual, expected_errors)
+    _assert_attributes("final_error_code", actual, expected_errors)
 
 
 def test_derive_transfers_doesnt_extract_error_code_given_pending_request_completed_ack():
@@ -111,7 +111,7 @@ def test_derive_transfers_doesnt_extract_error_code_given_pending_request_comple
 
     expected_errors = [None]
 
-    _assert_attributes("error_code", actual, expected_errors)
+    _assert_attributes("final_error_code", actual, expected_errors)
 
 
 def test_derive_transfers_flags_pending_request_completed_as_pending():

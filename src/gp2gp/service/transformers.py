@@ -47,7 +47,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         sla_duration=_calculate_sla(conversation),
         requesting_practice_ods_code=_extract_requesting_practice_ods_code(conversation),
         sending_practice_ods_code=_extract_sending_practice_ods_code(conversation),
-        error_code=_extract_error_code(conversation),
+        final_error_code=_extract_error_code(conversation),
         pending=_is_pending(conversation),
     )
 
@@ -57,7 +57,7 @@ def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Tr
 
 
 def is_successful(transfer):
-    return transfer.error_code is None or transfer.error_code == ERROR_SUPPRESSED
+    return transfer.final_error_code is None or transfer.final_error_code == ERROR_SUPPRESSED
 
 
 def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[SuccessfulTransfer]:

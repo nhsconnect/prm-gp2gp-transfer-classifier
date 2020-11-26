@@ -12,7 +12,7 @@ def test_includes_successful_transfer():
         requesting_practice_ods_code="A12345",
         sending_practice_ods_code="B67890",
         pending=False,
-        error_code=None,
+        final_error_code=None,
     )
 
     transfers = [successful_transfer]
@@ -38,7 +38,7 @@ def test_includes_suppressed_transfers():
         requesting_practice_ods_code="B12345",
         sending_practice_ods_code="A67890",
         pending=False,
-        error_code=15,
+        final_error_code=15,
     )
 
     transfers = [suppressed_transfer]
@@ -58,7 +58,7 @@ def test_includes_suppressed_transfers():
 
 
 def test_includes_successful_transfers():
-    transfers = [build_transfer(pending=False, error_code=None) for _ in range(3)]
+    transfers = [build_transfer(pending=False, final_error_code=None) for _ in range(3)]
 
     actual = filter_for_successful_transfers(transfers)
 
@@ -68,7 +68,7 @@ def test_includes_successful_transfers():
 
 
 def test_excludes_failed_transfers():
-    failed_transfer = build_transfer(error_code=99)
+    failed_transfer = build_transfer(final_error_code=99)
     transfers = [failed_transfer]
 
     actual = filter_for_successful_transfers(transfers)

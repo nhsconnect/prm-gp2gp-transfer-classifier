@@ -8,7 +8,7 @@ def build_transfer(**kwargs):
         sla_duration=kwargs.get("sla_duration", a_duration()),
         requesting_practice_ods_code=kwargs.get("requesting_practice_ods_code", a_string(6)),
         sending_practice_ods_code=kwargs.get("sending_practice_ods_code", a_string(6)),
-        error_code=kwargs.get("error_code", None),
+        final_error_code=kwargs.get("final_error_code", None),
         pending=kwargs.get("pending", False),
     )
 
