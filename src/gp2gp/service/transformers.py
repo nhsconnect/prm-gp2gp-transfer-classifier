@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, List
 from warnings import warn
 
 from gp2gp.odsportal.models import OrganisationDetails
@@ -10,7 +10,7 @@ from gp2gp.service.models import (
     SlaBand,
     SuccessfulTransfer,
 )
-from gp2gp.spine.models import ParsedConversation
+from gp2gp.spine.models import ParsedConversation, Message
 
 
 THREE_DAYS_IN_SECONDS = 259200
@@ -31,10 +31,16 @@ def _extract_sending_practice_ods_code(conversation):
     return conversation.request_started.to_party_ods_code
 
 
-def _extract_error_code(conversation):
+def _extract_final_error_code(conversation):
     if conversation.request_completed_ack:
         return conversation.request_completed_ack.error_code
     return None
+
+
+def _extract_intermediate_error_code(intermediate_messages: List[Message]):
+    return [
+        message.error_code for message in intermediate_messages if message.error_code is not None
+    ]
 
 
 def _is_pending(conversation):
@@ -47,7 +53,10 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         sla_duration=_calculate_sla(conversation),
         requesting_practice_ods_code=_extract_requesting_practice_ods_code(conversation),
         sending_practice_ods_code=_extract_sending_practice_ods_code(conversation),
-        final_error_code=_extract_error_code(conversation),
+        final_error_code=_extract_final_error_code(conversation),
+        intermediate_error_codes=_extract_intermediate_error_code(
+            conversation.intermediate_messages
+        ),
         pending=_is_pending(conversation),
     )
 

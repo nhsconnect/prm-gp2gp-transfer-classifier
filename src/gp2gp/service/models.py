@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import NamedTuple, Optional
+from typing import NamedTuple, Optional, List
 from enum import Enum, auto
 
 ERROR_SUPPRESSED = 15
@@ -11,6 +11,7 @@ class Transfer(NamedTuple):
     requesting_practice_ods_code: str
     sending_practice_ods_code: str
     final_error_code: Optional[int]
+    intermediate_error_codes: List[int]
     pending: bool
 
 
