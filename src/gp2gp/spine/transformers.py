@@ -42,10 +42,12 @@ class SpineConversationParser:
         return message.interaction_id == EHR_REQUEST_COMPLETED
 
     def _is_final_ack(self, message, req_completed_message):
-        return (
-            message.interaction_id == APPLICATION_ACK
-            and message.message_ref == req_completed_message.guid  # noqa: W503
-        )
+        if req_completed_message is None:
+            return False
+        else:
+            is_ack = message.interaction_id == APPLICATION_ACK
+            is_request_completed_ack = message.message_ref == req_completed_message.guid
+            return is_ack and is_request_completed_ack
 
     def _get_next_or_none(self):
         next_message = next(self._messages, None)

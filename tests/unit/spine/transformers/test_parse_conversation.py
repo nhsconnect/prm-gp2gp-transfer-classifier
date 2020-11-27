@@ -10,6 +10,7 @@ from gp2gp.spine.models import (
 )
 from gp2gp.spine.transformers import parse_conversation, ConversationMissingStart
 from tests.builders.spine import build_message
+from tests.builders.common import a_string
 
 
 def test_parses_a_complete_conversation():
@@ -109,6 +110,30 @@ def test_parses_conversation_with_large_messages():
             common_p2p_ack_message,
         ],
         request_completed_ack=request_completed_ack_message,
+    )
+    actual = parse_conversation(conversation)
+
+    assert actual == expected
+
+
+def test_parses_conversation_without_request_completed():
+    guid = a_string()
+    request_started_message = build_message(guid=guid, interaction_id=EHR_REQUEST_STARTED)
+    request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref=guid)
+
+    messages = [
+        request_started_message,
+        request_started_ack_message,
+    ]
+
+    conversation = Conversation(guid, messages)
+
+    expected = ParsedConversation(
+        id=guid,
+        request_started=request_started_message,
+        request_completed=None,
+        intermediate_messages=[request_started_ack_message],
+        request_completed_ack=None,
     )
     actual = parse_conversation(conversation)
 
