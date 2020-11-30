@@ -3,7 +3,7 @@ from typing import List
 
 from gp2gp.service.transformers import derive_transfers
 from tests.builders.spine import build_parsed_conversation, build_message
-from gp2gp.service.models import Transfer
+from gp2gp.service.models import Transfer, TransferStatus
 
 
 def _assert_attributes(attr_name: str, actual: List[Transfer], expected: List):
@@ -211,3 +211,13 @@ def test_extracts_multiple_intermediate_message_error_codes():
     expected_intermediate_error_codes = [[11, 10]]
 
     _assert_attributes("intermediate_error_codes", actual, expected_intermediate_error_codes)
+
+
+def test_has_requested_status():
+    conversations = [build_parsed_conversation(request_started=build_message())]
+
+    actual = derive_transfers(conversations)
+
+    expected_statuses = [TransferStatus.REQUESTED]
+
+    _assert_attributes("status", actual, expected_statuses)

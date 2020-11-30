@@ -5,6 +5,7 @@ from warnings import warn
 from gp2gp.odsportal.models import OrganisationDetails
 from gp2gp.service.models import (
     Transfer,
+    TransferStatus,
     ERROR_SUPPRESSED,
     PracticeSlaMetrics,
     SlaBand,
@@ -58,6 +59,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
             conversation.intermediate_messages
         ),
         pending=_is_pending(conversation),
+        status=TransferStatus.REQUESTED,
     )
 
 

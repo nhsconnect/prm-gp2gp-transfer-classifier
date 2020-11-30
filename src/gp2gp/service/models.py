@@ -5,6 +5,10 @@ from enum import Enum, auto
 ERROR_SUPPRESSED = 15
 
 
+class TransferStatus(Enum):
+    REQUESTED = auto()
+
+
 class Transfer(NamedTuple):
     conversation_id: str
     sla_duration: Optional[timedelta]
@@ -12,6 +16,7 @@ class Transfer(NamedTuple):
     sending_practice_ods_code: str
     final_error_code: Optional[int]
     intermediate_error_codes: List[int]
+    status: TransferStatus
     pending: bool
 
 
