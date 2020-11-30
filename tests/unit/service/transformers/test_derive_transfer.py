@@ -3,7 +3,7 @@ from typing import List
 
 from gp2gp.service.transformers import derive_transfers
 from tests.builders.spine import build_parsed_conversation, build_message
-from gp2gp.service.models import Transfer, TransferStatus
+from gp2gp.service.models import Transfer, TransferStatus, ERROR_SUPPRESSED
 
 
 def _assert_attributes(attr_name: str, actual: List[Transfer], expected: List):
@@ -231,6 +231,22 @@ def test_has_integrated_status_if_no_error_in_final_ack():
             request_started=build_message(),
             request_completed=build_message(),
             request_completed_ack=build_message(error_code=None),
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_statuses = [TransferStatus.INTEGRATED]
+
+    _assert_attributes("status", actual, expected_statuses)
+
+
+def test_has_integrated_status_if_error_is_supressed():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed=build_message(),
+            request_completed_ack=build_message(error_code=ERROR_SUPPRESSED),
         )
     ]
 

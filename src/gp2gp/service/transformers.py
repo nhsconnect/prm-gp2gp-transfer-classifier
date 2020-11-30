@@ -71,9 +71,8 @@ def _assign_status(conversation: ParsedConversation) -> TransferStatus:
 
 
 def _is_integrated(conversation: ParsedConversation) -> bool:
-    return (
-        conversation.request_completed_ack and conversation.request_completed_ack.error_code is None
-    )
+    final_ack = conversation.request_completed_ack
+    return final_ack and (final_ack.error_code is None or final_ack.error_code == ERROR_SUPPRESSED)
 
 
 def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Transfer]:
