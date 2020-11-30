@@ -138,3 +138,38 @@ def test_parses_conversation_without_request_completed():
     actual = parse_conversation(conversation)
 
     assert actual == expected
+
+
+def test_saves_the_last_message_when_multiple_request_completed_messages_or_final_acks():
+    request_started_message = build_message(guid="cde", interaction_id=EHR_REQUEST_STARTED)
+    request_completed_message_1 = build_message(guid="cde-1", interaction_id=EHR_REQUEST_COMPLETED)
+    request_completed_message_2 = build_message(guid="cde-2", interaction_id=EHR_REQUEST_COMPLETED)
+    request_completed_message_3 = build_message(guid="cde-3", interaction_id=EHR_REQUEST_COMPLETED)
+    request_completed_ack_message_1 = build_message(
+        interaction_id=APPLICATION_ACK, message_ref="cde-3", error_code=12
+    )
+    request_completed_ack_message_2 = build_message(
+        interaction_id=APPLICATION_ACK, message_ref="cde-3", error_code=None
+    )
+
+    messages = [
+        request_started_message,
+        request_completed_message_1,
+        request_completed_message_2,
+        request_completed_message_3,
+        request_completed_ack_message_1,
+        request_completed_ack_message_2,
+    ]
+
+    conversation = Conversation("cde", messages)
+
+    expected = ParsedConversation(
+        id="cde",
+        request_started=request_started_message,
+        request_completed=request_completed_message_3,
+        intermediate_messages=[],
+        request_completed_ack=request_completed_ack_message_2,
+    )
+    actual = parse_conversation(conversation)
+
+    assert actual == expected
