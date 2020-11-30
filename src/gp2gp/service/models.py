@@ -7,6 +7,7 @@ ERROR_SUPPRESSED = 15
 
 class TransferStatus(Enum):
     REQUESTED = auto()
+    INTEGRATED = auto()
 
 
 class Transfer(NamedTuple):

@@ -59,7 +59,20 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
             conversation.intermediate_messages
         ),
         pending=_is_pending(conversation),
-        status=TransferStatus.REQUESTED,
+        status=_assign_status(conversation),
+    )
+
+
+def _assign_status(conversation: ParsedConversation) -> TransferStatus:
+    if _is_integrated(conversation):
+        return TransferStatus.INTEGRATED
+    else:
+        return TransferStatus.REQUESTED
+
+
+def _is_integrated(conversation: ParsedConversation) -> bool:
+    return (
+        conversation.request_completed_ack and conversation.request_completed_ack.error_code is None
     )
 
 

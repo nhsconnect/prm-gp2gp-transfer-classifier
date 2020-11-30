@@ -214,10 +214,28 @@ def test_extracts_multiple_intermediate_message_error_codes():
 
 
 def test_has_requested_status():
-    conversations = [build_parsed_conversation(request_started=build_message())]
+    conversations = [
+        build_parsed_conversation(request_started=build_message(), request_completed_ack=None)
+    ]
 
     actual = derive_transfers(conversations)
 
     expected_statuses = [TransferStatus.REQUESTED]
+
+    _assert_attributes("status", actual, expected_statuses)
+
+
+def test_has_integrated_status_if_no_error_in_final_ack():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed=build_message(),
+            request_completed_ack=build_message(error_code=None),
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_statuses = [TransferStatus.INTEGRATED]
 
     _assert_attributes("status", actual, expected_statuses)
