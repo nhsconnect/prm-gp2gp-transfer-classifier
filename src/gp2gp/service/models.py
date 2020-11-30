@@ -6,7 +6,7 @@ ERROR_SUPPRESSED = 15
 
 
 class TransferStatus(Enum):
-    REQUESTED = auto()
+    PENDING = auto()
     INTEGRATED = auto()
     FAILED = auto()
 

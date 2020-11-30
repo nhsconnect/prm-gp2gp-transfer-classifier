@@ -69,7 +69,7 @@ def _assign_status(conversation: ParsedConversation) -> TransferStatus:
     elif _has_error(conversation):
         return TransferStatus.FAILED
     else:
-        return TransferStatus.REQUESTED
+        return TransferStatus.PENDING
 
 
 def _is_integrated(conversation: ParsedConversation) -> bool:
