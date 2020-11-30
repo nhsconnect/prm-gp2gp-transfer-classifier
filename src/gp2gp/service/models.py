@@ -22,13 +22,6 @@ class Transfer(NamedTuple):
     pending: bool
 
 
-class SuccessfulTransfer(NamedTuple):
-    conversation_id: str
-    sla_duration: timedelta
-    requesting_practice_ods_code: str
-    sending_practice_ods_code: str
-
-
 class SlaBand(Enum):
     WITHIN_3_DAYS = auto()
     WITHIN_8_DAYS = auto()

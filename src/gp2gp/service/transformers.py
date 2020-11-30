@@ -9,7 +9,6 @@ from gp2gp.service.models import (
     ERROR_SUPPRESSED,
     PracticeSlaMetrics,
     SlaBand,
-    SuccessfulTransfer,
 )
 from gp2gp.spine.models import ParsedConversation, Message
 
@@ -99,16 +98,9 @@ def is_successful(transfer):
     return transfer.final_error_code is None or transfer.final_error_code == ERROR_SUPPRESSED
 
 
-def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[SuccessfulTransfer]:
+def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
     return (
-        SuccessfulTransfer(
-            conversation_id=t.conversation_id,
-            sla_duration=t.sla_duration,
-            requesting_practice_ods_code=t.requesting_practice_ods_code,
-            sending_practice_ods_code=t.sending_practice_ods_code,
-        )
-        for t in transfers
-        if is_successful(t) and not t.pending and t.sla_duration is not None
+        t for t in transfers if is_successful(t) and not t.pending and t.sla_duration is not None
     )
 
 
@@ -123,7 +115,7 @@ def _assign_to_sla_band(sla_duration: timedelta):
 
 
 def calculate_sla_by_practice(
-    practice_list: Iterable[OrganisationDetails], transfers: Iterable[SuccessfulTransfer]
+    practice_list: Iterable[OrganisationDetails], transfers: Iterable[Transfer]
 ) -> Iterator[PracticeSlaMetrics]:
 
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}

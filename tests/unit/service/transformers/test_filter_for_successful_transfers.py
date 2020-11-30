@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from gp2gp.service.models import SuccessfulTransfer
+from gp2gp.service.models import Transfer, TransferStatus
 from gp2gp.service.transformers import filter_for_successful_transfers
 from tests.builders.service import build_transfer
 
@@ -13,6 +13,7 @@ def test_includes_successful_transfer():
         sending_practice_ods_code="B67890",
         pending=False,
         final_error_code=None,
+        status=TransferStatus.INTEGRATED,
     )
 
     transfers = [successful_transfer]
@@ -20,11 +21,15 @@ def test_includes_successful_transfer():
     actual = filter_for_successful_transfers(transfers)
 
     expected = [
-        SuccessfulTransfer(
+        Transfer(
             conversation_id="123",
             sla_duration=timedelta(hours=1),
             requesting_practice_ods_code="A12345",
             sending_practice_ods_code="B67890",
+            pending=False,
+            final_error_code=None,
+            intermediate_error_codes=[],
+            status=TransferStatus.INTEGRATED,
         )
     ]
 
@@ -39,6 +44,7 @@ def test_includes_suppressed_transfers():
         sending_practice_ods_code="A67890",
         pending=False,
         final_error_code=15,
+        status=TransferStatus.INTEGRATED,
     )
 
     transfers = [suppressed_transfer]
@@ -46,11 +52,15 @@ def test_includes_suppressed_transfers():
     actual = filter_for_successful_transfers(transfers)
 
     expected = [
-        SuccessfulTransfer(
+        Transfer(
             conversation_id="456",
             sla_duration=timedelta(hours=2),
             requesting_practice_ods_code="B12345",
             sending_practice_ods_code="A67890",
+            pending=False,
+            final_error_code=15,
+            intermediate_error_codes=[],
+            status=TransferStatus.INTEGRATED,
         )
     ]
 
