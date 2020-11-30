@@ -255,3 +255,19 @@ def test_has_integrated_status_if_error_is_supressed():
     expected_statuses = [TransferStatus.INTEGRATED]
 
     _assert_attributes("status", actual, expected_statuses)
+
+
+def test_has_failed_status_if_error_in_final_ack():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed=build_message(),
+            request_completed_ack=build_message(error_code=30),
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_statuses = [TransferStatus.FAILED]
+
+    _assert_attributes("status", actual, expected_statuses)

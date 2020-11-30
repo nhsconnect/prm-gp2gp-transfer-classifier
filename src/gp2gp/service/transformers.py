@@ -66,6 +66,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
 def _assign_status(conversation: ParsedConversation) -> TransferStatus:
     if _is_integrated(conversation):
         return TransferStatus.INTEGRATED
+    elif _has_error(conversation):
+        return TransferStatus.FAILED
     else:
         return TransferStatus.REQUESTED
 
@@ -73,6 +75,11 @@ def _assign_status(conversation: ParsedConversation) -> TransferStatus:
 def _is_integrated(conversation: ParsedConversation) -> bool:
     final_ack = conversation.request_completed_ack
     return final_ack and (final_ack.error_code is None or final_ack.error_code == ERROR_SUPPRESSED)
+
+
+def _has_error(conversation: ParsedConversation) -> bool:
+    final_ack = conversation.request_completed_ack
+    return final_ack and final_ack.error_code and final_ack.error_code != ERROR_SUPPRESSED
 
 
 def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Transfer]:
