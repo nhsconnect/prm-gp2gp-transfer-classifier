@@ -41,10 +41,10 @@ do
         tox --recreate --devenv venv
         ;;
     validate)
-        ./tasks check-format typecheck lint test
+        ./tasks check-format typecheck lint test e2e-test
         ;;
     dojo-validate)
-        dojo "./tasks validate e2e-test"
+        dojo "./tasks validate"
         ;;
     *)
         echo "Invalid command: '${command}'"
