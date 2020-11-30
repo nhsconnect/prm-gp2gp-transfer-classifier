@@ -78,8 +78,17 @@ def _is_integrated(conversation: ParsedConversation) -> bool:
 
 
 def _has_error(conversation: ParsedConversation) -> bool:
+    return _has_final_ack_error(conversation) or _has_intermediate_message_error(conversation)
+
+
+def _has_final_ack_error(conversation: ParsedConversation) -> bool:
     final_ack = conversation.request_completed_ack
     return final_ack and final_ack.error_code and final_ack.error_code != ERROR_SUPPRESSED
+
+
+def _has_intermediate_message_error(conversation: ParsedConversation) -> bool:
+    intermediate_errors = _extract_intermediate_error_code(conversation.intermediate_messages)
+    return conversation.request_completed_ack is None and len(intermediate_errors) > 0
 
 
 def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Transfer]:
