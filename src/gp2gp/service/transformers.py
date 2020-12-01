@@ -86,12 +86,14 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
 
 
 def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Transfer]:
-    return (_derive_transfer(c) for c in conversations)
+    return (_derive_transfer(conversation) for conversation in conversations)
 
 
 def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
     return (
-        t for t in transfers if t.status == TransferStatus.INTEGRATED and t.sla_duration is not None
+        transfer
+        for transfer in transfers
+        if transfer.status == TransferStatus.INTEGRATED and transfer.sla_duration is not None
     )
 
 
@@ -110,7 +112,7 @@ def calculate_sla_by_practice(
 ) -> Iterator[PracticeSlaMetrics]:
 
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
-    practice_counts = {p.ods_code: default_sla.copy() for p in practice_list}
+    practice_counts = {practice.ods_code: default_sla.copy() for practice in practice_list}
 
     for transfer in transfers:
         ods_code = transfer.requesting_practice_ods_code
@@ -122,11 +124,11 @@ def calculate_sla_by_practice(
 
     return (
         PracticeSlaMetrics(
-            p.ods_code,
-            p.name,
-            within_3_days=practice_counts[p.ods_code][SlaBand.WITHIN_3_DAYS],
-            within_8_days=practice_counts[p.ods_code][SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=practice_counts[p.ods_code][SlaBand.BEYOND_8_DAYS],
+            practice.ods_code,
+            practice.name,
+            within_3_days=practice_counts[practice.ods_code][SlaBand.WITHIN_3_DAYS],
+            within_8_days=practice_counts[practice.ods_code][SlaBand.WITHIN_8_DAYS],
+            beyond_8_days=practice_counts[practice.ods_code][SlaBand.BEYOND_8_DAYS],
         )
-        for p in practice_list
+        for practice in practice_list
     )
