@@ -94,13 +94,9 @@ def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Tr
     return (_derive_transfer(c) for c in conversations)
 
 
-def is_successful(transfer):
-    return transfer.final_error_code is None or transfer.final_error_code == ERROR_SUPPRESSED
-
-
 def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
     return (
-        t for t in transfers if is_successful(t) and not t.pending and t.sla_duration is not None
+        t for t in transfers if t.status == TransferStatus.INTEGRATED and t.sla_duration is not None
     )
 
 

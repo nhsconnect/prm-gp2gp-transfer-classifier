@@ -67,29 +67,34 @@ def test_includes_suppressed_transfers():
     assert list(actual) == expected
 
 
-def test_includes_successful_transfers():
-    transfers = [build_transfer(pending=False, final_error_code=None) for _ in range(3)]
-
-    actual = filter_for_successful_transfers(transfers)
-
-    expected_length = 3
-
-    assert len(list(actual)) == expected_length
-
-
 def test_excludes_failed_transfers():
-    failed_transfer = build_transfer(final_error_code=99)
-    transfers = [failed_transfer]
+    integrated_transfer_1 = build_transfer(status=TransferStatus.INTEGRATED)
+    integrated_transfer_2 = build_transfer(status=TransferStatus.INTEGRATED)
+    failed_transfer = build_transfer(status=TransferStatus.FAILED)
+    transfers = [integrated_transfer_1, integrated_transfer_2, failed_transfer]
 
     actual = filter_for_successful_transfers(transfers)
 
-    expected = []
+    expected = [integrated_transfer_1, integrated_transfer_2]
+
+    assert list(actual) == expected
+
+
+def test_excludes_transfers_missing_SLA_duration():
+    integrated_transfer_1 = build_transfer(status=TransferStatus.INTEGRATED)
+    integrated_transfer_2 = build_transfer(status=TransferStatus.INTEGRATED, sla_duration=None)
+    failed_transfer = build_transfer(status=TransferStatus.FAILED)
+    transfers = [integrated_transfer_1, integrated_transfer_2, failed_transfer]
+
+    actual = filter_for_successful_transfers(transfers)
+
+    expected = [integrated_transfer_1]
 
     assert list(actual) == expected
 
 
 def test_excludes_pending_transfers():
-    pending_transfer = build_transfer(pending=True)
+    pending_transfer = build_transfer(status=TransferStatus.PENDING)
 
     transfers = [pending_transfer]
 
