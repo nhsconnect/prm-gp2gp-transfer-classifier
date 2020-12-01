@@ -116,52 +116,6 @@ def test_doesnt_extract_error_code_given_pending_request_completed_ack():
     _assert_attributes("final_error_code", actual, expected_errors)
 
 
-def test_flags_pending_request_completed_as_pending():
-    conversations = [
-        build_parsed_conversation(
-            request_started=build_message(), request_completed=None, request_completed_ack=None
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_pending_statuses = [True]
-
-    _assert_attributes("pending", actual, expected_pending_statuses)
-
-
-def test_flags_pending_request_completed_ack_as_pending():
-    conversations = [
-        build_parsed_conversation(
-            request_started=build_message(),
-            request_completed=build_message(),
-            request_completed_ack=None,
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_pending_statuses = [True]
-
-    _assert_attributes("pending", actual, expected_pending_statuses)
-
-
-def test_flags_completed_conversation_as_not_pending():
-    conversations = [
-        build_parsed_conversation(
-            request_started=build_message(),
-            request_completed=build_message(),
-            request_completed_ack=build_message(),
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_pending_statuses = [False]
-
-    _assert_attributes("pending", actual, expected_pending_statuses)
-
-
 def test_extracts_conversation_ids_for_conversations():
     conversations = [
         build_parsed_conversation(id="1234"),
@@ -216,6 +170,20 @@ def test_extracts_multiple_intermediate_message_error_codes():
 def test_has_pending_status_if_no_final_ack():
     conversations = [
         build_parsed_conversation(request_started=build_message(), request_completed_ack=None)
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_statuses = [TransferStatus.PENDING]
+
+    _assert_attributes("status", actual, expected_statuses)
+
+
+def test_has_pending_status_if_no_request_completed_message():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(), request_completed=None, request_completed_ack=None
+        )
     ]
 
     actual = derive_transfers(conversations)

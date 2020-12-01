@@ -11,7 +11,6 @@ def test_includes_successful_transfer():
         sla_duration=timedelta(hours=1),
         requesting_practice_ods_code="A12345",
         sending_practice_ods_code="B67890",
-        pending=False,
         final_error_code=None,
         status=TransferStatus.INTEGRATED,
     )
@@ -26,7 +25,6 @@ def test_includes_successful_transfer():
             sla_duration=timedelta(hours=1),
             requesting_practice_ods_code="A12345",
             sending_practice_ods_code="B67890",
-            pending=False,
             final_error_code=None,
             intermediate_error_codes=[],
             status=TransferStatus.INTEGRATED,
@@ -42,7 +40,6 @@ def test_includes_suppressed_transfers():
         sla_duration=timedelta(hours=2),
         requesting_practice_ods_code="B12345",
         sending_practice_ods_code="A67890",
-        pending=False,
         final_error_code=15,
         status=TransferStatus.INTEGRATED,
     )
@@ -57,7 +54,6 @@ def test_includes_suppressed_transfers():
             sla_duration=timedelta(hours=2),
             requesting_practice_ods_code="B12345",
             sending_practice_ods_code="A67890",
-            pending=False,
             final_error_code=15,
             intermediate_error_codes=[],
             status=TransferStatus.INTEGRATED,

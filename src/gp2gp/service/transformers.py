@@ -43,25 +43,6 @@ def _extract_intermediate_error_code(intermediate_messages: List[Message]):
     ]
 
 
-def _is_pending(conversation):
-    return conversation.request_completed_ack is None
-
-
-def _derive_transfer(conversation: ParsedConversation) -> Transfer:
-    return Transfer(
-        conversation_id=conversation.id,
-        sla_duration=_calculate_sla(conversation),
-        requesting_practice_ods_code=_extract_requesting_practice_ods_code(conversation),
-        sending_practice_ods_code=_extract_sending_practice_ods_code(conversation),
-        final_error_code=_extract_final_error_code(conversation),
-        intermediate_error_codes=_extract_intermediate_error_code(
-            conversation.intermediate_messages
-        ),
-        pending=_is_pending(conversation),
-        status=_assign_status(conversation),
-    )
-
-
 def _assign_status(conversation: ParsedConversation) -> TransferStatus:
     if _is_integrated(conversation):
         return TransferStatus.INTEGRATED
@@ -88,6 +69,20 @@ def _has_final_ack_error(conversation: ParsedConversation) -> bool:
 def _has_intermediate_message_error(conversation: ParsedConversation) -> bool:
     intermediate_errors = _extract_intermediate_error_code(conversation.intermediate_messages)
     return conversation.request_completed_ack is None and len(intermediate_errors) > 0
+
+
+def _derive_transfer(conversation: ParsedConversation) -> Transfer:
+    return Transfer(
+        conversation_id=conversation.id,
+        sla_duration=_calculate_sla(conversation),
+        requesting_practice_ods_code=_extract_requesting_practice_ods_code(conversation),
+        sending_practice_ods_code=_extract_sending_practice_ods_code(conversation),
+        final_error_code=_extract_final_error_code(conversation),
+        intermediate_error_codes=_extract_intermediate_error_code(
+            conversation.intermediate_messages
+        ),
+        status=_assign_status(conversation),
+    )
 
 
 def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Transfer]:
