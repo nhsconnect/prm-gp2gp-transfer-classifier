@@ -1,5 +1,5 @@
-from datetime import timedelta
-from typing import Iterable, Iterator, List
+from datetime import timedelta, datetime
+from typing import Iterable, Iterator, List, Optional
 from warnings import warn
 
 from gp2gp.odsportal.models import OrganisationDetails
@@ -10,37 +10,45 @@ from gp2gp.service.models import (
     PracticeSlaMetrics,
     SlaBand,
 )
-from gp2gp.spine.models import ParsedConversation, Message
+from gp2gp.spine.models import ParsedConversation
 
 
 THREE_DAYS_IN_SECONDS = 259200
 EIGHT_DAYS_IN_SECONDS = 691200
 
 
-def _calculate_sla(conversation):
+def _calculate_sla(conversation: ParsedConversation):
     if conversation.request_completed is None or conversation.request_completed_ack is None:
         return None
     return conversation.request_completed_ack.time - conversation.request_completed.time
 
 
-def _extract_requesting_practice_ods_code(conversation):
+def _extract_requesting_practice_ods_code(conversation: ParsedConversation) -> str:
     return conversation.request_started.from_party_ods_code
 
 
-def _extract_sending_practice_ods_code(conversation):
+def _extract_sending_practice_ods_code(conversation: ParsedConversation) -> str:
     return conversation.request_started.to_party_ods_code
 
 
-def _extract_final_error_code(conversation):
+def _extract_final_error_code(conversation: ParsedConversation) -> Optional[int]:
     if conversation.request_completed_ack:
         return conversation.request_completed_ack.error_code
     return None
 
 
-def _extract_intermediate_error_code(intermediate_messages: List[Message]):
+def _extract_intermediate_error_code(conversation: ParsedConversation) -> List[Optional[int]]:
     return [
-        message.error_code for message in intermediate_messages if message.error_code is not None
+        message.error_code
+        for message in conversation.intermediate_messages
+        if message.error_code is not None
     ]
+
+
+def _extract_date_completed(conversation: ParsedConversation) -> Optional[datetime]:
+    if conversation.request_completed_ack:
+        return conversation.request_completed_ack.time
+    return None
 
 
 def _assign_status(conversation: ParsedConversation) -> TransferStatus:
@@ -67,7 +75,7 @@ def _has_final_ack_error(conversation: ParsedConversation) -> bool:
 
 
 def _has_intermediate_message_error(conversation: ParsedConversation) -> bool:
-    intermediate_errors = _extract_intermediate_error_code(conversation.intermediate_messages)
+    intermediate_errors = _extract_intermediate_error_code(conversation)
     return conversation.request_completed_ack is None and len(intermediate_errors) > 0
 
 
@@ -78,11 +86,9 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         requesting_practice_ods_code=_extract_requesting_practice_ods_code(conversation),
         sending_practice_ods_code=_extract_sending_practice_ods_code(conversation),
         final_error_code=_extract_final_error_code(conversation),
-        intermediate_error_codes=_extract_intermediate_error_code(
-            conversation.intermediate_messages
-        ),
+        intermediate_error_codes=_extract_intermediate_error_code(conversation),
         status=_assign_status(conversation),
-        date_completed=None,
+        date_completed=_extract_date_completed(conversation),
     )
 
 

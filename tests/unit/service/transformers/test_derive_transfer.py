@@ -3,6 +3,7 @@ from typing import List
 
 from gp2gp.service.transformers import derive_transfers
 from tests.builders.spine import build_parsed_conversation, build_message
+from tests.builders.common import a_datetime
 from gp2gp.service.models import Transfer, TransferStatus, ERROR_SUPPRESSED
 
 
@@ -23,6 +24,7 @@ def test_extracts_conversation_id():
 def test_produces_sla_of_successful_conversation():
     conversations = [
         build_parsed_conversation(
+            request_started=build_message(),
             request_completed=build_message(
                 time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
             ),
@@ -272,3 +274,35 @@ def test_has_failed_status_if_error_in_intermediate_message():
     expected_statuses = [TransferStatus.FAILED]
 
     _assert_attributes("status", actual, expected_statuses)
+
+
+def test_extracts_date_completed_from_request_completed_ack():
+    date_completed = a_datetime()
+
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed=build_message(),
+            request_completed_ack=build_message(
+                time=date_completed,
+            ),
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    _assert_attributes("date_completed", actual, [date_completed])
+
+
+def test_date_completed_is_None_when_request_completed_ack_not_present():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed=build_message(),
+            request_completed_ack=None,
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    _assert_attributes("date_completed", actual, [None])
