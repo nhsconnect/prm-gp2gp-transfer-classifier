@@ -11,6 +11,7 @@ def build_transfer(**kwargs):
         final_error_code=kwargs.get("final_error_code", None),
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),
         status=kwargs.get("status", TransferStatus.PENDING),
+        date_completed=kwargs.get("date_completed", None),
     )
 
 

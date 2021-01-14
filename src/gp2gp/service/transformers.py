@@ -82,6 +82,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
             conversation.intermediate_messages
         ),
         status=_assign_status(conversation),
+        date_completed=None,
     )
 
 
