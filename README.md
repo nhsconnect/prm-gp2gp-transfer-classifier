@@ -25,7 +25,6 @@ These generally work by running a command in a virtual environment configured vi
 
 - Python 3
 - [Tox](https://tox.readthedocs.io/en/latest/#)
-- [Minio](https://github.com/minio/minio)
 
 ### Running the unit and integration tests
 

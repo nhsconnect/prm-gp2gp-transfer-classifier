@@ -4,14 +4,29 @@ import logging
 import shutil
 from io import BytesIO
 from os import getenv
+from threading import Thread
 
 import boto3
 from botocore.config import Config
+from moto.server import DomainDispatcherApplication, create_backend_app
+from cheroot.wsgi import Server
 
-from tests.builders.common import a_string
 from subprocess import PIPE, Popen
 
 logger = logging.getLogger(__name__)
+
+
+class ThreadedHttpd:
+    def __init__(self, httpd):
+        self._httpd = httpd
+        self._thread = Thread(target=httpd.safe_start)
+
+    def start(self):
+        self._thread.start()
+
+    def stop(self):
+        self._httpd.stop()
+        self._thread.join()
 
 
 def _read_json(path):
@@ -43,6 +58,12 @@ def _read_s3_json(bucket, key):
     bucket.download_fileobj(key, f)
     f.seek(0)
     return json.loads(f.read().decode("utf-8"))
+
+
+def _build_fake_s3(host, port):
+    app = DomainDispatcherApplication(create_backend_app, "s3")
+    httpd = Server((host, port), app)
+    return ThreadedHttpd(httpd)
 
 
 def test_with_local_files(datadir):
@@ -81,32 +102,23 @@ def test_with_local_files(datadir):
 
 
 def test_with_s3_output(datadir):
-    minio_data_dir = datadir / "minio"
-    minio_address = "localhost:9001"
-    minio_access_key = a_string()
-    minio_secret_key = a_string()
-    minio_region = "eu-west-2"
-    minio_command = f"\
-        minio server {minio_data_dir} \
-        --address {minio_address} \
-        --compat \
-    "
-    minio_env = {
-        "MINIO_ACCESS_KEY": minio_access_key,
-        "MINIO_SECRET_KEY": minio_secret_key,
-        "MINIO_REGION_NAME": minio_region,
-        "HOME": datadir,
-    }
+    fake_s3_host = "127.0.0.1"
+    fake_s3_port = 8887
+    fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"
+    fake_s3_access_key = "testing"
+    fake_s3_secret_key = "testing"
+    fake_s3_region = "us-west-1"
 
-    minio_process = Popen(minio_command, env=minio_env, shell=True, stdout=PIPE, stderr=PIPE)
+    fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
+    fake_s3.start()
 
     s3 = boto3.resource(
         "s3",
-        endpoint_url=f"http://{minio_address}",
-        aws_access_key_id=minio_access_key,
-        aws_secret_access_key=minio_secret_key,
+        endpoint_url=fake_s3_url,
+        aws_access_key_id=fake_s3_access_key,
+        aws_secret_access_key=fake_s3_secret_key,
         config=Config(signature_version="s3v4"),
-        region_name=minio_region,
+        region_name=fake_s3_region,
     )
 
     output_bucket_name = "testbucket"
@@ -129,9 +141,9 @@ def test_with_s3_output(datadir):
     year = 2019
 
     pipeline_env = {
-        "AWS_ACCESS_KEY_ID": minio_access_key,
-        "AWS_SECRET_ACCESS_KEY": minio_secret_key,
-        "AWS_DEFAULT_REGION": minio_region,
+        "AWS_ACCESS_KEY_ID": fake_s3_access_key,
+        "AWS_SECRET_ACCESS_KEY": fake_s3_secret_key,
+        "AWS_DEFAULT_REGION": fake_s3_region,
         "PATH": getenv("PATH"),
     }
 
@@ -143,7 +155,7 @@ def test_with_s3_output(datadir):
         --output-bucket {output_bucket_name}\
         --practice-metrics-output-key {practice_metrics_output_key} \
         --practice-metadata-output-key {practice_metadata_output_key} \
-        --s3-endpoint-url http://{minio_address} \
+        --s3-endpoint-url {fake_s3_url} \
     "
     pipeline_process = Popen(
         pipeline_command, shell=True, env=pipeline_env, stdout=PIPE, stderr=PIPE
@@ -161,11 +173,7 @@ def test_with_s3_output(datadir):
     finally:
         output_bucket.objects.all().delete()
         output_bucket.delete()
-        minio_process.terminate()
-        minio_process.wait()
-        if minio_process.returncode != 0:
-            logger.error(f"Minio stdout: {minio_process.stdout.read()}")
-            logger.error(f"Minio stderr: {minio_process.stderr.read()}")
+        fake_s3.stop()
         if pipeline_process.returncode != 0:
             logger.error(f"Pipeline stdout: {pipeline_process.stdout.read()}")
             logger.error(f"Pipeline stderr: {pipeline_process.stderr.read()}")
