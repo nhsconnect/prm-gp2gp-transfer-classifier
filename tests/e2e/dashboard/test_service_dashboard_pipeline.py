@@ -9,23 +9,23 @@ from threading import Thread
 import boto3
 from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
-from cheroot.wsgi import Server
+from werkzeug.serving import make_server
 
 from subprocess import PIPE, Popen
 
 logger = logging.getLogger(__name__)
 
 
-class ThreadedHttpd:
-    def __init__(self, httpd):
-        self._httpd = httpd
-        self._thread = Thread(target=httpd.safe_start)
+class ThreadedServer:
+    def __init__(self, server):
+        self._server = server
+        self._thread = Thread(target=server.serve_forever)
 
     def start(self):
         self._thread.start()
 
     def stop(self):
-        self._httpd.stop()
+        self._server.shutdown()
         self._thread.join()
 
 
@@ -62,8 +62,8 @@ def _read_s3_json(bucket, key):
 
 def _build_fake_s3(host, port):
     app = DomainDispatcherApplication(create_backend_app, "s3")
-    httpd = Server((host, port), app)
-    return ThreadedHttpd(httpd)
+    server = make_server(host, port, app)
+    return ThreadedServer(server)
 
 
 def test_with_local_files(datadir):
