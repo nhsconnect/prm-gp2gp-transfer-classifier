@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import Iterable
+from warnings import warn
 
 import requests
 from dateutil.tz import tzutc
@@ -64,17 +65,26 @@ def construct_organisation_list_from_dict(data: dict) -> OrganisationMetadata:
     )
 
 
+def _is_ods_in_mapping(ods_code: str, asid_mapping: dict):
+    if ods_code in asid_mapping:
+        return True
+    else:
+        warn(f"ODS code not found in ASID mapping: {ods_code}", RuntimeWarning)
+        return False
+
+
 def construct_organisation_metadata_from_ods_portal_response(
-    practiceData: Iterable[dict],
-    ccgData: Iterable[dict],
+    practice_data: Iterable[dict], ccg_data: Iterable[dict], asid_mapping: dict
 ) -> OrganisationMetadata:
-    unique_practices = _remove_duplicated_organisations(practiceData)
-    unique_ccgs = _remove_duplicated_organisations(ccgData)
+    unique_practices = _remove_duplicated_organisations(practice_data)
+    unique_ccgs = _remove_duplicated_organisations(ccg_data)
 
     return OrganisationMetadata(
         generated_on=datetime.now(tzutc()),
         practices=[
-            OrganisationDetails(ods_code=p["OrgId"], name=p["Name"]) for p in unique_practices
+            OrganisationDetails(asid=asid_mapping[p["OrgId"]], ods_code=p["OrgId"], name=p["Name"])
+            for p in unique_practices
+            if _is_ods_in_mapping(p["OrgId"], asid_mapping)
         ],
         ccgs=[OrganisationDetails(ods_code=c["OrgId"], name=c["Name"]) for c in unique_ccgs],
     )
