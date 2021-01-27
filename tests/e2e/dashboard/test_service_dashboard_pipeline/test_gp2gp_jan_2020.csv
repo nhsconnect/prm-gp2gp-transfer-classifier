@@ -1,2 +1,2 @@
-"_time",conversationID,GUID,interactionID,fromNACS,toNACS,messageRef,jdiEvent,"_raw"
-"2020-01-01T08:41:48.337+0000","abc","abc_3","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",A12345,B56789,"abc_1",NONE,
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,"_raw"
+"2020-01-01T08:41:48.337+0000","abc","abc_3","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,003456789123,"abc_1",NONE,

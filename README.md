@@ -58,7 +58,7 @@ Activate virtual dev environment:
 
 Then run the pipeline command:
 
-`ods-portal-pipeline --output-file "<output-file>.json"`
+`ods-portal-pipeline --output-file "<output-file>.json" --mapping-file "<lookup-file>.csv.gz"`
 
 ### Dashboard Pipeline
 

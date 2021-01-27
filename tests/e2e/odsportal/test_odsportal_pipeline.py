@@ -1,3 +1,5 @@
+import gzip
+import shutil
 import subprocess
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -19,6 +21,14 @@ CCG_RESPONSE_CONTENT = (
 )
 
 
+def _gzip_file(input_file_path):
+    gzip_file_path = input_file_path.with_suffix(".gz")
+    with open(input_file_path, "rb") as input_file:
+        with gzip.open(gzip_file_path, "wb") as output_file:
+            shutil.copyfileobj(input_file, output_file)
+    return gzip_file_path
+
+
 class MockRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_params = parse_qs(self.path[2:])
@@ -34,6 +44,7 @@ class MockRequestHandler(BaseHTTPRequestHandler):
 
 def test_ods_portal_pipeline(datadir):
     output_file_path = datadir / "practice_metadata.json"
+    input_mapping_file = _gzip_file(datadir / "asid_mapping.csv")
 
     expected_practices = read_json_file(datadir / "expected_practice_list.json")
     expected_ccgs = read_json_file(datadir / "expected_ccg_list.json")
@@ -47,6 +58,7 @@ def test_ods_portal_pipeline(datadir):
     pipeline_command = f"\
         ods-portal-pipeline\
         --output-file {output_file_path}\
+        --mapping-file {input_mapping_file}\
         --search-url {f'http://{HOST_NAME}:{PORT_NUMBER}'}\
     "
 

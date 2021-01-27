@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from typing import Iterable, Iterator, List, Optional
 from warnings import warn
 
-from gp2gp.odsportal.models import OrganisationDetails
+from gp2gp.odsportal.models import OrganisationDetailsWithAsid
 from gp2gp.service.models import (
     Transfer,
     TransferStatus,
@@ -115,19 +115,22 @@ def _assign_to_sla_band(sla_duration: timedelta):
 
 
 def calculate_sla_by_practice(
-    practice_list: Iterable[OrganisationDetails], transfers: Iterable[Transfer]
+    practice_list: Iterable[OrganisationDetailsWithAsid], transfers: Iterable[Transfer]
 ) -> Iterator[PracticeSlaMetrics]:
 
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
     practice_counts = {practice.asid: default_sla.copy() for practice in practice_list}
 
+    unexpected_asids = set()
     for transfer in transfers:
         asid = transfer.requesting_practice_asid
         if asid in practice_counts:
             sla_band = _assign_to_sla_band(transfer.sla_duration)
             practice_counts[asid][sla_band] += 1
         else:
-            warn(f"Unexpected ASID found: {asid}", RuntimeWarning)
+            unexpected_asids.add(asid)
+
+    warn(f"Unexpected ASID count: {len(unexpected_asids)}", RuntimeWarning)
 
     return (
         PracticeSlaMetrics(

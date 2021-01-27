@@ -7,7 +7,11 @@ from typing import List
 class OrganisationDetails:
     ods_code: str
     name: str
-    asid: str = None
+
+
+@dataclass
+class OrganisationDetailsWithAsid(OrganisationDetails):
+    asid: str
 
 
 @dataclass

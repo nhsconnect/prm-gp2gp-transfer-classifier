@@ -4,7 +4,7 @@ import pytest
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.odsportal.models import OrganisationDetails
+from gp2gp.odsportal.models import OrganisationDetails, OrganisationDetailsWithAsid
 from gp2gp.odsportal.sources import construct_organisation_metadata_from_ods_portal_response
 from tests.builders.common import a_string
 
@@ -41,7 +41,7 @@ def test_returns_single_practice_and_single_ccg():
     response_ccg_data = [_build_organisation_data(name="CCG", org_id="12C")]
 
     expected_practices = [
-        OrganisationDetails(asid="123456781234", ods_code="A12345", name="GP Practice")
+        OrganisationDetailsWithAsid(asid="123456781234", ods_code="A12345", name="GP Practice")
     ]
     expected_ccgs = [OrganisationDetails(ods_code="12C", name="CCG")]
 
@@ -75,9 +75,9 @@ def test_returns_multiple_practices_and_ccgs():
     }
 
     expected_practices = [
-        OrganisationDetails(asid="123456781234", ods_code="A12345", name="GP Practice"),
-        OrganisationDetails(asid="443456781234", ods_code="B56789", name="GP Practice 2"),
-        OrganisationDetails(asid="773456781234", ods_code="C56789", name="GP Practice 3"),
+        OrganisationDetailsWithAsid(asid="123456781234", ods_code="A12345", name="GP Practice"),
+        OrganisationDetailsWithAsid(asid="443456781234", ods_code="B56789", name="GP Practice 2"),
+        OrganisationDetailsWithAsid(asid="773456781234", ods_code="C56789", name="GP Practice 3"),
     ]
 
     expected_ccgs = [
@@ -126,7 +126,7 @@ def test_skips_practice_and_warns_when_ods_not_in_asid_mapping():
     asid_to_ods_mapping = {"A12345": "123456781234"}
 
     expected_practices = [
-        OrganisationDetails(asid="123456781234", ods_code="A12345", name="GP Practice"),
+        OrganisationDetailsWithAsid(asid="123456781234", ods_code="A12345", name="GP Practice"),
     ]
 
     with pytest.warns(RuntimeWarning):

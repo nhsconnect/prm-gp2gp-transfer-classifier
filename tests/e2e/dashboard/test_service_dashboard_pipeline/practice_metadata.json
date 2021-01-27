@@ -3,7 +3,8 @@
   "practices": [
     {
       "ods_code": "A12345",
-      "name": "Test GP"
+      "name": "Test GP",
+      "asid": "123456789123"
     }
   ],
   "ccgs": []

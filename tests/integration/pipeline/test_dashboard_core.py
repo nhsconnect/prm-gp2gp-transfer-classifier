@@ -2,7 +2,6 @@ from datetime import datetime
 
 from dateutil.tz import UTC
 from freezegun import freeze_time
-
 from gp2gp.dashboard.models import (
     ServiceDashboardData,
     PracticeSummary,
@@ -11,9 +10,10 @@ from gp2gp.dashboard.models import (
     TimeToIntegrateSla,
 )
 from gp2gp.date.range import DateTimeRange
-from gp2gp.odsportal.models import OrganisationDetails
-from tests.builders.spine import build_message
+from gp2gp.odsportal.models import OrganisationDetailsWithAsid
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data
+
+from tests.builders.spine import build_message
 
 
 def _build_successful_conversation(**kwargs):
@@ -74,7 +74,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
     )
 
     practice_list = [
-        OrganisationDetails(
+        OrganisationDetailsWithAsid(
             asid=requesting_asid, ods_code=requesting_ods_code, name=requesting_practice_name
         )
     ]

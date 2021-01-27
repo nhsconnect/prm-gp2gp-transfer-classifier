@@ -1,13 +1,17 @@
 import json
 from datetime import datetime
-from typing import Iterable
+from typing import Iterable, List
 from warnings import warn
 
 import requests
 from dateutil.tz import tzutc
 from dateutil import parser
 
-from gp2gp.odsportal.models import OrganisationDetails, OrganisationMetadata
+from gp2gp.odsportal.models import (
+    OrganisationDetails,
+    OrganisationMetadata,
+    OrganisationDetailsWithAsid,
+)
 
 ODS_PORTAL_SEARCH_URL = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
 PRACTICE_SEARCH_PARAMS = {
@@ -55,12 +59,22 @@ class OdsDataFetcher:
         return json.loads(response.content)["Organisations"]
 
 
-def construct_organisation_list_from_dict(data: dict) -> OrganisationMetadata:
+def _generate_practices(practices: dict, with_asid: bool) -> List[OrganisationDetails]:
+    if with_asid:
+        return [
+            OrganisationDetailsWithAsid(asid=p["asid"], ods_code=p["ods_code"], name=p["name"])
+            for p in practices
+        ]
+    else:
+        return [OrganisationDetails(ods_code=p["ods_code"], name=p["name"]) for p in practices]
+
+
+def construct_organisation_list_from_dict(
+    data: dict, with_asid: bool = True
+) -> OrganisationMetadata:
     return OrganisationMetadata(
         generated_on=parser.isoparse(data["generated_on"]),
-        practices=[
-            OrganisationDetails(ods_code=p["ods_code"], name=p["name"]) for p in data["practices"]
-        ],
+        practices=_generate_practices(data["practices"], with_asid),
         ccgs=[OrganisationDetails(ods_code=c["ods_code"], name=c["name"]) for c in data["ccgs"]],
     )
 
@@ -82,7 +96,9 @@ def construct_organisation_metadata_from_ods_portal_response(
     return OrganisationMetadata(
         generated_on=datetime.now(tzutc()),
         practices=[
-            OrganisationDetails(asid=asid_mapping[p["OrgId"]], ods_code=p["OrgId"], name=p["Name"])
+            OrganisationDetailsWithAsid(
+                asid=asid_mapping[p["OrgId"]], ods_code=p["OrgId"], name=p["Name"]
+            )
             for p in unique_practices
             if _is_ods_in_mapping(p["OrgId"], asid_mapping)
         ],
@@ -92,3 +108,7 @@ def construct_organisation_metadata_from_ods_portal_response(
 
 def _remove_duplicated_organisations(raw_organisations: Iterable[dict]) -> Iterable[dict]:
     return {obj["OrgId"]: obj for obj in raw_organisations}.values()
+
+
+def construct_mapping_dict_from_list(raw_mappings: Iterable[dict]) -> dict:
+    return {mapping["NACS"]: mapping["ASID"] for mapping in raw_mappings}
