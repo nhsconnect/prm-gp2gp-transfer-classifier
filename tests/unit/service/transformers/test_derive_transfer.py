@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Iterator
 
 from gp2gp.service.transformers import derive_transfers
 from tests.builders.spine import build_parsed_conversation, build_message
@@ -7,7 +7,7 @@ from tests.builders.common import a_datetime
 from gp2gp.service.models import Transfer, TransferStatus, ERROR_SUPPRESSED
 
 
-def _assert_attributes(attr_name: str, actual: List[Transfer], expected: List):
+def _assert_attributes(attr_name: str, actual: Iterator[Transfer], expected: List):
     assert [getattr(i, attr_name) for i in actual] == expected
 
 
@@ -79,7 +79,7 @@ def test_extracts_requesting_practice_asid():
         build_parsed_conversation(request_started=build_message(from_party_asid="123456789012"))
     ]
 
-    actual = list(derive_transfers(conversations))
+    actual = derive_transfers(conversations)
 
     expected_asids = ["123456789012"]
 
@@ -91,7 +91,7 @@ def test_extracts_sending_practice_asid():
         build_parsed_conversation(request_started=build_message(to_party_asid="121212121212"))
     ]
 
-    actual = list(derive_transfers(conversations))
+    actual = derive_transfers(conversations)
 
     expected_asids = ["121212121212"]
 
