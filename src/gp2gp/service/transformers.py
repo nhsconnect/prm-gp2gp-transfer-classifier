@@ -23,12 +23,12 @@ def _calculate_sla(conversation: ParsedConversation):
     return conversation.request_completed_ack.time - conversation.request_completed.time
 
 
-def _extract_requesting_practice_ods_code(conversation: ParsedConversation) -> str:
-    return conversation.request_started.from_party_ods_code
+def _extract_requesting_practice_asid(conversation: ParsedConversation) -> str:
+    return conversation.request_started.from_party_asid
 
 
-def _extract_sending_practice_ods_code(conversation: ParsedConversation) -> str:
-    return conversation.request_started.to_party_ods_code
+def _extract_sending_practice_asid(conversation: ParsedConversation) -> str:
+    return conversation.request_started.to_party_asid
 
 
 def _extract_final_error_code(conversation: ParsedConversation) -> Optional[int]:
@@ -83,8 +83,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_calculate_sla(conversation),
-        requesting_practice_ods_code=_extract_requesting_practice_ods_code(conversation),
-        sending_practice_ods_code=_extract_sending_practice_ods_code(conversation),
+        requesting_practice_asid=_extract_requesting_practice_asid(conversation),
+        sending_practice_asid=_extract_sending_practice_asid(conversation),
         final_error_code=_extract_final_error_code(conversation),
         intermediate_error_codes=_extract_intermediate_error_code(conversation),
         status=_assign_status(conversation),
@@ -119,23 +119,23 @@ def calculate_sla_by_practice(
 ) -> Iterator[PracticeSlaMetrics]:
 
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
-    practice_counts = {practice.ods_code: default_sla.copy() for practice in practice_list}
+    practice_counts = {practice.asid: default_sla.copy() for practice in practice_list}
 
     for transfer in transfers:
-        ods_code = transfer.requesting_practice_ods_code
-        if ods_code in practice_counts:
+        asid = transfer.requesting_practice_asid
+        if asid in practice_counts:
             sla_band = _assign_to_sla_band(transfer.sla_duration)
-            practice_counts[ods_code][sla_band] += 1
+            practice_counts[asid][sla_band] += 1
         else:
-            warn(f"Unexpected ODS code found: {ods_code}", RuntimeWarning)
+            warn(f"Unexpected ASID found: {asid}", RuntimeWarning)
 
     return (
         PracticeSlaMetrics(
             practice.ods_code,
             practice.name,
-            within_3_days=practice_counts[practice.ods_code][SlaBand.WITHIN_3_DAYS],
-            within_8_days=practice_counts[practice.ods_code][SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=practice_counts[practice.ods_code][SlaBand.BEYOND_8_DAYS],
+            within_3_days=practice_counts[practice.asid][SlaBand.WITHIN_3_DAYS],
+            within_8_days=practice_counts[practice.asid][SlaBand.WITHIN_8_DAYS],
+            beyond_8_days=practice_counts[practice.asid][SlaBand.BEYOND_8_DAYS],
         )
         for practice in practice_list
     )

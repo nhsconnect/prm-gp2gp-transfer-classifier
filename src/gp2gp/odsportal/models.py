@@ -5,6 +5,7 @@ from typing import List
 
 @dataclass
 class OrganisationDetails:
+    asid: str
     ods_code: str
     name: str
 

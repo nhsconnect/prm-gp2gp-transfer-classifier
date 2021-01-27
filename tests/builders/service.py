@@ -6,8 +6,8 @@ def build_transfer(**kwargs):
     return Transfer(
         conversation_id=kwargs.get("conversation_id", a_string(36)),
         sla_duration=kwargs.get("sla_duration", a_duration()),
-        requesting_practice_ods_code=kwargs.get("requesting_practice_ods_code", a_string(6)),
-        sending_practice_ods_code=kwargs.get("sending_practice_ods_code", a_string(6)),
+        requesting_practice_asid=kwargs.get("requesting_practice_asid", a_string(12)),
+        sending_practice_asid=kwargs.get("sending_practice_asid", a_string(12)),
         final_error_code=kwargs.get("final_error_code", None),
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),
         status=kwargs.get("status", TransferStatus.PENDING),

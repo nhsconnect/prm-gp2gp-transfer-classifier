@@ -23,24 +23,24 @@ def _build_successful_conversation(**kwargs):
             conversation_id="abc",
             guid="abc",
             interaction_id="urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",
-            from_party_ods_code=kwargs.get("requesting_ods_code"),
-            to_party_ods_code="B56789",
+            from_party_asid=kwargs.get("requesting_asid"),
+            to_party_asid="123456789012",
         ),
         build_message(
             time=kwargs.get("ehr_request_completed_on"),
             conversation_id="abc",
             guid="abc_1",
             interaction_id="urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",
-            from_party_ods_code="B56789",
-            to_party_ods_code=kwargs.get("requesting_ods_code"),
+            from_party_asid="123456789012",
+            to_party_asid=kwargs.get("requesting_asid"),
         ),
         build_message(
             time=kwargs.get("ehr_request_started_acknowledged_on"),
             conversation_id="abc",
             guid="abc_2",
             interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
-            from_party_ods_code="B56789",
-            to_party_ods_code=kwargs.get("requesting_ods_code"),
+            from_party_asid="123456789012",
+            to_party_asid=kwargs.get("requesting_asid"),
             message_ref="abc",
         ),
         build_message(
@@ -48,8 +48,8 @@ def _build_successful_conversation(**kwargs):
             conversation_id="abc",
             guid="abc_3",
             interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
-            from_party_ods_code=kwargs.get("requesting_ods_code"),
-            to_party_ods_code="B56789",
+            from_party_asid=kwargs.get("requesting_asid"),
+            to_party_asid="123456789012",
             message_ref="abc_1",
         ),
     ]
@@ -63,9 +63,10 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
     requesting_practice_name = "Test GP"
     requesting_ods_code = "A12345"
+    requesting_asid = "343434343434"
 
     spine_messages = _build_successful_conversation(
-        requesting_ods_code=requesting_ods_code,
+        requesting_asid=requesting_asid,
         ehr_request_started_on=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
         ehr_request_completed_on=datetime(2019, 12, 30, 18, 3, 21, tzinfo=UTC),
         ehr_request_started_acknowledged_on=datetime(2019, 12, 30, 18, 3, 23, tzinfo=UTC),
@@ -73,7 +74,9 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
     )
 
     practice_list = [
-        OrganisationDetails(ods_code=requesting_ods_code, name=requesting_practice_name)
+        OrganisationDetails(
+            asid=requesting_asid, ods_code=requesting_ods_code, name=requesting_practice_name
+        )
     ]
 
     expected = ServiceDashboardData(

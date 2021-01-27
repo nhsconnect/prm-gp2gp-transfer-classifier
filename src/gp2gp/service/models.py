@@ -14,8 +14,8 @@ class TransferStatus(Enum):
 class Transfer(NamedTuple):
     conversation_id: str
     sla_duration: Optional[timedelta]
-    requesting_practice_ods_code: str
-    sending_practice_ods_code: str
+    requesting_practice_asid: str
+    sending_practice_asid: str
     final_error_code: Optional[int]
     intermediate_error_codes: List[int]
     status: TransferStatus

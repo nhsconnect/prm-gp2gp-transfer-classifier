@@ -35,17 +35,17 @@ def _assert_first_summary_has_sla_counts(
     assert actual_slas == expected_slas
 
 
-def test_groups_by_ods_code_given_single_practice_and_single_transfer():
-    practices = [OrganisationDetails(ods_code="A12345", name=a_string())]
-    transfers = [build_transfer(requesting_practice_ods_code="A12345")]
+def test_groups_by_asid_and_saves_ods_code_given_single_practice_and_single_transfer():
+    practices = [OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string())]
+    transfers = [build_transfer(requesting_practice_asid="121212121212")]
 
     actual = calculate_sla_by_practice(practices, transfers)
 
     _assert_has_ods_codes(actual, {"A12345"})
 
 
-def test_groups_by_ods_code_given_single_practice_and_no_transfers():
-    practices = [OrganisationDetails(ods_code="A12345", name=a_string())]
+def test_groups_asid_and_saves_ods_code_given_single_practice_and_no_transfers():
+    practices = [OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string())]
     transfers = []
 
     actual = calculate_sla_by_practice(practices, transfers)
@@ -53,22 +53,22 @@ def test_groups_by_ods_code_given_single_practice_and_no_transfers():
     _assert_has_ods_codes(actual, {"A12345"})
 
 
-def test_warns_about_transfer_with_unexpected_ods_code():
+def test_warns_about_transfer_with_unexpected_asid():
     practices = []
-    transfers = [build_transfer(requesting_practice_ods_code="A12345")]
+    transfers = [build_transfer(requesting_practice_asid="121212121212")]
 
     with pytest.warns(RuntimeWarning):
         calculate_sla_by_practice(practices, transfers)
 
 
-def test_groups_by_ods_code_given_two_practices_and_two_transfers_from_different_practices():
+def test_groups_by_asid_given_two_practices_and_two_transfers_from_different_practices():
     practices = [
-        OrganisationDetails(ods_code="A12345", name=a_string()),
-        OrganisationDetails(ods_code="X67890", name=a_string()),
+        OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string()),
+        OrganisationDetails(asid="343434343434", ods_code="X67890", name=a_string()),
     ]
     transfers = [
-        build_transfer(requesting_practice_ods_code="A12345"),
-        build_transfer(requesting_practice_ods_code="X67890"),
+        build_transfer(requesting_practice_asid="121212121212"),
+        build_transfer(requesting_practice_asid="343434343434"),
     ]
 
     actual = calculate_sla_by_practice(practices, transfers)
@@ -76,11 +76,11 @@ def test_groups_by_ods_code_given_two_practices_and_two_transfers_from_different
     _assert_has_ods_codes(actual, {"A12345", "X67890"})
 
 
-def test_groups_by_ods_code_given_single_practice_and_transfers_from_the_same_practice():
-    practices = [OrganisationDetails(ods_code="A12345", name=a_string())]
+def test_groups_by_asid_given_single_practice_and_transfers_from_the_same_practice():
+    practices = [OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string())]
     transfers = [
-        build_transfer(requesting_practice_ods_code="A12345"),
-        build_transfer(requesting_practice_ods_code="A12345"),
+        build_transfer(requesting_practice_asid="121212121212"),
+        build_transfer(requesting_practice_asid="121212121212"),
     ]
 
     actual = calculate_sla_by_practice(practices, transfers)
@@ -90,7 +90,7 @@ def test_groups_by_ods_code_given_single_practice_and_transfers_from_the_same_pr
 
 def test_contains_practice_name():
     expected_name = "A Practice"
-    practices = [OrganisationDetails(ods_code=a_string(), name=expected_name)]
+    practices = [OrganisationDetails(asid=a_string(), ods_code=a_string(), name=expected_name)]
     transfers = []
 
     actual_name = list(calculate_sla_by_practice(practices, transfers))[0].name
@@ -99,7 +99,7 @@ def test_contains_practice_name():
 
 
 def test_returns_practice_sla_metrics_placeholder_given_a_list_with_one_practice_and_no_metrics():
-    practice_list = [OrganisationDetails(ods_code="A12345", name=a_string())]
+    practice_list = [OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string())]
     transfers = []
     actual = calculate_sla_by_practice(practice_list, transfers)
 
@@ -107,9 +107,9 @@ def test_returns_practice_sla_metrics_placeholder_given_a_list_with_one_practice
 
 
 def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_3_days():
-    practice_list = [OrganisationDetails(ods_code="A12345", name=a_string())]
+    practice_list = [OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string())]
     transfer = build_transfer(
-        requesting_practice_ods_code="A12345", sla_duration=timedelta(hours=1, minutes=10)
+        requesting_practice_asid="121212121212", sla_duration=timedelta(hours=1, minutes=10)
     )
     actual = calculate_sla_by_practice(practice_list, [transfer])
 
@@ -117,9 +117,9 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_3_da
 
 
 def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_8_days():
-    practice_list = [OrganisationDetails(ods_code="A12345", name=a_string())]
+    practice_list = [OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string())]
     transfer = build_transfer(
-        requesting_practice_ods_code="A12345", sla_duration=timedelta(days=7, hours=1, minutes=10)
+        requesting_practice_asid="121212121212", sla_duration=timedelta(days=7, hours=1, minutes=10)
     )
     actual = calculate_sla_by_practice(practice_list, [transfer])
 
@@ -127,9 +127,9 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_8_da
 
 
 def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_beyond_8_days():
-    practice_list = [OrganisationDetails(ods_code="A12345", name=a_string())]
+    practice_list = [OrganisationDetails(asid="121212121212", ods_code="A12345", name=a_string())]
     transfer = build_transfer(
-        requesting_practice_ods_code="A12345", sla_duration=timedelta(days=8, hours=1, minutes=10)
+        requesting_practice_asid="121212121212", sla_duration=timedelta(days=8, hours=1, minutes=10)
     )
     actual = calculate_sla_by_practice(practice_list, [transfer])
 
@@ -138,28 +138,28 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_beyond_8_da
 
 def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practices():
     practice_list = [
-        OrganisationDetails(ods_code="A12345", name="A Practice"),
-        OrganisationDetails(ods_code="B12345", name="Another Practice"),
+        OrganisationDetails(asid="121212121212", ods_code="A12345", name="A Practice"),
+        OrganisationDetails(asid="343434343434", ods_code="B12345", name="Another Practice"),
     ]
     transfers = [
         build_transfer(
-            requesting_practice_ods_code="A12345",
+            requesting_practice_asid="121212121212",
             sla_duration=timedelta(days=8, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_ods_code="B12345",
+            requesting_practice_asid="343434343434",
             sla_duration=timedelta(days=4, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_ods_code="A12345",
+            requesting_practice_asid="121212121212",
             sla_duration=timedelta(days=0, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_ods_code="B12345",
+            requesting_practice_asid="343434343434",
             sla_duration=timedelta(days=8, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_ods_code="B12345",
+            requesting_practice_asid="343434343434",
             sla_duration=timedelta(days=5, hours=1, minutes=10),
         ),
     ]

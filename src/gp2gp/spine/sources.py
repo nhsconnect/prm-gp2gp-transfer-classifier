@@ -20,8 +20,8 @@ def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Mess
             conversation_id=item["conversationID"],
             guid=item["GUID"],
             interaction_id=item["interactionID"],
-            from_party_ods_code=item["fromNACS"],
-            to_party_ods_code=item["toNACS"],
+            from_party_asid=item["messageSender"],
+            to_party_asid=item["messageRecipient"],
             message_ref=_parse_message_ref(item["messageRef"]),
             error_code=_parse_error_code(item["jdiEvent"]),
         )

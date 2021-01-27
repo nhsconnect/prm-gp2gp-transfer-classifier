@@ -12,8 +12,8 @@ def test_includes_successful_transfer():
     successful_transfer = build_transfer(
         conversation_id="123",
         sla_duration=timedelta(hours=1),
-        requesting_practice_ods_code="A12345",
-        sending_practice_ods_code="B67890",
+        requesting_practice_asid="121212121212",
+        sending_practice_asid="343434343434",
         final_error_code=None,
         status=TransferStatus.INTEGRATED,
         date_completed=date_completed,
@@ -27,8 +27,8 @@ def test_includes_successful_transfer():
         Transfer(
             conversation_id="123",
             sla_duration=timedelta(hours=1),
-            requesting_practice_ods_code="A12345",
-            sending_practice_ods_code="B67890",
+            requesting_practice_asid="121212121212",
+            sending_practice_asid="343434343434",
             final_error_code=None,
             intermediate_error_codes=[],
             status=TransferStatus.INTEGRATED,
@@ -43,8 +43,8 @@ def test_includes_suppressed_transfers():
     suppressed_transfer = build_transfer(
         conversation_id="456",
         sla_duration=timedelta(hours=2),
-        requesting_practice_ods_code="B12345",
-        sending_practice_ods_code="A67890",
+        requesting_practice_asid="121212121212",
+        sending_practice_asid="343434343434",
         final_error_code=15,
         status=TransferStatus.INTEGRATED,
         date_completed=date_completed,
@@ -58,8 +58,8 @@ def test_includes_suppressed_transfers():
         Transfer(
             conversation_id="456",
             sla_duration=timedelta(hours=2),
-            requesting_practice_ods_code="B12345",
-            sending_practice_ods_code="A67890",
+            requesting_practice_asid="121212121212",
+            sending_practice_asid="343434343434",
             final_error_code=15,
             intermediate_error_codes=[],
             status=TransferStatus.INTEGRATED,
@@ -83,7 +83,7 @@ def test_excludes_failed_transfers():
     assert list(actual) == expected
 
 
-def test_excludes_transfers_missing_SLA_duration():
+def test_excludes_transfers_missing_sla_duration():
     integrated_transfer_1 = build_transfer(status=TransferStatus.INTEGRATED)
     integrated_transfer_2 = build_transfer(status=TransferStatus.INTEGRATED, sla_duration=None)
     failed_transfer = build_transfer(status=TransferStatus.FAILED)
