@@ -1,11 +1,10 @@
-import gzip
-import shutil
 import subprocess
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
 from gp2gp.io.json import read_json_file
 from urllib.parse import parse_qs
+from tests.builders.file import gzip_file
 
 HOST_NAME = "localhost"
 PORT_NUMBER = 9000
@@ -19,14 +18,6 @@ CCG_RESPONSE_CONTENT = (
     b'{"Name": "Test CCG 2", "OrgId": "13B"}, '
     b'{"Name": "Test CCG 3", "OrgId": "14C"}]}'
 )
-
-
-def _gzip_file(input_file_path):
-    gzip_file_path = input_file_path.with_suffix(".gz")
-    with open(input_file_path, "rb") as input_file:
-        with gzip.open(gzip_file_path, "wb") as output_file:
-            shutil.copyfileobj(input_file, output_file)
-    return gzip_file_path
 
 
 class MockRequestHandler(BaseHTTPRequestHandler):
@@ -44,7 +35,7 @@ class MockRequestHandler(BaseHTTPRequestHandler):
 
 def test_ods_portal_pipeline(datadir):
     output_file_path = datadir / "organisation_metadata.json"
-    input_mapping_file = _gzip_file(datadir / "asid_mapping.csv")
+    input_mapping_file = gzip_file(datadir / "asid_mapping.csv")
 
     expected_practices = read_json_file(datadir / "expected_practice_list.json")
     expected_ccgs = read_json_file(datadir / "expected_ccg_list.json")

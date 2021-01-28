@@ -1,7 +1,5 @@
 import json
-import gzip
 import logging
-import shutil
 from io import BytesIO
 from os import getenv
 from threading import Thread
@@ -10,6 +8,7 @@ import boto3
 from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
 from werkzeug.serving import make_server
+from tests.builders.file import gzip_file
 
 from subprocess import PIPE, Popen
 
@@ -33,16 +32,8 @@ def _read_json(path):
     return json.loads(path.read_text())
 
 
-def _gzip_file(input_file_path):
-    gzip_file_path = input_file_path.with_suffix(".gz")
-    with open(input_file_path, "rb") as input_file:
-        with gzip.open(gzip_file_path, "wb") as output_file:
-            shutil.copyfileobj(input_file, output_file)
-    return gzip_file_path
-
-
 def _gzip_files(file_paths):
-    return [_gzip_file(file_path) for file_path in file_paths]
+    return [gzip_file(file_path) for file_path in file_paths]
 
 
 def _csv_join(strings):
