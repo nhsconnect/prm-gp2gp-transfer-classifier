@@ -43,7 +43,7 @@ class MockRequestHandler(BaseHTTPRequestHandler):
 
 
 def test_ods_portal_pipeline(datadir):
-    output_file_path = datadir / "practice_metadata.json"
+    output_file_path = datadir / "organisation_metadata.json"
     input_mapping_file = _gzip_file(datadir / "asid_mapping.csv")
 
     expected_practices = read_json_file(datadir / "expected_practice_list.json")

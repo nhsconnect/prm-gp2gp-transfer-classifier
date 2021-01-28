@@ -9,7 +9,7 @@ def parse_dashboard_pipeline_arguments(argument_list):
     parser = ArgumentParser(description="GP2GP Service dashboard data pipeline")
     parser.add_argument("--month", type=int)
     parser.add_argument("--year", type=int)
-    parser.add_argument("--practice-list-file", type=str)
+    parser.add_argument("--organisation-list-file", type=str)
     parser.add_argument("--input-files", type=_list_str)
     parser.add_argument("--output-bucket", type=str)
     parser.add_argument("--s3-endpoint-url", type=str)
@@ -20,13 +20,13 @@ def parse_dashboard_pipeline_arguments(argument_list):
     metrics_output_group.add_argument("--practice-metrics-output-file", type=str)
     metrics_output_group.add_argument("--practice-metrics-output-key", type=str)
 
-    metadata_output_group.add_argument("--practice-metadata-output-file", type=str)
-    metadata_output_group.add_argument("--practice-metadata-output-key", type=str)
+    metadata_output_group.add_argument("--organisation-metadata-output-file", type=str)
+    metadata_output_group.add_argument("--organisation-metadata-output-key", type=str)
 
     args = parser.parse_args(argument_list)
 
-    if args.practice_metadata_output_key is not None and args.output_bucket is None:
-        parser.error("--practice-metadata-output-key requires --output-bucket to be set")
+    if args.organisation_metadata_output_key is not None and args.output_bucket is None:
+        parser.error("--organisation-metadata-output-key requires --output-bucket to be set")
 
     if args.practice_metrics_output_key is not None and args.output_bucket is None:
         parser.error("--practice-metrics-output-key requires --output-bucket to be set")

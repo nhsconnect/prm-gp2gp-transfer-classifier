@@ -130,7 +130,8 @@ def calculate_sla_by_practice(
         else:
             unexpected_asids.add(asid)
 
-    warn(f"Unexpected ASID count: {len(unexpected_asids)}", RuntimeWarning)
+    if len(unexpected_asids) > 0:
+        warn(f"Unexpected ASID count: {len(unexpected_asids)}", RuntimeWarning)
 
     return (
         PracticeSlaMetrics(

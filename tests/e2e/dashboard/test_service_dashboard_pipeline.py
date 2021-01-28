@@ -70,14 +70,16 @@ def test_with_local_files(datadir):
     input_file_paths = _gzip_files(
         [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
     )
-    practice_metadata_file_path = datadir / "practice_metadata.json"
+    organisation_metadata_file_path = datadir / "organisation_metadata.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
     practice_metrics_output_file_path = datadir / "practice_metrics_dec_2019.json"
-    practice_metadata_output_file_path = datadir / "practice_metadata_dec_2019.json"
+    organisation_metadata_output_file_path = datadir / "organisation_metadata_dec_2019.json"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
-    expected_practice_metadata = _read_json(datadir / "expected_practice_metadata_dec_2019.json")
+    expected_organisation_metadata = _read_json(
+        datadir / "expected_organisation_metadata_dec_2019.json"
+    )
 
     month = 12
     year = 2019
@@ -85,20 +87,20 @@ def test_with_local_files(datadir):
     pipeline_command = f"\
         gp2gp-dashboard-pipeline --month {month}\
         --year {year}\
-        --practice-list-file {practice_metadata_file_path}\
+        --organisation-list-file {organisation_metadata_file_path}\
         --input-files {input_file_paths_str}\
         --practice-metrics-output-file {practice_metrics_output_file_path}\
-        --practice-metadata-output-file {practice_metadata_output_file_path}\
+        --organisation-metadata-output-file {organisation_metadata_output_file_path}\
     "
 
     process = Popen(pipeline_command, shell=True)
     process.wait()
 
     actual_practice_metrics = _read_json(practice_metrics_output_file_path)
-    actual_practice_metadata = _read_json(practice_metadata_output_file_path)
+    actual_organisation_metadata = _read_json(organisation_metadata_output_file_path)
 
     assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
-    assert actual_practice_metadata["practices"] == expected_practice_metadata["practices"]
+    assert actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
 
 
 def test_with_s3_output(datadir):
@@ -128,14 +130,16 @@ def test_with_s3_output(datadir):
     input_file_paths = _gzip_files(
         [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
     )
-    practice_metadata_file_path = datadir / "practice_metadata.json"
+    organisation_metadata_file_path = datadir / "organisation_metadata.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
     practice_metrics_output_key = "practice_metrics_dec_2019.json"
-    practice_metadata_output_key = "practice_metadata_dec_2019.json"
+    organisation_metadata_output_key = "organisation_metadata_dec_2019.json"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
-    expected_practice_metadata = _read_json(datadir / "expected_practice_metadata_dec_2019.json")
+    expected_organisation_metadata = _read_json(
+        datadir / "expected_organisation_metadata_dec_2019.json"
+    )
 
     month = 12
     year = 2019
@@ -150,11 +154,11 @@ def test_with_s3_output(datadir):
     pipeline_command = f"\
         gp2gp-dashboard-pipeline --month {month}\
         --year {year}\
-        --practice-list-file {practice_metadata_file_path}\
+        --organisation-list-file {organisation_metadata_file_path}\
         --input-files {input_file_paths_str}\
         --output-bucket {output_bucket_name}\
         --practice-metrics-output-key {practice_metrics_output_key} \
-        --practice-metadata-output-key {practice_metadata_output_key} \
+        --organisation-metadata-output-key {organisation_metadata_output_key} \
         --s3-endpoint-url {fake_s3_url} \
     "
     pipeline_process = Popen(
@@ -166,10 +170,14 @@ def test_with_s3_output(datadir):
         pipeline_process.wait()
 
         actual_practice_metrics = _read_s3_json(output_bucket, practice_metrics_output_key)
-        actual_practice_metadata = _read_s3_json(output_bucket, practice_metadata_output_key)
+        actual_organisation_metadata = _read_s3_json(
+            output_bucket, organisation_metadata_output_key
+        )
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
-        assert actual_practice_metadata["practices"] == expected_practice_metadata["practices"]
+        assert (
+            actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
+        )
     finally:
         output_bucket.objects.all().delete()
         output_bucket.delete()

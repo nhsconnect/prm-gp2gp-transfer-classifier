@@ -40,7 +40,7 @@ def main():
     next_month = metric_month + relativedelta(months=1)
     time_range = DateTimeRange(metric_month, next_month)
 
-    organisation_data = read_json_file(args.practice_list_file)
+    organisation_data = read_json_file(args.organisation_list_file)
     organisation_metadata = construct_organisation_list_from_dict(data=organisation_data)
 
     spine_messages = read_spine_csv_gz_files(args.input_files)
@@ -52,17 +52,20 @@ def main():
         data=organisation_data, with_asid=False
     )
 
-    if args.practice_metadata_output_file is not None:
-        write_dashboard_json_file(organisation_metadata_output, args.practice_metadata_output_file)
+    if args.organisation_metadata_output_file is not None:
+        write_dashboard_json_file(
+            organisation_metadata_output, args.organisation_metadata_output_file
+        )
 
     if args.practice_metrics_output_file is not None:
         write_dashboard_json_file(service_dashboard_data, args.practice_metrics_output_file)
 
     s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
     bucket_name = args.output_bucket
-    if args.practice_metadata_output_key is not None:
+    if args.organisation_metadata_output_key is not None:
         upload_dashboard_json_object(
-            organisation_metadata_output, s3.Object(bucket_name, args.practice_metadata_output_key)
+            organisation_metadata_output,
+            s3.Object(bucket_name, args.organisation_metadata_output_key),
         )
     if args.practice_metrics_output_key is not None:
         upload_dashboard_json_object(
