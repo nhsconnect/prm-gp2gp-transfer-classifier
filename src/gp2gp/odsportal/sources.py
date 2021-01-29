@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Iterable, List
+from typing import Iterable, List, Dict
 from warnings import warn
 
 import requests
@@ -62,7 +62,7 @@ class OdsDataFetcher:
 def _generate_practices(practices: dict, with_asid: bool) -> List[OrganisationDetails]:
     if with_asid:
         return [
-            OrganisationDetailsWithAsid(asid=p["asid"], ods_code=p["ods_code"], name=p["name"])
+            OrganisationDetailsWithAsid(asids=p["asids"], ods_code=p["ods_code"], name=p["name"])
             for p in practices
         ]
     else:
@@ -79,7 +79,10 @@ def construct_organisation_list_from_dict(
     )
 
 
-def _is_ods_in_mapping(ods_code: str, asid_mapping: dict):
+def _is_ods_in_mapping(
+    ods_code: str,
+    asid_mapping: dict,
+):
     if ods_code in asid_mapping:
         return True
     else:
@@ -97,7 +100,7 @@ def construct_organisation_metadata_from_ods_portal_response(
         generated_on=datetime.now(tzutc()),
         practices=[
             OrganisationDetailsWithAsid(
-                asid=asid_mapping[p["OrgId"]], ods_code=p["OrgId"], name=p["Name"]
+                asids=asid_mapping[p["OrgId"]], ods_code=p["OrgId"], name=p["Name"]
             )
             for p in unique_practices
             if _is_ods_in_mapping(p["OrgId"], asid_mapping)
@@ -111,4 +114,7 @@ def _remove_duplicated_organisations(raw_organisations: Iterable[dict]) -> Itera
 
 
 def construct_mapping_dict_from_list(raw_mappings: Iterable[dict]) -> dict:
-    return {mapping["NACS"]: mapping["ASID"] for mapping in raw_mappings}
+    complete_mapping: Dict[str, List[str]] = {}
+    for mapping in raw_mappings:
+        complete_mapping.setdefault(mapping["NACS"], []).append(mapping["ASID"])
+    return complete_mapping

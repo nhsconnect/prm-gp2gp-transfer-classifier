@@ -41,11 +41,11 @@ def test_returns_single_practice_and_single_ccg():
     response_ccg_data = [_build_organisation_data(name="CCG", org_id="12C")]
 
     expected_practices = [
-        OrganisationDetailsWithAsid(asid="123456781234", ods_code="A12345", name="GP Practice")
+        OrganisationDetailsWithAsid(asids=["123456781234"], ods_code="A12345", name="GP Practice")
     ]
     expected_ccgs = [OrganisationDetails(ods_code="12C", name="CCG")]
 
-    asid_to_ods_mapping = {"A12345": "123456781234"}
+    asid_to_ods_mapping = {"A12345": ["123456781234"]}
 
     actual = construct_organisation_metadata_from_ods_portal_response(
         response_practice_data, response_ccg_data, asid_to_ods_mapping
@@ -69,15 +69,19 @@ def test_returns_multiple_practices_and_ccgs():
     ]
 
     asid_to_ods_mapping = {
-        "A12345": "123456781234",
-        "B56789": "443456781234",
-        "C56789": "773456781234",
+        "A12345": ["123456781234"],
+        "B56789": ["443456781234"],
+        "C56789": ["773456781234"],
     }
 
     expected_practices = [
-        OrganisationDetailsWithAsid(asid="123456781234", ods_code="A12345", name="GP Practice"),
-        OrganisationDetailsWithAsid(asid="443456781234", ods_code="B56789", name="GP Practice 2"),
-        OrganisationDetailsWithAsid(asid="773456781234", ods_code="C56789", name="GP Practice 3"),
+        OrganisationDetailsWithAsid(asids=["123456781234"], ods_code="A12345", name="GP Practice"),
+        OrganisationDetailsWithAsid(
+            asids=["443456781234"], ods_code="B56789", name="GP Practice 2"
+        ),
+        OrganisationDetailsWithAsid(
+            asids=["773456781234"], ods_code="C56789", name="GP Practice 3"
+        ),
     ]
 
     expected_ccgs = [
@@ -123,10 +127,10 @@ def test_skips_practice_and_warns_when_ods_not_in_asid_mapping():
 
     response_ccg_data = []
 
-    asid_to_ods_mapping = {"A12345": "123456781234"}
+    asid_to_ods_mapping = {"A12345": ["123456781234"]}
 
     expected_practices = [
-        OrganisationDetailsWithAsid(asid="123456781234", ods_code="A12345", name="GP Practice"),
+        OrganisationDetailsWithAsid(asids=["123456781234"], ods_code="A12345", name="GP Practice"),
     ]
 
     with pytest.warns(RuntimeWarning):
@@ -135,3 +139,24 @@ def test_skips_practice_and_warns_when_ods_not_in_asid_mapping():
         )
 
     assert actual.practices == expected_practices
+
+
+def test_returns_single_practice_with_multiple_asids():
+    response_practice_data = [_build_organisation_data(name="GP Practice", org_id="A12345")]
+    response_ccg_data = [_build_organisation_data(name="CCG", org_id="12C")]
+
+    expected_practices = [
+        OrganisationDetailsWithAsid(
+            asids=["123456781234", "654321234564"], ods_code="A12345", name="GP Practice"
+        )
+    ]
+    expected_ccgs = [OrganisationDetails(ods_code="12C", name="CCG")]
+
+    asid_to_ods_mapping = {"A12345": ["123456781234", "654321234564"]}
+
+    actual = construct_organisation_metadata_from_ods_portal_response(
+        response_practice_data, response_ccg_data, asid_to_ods_mapping
+    )
+
+    assert actual.practices == expected_practices
+    assert actual.ccgs == expected_ccgs

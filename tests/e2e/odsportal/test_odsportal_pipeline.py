@@ -57,7 +57,6 @@ def test_ods_portal_pipeline(datadir):
     process.wait()
 
     httpd.server_close()
-
     actual = read_json_file(output_file_path)
 
     assert actual["practices"] == expected_practices

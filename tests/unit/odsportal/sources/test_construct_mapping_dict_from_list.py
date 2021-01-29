@@ -14,7 +14,7 @@ def test_returns_dict_with_one_asid_mapping():
         }
     ]
 
-    expected = {"A12345": "123456789123"}
+    expected = {"A12345": ["123456789123"]}
     actual = construct_mapping_dict_from_list(data)
 
     assert actual == expected
@@ -51,7 +51,35 @@ def test_returns_dict_with_multiple_asid_mappings():
         },
     ]
 
-    expected = {"B12345": "223456789123", "C12345": "323456789123", "D12345": "023456789123"}
+    expected = {"B12345": ["223456789123"], "C12345": ["323456789123"], "D12345": ["023456789123"]}
+    actual = construct_mapping_dict_from_list(data)
+
+    assert actual == expected
+
+
+def test_returns_dict_with_one_practice_with_multiple_asids():
+    data = [
+        {
+            "ASID": "123456789123",
+            "NACS": "A12345",
+            "OrgName": "A GP",
+            "MName": "A Supplier",
+            "PName": "A system",
+            "OrgType": "GP Practice",
+            "PostCode": "X12 2TB",
+        },
+        {
+            "ASID": "8765456789123",
+            "NACS": "A12345",
+            "OrgName": "A GP",
+            "MName": "A Supplier",
+            "PName": "A system",
+            "OrgType": "GP Practice",
+            "PostCode": "X12 2TB",
+        },
+    ]
+
+    expected = {"A12345": ["123456789123", "8765456789123"]}
     actual = construct_mapping_dict_from_list(data)
 
     assert actual == expected

@@ -11,7 +11,7 @@ class OrganisationDetails:
 
 @dataclass
 class OrganisationDetailsWithAsid(OrganisationDetails):
-    asid: str
+    asids: List[str]
 
 
 @dataclass

@@ -119,14 +119,20 @@ def calculate_sla_by_practice(
 ) -> Iterator[PracticeSlaMetrics]:
 
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
-    practice_counts = {practice.asid: default_sla.copy() for practice in practice_list}
+    practice_counts = {practice.ods_code: default_sla.copy() for practice in practice_list}
+
+    asid_to_ods_mapping = {
+        asid: practice.ods_code for practice in practice_list for asid in practice.asids
+    }
 
     unexpected_asids = set()
     for transfer in transfers:
         asid = transfer.requesting_practice_asid
-        if asid in practice_counts:
+
+        if asid in asid_to_ods_mapping:
+            ods_code = asid_to_ods_mapping[asid]
             sla_band = _assign_to_sla_band(transfer.sla_duration)
-            practice_counts[asid][sla_band] += 1
+            practice_counts[ods_code][sla_band] += 1
         else:
             unexpected_asids.add(asid)
 
@@ -137,9 +143,9 @@ def calculate_sla_by_practice(
         PracticeSlaMetrics(
             practice.ods_code,
             practice.name,
-            within_3_days=practice_counts[practice.asid][SlaBand.WITHIN_3_DAYS],
-            within_8_days=practice_counts[practice.asid][SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=practice_counts[practice.asid][SlaBand.BEYOND_8_DAYS],
+            within_3_days=practice_counts[practice.ods_code][SlaBand.WITHIN_3_DAYS],
+            within_8_days=practice_counts[practice.ods_code][SlaBand.WITHIN_8_DAYS],
+            beyond_8_days=practice_counts[practice.ods_code][SlaBand.BEYOND_8_DAYS],
         )
         for practice in practice_list
     )

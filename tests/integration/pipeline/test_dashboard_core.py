@@ -63,10 +63,11 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
     requesting_practice_name = "Test GP"
     requesting_ods_code = "A12345"
-    requesting_asid = "343434343434"
+    requesting_asid_without_transfer = "123456789123"
+    requesting_asid_with_transfer = "343434343434"
 
     spine_messages = _build_successful_conversation(
-        requesting_asid=requesting_asid,
+        requesting_asid=requesting_asid_with_transfer,
         ehr_request_started_on=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
         ehr_request_completed_on=datetime(2019, 12, 30, 18, 3, 21, tzinfo=UTC),
         ehr_request_started_acknowledged_on=datetime(2019, 12, 30, 18, 3, 23, tzinfo=UTC),
@@ -75,7 +76,9 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
     practice_list = [
         OrganisationDetailsWithAsid(
-            asid=requesting_asid, ods_code=requesting_ods_code, name=requesting_practice_name
+            asids=[requesting_asid_without_transfer, requesting_asid_with_transfer],
+            ods_code=requesting_ods_code,
+            name=requesting_practice_name,
         )
     ]
 
