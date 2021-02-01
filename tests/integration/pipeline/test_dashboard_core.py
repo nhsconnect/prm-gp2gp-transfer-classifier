@@ -10,7 +10,7 @@ from gp2gp.dashboard.models import (
     TimeToIntegrateSla,
 )
 from gp2gp.date.range import DateTimeRange
-from gp2gp.odsportal.models import OrganisationDetailsWithAsid
+from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data
 
 from tests.builders.spine import build_message
@@ -75,7 +75,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
     )
 
     practice_list = [
-        OrganisationDetailsWithAsid(
+        PracticeDetails(
             asids=[requesting_asid_without_transfer, requesting_asid_with_transfer],
             ods_code=requesting_ods_code,
             name=requesting_practice_name,

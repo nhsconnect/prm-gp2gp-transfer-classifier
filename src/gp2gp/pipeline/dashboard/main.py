@@ -5,6 +5,7 @@ from datetime import datetime
 import boto3
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
+from gp2gp.dashboard.transformers import construct_service_dashboard_metadata
 from gp2gp.date.range import DateTimeRange
 
 from gp2gp.io.csv import read_gzip_csv_files
@@ -48,13 +49,11 @@ def main():
         spine_messages, organisation_metadata.practices, time_range
     )
 
-    organisation_metadata_output = construct_organisation_list_from_dict(
-        data=organisation_data, with_asid=False
-    )
+    service_dashboard_metadata = construct_service_dashboard_metadata(organisation_metadata)
 
     if args.organisation_metadata_output_file is not None:
         write_dashboard_json_file(
-            organisation_metadata_output, args.organisation_metadata_output_file
+            service_dashboard_metadata, args.organisation_metadata_output_file
         )
 
     if args.practice_metrics_output_file is not None:
@@ -64,7 +63,7 @@ def main():
     bucket_name = args.output_bucket
     if args.organisation_metadata_output_key is not None:
         upload_dashboard_json_object(
-            organisation_metadata_output,
+            service_dashboard_metadata,
             s3.Object(bucket_name, args.organisation_metadata_output_key),
         )
     if args.practice_metrics_output_key is not None:

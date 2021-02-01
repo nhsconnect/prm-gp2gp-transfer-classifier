@@ -33,3 +33,16 @@ class PracticeSummary:
 class ServiceDashboardData:
     generated_on: datetime
     practices: List[PracticeSummary]
+
+
+@dataclass
+class OrganisationDetails:
+    ods_code: str
+    name: str
+
+
+@dataclass
+class ServiceDashboardMetadata:
+    generated_on: datetime
+    practices: List[OrganisationDetails]
+    ccgs: List[OrganisationDetails]

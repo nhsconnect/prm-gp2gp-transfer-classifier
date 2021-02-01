@@ -4,7 +4,7 @@ import pytest
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.odsportal.models import OrganisationDetails, OrganisationDetailsWithAsid
+from gp2gp.odsportal.models import CcgDetails, PracticeDetails
 from gp2gp.odsportal.sources import construct_organisation_metadata_from_ods_portal_response
 from tests.builders.common import a_string
 
@@ -41,9 +41,9 @@ def test_returns_single_practice_and_single_ccg():
     response_ccg_data = [_build_organisation_data(name="CCG", org_id="12C")]
 
     expected_practices = [
-        OrganisationDetailsWithAsid(asids=["123456781234"], ods_code="A12345", name="GP Practice")
+        PracticeDetails(asids=["123456781234"], ods_code="A12345", name="GP Practice")
     ]
-    expected_ccgs = [OrganisationDetails(ods_code="12C", name="CCG")]
+    expected_ccgs = [CcgDetails(ods_code="12C", name="CCG")]
 
     asid_to_ods_mapping = {"A12345": ["123456781234"]}
 
@@ -75,19 +75,15 @@ def test_returns_multiple_practices_and_ccgs():
     }
 
     expected_practices = [
-        OrganisationDetailsWithAsid(asids=["123456781234"], ods_code="A12345", name="GP Practice"),
-        OrganisationDetailsWithAsid(
-            asids=["443456781234"], ods_code="B56789", name="GP Practice 2"
-        ),
-        OrganisationDetailsWithAsid(
-            asids=["773456781234"], ods_code="C56789", name="GP Practice 3"
-        ),
+        PracticeDetails(asids=["123456781234"], ods_code="A12345", name="GP Practice"),
+        PracticeDetails(asids=["443456781234"], ods_code="B56789", name="GP Practice 2"),
+        PracticeDetails(asids=["773456781234"], ods_code="C56789", name="GP Practice 3"),
     ]
 
     expected_ccgs = [
-        OrganisationDetails(ods_code="12A", name="CCG"),
-        OrganisationDetails(ods_code="34A", name="CCG 2"),
-        OrganisationDetails(ods_code="56A", name="CCG 3"),
+        CcgDetails(ods_code="12A", name="CCG"),
+        CcgDetails(ods_code="34A", name="CCG 2"),
+        CcgDetails(ods_code="56A", name="CCG 3"),
     ]
 
     actual = construct_organisation_metadata_from_ods_portal_response(
@@ -130,7 +126,7 @@ def test_skips_practice_and_warns_when_ods_not_in_asid_mapping():
     asid_to_ods_mapping = {"A12345": ["123456781234"]}
 
     expected_practices = [
-        OrganisationDetailsWithAsid(asids=["123456781234"], ods_code="A12345", name="GP Practice"),
+        PracticeDetails(asids=["123456781234"], ods_code="A12345", name="GP Practice"),
     ]
 
     with pytest.warns(RuntimeWarning):
@@ -146,11 +142,11 @@ def test_returns_single_practice_with_multiple_asids():
     response_ccg_data = [_build_organisation_data(name="CCG", org_id="12C")]
 
     expected_practices = [
-        OrganisationDetailsWithAsid(
+        PracticeDetails(
             asids=["123456781234", "654321234564"], ods_code="A12345", name="GP Practice"
         )
     ]
-    expected_ccgs = [OrganisationDetails(ods_code="12C", name="CCG")]
+    expected_ccgs = [CcgDetails(ods_code="12C", name="CCG")]
 
     asid_to_ods_mapping = {"A12345": ["123456781234", "654321234564"]}
 

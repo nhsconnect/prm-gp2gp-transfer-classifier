@@ -8,9 +8,9 @@ from dateutil.tz import tzutc
 from dateutil import parser
 
 from gp2gp.odsportal.models import (
-    OrganisationDetails,
+    CcgDetails,
     OrganisationMetadata,
-    OrganisationDetailsWithAsid,
+    PracticeDetails,
 )
 
 ODS_PORTAL_SEARCH_URL = "https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations"
@@ -59,23 +59,14 @@ class OdsDataFetcher:
         return json.loads(response.content)["Organisations"]
 
 
-def _generate_practices(practices: dict, with_asid: bool) -> List[OrganisationDetails]:
-    if with_asid:
-        return [
-            OrganisationDetailsWithAsid(asids=p["asids"], ods_code=p["ods_code"], name=p["name"])
-            for p in practices
-        ]
-    else:
-        return [OrganisationDetails(ods_code=p["ods_code"], name=p["name"]) for p in practices]
-
-
-def construct_organisation_list_from_dict(
-    data: dict, with_asid: bool = True
-) -> OrganisationMetadata:
+def construct_organisation_list_from_dict(data: dict) -> OrganisationMetadata:
     return OrganisationMetadata(
         generated_on=parser.isoparse(data["generated_on"]),
-        practices=_generate_practices(data["practices"], with_asid),
-        ccgs=[OrganisationDetails(ods_code=c["ods_code"], name=c["name"]) for c in data["ccgs"]],
+        practices=[
+            PracticeDetails(asids=p["asids"], ods_code=p["ods_code"], name=p["name"])
+            for p in data["practices"]
+        ],
+        ccgs=[CcgDetails(ods_code=c["ods_code"], name=c["name"]) for c in data["ccgs"]],
     )
 
 
@@ -99,13 +90,11 @@ def construct_organisation_metadata_from_ods_portal_response(
     return OrganisationMetadata(
         generated_on=datetime.now(tzutc()),
         practices=[
-            OrganisationDetailsWithAsid(
-                asids=asid_mapping[p["OrgId"]], ods_code=p["OrgId"], name=p["Name"]
-            )
+            PracticeDetails(asids=asid_mapping[p["OrgId"]], ods_code=p["OrgId"], name=p["Name"])
             for p in unique_practices
             if _is_ods_in_mapping(p["OrgId"], asid_mapping)
         ],
-        ccgs=[OrganisationDetails(ods_code=c["OrgId"], name=c["Name"]) for c in unique_ccgs],
+        ccgs=[CcgDetails(ods_code=c["OrgId"], name=c["Name"]) for c in unique_ccgs],
     )
 
 
