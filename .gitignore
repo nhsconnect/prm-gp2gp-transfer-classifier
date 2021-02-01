@@ -9,3 +9,4 @@ venv/
 *.pyc
 gp2gp_data_pipeline.egg-info
 .tox
+.coverage

@@ -9,9 +9,6 @@ do
     test)
         tox -e py38
         ;;
-    e2e-test)
-        tox -e e2e
-        ;;
     format)
         tox -e format
         ;;
@@ -41,7 +38,7 @@ do
         tox --recreate --devenv venv
         ;;
     validate)
-        ./tasks check-format typecheck lint test e2e-test
+        ./tasks check-format typecheck lint test
         ;;
     dojo-validate)
         dojo "./tasks validate"
