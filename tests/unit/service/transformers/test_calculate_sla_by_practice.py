@@ -215,3 +215,24 @@ def test_counts_second_asid_for_practice_with_two_asids():
     actual = calculate_sla_by_practice(practice_list, [transfer])
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=1, within_8_days=0, beyond_8_days=0)
+
+
+def test_counts_both_asids_for_practice_with_two_asids():
+    practice_list = [
+        OrganisationDetailsWithAsid(
+            asids=["121212121212", "343434343434"], ods_code="A12345", name=a_string()
+        )
+    ]
+    transfers = [
+        build_transfer(
+            requesting_practice_asid="343434343434",
+            sla_duration=timedelta(hours=1, minutes=10),
+        ),
+        build_transfer(
+            requesting_practice_asid="121212121212",
+            sla_duration=timedelta(days=5, hours=1, minutes=10),
+        ),
+    ]
+    actual = calculate_sla_by_practice(practice_list, transfers)
+
+    _assert_first_summary_has_sla_counts(actual, within_3_days=1, within_8_days=1, beyond_8_days=0)
