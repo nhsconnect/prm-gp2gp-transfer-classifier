@@ -63,7 +63,6 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
     requesting_practice_name = "Test GP"
     requesting_ods_code = "A12345"
-    requesting_asid_without_transfer = "123456789123"
     requesting_asid_with_transfer = "343434343434"
 
     spine_messages = _build_successful_conversation(
@@ -76,7 +75,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
     practice_list = [
         PracticeDetails(
-            asids=[requesting_asid_without_transfer, requesting_asid_with_transfer],
+            asids=[requesting_asid_with_transfer],
             ods_code=requesting_ods_code,
             name=requesting_practice_name,
         )

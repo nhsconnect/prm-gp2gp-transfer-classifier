@@ -8,12 +8,12 @@ def test_parse_ods_portal_arguments():
         "--output-file",
         "data/practice-list.json",
         "--mapping-file",
-        "data/asid-mapping.csv",
+        "data/asid-mapping.csv.gz",
     ]
 
     expected = Namespace(
         output_file="data/practice-list.json",
-        mapping_file="data/asid-mapping.csv",
+        mapping_file="data/asid-mapping.csv.gz",
         search_url="https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations",
     )
 
@@ -27,14 +27,14 @@ def test_parse_optional_ods_portal_arguments():
         "--output-file",
         "data/practice-list.json",
         "--mapping-file",
-        "data/asid-mapping.csv",
+        "data/asid-mapping.csv.gz",
         "--search-url",
         "http://test.com",
     ]
 
     expected = Namespace(
         output_file="data/practice-list.json",
-        mapping_file="data/asid-mapping.csv",
+        mapping_file="data/asid-mapping.csv.gz",
         search_url="http://test.com",
     )
 

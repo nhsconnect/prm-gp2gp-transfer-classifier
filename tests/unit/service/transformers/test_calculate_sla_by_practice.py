@@ -36,7 +36,7 @@ def _assert_first_summary_has_sla_counts(
     assert actual_slas == expected_slas
 
 
-def test_groups_by_asid_and_saves_ods_code_given_single_practice_and_single_transfer():
+def test_groups_by_ods_code_given_single_practice_and_single_transfer():
     practices = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     transfers = [build_transfer(requesting_practice_asid="121212121212")]
 
@@ -45,7 +45,7 @@ def test_groups_by_asid_and_saves_ods_code_given_single_practice_and_single_tran
     _assert_has_ods_codes(actual, {"A12345"})
 
 
-def test_groups_asid_and_saves_ods_code_given_single_practice_and_no_transfers():
+def test_groups_by_ods_code_given_single_practice_and_no_transfers():
     practices = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     transfers = []
 

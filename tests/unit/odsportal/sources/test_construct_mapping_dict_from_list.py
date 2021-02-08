@@ -1,4 +1,4 @@
-from gp2gp.odsportal.sources import construct_mapping_dict_from_list
+from gp2gp.odsportal.sources import construct_asid_to_ods_mappings
 
 
 def test_returns_dict_with_one_asid_mapping():
@@ -15,7 +15,7 @@ def test_returns_dict_with_one_asid_mapping():
     ]
 
     expected = {"A12345": ["123456789123"]}
-    actual = construct_mapping_dict_from_list(data)
+    actual = construct_asid_to_ods_mappings(data)
 
     assert actual == expected
 
@@ -52,7 +52,7 @@ def test_returns_dict_with_multiple_asid_mappings():
     ]
 
     expected = {"B12345": ["223456789123"], "C12345": ["323456789123"], "D12345": ["023456789123"]}
-    actual = construct_mapping_dict_from_list(data)
+    actual = construct_asid_to_ods_mappings(data)
 
     assert actual == expected
 
@@ -80,6 +80,6 @@ def test_returns_dict_with_one_practice_with_multiple_asids():
     ]
 
     expected = {"A12345": ["123456789123", "8765456789123"]}
-    actual = construct_mapping_dict_from_list(data)
+    actual = construct_asid_to_ods_mappings(data)
 
     assert actual == expected

@@ -1,6 +1,7 @@
 import json
+from collections import defaultdict
 from datetime import datetime
-from typing import Iterable, List, Dict
+from typing import Iterable, List, DefaultDict
 from warnings import warn
 
 import requests
@@ -102,8 +103,8 @@ def _remove_duplicated_organisations(raw_organisations: Iterable[dict]) -> Itera
     return {obj["OrgId"]: obj for obj in raw_organisations}.values()
 
 
-def construct_mapping_dict_from_list(raw_mappings: Iterable[dict]) -> dict:
-    complete_mapping: Dict[str, List[str]] = {}
+def construct_asid_to_ods_mappings(raw_mappings: Iterable[dict]) -> defaultdict:
+    complete_mapping: DefaultDict[str, List[str]] = defaultdict(list)
     for mapping in raw_mappings:
-        complete_mapping.setdefault(mapping["NACS"], []).append(mapping["ASID"])
+        complete_mapping[mapping["NACS"]].append(mapping["ASID"])
     return complete_mapping

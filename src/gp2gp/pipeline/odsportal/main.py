@@ -10,7 +10,7 @@ from gp2gp.odsportal.sources import (
     ODS_PORTAL_SEARCH_URL,
     PRACTICE_SEARCH_PARAMS,
     CCG_SEARCH_PARAMS,
-    construct_mapping_dict_from_list,
+    construct_asid_to_ods_mappings,
 )
 
 
@@ -30,7 +30,7 @@ def main():
     practice_data = data_fetcher.fetch_organisation_data(PRACTICE_SEARCH_PARAMS)
     ccg_data = data_fetcher.fetch_organisation_data(CCG_SEARCH_PARAMS)
 
-    asid_mapping = construct_mapping_dict_from_list(read_gzip_csv_file(args.mapping_file))
+    asid_mapping = construct_asid_to_ods_mappings(read_gzip_csv_file(args.mapping_file))
 
     organisation_metadata = construct_organisation_metadata_from_ods_portal_response(
         practice_data, ccg_data, asid_mapping
