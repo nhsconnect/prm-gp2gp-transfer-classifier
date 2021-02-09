@@ -276,6 +276,22 @@ def test_has_failed_status_if_error_in_intermediate_message():
     _assert_attributes("status", actual, expected_statuses)
 
 
+def test_extracts_date_requested_from_request_started_message():
+    date_requested = a_datetime()
+
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(time=date_requested),
+            request_completed=build_message(),
+            request_completed_ack=build_message(),
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    _assert_attributes("date_requested", actual, [date_requested])
+
+
 def test_extracts_date_completed_from_request_completed_ack():
     date_completed = a_datetime()
 

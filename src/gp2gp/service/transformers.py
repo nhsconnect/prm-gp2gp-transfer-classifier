@@ -45,6 +45,10 @@ def _extract_intermediate_error_code(conversation: ParsedConversation) -> List[O
     ]
 
 
+def _extract_date_requested(conversation: ParsedConversation) -> datetime:
+    return conversation.request_started.time
+
+
 def _extract_date_completed(conversation: ParsedConversation) -> Optional[datetime]:
     if conversation.request_completed_ack:
         return conversation.request_completed_ack.time
@@ -88,6 +92,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         final_error_code=_extract_final_error_code(conversation),
         intermediate_error_codes=_extract_intermediate_error_code(conversation),
         status=_assign_status(conversation),
+        date_requested=_extract_date_requested(conversation),
         date_completed=_extract_date_completed(conversation),
     )
 

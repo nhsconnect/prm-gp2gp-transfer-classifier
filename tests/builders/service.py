@@ -1,5 +1,5 @@
 from gp2gp.service.models import Transfer, PracticeSlaMetrics, TransferStatus
-from tests.builders.common import a_string, a_duration, an_integer
+from tests.builders.common import a_string, a_duration, an_integer, a_datetime
 
 
 def build_transfer(**kwargs):
@@ -11,6 +11,7 @@ def build_transfer(**kwargs):
         final_error_code=kwargs.get("final_error_code", None),
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),
         status=kwargs.get("status", TransferStatus.PENDING),
+        date_requested=kwargs.get("date_requested", a_datetime()),
         date_completed=kwargs.get("date_completed", None),
     )
 

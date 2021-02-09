@@ -5,6 +5,7 @@ from gp2gp.service.transformers import filter_for_successful_transfers
 from tests.builders.service import build_transfer
 from tests.builders.common import a_datetime
 
+date_requested = a_datetime()
 date_completed = a_datetime()
 
 
@@ -16,6 +17,7 @@ def test_includes_successful_transfer():
         sending_practice_asid="343434343434",
         final_error_code=None,
         status=TransferStatus.INTEGRATED,
+        date_requested=date_requested,
         date_completed=date_completed,
     )
 
@@ -32,6 +34,7 @@ def test_includes_successful_transfer():
             final_error_code=None,
             intermediate_error_codes=[],
             status=TransferStatus.INTEGRATED,
+            date_requested=date_requested,
             date_completed=date_completed,
         )
     ]
@@ -47,6 +50,7 @@ def test_includes_suppressed_transfers():
         sending_practice_asid="343434343434",
         final_error_code=15,
         status=TransferStatus.INTEGRATED,
+        date_requested=date_requested,
         date_completed=date_completed,
     )
 
@@ -63,6 +67,7 @@ def test_includes_suppressed_transfers():
             final_error_code=15,
             intermediate_error_codes=[],
             status=TransferStatus.INTEGRATED,
+            date_requested=date_requested,
             date_completed=date_completed,
         )
     ]

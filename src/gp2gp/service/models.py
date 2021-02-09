@@ -19,6 +19,7 @@ class Transfer(NamedTuple):
     final_error_code: Optional[int]
     intermediate_error_codes: List[int]
     status: TransferStatus
+    date_requested: datetime
     date_completed: Optional[datetime]
 
 
