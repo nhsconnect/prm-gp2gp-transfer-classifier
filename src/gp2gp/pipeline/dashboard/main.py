@@ -13,7 +13,7 @@ from gp2gp.io.dictionary import camelize_dict
 from gp2gp.io.json import write_json_file, read_json_file, upload_json_object
 from gp2gp.odsportal.sources import construct_organisation_list_from_dict
 from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
-from gp2gp.pipeline.dashboard.core import calculate_dashboard_data
+from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
 from gp2gp.spine.sources import construct_messages_from_splunk_items
 
 
@@ -45,8 +45,9 @@ def main():
     organisation_metadata = construct_organisation_list_from_dict(data=organisation_data)
 
     spine_messages = read_spine_csv_gz_files(args.input_files)
+    transfers = parse_transfers_from_messages(spine_messages, time_range)
     service_dashboard_data = calculate_dashboard_data(
-        spine_messages, organisation_metadata.practices, time_range
+        transfers, organisation_metadata.practices, time_range
     )
 
     service_dashboard_metadata = construct_service_dashboard_metadata(organisation_metadata)
