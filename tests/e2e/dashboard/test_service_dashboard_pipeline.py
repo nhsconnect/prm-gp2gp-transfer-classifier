@@ -66,10 +66,14 @@ def test_with_local_files(datadir):
 
     practice_metrics_output_file_path = datadir / "practice_metrics_dec_2019.json"
     organisation_metadata_output_file_path = datadir / "organisation_metadata_dec_2019.json"
+    transfers_output_file_path = datadir / "transfers_dec_2019.json"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
+    )
+    expected_transfers = _read_json(
+        datadir / "expected_transfers_dec_2019.json"
     )
 
     month = 12
@@ -82,6 +86,7 @@ def test_with_local_files(datadir):
         --input-files {input_file_paths_str}\
         --practice-metrics-output-file {practice_metrics_output_file_path}\
         --organisation-metadata-output-file {organisation_metadata_output_file_path}\
+        --transfers-output-file {transfers_output_file_path}\
     "
 
     process = Popen(pipeline_command, shell=True)
@@ -89,9 +94,11 @@ def test_with_local_files(datadir):
 
     actual_practice_metrics = _read_json(practice_metrics_output_file_path)
     actual_organisation_metadata = _read_json(organisation_metadata_output_file_path)
+    actual_transfers = _read_json(transfers_output_file_path)
 
     assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
     assert actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
+    assert actual_transfers == expected_transfers
 
 
 def test_with_s3_output(datadir):
@@ -126,11 +133,13 @@ def test_with_s3_output(datadir):
 
     practice_metrics_output_key = "practice_metrics_dec_2019.json"
     organisation_metadata_output_key = "organisation_metadata_dec_2019.json"
+    transfers_output_key = "transfers_dec_2019.json"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
+    expected_transfers = _read_json(datadir / "expected_transfers_dec_2019.json")
 
     month = 12
     year = 2019
@@ -150,6 +159,7 @@ def test_with_s3_output(datadir):
         --output-bucket {output_bucket_name}\
         --practice-metrics-output-key {practice_metrics_output_key} \
         --organisation-metadata-output-key {organisation_metadata_output_key} \
+        --transfers-output-key {transfers_output_key} \
         --s3-endpoint-url {fake_s3_url} \
     "
     pipeline_process = Popen(
@@ -164,11 +174,15 @@ def test_with_s3_output(datadir):
         actual_organisation_metadata = _read_s3_json(
             output_bucket, organisation_metadata_output_key
         )
+        actual_transfers = _read_s3_json(
+            output_bucket, transfers_output_key
+        )
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
         assert (
             actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
         )
+        assert actual_transfers == expected_transfers
     finally:
         output_bucket.objects.all().delete()
         output_bucket.delete()

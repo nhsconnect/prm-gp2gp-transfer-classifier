@@ -1,12 +1,18 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
+
+from gp2gp.service.models import TransferStatus
 
 
 def _serialize_datetime(obj):
-    if isinstance(obj, datetime):
+    if isinstance(obj, timedelta):
+        return str(obj)
+    elif isinstance(obj, datetime):
         return obj.isoformat()
-    raise TypeError("Type {} is not JSON serializable".format(type(obj)))
+    elif isinstance(obj, TransferStatus):
+        return str(obj)
+    raise TypeError(f"Type {type(obj)} is not JSON serializable")
 
 
 def write_json_file(content: dict, file_path: str):

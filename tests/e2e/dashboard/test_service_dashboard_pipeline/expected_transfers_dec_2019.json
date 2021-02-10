@@ -1,0 +1,13 @@
+[
+  {
+    "conversationId": "abc",
+    "slaDuration": "1 day, 14:38:26.429000",
+    "requestingPracticeAsid": "123456789123",
+    "sendingPracticeAsid": "003456789123",
+    "finalErrorCode": null,
+    "intermediateErrorCodes": [],
+    "status": "TransferStatus.INTEGRATED",
+    "dateRequested": "2019-12-30T18:02:29.985000+00:00",
+    "dateCompleted": "2020-01-01T08:41:48.337000+00:00"
+  }
+]

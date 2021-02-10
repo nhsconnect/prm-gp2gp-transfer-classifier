@@ -16,12 +16,16 @@ def parse_dashboard_pipeline_arguments(argument_list):
 
     metrics_output_group = parser.add_mutually_exclusive_group(required=True)
     metadata_output_group = parser.add_mutually_exclusive_group(required=True)
+    transfers_output_group = parser.add_mutually_exclusive_group(required=True)
 
     metrics_output_group.add_argument("--practice-metrics-output-file", type=str)
     metrics_output_group.add_argument("--practice-metrics-output-key", type=str)
 
     metadata_output_group.add_argument("--organisation-metadata-output-file", type=str)
     metadata_output_group.add_argument("--organisation-metadata-output-key", type=str)
+
+    transfers_output_group.add_argument("--transfers-output-file", type=str)
+    transfers_output_group.add_argument("--transfers-output-key", type=str)
 
     args = parser.parse_args(argument_list)
 
