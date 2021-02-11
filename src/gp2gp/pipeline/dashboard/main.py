@@ -11,6 +11,7 @@ from gp2gp.date.range import DateTimeRange
 from gp2gp.io.csv import read_gzip_csv_files
 from gp2gp.io.dictionary import camelize_dict
 from gp2gp.io.json import write_json_file, read_json_file, upload_json_object
+from gp2gp.io.parquet import write_parquet_file, upload_parquet_object
 from gp2gp.odsportal.sources import construct_organisation_list_from_dict
 from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
@@ -23,22 +24,43 @@ def write_dashboard_json_file(dashboard_data, output_file_path):
     write_json_file(camelized_dict, output_file_path)
 
 
-def write_transfers_json_file(transfers, output_file_path):
-    content_dict = [transfer._asdict() for transfer in transfers]
-    camelized_dict = camelize_dict(content_dict)
-    write_json_file(camelized_dict, output_file_path)
-
-
 def upload_dashboard_json_object(dashboard_data, s3_object):
     content_dict = asdict(dashboard_data)
     camelized_dict = camelize_dict(content_dict)
     upload_json_object(camelized_dict, s3_object)
 
 
-def upload_transfers_json_object(transfers, s3_object):
-    content_dict = [transfer._asdict() for transfer in transfers]
-    camelized_dict = camelize_dict(content_dict)
-    upload_json_object(camelized_dict, s3_object)
+def _convert_transfers_to_dictionary(transfers):
+    transfer_dicts = []
+    for transfer in transfers:
+        transfer_dict = transfer._asdict()
+
+        transfer_dict["sla_duration"] = (
+            transfer_dict["sla_duration"].total_seconds()
+            if transfer_dict["sla_duration"] is not None
+            else None
+        )
+        transfer_dict["date_requested"] = transfer_dict["date_requested"].isoformat()
+        transfer_dict["date_completed"] = (
+            transfer_dict["date_completed"].isoformat()
+            if transfer_dict["date_completed"] is not None
+            else None
+        )
+        transfer_dict["status"] = transfer_dict["status"].value
+
+        transfer_dicts.append(transfer_dict)
+
+    return camelize_dict(transfer_dicts)
+
+
+def upload_transfers_parquet_object(transfers, s3_object):
+    transfer_dicts = _convert_transfers_to_dictionary(transfers)
+    upload_parquet_object(transfer_dicts, s3_object)
+
+
+def write_transfers_parquet_file(transfers, output_file_path):
+    transfer_dicts = _convert_transfers_to_dictionary(transfers)
+    write_parquet_file(transfer_dicts, output_file_path)
 
 
 def read_spine_csv_gz_files(file_paths):
@@ -46,7 +68,7 @@ def read_spine_csv_gz_files(file_paths):
     return construct_messages_from_splunk_items(items)
 
 
-def main():
+def main():  # noqa: C901
     args = parse_dashboard_pipeline_arguments(sys.argv[1:])
 
     metric_month = datetime(args.year, args.month, 1, tzinfo=tzutc())
@@ -73,7 +95,7 @@ def main():
         write_dashboard_json_file(service_dashboard_data, args.practice_metrics_output_file)
 
     if args.transfers_output_file is not None:
-        write_transfers_json_file(transfers, args.transfers_output_file)
+        write_transfers_parquet_file(transfers, args.transfers_output_file)
 
     s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
     bucket_name = args.output_bucket
@@ -87,6 +109,6 @@ def main():
             service_dashboard_data, s3.Object(bucket_name, args.practice_metrics_output_key)
         )
     if args.transfers_output_key is not None:
-        upload_transfers_json_object(
+        upload_transfers_parquet_object(
             transfers, s3.Object(bucket_name, args.transfers_output_key)
         )

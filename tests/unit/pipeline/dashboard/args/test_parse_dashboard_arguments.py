@@ -36,7 +36,6 @@ def test_parse_arguments_with_local_files():
         organisation_metadata_output_key=None,
         transfers_output_key=None,
         s3_endpoint_url=None,
-
     )
 
     actual = parse_dashboard_pipeline_arguments(args)
@@ -78,7 +77,7 @@ def test_parse_arguments_with_s3_upload():
         s3_endpoint_url="https://localhost:6789",
         practice_metrics_output_file=None,
         organisation_metadata_output_file=None,
-        transfers_output_file=None
+        transfers_output_file=None,
     )
 
     actual = parse_dashboard_pipeline_arguments(args)

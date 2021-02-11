@@ -9,6 +9,7 @@ from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
 from werkzeug.serving import make_server
 from tests.builders.file import gzip_file
+import pyarrow.parquet as pq
 
 from subprocess import PIPE, Popen
 
@@ -32,6 +33,10 @@ def _read_json(path):
     return json.loads(path.read_text())
 
 
+def _read_parquet(path):
+    return pq.read_table(path).to_pydict()
+
+
 def _gzip_files(file_paths):
     return [gzip_file(file_path) for file_path in file_paths]
 
@@ -51,6 +56,12 @@ def _read_s3_json(bucket, key):
     return json.loads(f.read().decode("utf-8"))
 
 
+def _read_s3_parquet(bucket, key):
+    f = BytesIO()
+    bucket.download_fileobj(key, f)
+    return pq.read_table(f).to_pydict()
+
+
 def _build_fake_s3(host, port):
     app = DomainDispatcherApplication(create_backend_app, "s3")
     server = make_server(host, port, app)
@@ -66,15 +77,13 @@ def test_with_local_files(datadir):
 
     practice_metrics_output_file_path = datadir / "practice_metrics_dec_2019.json"
     organisation_metadata_output_file_path = datadir / "organisation_metadata_dec_2019.json"
-    transfers_output_file_path = datadir / "transfers_dec_2019.json"
+    transfers_output_file_path = datadir / "transfers_dec_2019.parquet"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
-    expected_transfers = _read_json(
-        datadir / "expected_transfers_dec_2019.json"
-    )
+    expected_transfers = _read_json(datadir / "expected_transfers_dec_2019.json")
 
     month = 12
     year = 2019
@@ -94,7 +103,7 @@ def test_with_local_files(datadir):
 
     actual_practice_metrics = _read_json(practice_metrics_output_file_path)
     actual_organisation_metadata = _read_json(organisation_metadata_output_file_path)
-    actual_transfers = _read_json(transfers_output_file_path)
+    actual_transfers = _read_parquet(transfers_output_file_path)
 
     assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
     assert actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
@@ -133,7 +142,7 @@ def test_with_s3_output(datadir):
 
     practice_metrics_output_key = "practice_metrics_dec_2019.json"
     organisation_metadata_output_key = "organisation_metadata_dec_2019.json"
-    transfers_output_key = "transfers_dec_2019.json"
+    transfers_output_key = "transfers_dec_2019.parquet"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
@@ -174,9 +183,7 @@ def test_with_s3_output(datadir):
         actual_organisation_metadata = _read_s3_json(
             output_bucket, organisation_metadata_output_key
         )
-        actual_transfers = _read_s3_json(
-            output_bucket, transfers_output_key
-        )
+        actual_transfers = _read_s3_parquet(output_bucket, transfers_output_key)
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
         assert (

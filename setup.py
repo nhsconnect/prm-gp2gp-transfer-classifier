@@ -5,7 +5,13 @@ setup(
     version="1.0.0",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    install_requires=["python-dateutil~=2.8", "requests~=2.2", "boto3~=1.12"],
+    install_requires=[
+        "python-dateutil~=2.8",
+        "requests~=2.2",
+        "boto3~=1.12",
+        "PyArrow~=3.0",
+        "pandas~=1.2",
+    ],
     entry_points={
         "console_scripts": [
             "gp2gp-dashboard-pipeline=gp2gp.pipeline.dashboard.main:main",

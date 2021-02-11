@@ -6,9 +6,9 @@ ERROR_SUPPRESSED = 15
 
 
 class TransferStatus(Enum):
-    PENDING = auto()
-    INTEGRATED = auto()
-    FAILED = auto()
+    PENDING = "PENDING"
+    INTEGRATED = "INTEGRATED"
+    FAILED = "FAILED"
 
 
 class Transfer(NamedTuple):
