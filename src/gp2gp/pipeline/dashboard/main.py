@@ -15,6 +15,7 @@ from gp2gp.io.parquet import write_parquet_file, upload_parquet_object
 from gp2gp.odsportal.sources import construct_organisation_list_from_dict
 from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
+from gp2gp.service.transformers import convert_transfers_to_dict
 from gp2gp.spine.sources import construct_messages_from_splunk_items
 
 
@@ -30,36 +31,13 @@ def upload_dashboard_json_object(dashboard_data, s3_object):
     upload_json_object(camelized_dict, s3_object)
 
 
-def _convert_transfers_to_dictionary(transfers):
-    transfer_dicts = []
-    for transfer in transfers:
-        transfer_dict = transfer._asdict()
-
-        transfer_dict["sla_duration"] = (
-            transfer_dict["sla_duration"].total_seconds()
-            if transfer_dict["sla_duration"] is not None
-            else None
-        )
-        transfer_dict["date_requested"] = transfer_dict["date_requested"].isoformat()
-        transfer_dict["date_completed"] = (
-            transfer_dict["date_completed"].isoformat()
-            if transfer_dict["date_completed"] is not None
-            else None
-        )
-        transfer_dict["status"] = transfer_dict["status"].value
-
-        transfer_dicts.append(transfer_dict)
-
-    return camelize_dict(transfer_dicts)
-
-
 def upload_transfers_parquet_object(transfers, s3_object):
-    transfer_dicts = _convert_transfers_to_dictionary(transfers)
+    transfer_dicts = convert_transfers_to_dict(transfers)
     upload_parquet_object(transfer_dicts, s3_object)
 
 
 def write_transfers_parquet_file(transfers, output_file_path):
-    transfer_dicts = _convert_transfers_to_dictionary(transfers)
+    transfer_dicts = convert_transfers_to_dict(transfers)
     write_parquet_file(transfer_dicts, output_file_path)
 
 

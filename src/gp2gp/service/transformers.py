@@ -2,6 +2,7 @@ from datetime import timedelta, datetime
 from typing import Iterable, Iterator, List, Optional
 from warnings import warn
 
+from gp2gp.io.dictionary import camelize_dict
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.models import (
     Transfer,
@@ -107,6 +108,29 @@ def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[T
         for transfer in transfers
         if transfer.status == TransferStatus.INTEGRATED and transfer.sla_duration is not None
     )
+
+
+def convert_transfers_to_dict(transfers: List[Transfer]) -> List[dict]:
+    transfer_dicts = []
+    for transfer in transfers:
+        transfer_dict = transfer._asdict()
+
+        transfer_dict["sla_duration"] = (
+            transfer_dict["sla_duration"].total_seconds()
+            if transfer_dict["sla_duration"] is not None
+            else None
+        )
+        transfer_dict["date_requested"] = transfer_dict["date_requested"].isoformat()
+        transfer_dict["date_completed"] = (
+            transfer_dict["date_completed"].isoformat()
+            if transfer_dict["date_completed"] is not None
+            else None
+        )
+        transfer_dict["status"] = transfer_dict["status"].value
+
+        transfer_dicts.append(transfer_dict)
+
+    return camelize_dict(transfer_dicts)
 
 
 def _assign_to_sla_band(sla_duration: timedelta):
