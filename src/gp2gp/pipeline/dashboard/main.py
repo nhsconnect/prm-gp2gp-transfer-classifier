@@ -46,12 +46,31 @@ def read_spine_csv_gz_files(file_paths):
     return construct_messages_from_splunk_items(items)
 
 
-def main():  # noqa: C901
-    args = parse_dashboard_pipeline_arguments(sys.argv[1:])
-
-    metric_month = datetime(args.year, args.month, 1, tzinfo=tzutc())
+def _get_time_range(year, month):
+    metric_month = datetime(year, month, 1, tzinfo=tzutc())
     next_month = metric_month + relativedelta(months=1)
-    time_range = DateTimeRange(metric_month, next_month)
+    return DateTimeRange(metric_month, next_month)
+
+
+def _is_outputting_to_file(args):
+    return (
+        args.organisation_metadata_output_file
+        and args.practice_metrics_output_file
+        and args.transfers_output_file
+    )
+
+
+def _is_outputting_to_s3(args):
+    return (
+        args.organisation_metadata_output_key
+        and args.practice_metrics_output_key
+        and args.transfers_output_key
+    )
+
+
+def main():
+    args = parse_dashboard_pipeline_arguments(sys.argv[1:])
+    time_range = _get_time_range(args.year, args.month)
 
     organisation_data = read_json_file(args.organisation_list_file)
     organisation_metadata = construct_organisation_list_from_dict(data=organisation_data)
@@ -64,29 +83,23 @@ def main():  # noqa: C901
 
     service_dashboard_metadata = construct_service_dashboard_metadata(organisation_metadata)
 
-    if args.organisation_metadata_output_file is not None:
+    if _is_outputting_to_file(args):
         write_dashboard_json_file(
             service_dashboard_metadata, args.organisation_metadata_output_file
         )
-
-    if args.practice_metrics_output_file is not None:
         write_dashboard_json_file(service_dashboard_data, args.practice_metrics_output_file)
-
-    if args.transfers_output_file is not None:
         write_transfers_parquet_file(transfers, args.transfers_output_file)
+    elif _is_outputting_to_s3(args):
+        s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
+        bucket_name = args.output_bucket
 
-    s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
-    bucket_name = args.output_bucket
-    if args.organisation_metadata_output_key is not None:
         upload_dashboard_json_object(
             service_dashboard_metadata,
             s3.Object(bucket_name, args.organisation_metadata_output_key),
         )
-    if args.practice_metrics_output_key is not None:
         upload_dashboard_json_object(
             service_dashboard_data, s3.Object(bucket_name, args.practice_metrics_output_key)
         )
-    if args.transfers_output_key is not None:
         upload_transfers_parquet_object(
             transfers, s3.Object(bucket_name, args.transfers_output_key)
         )
