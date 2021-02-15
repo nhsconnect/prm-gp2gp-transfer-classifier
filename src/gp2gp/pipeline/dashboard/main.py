@@ -1,6 +1,7 @@
 import sys
 from dataclasses import asdict
 from datetime import datetime
+from typing import List
 
 import boto3
 from dateutil.relativedelta import relativedelta
@@ -15,33 +16,66 @@ from gp2gp.io.parquet import write_parquet_file, upload_parquet_object
 from gp2gp.odsportal.sources import construct_organisation_list_from_dict
 from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
-from gp2gp.service.transformers import convert_transfers_to_dict
+from gp2gp.service.models import Transfer
 from gp2gp.spine.sources import construct_messages_from_splunk_items
+import pyarrow as pa
 
 
-def write_dashboard_json_file(dashboard_data, output_file_path):
+def _write_dashboard_json_file(dashboard_data, output_file_path):
     content_dict = asdict(dashboard_data)
     camelized_dict = camelize_dict(content_dict)
     write_json_file(camelized_dict, output_file_path)
 
 
-def upload_dashboard_json_object(dashboard_data, s3_object):
+def _upload_dashboard_json_object(dashboard_data, s3_object):
     content_dict = asdict(dashboard_data)
     camelized_dict = camelize_dict(content_dict)
     upload_json_object(camelized_dict, s3_object)
 
 
-def upload_transfers_parquet_object(transfers, s3_object):
-    transfer_dicts = convert_transfers_to_dict(transfers)
-    upload_parquet_object(transfer_dicts, s3_object)
+def _build_transfer_table(transfers: List[Transfer]):
+    return pa.table(
+        {
+            "conversation_id": [t.conversation_id for t in transfers],
+            "sla_duration": [
+                int(t.sla_duration.total_seconds()) if t.sla_duration is not None else None
+                for t in transfers
+            ],
+            "requesting_practice_asid": [t.requesting_practice_asid for t in transfers],
+            "sending_practice_asid": [t.sending_practice_asid for t in transfers],
+            "final_error_code": [t.final_error_code for t in transfers],
+            "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
+            "status": [t.status.value for t in transfers],
+            "date_requested": [t.date_requested for t in transfers],
+            "date_completed": [t.date_completed for t in transfers],
+        },
+        schema=pa.schema(
+            [
+                ("conversation_id", pa.string()),
+                ("sla_duration", pa.int64()),
+                ("requesting_practice_asid", pa.string()),
+                ("sending_practice_asid", pa.string()),
+                ("final_error_code", pa.int64()),
+                ("intermediate_error_codes", pa.list_(pa.int64())),
+                ("status", pa.string()),
+                ("date_requested", pa.date64()),
+                ("date_completed", pa.date64()),
+            ]
+        ),
+    )
 
 
-def write_transfers_parquet_file(transfers, output_file_path):
-    transfer_dicts = convert_transfers_to_dict(transfers)
-    write_parquet_file(transfer_dicts, output_file_path)
+def _upload_transfers_parquet_object(transfers, s3_object):
+    transfer_table = _build_transfer_table(transfers)
+    upload_parquet_object(transfer_table, s3_object)
 
 
-def read_spine_csv_gz_files(file_paths):
+def _write_transfers_parquet_file(transfers, output_file_path):
+    transfer_table = _build_transfer_table(transfers)
+    write_parquet_file(transfer_table, output_file_path)
+
+
+def _read_spine_csv_gz_files(file_paths):
     items = read_gzip_csv_files(file_paths)
     return construct_messages_from_splunk_items(items)
 
@@ -75,7 +109,7 @@ def main():
     organisation_data = read_json_file(args.organisation_list_file)
     organisation_metadata = construct_organisation_list_from_dict(data=organisation_data)
 
-    spine_messages = read_spine_csv_gz_files(args.input_files)
+    spine_messages = _read_spine_csv_gz_files(args.input_files)
     transfers = list(parse_transfers_from_messages(spine_messages, time_range))
     service_dashboard_data = calculate_dashboard_data(
         transfers, organisation_metadata.practices, time_range
@@ -84,22 +118,22 @@ def main():
     service_dashboard_metadata = construct_service_dashboard_metadata(organisation_metadata)
 
     if _is_outputting_to_file(args):
-        write_dashboard_json_file(
+        _write_dashboard_json_file(
             service_dashboard_metadata, args.organisation_metadata_output_file
         )
-        write_dashboard_json_file(service_dashboard_data, args.practice_metrics_output_file)
-        write_transfers_parquet_file(transfers, args.transfers_output_file)
+        _write_dashboard_json_file(service_dashboard_data, args.practice_metrics_output_file)
+        _write_transfers_parquet_file(transfers, args.transfers_output_file)
     elif _is_outputting_to_s3(args):
         s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
         bucket_name = args.output_bucket
 
-        upload_dashboard_json_object(
+        _upload_dashboard_json_object(
             service_dashboard_metadata,
             s3.Object(bucket_name, args.organisation_metadata_output_key),
         )
-        upload_dashboard_json_object(
+        _upload_dashboard_json_object(
             service_dashboard_data, s3.Object(bucket_name, args.practice_metrics_output_key)
         )
-        upload_transfers_parquet_object(
+        _upload_transfers_parquet_object(
             transfers, s3.Object(bucket_name, args.transfers_output_key)
         )

@@ -1,38 +1,22 @@
-from datetime import datetime
 from io import BytesIO
 from unittest.mock import MagicMock
 
-import pandas as pd
 
 from gp2gp.io.parquet import upload_parquet_object
+import pyarrow.parquet as pq
+import pyarrow as pa
 
 
-def _convert_to_parquet_format(content):
-    df = pd.DataFrame(content)
-    out_buffer = BytesIO()
-    df.to_parquet(out_buffer, index=False)
-    return out_buffer.getvalue()
-
-
-def test_uploads_dictionary():
+def test_uploads_table():
     mock_s3_object = MagicMock()
 
-    content = [{"status": "open"}]
+    content_table = pa.table([["open"]], ["status"])
 
-    upload_parquet_object(content, mock_s3_object)
+    upload_parquet_object(content_table, mock_s3_object)
 
-    expected_body = _convert_to_parquet_format(content)
+    expected_table = pa.table([["open"]], ["status"])
 
-    mock_s3_object.put.assert_called_once_with(Body=expected_body)
+    actual_body = mock_s3_object.put.call_args_list[0][1]["Body"]
+    actual_table = pq.read_table(BytesIO(actual_body))
 
-
-def test_uploads_dictionary_with_datetime():
-    mock_s3_object = MagicMock()
-
-    content = [{"timestamp": datetime(2020, 7, 23)}]
-
-    upload_parquet_object(content, mock_s3_object)
-
-    expected_body = _convert_to_parquet_format(content)
-
-    mock_s3_object.put.assert_called_once_with(Body=expected_body)
+    assert actual_table.equals(expected_table)

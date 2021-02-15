@@ -1,3 +1,4 @@
+from datetime import date
 import json
 import logging
 from io import BytesIO
@@ -83,7 +84,17 @@ def test_with_local_files(datadir):
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
-    expected_transfers = _read_json(datadir / "expected_transfers_dec_2019.json")
+    expected_transfers = {
+        "conversation_id": ["abc"],
+        "date_completed": [date(2020, 1, 1)],
+        "date_requested": [date(2019, 12, 30)],
+        "final_error_code": [None],
+        "intermediate_error_codes": [[]],
+        "requesting_practice_asid": ["123456789123"],
+        "sending_practice_asid": ["003456789123"],
+        "sla_duration": [139106],
+        "status": ["INTEGRATED"],
+    }
 
     month = 12
     year = 2019
@@ -148,7 +159,17 @@ def test_with_s3_output(datadir):
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
-    expected_transfers = _read_json(datadir / "expected_transfers_dec_2019.json")
+    expected_transfers = {
+        "conversation_id": ["abc"],
+        "date_completed": [date(2020, 1, 1)],
+        "date_requested": [date(2019, 12, 30)],
+        "final_error_code": [None],
+        "intermediate_error_codes": [[]],
+        "requesting_practice_asid": ["123456789123"],
+        "sending_practice_asid": ["003456789123"],
+        "sla_duration": [139106],
+        "status": ["INTEGRATED"],
+    }
 
     month = 12
     year = 2019

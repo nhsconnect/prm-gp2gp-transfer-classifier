@@ -1,17 +1,17 @@
-from pathlib import Path
-import pandas as pd
 from gp2gp.io.parquet import write_parquet_file
+import pyarrow.parquet as pq
+import pyarrow as pa
 
 
-def test_writes_dictionary(fs):
-    content = [{"status": "open"}]
-    file_path = "/foo/bar.parquet"
-    fs.create_dir("/foo")
+def test_writes_tuple(tmp_path):
+    file_path = tmp_path / "bar.parquet"
 
-    write_parquet_file(content, file_path)
+    content_table = pa.table([["open"]], ["status"])
 
-    expected = pd.DataFrame({"status": ["open"]})
+    write_parquet_file(content_table, str(file_path))
 
-    actual = pd.read_parquet(path=Path(file_path))
+    expected = pa.table([["open"]], ["status"])
 
-    pd.testing.assert_frame_equal(actual, expected)
+    actual = pq.read_table(file_path)
+
+    assert actual.equals(expected)

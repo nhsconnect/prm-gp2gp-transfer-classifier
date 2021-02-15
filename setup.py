@@ -10,7 +10,6 @@ setup(
         "requests~=2.2",
         "boto3~=1.12",
         "PyArrow~=3.0",
-        "pandas~=1.2",
     ],
     entry_points={
         "console_scripts": [
