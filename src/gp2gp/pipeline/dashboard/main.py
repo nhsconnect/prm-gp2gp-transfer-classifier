@@ -12,13 +12,14 @@ from gp2gp.date.range import DateTimeRange
 from gp2gp.io.csv import read_gzip_csv_files
 from gp2gp.io.dictionary import camelize_dict
 from gp2gp.io.json import write_json_file, read_json_file, upload_json_object
-from gp2gp.io.parquet import write_parquet_file, upload_parquet_object
 from gp2gp.odsportal.sources import construct_organisation_list_from_dict
 from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
 from gp2gp.service.models import Transfer
 from gp2gp.spine.sources import construct_messages_from_splunk_items
 import pyarrow as pa
+from pyarrow.parquet import write_table
+from pyarrow.fs import S3FileSystem
 
 
 def _write_dashboard_json_file(dashboard_data, output_file_path):
@@ -65,14 +66,14 @@ def _build_transfer_table(transfers: List[Transfer]):
     )
 
 
-def _upload_transfers_parquet_object(transfers, s3_object):
+def _upload_transfers_parquet_object(transfers, s3_filesystem, s3_path):
     transfer_table = _build_transfer_table(transfers)
-    upload_parquet_object(transfer_table, s3_object)
+    write_table(transfer_table, where=s3_path, filesystem=s3_filesystem)
 
 
 def _write_transfers_parquet_file(transfers, output_file_path):
     transfer_table = _build_transfer_table(transfers)
-    write_parquet_file(transfer_table, output_file_path)
+    write_table(transfer_table, output_file_path)
 
 
 def _read_spine_csv_gz_files(file_paths):
@@ -125,6 +126,8 @@ def main():
         _write_transfers_parquet_file(transfers, args.transfers_output_file)
     elif _is_outputting_to_s3(args):
         s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
+        s3_filesystem = S3FileSystem(endpoint_override=args.s3_endpoint_url)
+
         bucket_name = args.output_bucket
 
         _upload_dashboard_json_object(
@@ -135,5 +138,5 @@ def main():
             service_dashboard_data, s3.Object(bucket_name, args.practice_metrics_output_key)
         )
         _upload_transfers_parquet_object(
-            transfers, s3.Object(bucket_name, args.transfers_output_key)
+            transfers, s3_filesystem, bucket_name + "/" + args.transfers_output_key
         )
