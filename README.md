@@ -21,8 +21,8 @@ These generally work by running a command in a virtual environment configured vi
 
 ### Prerequisites
 
-- Python 3
-- [Tox](https://tox.readthedocs.io/en/latest/#)
+- Python 3.9
+- [Tox](https://tox.readthedocs.io/en/latest/#) `pip install tox`
 
 ### Running the unit and integration tests
 
