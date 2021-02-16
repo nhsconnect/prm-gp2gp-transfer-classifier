@@ -15,7 +15,6 @@ from gp2gp.service.models import (
 from gp2gp.spine.models import ParsedConversation
 from pyarrow import Table
 
-
 THREE_DAYS_IN_SECONDS = 259200
 EIGHT_DAYS_IN_SECONDS = 691200
 
@@ -125,7 +124,6 @@ def _assign_to_sla_band(sla_duration: timedelta):
 def calculate_sla_by_practice(
     practice_list: Iterable[PracticeDetails], transfers: Iterable[Transfer]
 ) -> Iterator[PracticeSlaMetrics]:
-
     default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
     practice_counts = {practice.ods_code: default_sla.copy() for practice in practice_list}
 
@@ -159,5 +157,17 @@ def calculate_sla_by_practice(
     )
 
 
+def _convert_to_seconds(duration: Optional[timedelta]) -> Optional[int]:
+    if duration is not None:
+        return round(duration.total_seconds())
+    else:
+        return None
+
+
 def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
-    return table({"conversation_id": [t.conversation_id for t in transfers]})
+    return table(
+        {
+            "conversation_id": [t.conversation_id for t in transfers],
+            "sla_duration": [_convert_to_seconds(t.sla_duration) for t in transfers],
+        }
+    )
