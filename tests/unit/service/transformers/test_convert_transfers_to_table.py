@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from gp2gp.service.models import TransferStatus
 from gp2gp.service.transformers import convert_transfers_to_table
@@ -126,3 +126,36 @@ def test_status_is_converted_to_column():
     actual_status_column = table.select(["status"]).to_pydict()
 
     assert actual_status_column == expected_status_column
+
+
+def test_date_requested_is_converted_to_column():
+    transfer = build_transfer(date_requested=datetime(year=2020, month=7, day=23, hour=5))
+
+    expected_date_column = {"date_requested": [datetime(year=2020, month=7, day=23, hour=5)]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_date_column = table.select(["date_requested"]).to_pydict()
+
+    assert actual_date_column == expected_date_column
+
+
+def test_date_completed_is_converted_to_column():
+    transfer = build_transfer(date_completed=datetime(year=2020, month=7, day=28, hour=17))
+
+    expected_date_column = {"date_completed": [datetime(year=2020, month=7, day=28, hour=17)]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_date_column = table.select(["date_completed"]).to_pydict()
+
+    assert actual_date_column == expected_date_column
+
+
+def test_date_completed_is_converted_to_column_when_missing():
+    transfer = build_transfer(date_completed=None)
+
+    expected_date_column = {"date_completed": [None]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_date_column = table.select(["date_completed"]).to_pydict()
+
+    assert actual_date_column == expected_date_column

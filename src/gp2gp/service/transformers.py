@@ -174,5 +174,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "final_error_code": [t.final_error_code for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
             "status": [t.status.value for t in transfers],
+            "date_requested": [t.date_requested for t in transfers],
+            "date_completed": [t.date_completed for t in transfers],
         }
     )
