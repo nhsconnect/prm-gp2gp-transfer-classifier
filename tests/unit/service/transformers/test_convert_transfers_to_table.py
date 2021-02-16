@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from gp2gp.service.models import TransferStatus
 from gp2gp.service.transformers import convert_transfers_to_table
 from tests.builders.service import build_transfer
 
@@ -114,3 +115,14 @@ def test_intermediate_error_codes_is_converted_to_column_when_empty():
     actual_error_code_column = table.select(["intermediate_error_codes"]).to_pydict()
 
     assert actual_error_code_column == expected_error_code_column
+
+
+def test_status_is_converted_to_column():
+    transfer = build_transfer(status=TransferStatus.INTEGRATED)
+
+    expected_status_column = {"status": ["INTEGRATED"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_status_column = table.select(["status"]).to_pydict()
+
+    assert actual_status_column == expected_status_column

@@ -173,5 +173,6 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "sending_practice_asid": [t.sending_practice_asid for t in transfers],
             "final_error_code": [t.final_error_code for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
+            "status": [t.status.value for t in transfers],
         }
     )
