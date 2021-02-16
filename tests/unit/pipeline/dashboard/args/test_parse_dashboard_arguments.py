@@ -100,6 +100,8 @@ def test_fails_when_key_supplied_but_no_bucket_supplied(mock_exit):
         "jun-practice-metrics.json",
         "--organisation-metadata-output-key",
         "jun-organisation-metadata.json",
+        "--transfers-output-key",
+        "data/jun-transfers.parquet",
     ]
 
     parse_dashboard_pipeline_arguments(args)
