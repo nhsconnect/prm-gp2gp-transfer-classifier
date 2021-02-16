@@ -48,3 +48,25 @@ def test_sla_duration_is_converted_to_column_when_missing():
     actual_sla_duration_column = table.select(["sla_duration"]).to_pydict()
 
     assert actual_sla_duration_column == expected_sla_duration_column
+
+
+def test_requesting_practice_asid_is_converted_to_column():
+    transfer = build_transfer(requesting_practice_asid="003212345678")
+
+    expected_asid_column = {"requesting_practice_asid": ["003212345678"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_asid_column = table.select(["requesting_practice_asid"]).to_pydict()
+
+    assert actual_asid_column == expected_asid_column
+
+
+def test_sending_practice_asid_is_converted_to_column():
+    transfer = build_transfer(sending_practice_asid="001112345678")
+
+    expected_asid_column = {"sending_practice_asid": ["001112345678"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_asid_column = table.select(["sending_practice_asid"]).to_pydict()
+
+    assert actual_asid_column == expected_asid_column

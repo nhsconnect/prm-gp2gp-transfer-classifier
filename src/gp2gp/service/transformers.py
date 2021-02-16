@@ -169,5 +169,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
         {
             "conversation_id": [t.conversation_id for t in transfers],
             "sla_duration": [_convert_to_seconds(t.sla_duration) for t in transfers],
+            "requesting_practice_asid": [t.requesting_practice_asid for t in transfers],
+            "sending_practice_asid": [t.sending_practice_asid for t in transfers],
         }
     )
