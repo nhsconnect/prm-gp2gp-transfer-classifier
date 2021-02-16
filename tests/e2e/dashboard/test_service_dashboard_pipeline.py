@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 import json
 import logging
 from io import BytesIO
@@ -12,9 +12,21 @@ from werkzeug.serving import make_server
 from tests.builders.file import gzip_file
 import pyarrow.parquet as pq
 
-from subprocess import PIPE, Popen
+from subprocess import check_output
 
 logger = logging.getLogger(__name__)
+
+EXPECTED_TRANSFERS = {
+    "conversation_id": ["abc"],
+    "date_completed": [datetime(2020, 1, 1, 8, 41, 48, 337000)],
+    "date_requested": [datetime(2019, 12, 30, 18, 2, 29, 985000)],
+    "final_error_code": [None],
+    "intermediate_error_codes": [[]],
+    "requesting_practice_asid": ["123456789123"],
+    "sending_practice_asid": ["003456789123"],
+    "sla_duration": [139106],
+    "status": ["INTEGRATED"],
+}
 
 
 class ThreadedServer:
@@ -84,17 +96,6 @@ def test_with_local_files(datadir):
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
-    expected_transfers = {
-        "conversation_id": ["abc"],
-        "date_completed": [date(2020, 1, 1)],
-        "date_requested": [date(2019, 12, 30)],
-        "final_error_code": [None],
-        "intermediate_error_codes": [[]],
-        "requesting_practice_asid": ["123456789123"],
-        "sending_practice_asid": ["003456789123"],
-        "sla_duration": [139106],
-        "status": ["INTEGRATED"],
-    }
 
     month = 12
     year = 2019
@@ -109,8 +110,8 @@ def test_with_local_files(datadir):
         --transfers-output-file {transfers_output_file_path}\
     "
 
-    process = Popen(pipeline_command, shell=True)
-    process.wait()
+    pipeline_output = check_output(pipeline_command, shell=True)
+    logger.debug(pipeline_output)
 
     actual_practice_metrics = _read_json(practice_metrics_output_file_path)
     actual_organisation_metadata = _read_json(organisation_metadata_output_file_path)
@@ -118,7 +119,7 @@ def test_with_local_files(datadir):
 
     assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
     assert actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
-    assert actual_transfers == expected_transfers
+    assert actual_transfers == EXPECTED_TRANSFERS
 
 
 def test_with_s3_output(datadir):
@@ -159,17 +160,6 @@ def test_with_s3_output(datadir):
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
-    expected_transfers = {
-        "conversation_id": ["abc"],
-        "date_completed": [date(2020, 1, 1)],
-        "date_requested": [date(2019, 12, 30)],
-        "final_error_code": [None],
-        "intermediate_error_codes": [[]],
-        "requesting_practice_asid": ["123456789123"],
-        "sending_practice_asid": ["003456789123"],
-        "sla_duration": [139106],
-        "status": ["INTEGRATED"],
-    }
 
     month = 12
     year = 2019
@@ -192,13 +182,9 @@ def test_with_s3_output(datadir):
         --transfers-output-key {transfers_output_key} \
         --s3-endpoint-url {fake_s3_url} \
     "
-    pipeline_process = Popen(
-        pipeline_command, shell=True, env=pipeline_env, stdout=PIPE, stderr=PIPE
-    )
+    pipeline_output = check_output(pipeline_command, shell=True, env=pipeline_env)
 
     try:
-
-        pipeline_process.wait()
 
         actual_practice_metrics = _read_s3_json(output_bucket, practice_metrics_output_key)
         actual_organisation_metadata = _read_s3_json(
@@ -210,11 +196,9 @@ def test_with_s3_output(datadir):
         assert (
             actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
         )
-        assert actual_transfers == expected_transfers
+        assert actual_transfers == EXPECTED_TRANSFERS
     finally:
         output_bucket.objects.all().delete()
         output_bucket.delete()
         fake_s3.stop()
-        if pipeline_process.returncode != 0:
-            logger.error(f"Pipeline stdout: {pipeline_process.stdout.read()}")
-            logger.error(f"Pipeline stderr: {pipeline_process.stderr.read()}")
+        logger.debug(pipeline_output)
