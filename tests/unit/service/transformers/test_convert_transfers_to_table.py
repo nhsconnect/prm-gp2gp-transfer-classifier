@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
 
+import pyarrow as pa
+
 from gp2gp.service.models import TransferStatus
 from gp2gp.service.transformers import convert_transfers_to_table
 from tests.builders.service import build_transfer
@@ -174,3 +176,26 @@ def test_converts_multiple_rows_into_table():
     actual_columns = table.select(["conversation_id", "final_error_code"]).to_pydict()
 
     assert actual_columns == expected_columns
+
+
+def test_table_has_correct_schema():
+    transfers = [build_transfer()]
+
+    expected_schema = pa.schema(
+        [
+            ("conversation_id", pa.string()),
+            ("sla_duration", pa.uint64()),
+            ("requesting_practice_asid", pa.string()),
+            ("sending_practice_asid", pa.string()),
+            ("final_error_code", pa.int64()),
+            ("intermediate_error_codes", pa.list_(pa.int64())),
+            ("status", pa.string()),
+            ("date_requested", pa.timestamp("us")),
+            ("date_completed", pa.timestamp("us")),
+        ]
+    )
+
+    table = convert_transfers_to_table(transfers)
+    actual_schema = table.schema
+
+    assert actual_schema == expected_schema

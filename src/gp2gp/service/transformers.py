@@ -2,7 +2,6 @@ from datetime import timedelta, datetime
 from typing import Iterable, Iterator, List, Optional
 from warnings import warn
 
-from pyarrow.lib import table
 
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.models import (
@@ -14,6 +13,7 @@ from gp2gp.service.models import (
 )
 from gp2gp.spine.models import ParsedConversation
 from pyarrow import Table
+import pyarrow as pa
 
 THREE_DAYS_IN_SECONDS = 259200
 EIGHT_DAYS_IN_SECONDS = 691200
@@ -165,7 +165,7 @@ def _convert_to_seconds(duration: Optional[timedelta]) -> Optional[int]:
 
 
 def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
-    return table(
+    return pa.table(
         {
             "conversation_id": [t.conversation_id for t in transfers],
             "sla_duration": [_convert_to_seconds(t.sla_duration) for t in transfers],
@@ -176,5 +176,18 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "status": [t.status.value for t in transfers],
             "date_requested": [t.date_requested for t in transfers],
             "date_completed": [t.date_completed for t in transfers],
-        }
+        },
+        schema=pa.schema(
+            [
+                ("conversation_id", pa.string()),
+                ("sla_duration", pa.uint64()),
+                ("requesting_practice_asid", pa.string()),
+                ("sending_practice_asid", pa.string()),
+                ("final_error_code", pa.int64()),
+                ("intermediate_error_codes", pa.list_(pa.int64())),
+                ("status", pa.string()),
+                ("date_requested", pa.timestamp("us")),
+                ("date_completed", pa.timestamp("us")),
+            ]
+        ),
     )
