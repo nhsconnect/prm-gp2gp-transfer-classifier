@@ -2,6 +2,8 @@ from datetime import timedelta, datetime
 from typing import Iterable, Iterator, List, Optional
 from warnings import warn
 
+from pyarrow.lib import table
+
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.models import (
     Transfer,
@@ -11,6 +13,7 @@ from gp2gp.service.models import (
     SlaBand,
 )
 from gp2gp.spine.models import ParsedConversation
+from pyarrow import Table
 
 
 THREE_DAYS_IN_SECONDS = 259200
@@ -154,3 +157,7 @@ def calculate_sla_by_practice(
         )
         for practice in practice_list
     )
+
+
+def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
+    return table({"conversation_id": [t.conversation_id for t in transfers]})
