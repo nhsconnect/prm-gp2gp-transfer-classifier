@@ -20,7 +20,7 @@ def test_parse_arguments_with_local_files():
         "--organisation-metadata-output-file",
         "data/jun-organisation-metadata.json",
         "--transfers-output-file",
-        "data/jun-transfers.json",
+        "data/jun-transfers.parquet",
     ]
 
     expected = Namespace(
@@ -30,7 +30,7 @@ def test_parse_arguments_with_local_files():
         input_files=["data/jun.csv", "data/july.csv"],
         practice_metrics_output_file="data/jun-practice-metrics.json",
         organisation_metadata_output_file="data/jun-organisation-metadata.json",
-        transfers_output_file="data/jun-transfers.json",
+        transfers_output_file="data/jun-transfers.parquet",
         output_bucket=None,
         practice_metrics_output_key=None,
         organisation_metadata_output_key=None,
@@ -60,7 +60,7 @@ def test_parse_arguments_with_s3_upload():
         "--organisation-metadata-output-key",
         "jun-organisation-metadata.json",
         "--transfers-output-key",
-        "jun-transfers.json",
+        "jun-transfers.parquet",
         "--s3-endpoint-url",
         "https://localhost:6789",
     ]
@@ -73,7 +73,7 @@ def test_parse_arguments_with_s3_upload():
         output_bucket="test-bucket",
         practice_metrics_output_key="jun-practice-metrics.json",
         organisation_metadata_output_key="jun-organisation-metadata.json",
-        transfers_output_key="jun-transfers.json",
+        transfers_output_key="jun-transfers.parquet",
         s3_endpoint_url="https://localhost:6789",
         practice_metrics_output_file=None,
         organisation_metadata_output_file=None,
