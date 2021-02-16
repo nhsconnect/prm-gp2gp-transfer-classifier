@@ -159,3 +159,18 @@ def test_date_completed_is_converted_to_column_when_missing():
     actual_date_column = table.select(["date_completed"]).to_pydict()
 
     assert actual_date_column == expected_date_column
+
+
+def test_converts_multiple_rows_into_table():
+    transfers = [
+        build_transfer(conversation_id="123", final_error_code=1),
+        build_transfer(conversation_id="456", final_error_code=2),
+        build_transfer(conversation_id="789", final_error_code=3),
+    ]
+
+    expected_columns = {"conversation_id": ["123", "456", "789"], "final_error_code": [1, 2, 3]}
+
+    table = convert_transfers_to_table(transfers)
+    actual_columns = table.select(["conversation_id", "final_error_code"]).to_pydict()
+
+    assert actual_columns == expected_columns
