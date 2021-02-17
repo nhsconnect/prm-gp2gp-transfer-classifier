@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Iterator
 
+import pytest
 from gp2gp.service.transformers import derive_transfers
 from tests.builders.spine import build_parsed_conversation, build_message
 from tests.builders.common import a_datetime
@@ -310,7 +311,7 @@ def test_extracts_date_completed_from_request_completed_ack():
     _assert_attributes("date_completed", actual, [date_completed])
 
 
-def test_date_completed_is_None_when_request_completed_ack_not_present():
+def test_date_completed_is_none_when_request_completed_ack_not_present():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
@@ -322,3 +323,32 @@ def test_date_completed_is_None_when_request_completed_ack_not_present():
     actual = derive_transfers(conversations)
 
     _assert_attributes("date_completed", actual, [None])
+
+
+def test_negative_sla_duration_clamped_to_zero():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed=build_message(time=datetime(year=2021, month=1, day=5)),
+            request_completed_ack=build_message(time=datetime(year=2021, month=1, day=4)),
+        )
+    ]
+
+    expected_sla = timedelta(0)
+
+    actual = derive_transfers(conversations)
+
+    _assert_attributes("sla_duration", actual, [expected_sla])
+
+
+def test_warns_about_conversation_with_negative_sla():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed=build_message(time=datetime(year=2021, month=1, day=5)),
+            request_completed_ack=build_message(time=datetime(year=2021, month=1, day=4)),
+        )
+    ]
+
+    with pytest.warns(RuntimeWarning):
+        list(derive_transfers(conversations))

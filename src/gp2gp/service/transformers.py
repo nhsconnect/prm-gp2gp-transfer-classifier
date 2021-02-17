@@ -22,7 +22,12 @@ EIGHT_DAYS_IN_SECONDS = 691200
 def _calculate_sla(conversation: ParsedConversation):
     if conversation.request_completed is None or conversation.request_completed_ack is None:
         return None
-    return conversation.request_completed_ack.time - conversation.request_completed.time
+
+    sla_duration = conversation.request_completed_ack.time - conversation.request_completed.time
+    if sla_duration.total_seconds() < 0:
+        warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
+
+    return max(timedelta(0), sla_duration)
 
 
 def _extract_requesting_practice_asid(conversation: ParsedConversation) -> str:
