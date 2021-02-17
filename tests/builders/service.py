@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from gp2gp.service.practiceMetrics import PracticeSlaMetrics
 from gp2gp.service.transfer import Transfer, TransferStatus
 from tests.builders.common import a_string, a_duration, an_integer, a_datetime
@@ -25,3 +27,12 @@ def build_practice_sla_metrics(**kwargs):
         within_8_days=kwargs.get("within_8_days", an_integer()),
         beyond_8_days=kwargs.get("beyond_8_days", an_integer()),
     )
+
+
+def build_transfers(total_count: int, successful_transfers_count: int = 0) -> Iterable[Transfer]:
+    transfers = []
+    for _ in range(total_count):
+        transfers.append(build_transfer())
+    for _ in range(successful_transfers_count):
+        transfers.append(build_transfer(status=TransferStatus.INTEGRATED))
+    return transfers

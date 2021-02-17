@@ -1,18 +1,6 @@
-from typing import Iterable
-
 from gp2gp.service.nationalMetricsByMonth import calculate_national_metrics_by_month
-from gp2gp.service.transfer import Transfer, TransferStatus
-from tests.builders.service import build_transfer
+from tests.builders.service import build_transfers
 from tests.builders.common import an_integer
-
-
-def build_transfers(total_count: int, successful_transfers_count: int = 0) -> Iterable[Transfer]:
-    transfers = []
-    for _ in range(total_count):
-        transfers.append(build_transfer())
-    for _ in range(successful_transfers_count):
-        transfers.append(build_transfer(status=TransferStatus.INTEGRATED))
-    return transfers
 
 
 def test_returns_total_transfers_count():
