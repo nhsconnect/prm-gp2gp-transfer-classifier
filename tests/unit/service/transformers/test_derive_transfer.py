@@ -5,7 +5,7 @@ import pytest
 from gp2gp.service.transformers import derive_transfers
 from tests.builders.spine import build_parsed_conversation, build_message
 from tests.builders.common import a_datetime
-from gp2gp.service.models import Transfer, TransferStatus, ERROR_SUPPRESSED
+from gp2gp.service.transfer import Transfer, TransferStatus, ERROR_SUPPRESSED
 
 
 def _assert_attributes(attr_name: str, actual: Iterator[Transfer], expected: List):

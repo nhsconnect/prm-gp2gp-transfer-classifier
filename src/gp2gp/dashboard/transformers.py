@@ -13,7 +13,7 @@ from gp2gp.dashboard.models import (
     OrganisationDetails,
 )
 from gp2gp.odsportal.models import OrganisationMetadata
-from gp2gp.service.models import PracticeSlaMetrics
+from gp2gp.service.practiceMetrics import PracticeSlaMetrics
 
 
 def construct_service_dashboard_data(

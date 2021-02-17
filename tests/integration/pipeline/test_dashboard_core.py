@@ -12,7 +12,7 @@ from gp2gp.dashboard.models import (
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
-from gp2gp.service.models import Transfer, TransferStatus
+from gp2gp.service.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
 

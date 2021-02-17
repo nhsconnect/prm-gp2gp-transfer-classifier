@@ -4,10 +4,13 @@ from warnings import warn
 
 
 from gp2gp.odsportal.models import PracticeDetails
-from gp2gp.service.models import (
+from gp2gp.service.transfer import (
     Transfer,
     TransferStatus,
     ERROR_SUPPRESSED,
+)
+
+from gp2gp.service.practiceMetrics import (
     PracticeSlaMetrics,
     SlaBand,
 )

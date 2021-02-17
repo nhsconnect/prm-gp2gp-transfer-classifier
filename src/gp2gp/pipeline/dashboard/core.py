@@ -4,7 +4,7 @@ from gp2gp.dashboard.models import ServiceDashboardData
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
-from gp2gp.service.models import Transfer
+from gp2gp.service.transfer import Transfer
 from gp2gp.service.transformers import (
     derive_transfers,
     filter_for_successful_transfers,

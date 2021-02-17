@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 
 import pyarrow as pa
 
-from gp2gp.service.models import TransferStatus
+from gp2gp.service.transfer import TransferStatus
 from gp2gp.service.transformers import convert_transfers_to_table
 from tests.builders.service import build_transfer
 

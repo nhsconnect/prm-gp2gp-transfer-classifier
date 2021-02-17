@@ -4,7 +4,7 @@ from typing import Set, Iterator
 
 import pytest
 from gp2gp.odsportal.models import PracticeDetails
-from gp2gp.service.models import PracticeSlaMetrics
+from gp2gp.service.practiceMetrics import PracticeSlaMetrics
 from gp2gp.service.transformers import calculate_sla_by_practice
 
 from tests.builders.common import a_string
