@@ -4,12 +4,8 @@ from gp2gp.dashboard.models import ServiceDashboardData
 from gp2gp.dashboard.transformers import construct_service_dashboard_data
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
-from gp2gp.service.transfer import Transfer
-from gp2gp.service.transformers import (
-    derive_transfers,
-    filter_for_successful_transfers,
-    calculate_sla_by_practice,
-)
+from gp2gp.service.transfer import Transfer, derive_transfers, filter_for_successful_transfers
+from gp2gp.service.practiceMetrics import calculate_sla_by_practice
 from gp2gp.spine.models import Message
 from gp2gp.spine.transformers import (
     parse_conversation,

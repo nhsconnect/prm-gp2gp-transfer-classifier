@@ -1,7 +1,6 @@
 from datetime import timedelta
 
-from gp2gp.service.transfer import Transfer, TransferStatus
-from gp2gp.service.transformers import filter_for_successful_transfers
+from gp2gp.service.transfer import Transfer, TransferStatus, filter_for_successful_transfers
 from tests.builders.service import build_transfer
 from tests.builders.common import a_datetime
 

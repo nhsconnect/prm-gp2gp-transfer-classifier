@@ -14,7 +14,7 @@ from gp2gp.io.json import write_json_file, read_json_file, upload_json_object
 from gp2gp.odsportal.sources import construct_organisation_list_from_dict
 from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
 from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
-from gp2gp.service.transformers import convert_transfers_to_table
+from gp2gp.service.transfer import convert_transfers_to_table
 from gp2gp.spine.sources import construct_messages_from_splunk_items
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
