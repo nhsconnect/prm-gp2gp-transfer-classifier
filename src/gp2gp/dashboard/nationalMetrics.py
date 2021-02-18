@@ -7,7 +7,7 @@ from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth
 
 @dataclass
 class NationalMetrics:
-    total_count: int
+    transfer_count: int
 
 
 @dataclass
@@ -20,5 +20,5 @@ def construct_national_data_platform_data(
     national_metrics_by_month: NationalMetricsByMonth,
 ) -> NationalDataPlatformData:
     current_datetime = datetime.now(tzutc())
-    national_metrics = NationalMetrics(total_count=national_metrics_by_month.total_count)
+    national_metrics = NationalMetrics(transfer_count=national_metrics_by_month.transfer_count)
     return NationalDataPlatformData(generated_on=current_datetime, metrics=national_metrics)

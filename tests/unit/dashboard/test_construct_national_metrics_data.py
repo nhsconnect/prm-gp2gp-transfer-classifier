@@ -10,9 +10,9 @@ from tests.builders.common import an_integer
 
 def build_national_metrics_by_month(**kwargs):
     return NationalMetricsByMonth(
-        total_count=kwargs.get("total_count", an_integer()),
+        transfer_count=kwargs.get("transfer_count", an_integer()),
         integrated=IntegratedMetrics(
-            total_count=an_integer(),
+            transfer_count=an_integer(),
             within_3_days=an_integer(),
             within_8_days=an_integer(),
             beyond_8_days=an_integer(),
@@ -29,9 +29,11 @@ def test_has_correct_generated_on_given_time():
     assert actual.generated_on == expected_generated_on
 
 
-def test_has_total_count_of_all_transfers():
-    expected_total_count = an_integer(2, 7)
-    national_metrics_by_month = build_national_metrics_by_month(total_count=expected_total_count)
+def test_has_transfer_count_of_all_transfers():
+    expected_transfer_count = an_integer(2, 7)
+    national_metrics_by_month = build_national_metrics_by_month(
+        transfer_count=expected_transfer_count
+    )
     actual = construct_national_data_platform_data(national_metrics_by_month)
 
-    assert actual.metrics.total_count == expected_total_count
+    assert actual.metrics.transfer_count == expected_transfer_count

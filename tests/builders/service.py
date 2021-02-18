@@ -30,13 +30,13 @@ def build_practice_sla_metrics(**kwargs):
 
 
 def build_transfers(**kwargs) -> Iterable[Transfer]:
-    total_count = kwargs.get("total_count", an_integer())
-    successful_transfers_count = kwargs.get("successful_transfers_count", 0)
+    transfer_count = kwargs.get("transfer_count", an_integer())
+    integrated_transfer_count = kwargs.get("integrated_transfer_count", 0)
     sla_duration = kwargs.get("sla_duration", a_duration())
     transfers = []
-    for _ in range(total_count):
+    for _ in range(transfer_count):
         transfers.append(build_transfer())
-    for _ in range(successful_transfers_count):
+    for _ in range(integrated_transfer_count):
         transfers.append(
             build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration)
         )
