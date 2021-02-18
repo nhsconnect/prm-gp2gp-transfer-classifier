@@ -12,7 +12,7 @@ from gp2gp.dashboard.models import (
     RequesterMetrics,
     ServiceDashboardData,
 )
-from gp2gp.dashboard.transformers import construct_service_dashboard_data
+from gp2gp.dashboard.practiceMetrics import construct_service_dashboard_data
 from tests.builders.service import build_practice_sla_metrics
 
 A_YEAR = 1890

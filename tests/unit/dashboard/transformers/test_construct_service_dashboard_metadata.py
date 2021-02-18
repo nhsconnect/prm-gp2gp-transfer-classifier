@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from gp2gp.dashboard.models import OrganisationDetails
-from gp2gp.dashboard.transformers import construct_service_dashboard_metadata
+from gp2gp.dashboard.organisationMetrics import construct_service_dashboard_metadata
 from gp2gp.odsportal.models import OrganisationMetadata, CcgDetails, PracticeDetails
 
 

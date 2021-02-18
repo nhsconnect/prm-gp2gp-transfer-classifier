@@ -5,7 +5,7 @@ from datetime import datetime
 import boto3
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
-from gp2gp.dashboard.transformers import construct_service_dashboard_metadata
+from gp2gp.dashboard.organisationMetrics import construct_service_dashboard_metadata
 from gp2gp.date.range import DateTimeRange
 
 from gp2gp.io.csv import read_gzip_csv_files

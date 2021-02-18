@@ -1,7 +1,7 @@
 from typing import Iterable, List, Iterator
 
 from gp2gp.dashboard.models import ServiceDashboardData
-from gp2gp.dashboard.transformers import construct_service_dashboard_data
+from gp2gp.dashboard.practiceMetrics import construct_service_dashboard_data
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.transfer import Transfer, derive_transfers, filter_for_successful_transfers
