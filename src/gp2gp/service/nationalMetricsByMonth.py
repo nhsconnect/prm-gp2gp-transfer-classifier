@@ -1,17 +1,20 @@
-from typing import NamedTuple, Iterable
+from dataclasses import dataclass
+from typing import Iterable
 
 from gp2gp.service.common import SlaBand, assign_to_sla_band
 from gp2gp.service.transfer import Transfer, TransferStatus
 
 
-class IntegratedMetrics(NamedTuple):
+@dataclass
+class IntegratedMetrics:
     transfer_count: int
     within_3_days: int
     within_8_days: int
     beyond_8_days: int
 
 
-class NationalMetricsByMonth(NamedTuple):
+@dataclass
+class NationalMetricsByMonth:
     transfer_count: int
     integrated: IntegratedMetrics
 

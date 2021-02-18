@@ -9,7 +9,7 @@ from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth, Integra
 from tests.builders.common import an_integer
 
 
-def build_national_metrics_by_month(**kwargs):
+def build_national_metrics_by_month(**kwargs) -> NationalMetricsByMonth:
     within_3_days = kwargs.get("within_3_days", an_integer())
     within_8_days = kwargs.get("within_8_days", an_integer())
     beyond_8_days = kwargs.get("beyond_8_days", an_integer())
