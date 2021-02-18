@@ -8,12 +8,12 @@ from tests.builders.service import build_transfers
 from tests.builders.common import an_integer
 
 
-def test_returns_total_transfers_count_default_given_no_transfers():
+def test_returns_transfers_count_default_given_no_transfers():
     national_metrics = calculate_national_metrics_by_month([])
     assert national_metrics.transfer_count == 0
 
 
-def test_returns_total_transfers_count():
+def test_returns_transfers_count():
     transfer_count = an_integer(2, 10)
     transfers = build_transfers(transfer_count=transfer_count)
     national_metrics = calculate_national_metrics_by_month(transfers)
@@ -30,7 +30,7 @@ def test_returns_integrated_transfer_count_defaults_given_no_successful_transfer
     assert national_metrics.integrated.beyond_8_days == 0
 
 
-def test_returns_total_integrated_transfer_count():
+def test_returns_integrated_transfer_count():
     transfer_count = an_integer(7, 10)
     integrated_transfer_count = an_integer(2, 4)
     transfers = build_transfers(

@@ -3,16 +3,17 @@ from datetime import datetime
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.nationalMetrics import construct_national_data_platform_data
+from gp2gp.dashboard.nationalData import construct_national_data_platform_data
 from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth, IntegratedMetrics
 from tests.builders.common import an_integer
 
 
 def build_national_metrics_by_month(**kwargs):
+    transfer_count = kwargs.get("transfer_count", an_integer())
     return NationalMetricsByMonth(
         transfer_count=kwargs.get("transfer_count", an_integer()),
         integrated=IntegratedMetrics(
-            transfer_count=an_integer(),
+            transfer_count=kwargs.get("integrated_transfer_count", an_integer(0, transfer_count)),
             within_3_days=an_integer(),
             within_8_days=an_integer(),
             beyond_8_days=an_integer(),
@@ -37,3 +38,13 @@ def test_has_transfer_count_of_all_transfers():
     actual = construct_national_data_platform_data(national_metrics_by_month)
 
     assert actual.metrics.transfer_count == expected_transfer_count
+
+
+def test_has_integrated_transfer_count():
+    expected_integrated_transfer_count = an_integer(2, 7)
+    national_metrics_by_month = build_national_metrics_by_month(
+        integrated_transfer_count=expected_integrated_transfer_count
+    )
+    actual = construct_national_data_platform_data(national_metrics_by_month)
+
+    assert actual.metrics.integrated.transfer_count == expected_integrated_transfer_count
