@@ -15,14 +15,14 @@ def test_returns_total_transfers_count_default_given_no_transfers():
 
 def test_returns_total_transfers_count():
     total_count = an_integer(2, 10)
-    transfers = build_transfers(total_count)
+    transfers = build_transfers(total_count=total_count)
     national_metrics = calculate_national_metrics_by_month(transfers)
     assert national_metrics.total_count == total_count
 
 
 def test_returns_integrated_transfers_count_defaults_given_no_successful_transfers():
     total_count = an_integer(2, 10)
-    transfers = build_transfers(total_count)
+    transfers = build_transfers(total_count=total_count)
     national_metrics = calculate_national_metrics_by_month(transfers)
     assert national_metrics.integrated.total_count == 0
     assert national_metrics.integrated.within_3_days == 0
