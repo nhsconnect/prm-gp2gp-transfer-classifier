@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
@@ -9,14 +10,18 @@ from tests.builders.common import an_integer
 
 
 def build_national_metrics_by_month(**kwargs):
-    transfer_count = kwargs.get("transfer_count", an_integer())
+    within_3_days = kwargs.get("within_3_days", an_integer())
+    within_8_days = kwargs.get("within_8_days", an_integer())
+    beyond_8_days = kwargs.get("beyond_8_days", an_integer())
+    summed_transfer_count = within_3_days + within_8_days + beyond_8_days
+
     return NationalMetricsByMonth(
-        transfer_count=kwargs.get("transfer_count", an_integer()),
+        transfer_count=kwargs.get("transfer_count", summed_transfer_count),
         integrated=IntegratedMetrics(
-            transfer_count=kwargs.get("integrated_transfer_count", an_integer(0, transfer_count)),
-            within_3_days=an_integer(),
-            within_8_days=an_integer(),
-            beyond_8_days=an_integer(),
+            transfer_count=kwargs.get("integrated_transfer_count", summed_transfer_count),
+            within_3_days=within_3_days,
+            within_8_days=within_8_days,
+            beyond_8_days=beyond_8_days,
         ),
     )
 
@@ -48,3 +53,28 @@ def test_has_integrated_transfer_count():
     actual = construct_national_data_platform_data(national_metrics_by_month)
 
     assert actual.metrics.integrated.transfer_count == expected_integrated_transfer_count
+
+
+@pytest.mark.parametrize(
+    "national_metrics_integrated",
+    [
+        ({"within_3_days": 0, "within_8_days": 0, "beyond_8_days": 0}),
+        ({"within_3_days": 1, "within_8_days": 2, "beyond_8_days": 3}),
+        ({"within_3_days": 2, "within_8_days": 0, "beyond_8_days": 0}),
+        ({"within_3_days": 0, "within_8_days": 2, "beyond_8_days": 0}),
+        ({"within_3_days": 0, "within_8_days": 0, "beyond_8_days": 2}),
+    ],
+)
+def test_returns_integrated_transfer_count_by_sla_duration(national_metrics_integrated):
+    national_metrics_by_month = build_national_metrics_by_month(
+        within_3_days=national_metrics_integrated["within_3_days"],
+        within_8_days=national_metrics_integrated["within_8_days"],
+        beyond_8_days=national_metrics_integrated["beyond_8_days"],
+    )
+    actual_integrated_metrics = construct_national_data_platform_data(
+        national_metrics_by_month
+    ).metrics.integrated
+
+    assert actual_integrated_metrics.within_3_days == national_metrics_integrated["within_3_days"]
+    assert actual_integrated_metrics.within_8_days == national_metrics_integrated["within_8_days"]
+    assert actual_integrated_metrics.beyond_8_days == national_metrics_integrated["beyond_8_days"]
