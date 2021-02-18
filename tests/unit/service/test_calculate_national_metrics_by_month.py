@@ -8,6 +8,11 @@ from tests.builders.service import build_transfers
 from tests.builders.common import an_integer
 
 
+def test_returns_total_transfers_count_default_given_no_transfers():
+    national_metrics = calculate_national_metrics_by_month([])
+    assert national_metrics.total_count == 0
+
+
 def test_returns_total_transfers_count():
     total_count = an_integer(2, 10)
     transfers = build_transfers(total_count)
@@ -15,11 +20,14 @@ def test_returns_total_transfers_count():
     assert national_metrics.total_count == total_count
 
 
-def test_returns_integrated_transfers_count_zero_by_default():
+def test_returns_integrated_transfers_count_defaults_given_no_successful_transfers():
     total_count = an_integer(2, 10)
     transfers = build_transfers(total_count)
     national_metrics = calculate_national_metrics_by_month(transfers)
     assert national_metrics.integrated.total_count == 0
+    assert national_metrics.integrated.within_3_days == 0
+    assert national_metrics.integrated.within_8_days == 0
+    assert national_metrics.integrated.beyond_8_days == 0
 
 
 def test_returns_total_integrated_transfers_count():
@@ -49,7 +57,7 @@ def test_returns_total_integrated_transfers_count():
         ),
     ],
 )
-def test_returns_integrated_transfer_count_by_sla_duration_transfers_count(sla_duration, expected):
+def test_returns_integrated_transfer_count_by_sla_duration(sla_duration, expected):
     total_count = an_integer(7, 10)
     successful_transfers_count = 2
     transfers = build_transfers(
