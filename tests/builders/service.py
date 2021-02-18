@@ -1,8 +1,11 @@
+from datetime import timedelta
 from typing import Iterable
 
 from gp2gp.service.practiceMetrics import PracticeSlaMetrics
 from gp2gp.service.transfer import Transfer, TransferStatus
 from tests.builders.common import a_string, a_duration, an_integer, a_datetime
+
+_DEFAULT_TIME_DELTA = a_duration()
 
 
 def build_transfer(**kwargs):
@@ -29,10 +32,16 @@ def build_practice_sla_metrics(**kwargs):
     )
 
 
-def build_transfers(total_count: int, successful_transfers_count: int = 0) -> Iterable[Transfer]:
+def build_transfers(
+    total_count: int,
+    sla_duration: timedelta = _DEFAULT_TIME_DELTA,
+    successful_transfers_count: int = 0,
+) -> Iterable[Transfer]:
     transfers = []
     for _ in range(total_count):
         transfers.append(build_transfer())
     for _ in range(successful_transfers_count):
-        transfers.append(build_transfer(status=TransferStatus.INTEGRATED))
+        transfers.append(
+            build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration)
+        )
     return transfers
