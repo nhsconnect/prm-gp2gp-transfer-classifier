@@ -5,14 +5,14 @@ from typing import Set, Iterable
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.models import (
-    PracticeSummary,
+from gp2gp.dashboard.practiceMetrics import (
+    construct_service_dashboard_data,
     TimeToIntegrateSla,
-    MonthlyMetrics,
     RequesterMetrics,
+    MonthlyMetrics,
+    PracticeSummary,
     ServiceDashboardData,
 )
-from gp2gp.dashboard.practiceMetrics import construct_service_dashboard_data
 from tests.builders.service import build_practice_sla_metrics
 
 A_YEAR = 1890

@@ -1,5 +1,21 @@
-from gp2gp.dashboard.models import ServiceDashboardMetadata, OrganisationDetails
+from dataclasses import dataclass
+from datetime import datetime
+from typing import List
+
 from gp2gp.odsportal.models import OrganisationMetadata
+
+
+@dataclass
+class OrganisationDetails:
+    ods_code: str
+    name: str
+
+
+@dataclass
+class ServiceDashboardMetadata:
+    generated_on: datetime
+    practices: List[OrganisationDetails]
+    ccgs: List[OrganisationDetails]
 
 
 def construct_service_dashboard_metadata(

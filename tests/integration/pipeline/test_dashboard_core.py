@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 
 from dateutil.tz import UTC
 from freezegun import freeze_time
-from gp2gp.dashboard.models import (
-    ServiceDashboardData,
-    PracticeSummary,
-    MonthlyMetrics,
-    RequesterMetrics,
+from gp2gp.dashboard.practiceMetrics import (
     TimeToIntegrateSla,
+    RequesterMetrics,
+    MonthlyMetrics,
+    PracticeSummary,
+    ServiceDashboardData,
 )
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
