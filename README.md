@@ -23,6 +23,7 @@ These generally work by running a command in a virtual environment configured vi
 
 - Python 3.9
 - [Tox](https://tox.readthedocs.io/en/latest/#) `pip install tox`
+- [Docker](https://www.docker.com/get-started)
 
 ### Running the unit and integration tests
 
@@ -35,6 +36,12 @@ These generally work by running a command in a virtual environment configured vi
 ### Running tests, linting, and type checking
 
 `./tasks validate`
+
+### Running tests, linting, and type checking in a docker container
+
+This will run the validation commands in the same container used by the GoCD pipeline.
+
+`./tasks dojo-validate`
 
 ### Auto Formatting
 
@@ -75,7 +82,9 @@ Example 2 - Outputting to S3
 `gp2gp-dashboard-pipeline --month 6 --year 2019 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket" --practice-metrics-output-key "jun-practice-metrics.json" --organisation-metadata-output-key "jun-organisation-metadata.json" --transfers-output-key "jun-transfers.parquet"`
 
 ## Troubleshooting
+
 ```
 ERROR: InvocationError for command /YOUR_PROJECT_DIRECTORY/prm-gp2gp-data-pipeline/.tox/check-format/bin/black --check -t py38 -l100 src/ tests/ setup.py (exited with code 2)
 ```
+
 If you see this error, you need to delete the .tox package and try again
