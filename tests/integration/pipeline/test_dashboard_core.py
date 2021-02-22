@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 
-from dateutil.tz import UTC
+from dateutil.tz import UTC, tzutc
 from freezegun import freeze_time
+
+from gp2gp.dashboard.nationalData import NationalDataPlatformData
 from gp2gp.dashboard.practiceMetrics import (
     TimeToIntegrateSla,
     RequesterMetrics,
@@ -14,10 +16,14 @@ from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.pipeline.dashboard.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
+    calculate_national_metrics_data,
 )
+from gp2gp.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
+from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth, IntegratedMetrics
 from gp2gp.service.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
+from tests.builders.service import build_transfer
 
 
 def _build_successful_conversation(**kwargs):
@@ -156,5 +162,46 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
     )
 
     actual = calculate_practice_metrics_data(transfers, practice_list, time_range)
+
+    assert actual == expected
+
+
+@freeze_time(datetime(year=2020, month=1, day=17, hour=21, second=32), tz_offset=0)
+def test_calculates_correct_national_metrics_given_series_of_messages():
+    sla_duration_within_3_days = timedelta(seconds=THREE_DAYS_IN_SECONDS)
+    sla_duration_within_8_days = timedelta(seconds=EIGHT_DAYS_IN_SECONDS)
+    sla_duration_beyond_8_days = timedelta(seconds=EIGHT_DAYS_IN_SECONDS + 1)
+
+    transfers = [
+        build_transfer(),
+        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_3_days),
+        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_8_days),
+        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_8_days),
+        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
+        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
+        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
+    ]
+
+    time_range = DateTimeRange(
+        start=datetime(2019, 12, 1, tzinfo=UTC), end=datetime(2020, 1, 1, tzinfo=UTC)
+    )
+    current_datetime = datetime.now(tzutc())
+
+    expected_national_metrics_by_month = NationalMetricsByMonth(
+        transfer_count=7,
+        integrated=IntegratedMetrics(
+            transfer_count=6,
+            within_3_days=1,
+            within_8_days=2,
+            beyond_8_days=3,
+        ),
+        year=2019,
+        month=12,
+    )
+
+    expected = NationalDataPlatformData(
+        generated_on=current_datetime, metrics=[expected_national_metrics_by_month]
+    )
+    actual = calculate_national_metrics_data(transfers, time_range)
 
     assert actual == expected

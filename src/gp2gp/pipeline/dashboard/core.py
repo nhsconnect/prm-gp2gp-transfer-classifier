@@ -1,8 +1,13 @@
 from typing import Iterable, List, Iterator
 
+from gp2gp.dashboard.nationalData import (
+    NationalDataPlatformData,
+    construct_national_data_platform_data,
+)
 from gp2gp.dashboard.practiceMetrics import construct_practice_metrics_data, PracticeMetricsData
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
+from gp2gp.service.nationalMetricsByMonth import calculate_national_metrics_by_month
 from gp2gp.service.transfer import Transfer, derive_transfers, filter_for_successful_transfers
 from gp2gp.service.practiceMetrics import calculate_sla_by_practice
 from gp2gp.spine.models import Message
@@ -45,3 +50,14 @@ def calculate_practice_metrics_data(
         sla_metrics, year=time_range.start.year, month=time_range.start.month
     )
     return dashboard_data
+
+
+def calculate_national_metrics_data(
+    transfers: Iterable[Transfer], time_range: DateTimeRange
+) -> NationalDataPlatformData:
+    national_metrics_by_month = calculate_national_metrics_by_month(
+        transfers=transfers, year=time_range.start.year, month=time_range.start.month
+    )
+    return construct_national_data_platform_data(
+        national_metrics_by_month=national_metrics_by_month
+    )
