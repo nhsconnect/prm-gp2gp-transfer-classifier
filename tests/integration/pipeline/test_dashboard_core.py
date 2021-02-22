@@ -7,7 +7,7 @@ from gp2gp.dashboard.practiceMetrics import (
     RequesterMetrics,
     MonthlyMetrics,
     PracticeSummary,
-    ServiceDashboardData,
+    PracticeMetricsData,
 )
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
@@ -132,7 +132,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         )
     ]
 
-    expected = ServiceDashboardData(
+    expected = PracticeMetricsData(
         generated_on=datetime(year=2020, month=1, day=15, hour=23, second=42, tzinfo=UTC),
         practices=[
             PracticeSummary(

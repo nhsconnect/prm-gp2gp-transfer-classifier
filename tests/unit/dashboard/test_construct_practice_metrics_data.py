@@ -11,7 +11,7 @@ from gp2gp.dashboard.practiceMetrics import (
     RequesterMetrics,
     MonthlyMetrics,
     PracticeSummary,
-    ServiceDashboardData,
+    PracticeMetricsData,
 )
 from tests.builders.service import build_practice_sla_metrics
 
@@ -117,7 +117,7 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
         ),
     ]
 
-    expected = ServiceDashboardData(
+    expected = PracticeMetricsData(
         generated_on=datetime(year=2020, month=1, day=2, hour=23, second=42, tzinfo=tzutc()),
         practices=[
             PracticeSummary(

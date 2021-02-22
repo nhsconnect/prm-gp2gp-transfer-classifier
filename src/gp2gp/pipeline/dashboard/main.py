@@ -71,18 +71,16 @@ def main():
 
     spine_messages = _read_spine_csv_gz_files(args.input_files)
     transfers = list(parse_transfers_from_messages(spine_messages, time_range))
-    service_dashboard_data = calculate_practice_metrics_data(
+    practice_metrics_data = calculate_practice_metrics_data(
         transfers, organisation_metadata.practices, time_range
     )
 
-    service_dashboard_metadata = construct_service_dashboard_metadata(organisation_metadata)
+    organisation_metadata = construct_service_dashboard_metadata(organisation_metadata)
     transfer_table = convert_transfers_to_table(transfers)
 
     if _is_outputting_to_file(args):
-        _write_dashboard_json_file(
-            service_dashboard_metadata, args.organisation_metadata_output_file
-        )
-        _write_dashboard_json_file(service_dashboard_data, args.practice_metrics_output_file)
+        _write_dashboard_json_file(organisation_metadata, args.organisation_metadata_output_file)
+        _write_dashboard_json_file(practice_metrics_data, args.practice_metrics_output_file)
         write_table(transfer_table, args.transfers_output_file)
     elif _is_outputting_to_s3(args):
         s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
@@ -90,11 +88,11 @@ def main():
         bucket_name = args.output_bucket
 
         _upload_dashboard_json_object(
-            service_dashboard_metadata,
+            organisation_metadata,
             s3.Object(bucket_name, args.organisation_metadata_output_key),
         )
         _upload_dashboard_json_object(
-            service_dashboard_data, s3.Object(bucket_name, args.practice_metrics_output_key)
+            practice_metrics_data, s3.Object(bucket_name, args.practice_metrics_output_key)
         )
         write_table(
             table=transfer_table,

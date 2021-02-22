@@ -34,16 +34,16 @@ class PracticeSummary:
 
 
 @dataclass
-class ServiceDashboardData:
+class PracticeMetricsData:
     generated_on: datetime
     practices: List[PracticeSummary]
 
 
 def construct_practice_metrics_data(
     sla_metrics: Iterable[PracticeSlaMetrics], year: int, month: int
-) -> ServiceDashboardData:
+) -> PracticeMetricsData:
 
-    return ServiceDashboardData(
+    return PracticeMetricsData(
         generated_on=datetime.now(tzutc()),
         practices=[
             PracticeSummary(
