@@ -81,6 +81,8 @@ Example 2 - Outputting to S3
 
 `gp2gp-dashboard-pipeline --month 6 --year 2019 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket" --practice-metrics-output-key "practice-metrics.json" --organisation-metadata-output-key "organisation-metadata.json" --national-metrics-output-key "national-metrics.json" --transfers-output-key "transfers.parquet"`
 
+- Note this will use the year and month as part of the s3 key structure, as well 'v2' (data pipeline output version). 
+
 ## Troubleshooting
 
 ```
