@@ -42,7 +42,7 @@ def test_has_transfer_count_of_all_transfers():
     )
     actual = construct_national_data_platform_data(national_metrics_by_month)
 
-    assert actual.metrics.transfer_count == expected_transfer_count
+    assert actual.metrics[0].transfer_count == expected_transfer_count
 
 
 def test_has_integrated_transfer_count():
@@ -52,7 +52,7 @@ def test_has_integrated_transfer_count():
     )
     actual = construct_national_data_platform_data(national_metrics_by_month)
 
-    assert actual.metrics.integrated.transfer_count == expected_integrated_transfer_count
+    assert actual.metrics[0].integrated.transfer_count == expected_integrated_transfer_count
 
 
 @pytest.mark.parametrize(
@@ -73,7 +73,7 @@ def test_returns_integrated_transfer_count_by_sla_duration(national_metrics_inte
     )
     actual_integrated_metrics = construct_national_data_platform_data(
         national_metrics_by_month
-    ).metrics.integrated
+    ).metrics[0].integrated
 
     assert actual_integrated_metrics.within_3_days == national_metrics_integrated["within_3_days"]
     assert actual_integrated_metrics.within_8_days == national_metrics_integrated["within_8_days"]
