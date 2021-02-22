@@ -71,9 +71,9 @@ def test_returns_integrated_transfer_count_by_sla_duration(national_metrics_inte
         within_8_days=national_metrics_integrated["within_8_days"],
         beyond_8_days=national_metrics_integrated["beyond_8_days"],
     )
-    actual_integrated_metrics = construct_national_data_platform_data(
-        national_metrics_by_month
-    ).metrics[0].integrated
+    actual_integrated_metrics = (
+        construct_national_data_platform_data(national_metrics_by_month).metrics[0].integrated
+    )
 
     assert actual_integrated_metrics.within_3_days == national_metrics_integrated["within_3_days"]
     assert actual_integrated_metrics.within_8_days == national_metrics_integrated["within_8_days"]
