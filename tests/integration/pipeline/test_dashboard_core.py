@@ -11,7 +11,10 @@ from gp2gp.dashboard.practiceMetrics import (
 )
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
-from gp2gp.pipeline.dashboard.core import calculate_dashboard_data, parse_transfers_from_messages
+from gp2gp.pipeline.dashboard.core import (
+    calculate_practice_metrics_data,
+    parse_transfers_from_messages,
+)
 from gp2gp.service.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
@@ -152,6 +155,6 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         ],
     )
 
-    actual = calculate_dashboard_data(transfers, practice_list, time_range)
+    actual = calculate_practice_metrics_data(transfers, practice_list, time_range)
 
     assert actual == expected

@@ -1,6 +1,6 @@
 from typing import Iterable, List, Iterator
 
-from gp2gp.dashboard.practiceMetrics import construct_service_dashboard_data, ServiceDashboardData
+from gp2gp.dashboard.practiceMetrics import construct_practice_metrics_data, ServiceDashboardData
 from gp2gp.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.transfer import Transfer, derive_transfers, filter_for_successful_transfers
@@ -34,14 +34,14 @@ def parse_transfers_from_messages(
     return transfers
 
 
-def calculate_dashboard_data(
+def calculate_practice_metrics_data(
     transfers: Iterable[Transfer],
     practice_list: List[PracticeDetails],
     time_range: DateTimeRange,
 ) -> ServiceDashboardData:
     completed_transfers = filter_for_successful_transfers(transfers)
     sla_metrics = calculate_sla_by_practice(practice_list, completed_transfers)
-    dashboard_data = construct_service_dashboard_data(
+    dashboard_data = construct_practice_metrics_data(
         sla_metrics, year=time_range.start.year, month=time_range.start.month
     )
     return dashboard_data

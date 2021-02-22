@@ -39,7 +39,7 @@ class ServiceDashboardData:
     practices: List[PracticeSummary]
 
 
-def construct_service_dashboard_data(
+def construct_practice_metrics_data(
     sla_metrics: Iterable[PracticeSlaMetrics], year: int, month: int
 ) -> ServiceDashboardData:
 
