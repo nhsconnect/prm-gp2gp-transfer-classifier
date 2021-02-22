@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from gp2gp.dashboard.organisationMetrics import (
+from gp2gp.dashboard.organisationMetadata import (
     construct_service_dashboard_metadata,
     OrganisationDetails,
 )
