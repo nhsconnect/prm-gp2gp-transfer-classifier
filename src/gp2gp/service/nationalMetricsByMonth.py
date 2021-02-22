@@ -17,9 +17,13 @@ class IntegratedMetrics:
 class NationalMetricsByMonth:
     transfer_count: int
     integrated: IntegratedMetrics
+    year: int
+    month: int
 
 
-def calculate_national_metrics_by_month(transfers: Iterable[Transfer]) -> NationalMetricsByMonth:
+def calculate_national_metrics_by_month(
+    transfers: Iterable[Transfer], year: int, month: int
+) -> NationalMetricsByMonth:
     transfer_count = 0
     integrated_transfer_count = 0
     sla_count = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
@@ -32,6 +36,8 @@ def calculate_national_metrics_by_month(transfers: Iterable[Transfer]) -> Nation
             sla_count[sla_band] += 1
 
     return NationalMetricsByMonth(
+        year=year,
+        month=month,
         transfer_count=transfer_count,
         integrated=IntegratedMetrics(
             transfer_count=integrated_transfer_count,

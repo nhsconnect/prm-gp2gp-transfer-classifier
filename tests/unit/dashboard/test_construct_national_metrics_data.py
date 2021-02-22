@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 from gp2gp.dashboard.nationalData import construct_national_data_platform_data
 from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth, IntegratedMetrics
-from tests.builders.common import an_integer
+from tests.builders.common import an_integer, a_datetime
 
 
 def build_national_metrics_by_month(**kwargs) -> NationalMetricsByMonth:
@@ -16,6 +16,8 @@ def build_national_metrics_by_month(**kwargs) -> NationalMetricsByMonth:
     summed_transfer_count = within_3_days + within_8_days + beyond_8_days
 
     return NationalMetricsByMonth(
+        year=a_datetime().year,
+        month=a_datetime().month,
         transfer_count=kwargs.get("transfer_count", summed_transfer_count),
         integrated=IntegratedMetrics(
             transfer_count=kwargs.get("integrated_transfer_count", summed_transfer_count),
