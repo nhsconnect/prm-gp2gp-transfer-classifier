@@ -79,7 +79,7 @@ Example 1 - Outputting to file
 
 Example 2 - Outputting to S3
 
-`gp2gp-dashboard-pipeline --month 6 --year 2019 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket" --practice-metrics-output-key "jun-practice-metrics.json" --organisation-metadata-output-key "jun-organisation-metadata.json" --transfers-output-key "jun-transfers.parquet"`
+`gp2gp-dashboard-pipeline --month 6 --year 2019 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket" --practice-metrics-output-key "jun-practice-metrics.json" --organisation-metadata-output-key "jun-organisation-metadata.json" --national-metrics-output-key "jun-national-metrics.json" --transfers-output-key "jun-transfers.parquet"`
 
 ## Troubleshooting
 

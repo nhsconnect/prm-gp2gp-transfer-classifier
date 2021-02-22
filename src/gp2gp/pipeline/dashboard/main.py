@@ -82,8 +82,8 @@ def main():
     transfer_table = convert_transfers_to_table(transfers)
 
     if _is_outputting_to_file(args):
-        _write_dashboard_json_file(organisation_metadata, args.organisation_metadata_output_file)
         _write_dashboard_json_file(practice_metrics_data, args.practice_metrics_output_file)
+        _write_dashboard_json_file(organisation_metadata, args.organisation_metadata_output_file)
         _write_dashboard_json_file(national_metrics_data, args.national_metrics_output_file)
         write_table(transfer_table, args.transfers_output_file)
     elif _is_outputting_to_s3(args):
@@ -92,11 +92,14 @@ def main():
         bucket_name = args.output_bucket
 
         _upload_dashboard_json_object(
+            practice_metrics_data, s3.Object(bucket_name, args.practice_metrics_output_key)
+        )
+        _upload_dashboard_json_object(
             organisation_metadata,
             s3.Object(bucket_name, args.organisation_metadata_output_key),
         )
         _upload_dashboard_json_object(
-            practice_metrics_data, s3.Object(bucket_name, args.practice_metrics_output_key)
+            national_metrics_data, s3.Object(bucket_name, args.national_metrics_output_key)
         )
         write_table(
             table=transfer_table,

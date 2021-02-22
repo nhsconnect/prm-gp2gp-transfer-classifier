@@ -167,12 +167,14 @@ def test_with_s3_output(datadir):
 
     practice_metrics_output_key = "practice_metrics_dec_2019.json"
     organisation_metadata_output_key = "organisation_metadata_dec_2019.json"
+    national_metrics_output_key = "national_metrics_dec_2019.json"
     transfers_output_key = "transfers_dec_2019.parquet"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
+    expected_national_metrics = _read_json(datadir / "expected_national_metrics_dec_2019.json")
 
     month = 12
     year = 2019
@@ -192,6 +194,7 @@ def test_with_s3_output(datadir):
         --output-bucket {output_bucket_name}\
         --practice-metrics-output-key {practice_metrics_output_key} \
         --organisation-metadata-output-key {organisation_metadata_output_key} \
+        --national-metrics-output-key {national_metrics_output_key}\
         --transfers-output-key {transfers_output_key} \
         --s3-endpoint-url {fake_s3_url} \
     "
@@ -203,12 +206,15 @@ def test_with_s3_output(datadir):
         actual_organisation_metadata = _read_s3_json(
             output_bucket, organisation_metadata_output_key
         )
+        actual_national_metrics = _read_s3_json(output_bucket, national_metrics_output_key)
         actual_transfers = _read_s3_parquet(output_bucket, transfers_output_key)
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
         assert (
             actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
         )
+        assert actual_national_metrics["metrics"] == expected_national_metrics["metrics"]
+
         assert actual_transfers == EXPECTED_TRANSFERS
     finally:
         output_bucket.objects.all().delete()
