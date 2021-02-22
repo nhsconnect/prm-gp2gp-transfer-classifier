@@ -1,5 +1,13 @@
 "_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,"_raw"
 "2019-12-01T08:41:48.337+0000","xyz","xyz_3","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,003456789123,"xyz_1",NONE,
+"2019-12-01T18:02:29.985+0000","integrated-within-8-days","integrated-within-8-days","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,
+"2019-12-01T18:03:21.908+0000","integrated-within-8-days","integrated-within-8-days_1","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,
+"2019-12-01T18:03:23.982+0000","integrated-within-8-days","integrated-within-8-days_2","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"integrated-within-8-days",NONE,
+"2019-12-06T08:41:48.337+0000","integrated-within-8-days","integrated-within-8-days_3","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,003456789123,"integrated-within-8-days_1",NONE,
+"2019-12-05T18:02:29.985+0000","integrated-beyond-8-days","integrated-beyond-8-days","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,
+"2019-12-05T18:03:21.908+0000","integrated-beyond-8-days","integrated-beyond-8-days_1","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,
+"2019-12-05T18:03:23.982+0000","integrated-beyond-8-days","integrated-beyond-8-days_2","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"integrated-beyond-8-days",NONE,
+"2019-12-15T08:41:48.337+0000","integrated-beyond-8-days","integrated-beyond-8-days_3","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,003456789123,"integrated-beyond-8-days_1",NONE,
 "2019-12-30T18:02:29.985+0000","abc","abc","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,
 "2019-12-30T18:03:21.908+0000","abc","abc_1","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,
 "2019-12-30T18:03:23.982+0000","abc","abc_2","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"abc",NONE,

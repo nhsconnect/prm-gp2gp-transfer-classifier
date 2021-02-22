@@ -11,8 +11,8 @@
           "requester": {
             "timeToIntegrateSla": {
               "within3Days": 1,
-              "within8Days": 0,
-              "beyond8Days": 0
+              "within8Days": 1,
+              "beyond8Days": 1
             }
           }
         }

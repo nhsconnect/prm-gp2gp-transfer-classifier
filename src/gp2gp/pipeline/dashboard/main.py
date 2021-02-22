@@ -16,6 +16,7 @@ from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
 from gp2gp.pipeline.dashboard.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
+    calculate_national_metrics_data,
 )
 from gp2gp.service.transfer import convert_transfers_to_table
 from gp2gp.spine.sources import construct_messages_from_splunk_items
@@ -74,13 +75,16 @@ def main():
     practice_metrics_data = calculate_practice_metrics_data(
         transfers, organisation_metadata.practices, time_range
     )
-
+    national_metrics_data = calculate_national_metrics_data(
+        transfers=transfers, time_range=time_range
+    )
     organisation_metadata = construct_service_dashboard_metadata(organisation_metadata)
     transfer_table = convert_transfers_to_table(transfers)
 
     if _is_outputting_to_file(args):
         _write_dashboard_json_file(organisation_metadata, args.organisation_metadata_output_file)
         _write_dashboard_json_file(practice_metrics_data, args.practice_metrics_output_file)
+        _write_dashboard_json_file(national_metrics_data, args.national_metrics_output_file)
         write_table(transfer_table, args.transfers_output_file)
     elif _is_outputting_to_s3(args):
         s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)

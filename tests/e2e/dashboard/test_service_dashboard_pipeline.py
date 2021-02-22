@@ -17,15 +17,23 @@ from subprocess import check_output
 logger = logging.getLogger(__name__)
 
 EXPECTED_TRANSFERS = {
-    "conversation_id": ["abc"],
-    "date_completed": [datetime(2020, 1, 1, 8, 41, 48, 337000)],
-    "date_requested": [datetime(2019, 12, 30, 18, 2, 29, 985000)],
-    "final_error_code": [None],
-    "intermediate_error_codes": [[]],
-    "requesting_practice_asid": ["123456789123"],
-    "sending_practice_asid": ["003456789123"],
-    "sla_duration": [139106],
-    "status": ["INTEGRATED"],
+    "conversation_id": ["integrated-within-8-days", "integrated-beyond-8-days", "abc"],
+    "date_completed": [
+        datetime(2019, 12, 6, 8, 41, 48, 337000),
+        datetime(2019, 12, 15, 8, 41, 48, 337000),
+        datetime(2020, 1, 1, 8, 41, 48, 337000),
+    ],
+    "date_requested": [
+        datetime(2019, 12, 1, 18, 2, 29, 985000),
+        datetime(2019, 12, 5, 18, 2, 29, 985000),
+        datetime(2019, 12, 30, 18, 2, 29, 985000),
+    ],
+    "final_error_code": [None, None, None],
+    "intermediate_error_codes": [[], [], []],
+    "requesting_practice_asid": ["123456789123", "123456789123", "123456789123"],
+    "sending_practice_asid": ["003456789123", "003456789123", "003456789123"],
+    "sla_duration": [398306, 830306, 139106],
+    "status": ["INTEGRATED", "INTEGRATED", "INTEGRATED"],
 }
 
 
@@ -90,12 +98,14 @@ def test_with_local_files(datadir):
 
     practice_metrics_output_file_path = datadir / "practice_metrics_dec_2019.json"
     organisation_metadata_output_file_path = datadir / "organisation_metadata_dec_2019.json"
+    national_metrics_output_file_path = datadir / "national_metrics_dec_2019.json"
     transfers_output_file_path = datadir / "transfers_dec_2019.parquet"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
         datadir / "expected_organisation_metadata_dec_2019.json"
     )
+    expected_national_metrics = _read_json(datadir / "expected_national_metrics_dec_2019.json")
 
     month = 12
     year = 2019
@@ -107,6 +117,7 @@ def test_with_local_files(datadir):
         --input-files {input_file_paths_str}\
         --practice-metrics-output-file {practice_metrics_output_file_path}\
         --organisation-metadata-output-file {organisation_metadata_output_file_path}\
+        --national-metrics-output-file {national_metrics_output_file_path}\
         --transfers-output-file {transfers_output_file_path}\
     "
 
@@ -115,10 +126,12 @@ def test_with_local_files(datadir):
 
     actual_practice_metrics = _read_json(practice_metrics_output_file_path)
     actual_organisation_metadata = _read_json(organisation_metadata_output_file_path)
+    actual_national_metrics = _read_json(national_metrics_output_file_path)
     actual_transfers = _read_parquet(transfers_output_file_path)
 
     assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
     assert actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
+    assert actual_national_metrics["metrics"] == expected_national_metrics["metrics"]
     assert actual_transfers == EXPECTED_TRANSFERS
 
 

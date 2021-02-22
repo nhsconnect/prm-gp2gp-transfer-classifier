@@ -19,6 +19,8 @@ def test_parse_arguments_with_local_files():
         "data/jun-practice-metrics.json",
         "--organisation-metadata-output-file",
         "data/jun-organisation-metadata.json",
+        "--national-metrics-output-file",
+        "data/jun-national-metrics.json",
         "--transfers-output-file",
         "data/jun-transfers.parquet",
     ]
@@ -34,6 +36,7 @@ def test_parse_arguments_with_local_files():
         output_bucket=None,
         practice_metrics_output_key=None,
         organisation_metadata_output_key=None,
+        national_metrics_output_file="data/jun-national-metrics.json",
         transfers_output_key=None,
         s3_endpoint_url=None,
     )
@@ -77,6 +80,7 @@ def test_parse_arguments_with_s3_upload():
         s3_endpoint_url="https://localhost:6789",
         practice_metrics_output_file=None,
         organisation_metadata_output_file=None,
+        national_metrics_output_file=None,
         transfers_output_file=None,
     )
 

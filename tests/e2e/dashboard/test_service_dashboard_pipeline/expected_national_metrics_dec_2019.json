@@ -1,0 +1,16 @@
+{
+  "generatedOn": "2020-02-24 16:51:21.353977",
+  "metrics": [
+    {
+      "year": 2019,
+      "month": 12,
+      "transferCount": 3,
+      "integrated": {
+        "transferCount": 3,
+          "within3Days": 1,
+          "within8Days": 1,
+          "beyond8Days": 1
+      }
+    }
+  ]
+}
