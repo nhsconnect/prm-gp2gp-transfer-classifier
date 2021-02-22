@@ -201,13 +201,17 @@ def test_with_s3_output(datadir):
     pipeline_output = check_output(pipeline_command, shell=True, env=pipeline_env)
 
     try:
-
-        actual_practice_metrics = _read_s3_json(output_bucket, practice_metrics_output_key)
-        actual_organisation_metadata = _read_s3_json(
-            output_bucket, organisation_metadata_output_key
+        s3_path = "v2/2019/12/"
+        actual_practice_metrics = _read_s3_json(
+            output_bucket, f"{s3_path}{practice_metrics_output_key}"
         )
-        actual_national_metrics = _read_s3_json(output_bucket, national_metrics_output_key)
-        actual_transfers = _read_s3_parquet(output_bucket, transfers_output_key)
+        actual_organisation_metadata = _read_s3_json(
+            output_bucket, f"{s3_path}{organisation_metadata_output_key}"
+        )
+        actual_national_metrics = _read_s3_json(
+            output_bucket, f"{s3_path}{national_metrics_output_key}"
+        )
+        actual_transfers = _read_s3_parquet(output_bucket, f"{s3_path}{transfers_output_key}")
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
         assert (

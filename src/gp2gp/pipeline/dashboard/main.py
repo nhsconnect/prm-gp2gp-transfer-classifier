@@ -90,19 +90,22 @@ def main():
         s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
 
         bucket_name = args.output_bucket
-
+        version = "v2"
+        s3_path = f"{version}/{args.year}/{args.month}/"
         _upload_dashboard_json_object(
-            practice_metrics_data, s3.Object(bucket_name, args.practice_metrics_output_key)
+            practice_metrics_data,
+            s3.Object(bucket_name, f"{s3_path}{args.practice_metrics_output_key}"),
         )
         _upload_dashboard_json_object(
             organisation_metadata,
-            s3.Object(bucket_name, args.organisation_metadata_output_key),
+            s3.Object(bucket_name, f"{s3_path}{args.organisation_metadata_output_key}"),
         )
         _upload_dashboard_json_object(
-            national_metrics_data, s3.Object(bucket_name, args.national_metrics_output_key)
+            national_metrics_data,
+            s3.Object(bucket_name, f"{s3_path}{args.national_metrics_output_key}"),
         )
         write_table(
             table=transfer_table,
-            where=bucket_name + "/" + args.transfers_output_key,
+            where=bucket_name + "/" + f"{s3_path}{args.transfers_output_key}",
             filesystem=S3FileSystem(endpoint_override=args.s3_endpoint_url),
         )
