@@ -9,6 +9,7 @@ from gp2gp.service.common import assign_to_sla_band, SlaBand
 class PracticeSlaMetrics(NamedTuple):
     ods_code: str
     name: str
+    transfer_count: int
     within_3_days: int
     within_8_days: int
     beyond_8_days: int
@@ -42,6 +43,9 @@ def calculate_sla_by_practice(
         PracticeSlaMetrics(
             practice.ods_code,
             practice.name,
+            transfer_count=practice_counts[practice.ods_code][SlaBand.WITHIN_3_DAYS]
+            + practice_counts[practice.ods_code][SlaBand.WITHIN_8_DAYS]
+            + practice_counts[practice.ods_code][SlaBand.BEYOND_8_DAYS],
             within_3_days=practice_counts[practice.ods_code][SlaBand.WITHIN_3_DAYS],
             within_8_days=practice_counts[practice.ods_code][SlaBand.WITHIN_8_DAYS],
             beyond_8_days=practice_counts[practice.ods_code][SlaBand.BEYOND_8_DAYS],
