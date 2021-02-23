@@ -5,7 +5,7 @@ from typing import Set, Iterable
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.practiceMetrics import (
+from gp2gp.dashboard.practice_metrics import (
     construct_practice_metrics_data,
     TimeToIntegrateSla,
     RequesterMetrics,

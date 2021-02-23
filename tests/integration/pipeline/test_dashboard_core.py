@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 from dateutil.tz import UTC, tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.nationalData import NationalDataPlatformData
-from gp2gp.dashboard.practiceMetrics import (
+from gp2gp.dashboard.national_data import NationalDataPlatformData
+from gp2gp.dashboard.practice_metrics import (
     TimeToIntegrateSla,
     RequesterMetrics,
     MonthlyMetrics,
@@ -19,7 +19,7 @@ from gp2gp.pipeline.dashboard.core import (
     calculate_national_metrics_data,
 )
 from gp2gp.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
-from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth, IntegratedMetrics
+from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth, IntegratedMetrics
 from gp2gp.service.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message

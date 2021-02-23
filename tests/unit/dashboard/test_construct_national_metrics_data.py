@@ -4,8 +4,8 @@ import pytest
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.nationalData import construct_national_data_platform_data
-from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth, IntegratedMetrics
+from gp2gp.dashboard.national_data import construct_national_data_platform_data
+from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth, IntegratedMetrics
 from tests.builders.common import an_integer, a_datetime
 
 

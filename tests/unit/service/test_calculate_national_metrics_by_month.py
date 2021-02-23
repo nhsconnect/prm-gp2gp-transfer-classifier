@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from gp2gp.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
-from gp2gp.service.nationalMetricsByMonth import calculate_national_metrics_by_month
+from gp2gp.service.national_metrics_by_month import calculate_national_metrics_by_month
 from tests.builders.service import build_transfers
 from tests.builders.common import an_integer, a_datetime
 

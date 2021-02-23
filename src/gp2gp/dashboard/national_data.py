@@ -4,7 +4,7 @@ from typing import List
 
 from dateutil.tz import tzutc
 
-from gp2gp.service.nationalMetricsByMonth import NationalMetricsByMonth
+from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth
 
 
 @dataclass
