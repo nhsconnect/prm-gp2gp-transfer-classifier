@@ -10,6 +10,7 @@
           "month": 12,
           "requester": {
             "integrated": {
+              "transferCount": 3,
               "within3Days": 1,
               "within8Days": 1,
               "beyond8Days": 1

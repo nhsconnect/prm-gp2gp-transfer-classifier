@@ -13,7 +13,7 @@ from gp2gp.dashboard.practiceMetrics import (
     PracticeSummary,
     PracticeMetricsData,
 )
-from tests.builders.service import build_practice_sla_metrics
+from tests.builders.service import build_practice_metrics
 
 A_YEAR = 1890
 A_MONTH = 3
@@ -37,7 +37,7 @@ def test_has_correct_generated_on_given_time():
 
 
 def test_has_correct_ods_code_given_a_single_practice():
-    sla_metrics = [build_practice_sla_metrics(ods_code="A12345")]
+    sla_metrics = [build_practice_metrics(ods_code="A12345")]
 
     expected_ods_codes = "A12345"
 
@@ -48,8 +48,8 @@ def test_has_correct_ods_code_given_a_single_practice():
 
 def test_has_correct_ods_code_given_two_practices():
     sla_metrics = [
-        build_practice_sla_metrics(ods_code="A12345"),
-        build_practice_sla_metrics(ods_code="Z56789"),
+        build_practice_metrics(ods_code="A12345"),
+        build_practice_metrics(ods_code="Z56789"),
     ]
 
     expected_ods_codes = {"A12345", "Z56789"}
@@ -60,7 +60,7 @@ def test_has_correct_ods_code_given_two_practices():
 
 
 def test_has_correct_practice_name_given_a_single_practice():
-    sla_metrics = [build_practice_sla_metrics(name="A Practice")]
+    sla_metrics = [build_practice_metrics(name="A Practice")]
 
     expected_name = "A Practice"
 
@@ -70,7 +70,7 @@ def test_has_correct_practice_name_given_a_single_practice():
 
 
 def test_has_correct_year_given_a_single_practice():
-    sla_metrics = [build_practice_sla_metrics(ods_code="A12345")]
+    sla_metrics = [build_practice_metrics(ods_code="A12345")]
 
     expected_year = 2019
 
@@ -80,7 +80,7 @@ def test_has_correct_year_given_a_single_practice():
 
 
 def test_has_correct_month_given_a_single_practice():
-    sla_metrics = [build_practice_sla_metrics(ods_code="A12345")]
+    sla_metrics = [build_practice_metrics(ods_code="A12345")]
 
     expected_month = 11
 
@@ -90,10 +90,12 @@ def test_has_correct_month_given_a_single_practice():
 
 
 def test_has_correct_requester_sla_metrics_given_single_practice():
-    sla_metrics = [build_practice_sla_metrics(within_3_days=1, within_8_days=0, beyond_8_days=2)]
+    sla_metrics = [
+        build_practice_metrics(transfer_count=3, within_3_days=1, within_8_days=0, beyond_8_days=2)
+    ]
 
     expected_requester_sla_metrics = IntegratedPracticeMetrics(
-        within_3_days=1, within_8_days=0, beyond_8_days=2
+        transfer_count=3, within_3_days=1, within_8_days=0, beyond_8_days=2
     )
 
     actual = construct_practice_metrics_data(sla_metrics, A_YEAR, A_MONTH)
@@ -105,12 +107,18 @@ def test_has_correct_requester_sla_metrics_given_single_practice():
 @freeze_time(datetime(year=2020, month=1, day=2, hour=23, second=42), tz_offset=0)
 def test_has_correct_requester_sla_metrics_given_two_practices():
     sla_metrics = [
-        build_practice_sla_metrics(
-            ods_code="A12345", name="A practice", within_3_days=1, within_8_days=0, beyond_8_days=2
+        build_practice_metrics(
+            ods_code="A12345",
+            name="A practice",
+            transfer_count=3,
+            within_3_days=1,
+            within_8_days=0,
+            beyond_8_days=2,
         ),
-        build_practice_sla_metrics(
+        build_practice_metrics(
             ods_code="Z98765",
             name="Another practice",
+            transfer_count=7,
             within_3_days=0,
             within_8_days=5,
             beyond_8_days=2,
@@ -129,7 +137,7 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                         month=1,
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
-                                within_3_days=1, within_8_days=0, beyond_8_days=2
+                                transfer_count=3, within_3_days=1, within_8_days=0, beyond_8_days=2
                             )
                         ),
                     )
@@ -144,7 +152,7 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                         month=1,
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
-                                within_3_days=0, within_8_days=5, beyond_8_days=2
+                                transfer_count=7, within_3_days=0, within_8_days=5, beyond_8_days=2
                             )
                         ),
                     )
