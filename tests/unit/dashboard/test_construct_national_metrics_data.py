@@ -80,3 +80,14 @@ def test_returns_integrated_transfer_count_by_sla_duration(national_metrics_inte
     assert actual_integrated_metrics.within_3_days == national_metrics_integrated["within_3_days"]
     assert actual_integrated_metrics.within_8_days == national_metrics_integrated["within_8_days"]
     assert actual_integrated_metrics.beyond_8_days == national_metrics_integrated["beyond_8_days"]
+
+
+def test_has_integrated_percentage():
+    expected_transfer_count = 3
+    national_metrics_by_month = build_national_metrics_by_month(
+        transfer_count=expected_transfer_count, integrated_transfer_count=1
+    )
+    expected_percentage = 33.33
+    actual = construct_national_data_platform_data(national_metrics_by_month)
+
+    assert actual.metrics[0].integrated.transfer_percentage == expected_percentage

@@ -3,7 +3,11 @@ from datetime import datetime, timedelta
 from dateutil.tz import UTC, tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.national_data import NationalDataPlatformData
+from gp2gp.dashboard.national_data import (
+    NationalDataPlatformData,
+    DataPlatformIntegratedMetrics,
+    DataPlatformNationalMetrics,
+)
 from gp2gp.dashboard.practice_metrics import (
     TimeToIntegrateSla,
     RequesterMetrics,
@@ -19,7 +23,7 @@ from gp2gp.pipeline.dashboard.core import (
     calculate_national_metrics_data,
 )
 from gp2gp.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
-from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth, IntegratedMetrics
+
 from gp2gp.service.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
@@ -187,9 +191,10 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     )
     current_datetime = datetime.now(tzutc())
 
-    expected_national_metrics_by_month = NationalMetricsByMonth(
+    expected_national_metrics_by_month = DataPlatformNationalMetrics(
         transfer_count=7,
-        integrated=IntegratedMetrics(
+        integrated=DataPlatformIntegratedMetrics(
+            transfer_percentage=85.71,
             transfer_count=6,
             within_3_days=1,
             within_8_days=2,

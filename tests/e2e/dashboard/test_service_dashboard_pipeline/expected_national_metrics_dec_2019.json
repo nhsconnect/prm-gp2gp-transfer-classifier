@@ -6,10 +6,11 @@
       "month": 12,
       "transferCount": 3,
       "integrated": {
+        "transferPercentage": 100,
         "transferCount": 3,
-          "within3Days": 1,
-          "within8Days": 1,
-          "beyond8Days": 1
+        "within3Days": 1,
+        "within8Days": 1,
+        "beyond8Days": 1
       }
     }
   ]
