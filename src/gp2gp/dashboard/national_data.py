@@ -8,6 +8,11 @@ from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth
 
 
 @dataclass
+class DataPlatformPaperMetrics:
+    transfer_count: int
+
+
+@dataclass
 class DataPlatformIntegratedMetrics:
     transfer_count: int
     transfer_percentage: float
@@ -20,6 +25,7 @@ class DataPlatformIntegratedMetrics:
 class DataPlatformNationalMetrics:
     transfer_count: int
     integrated: DataPlatformIntegratedMetrics
+    paper_fallback: DataPlatformPaperMetrics
     year: int
     month: int
 
@@ -41,6 +47,12 @@ def construct_national_data_platform_data(
 ) -> NationalDataPlatformData:
     current_datetime = datetime.now(tzutc())
 
+    paper_fallback_count = (
+        national_metrics_by_month.transfer_count
+        - national_metrics_by_month.integrated.within_3_days
+        - national_metrics_by_month.integrated.within_8_days
+    )
+
     return NationalDataPlatformData(
         generated_on=current_datetime,
         metrics=[
@@ -56,6 +68,7 @@ def construct_national_data_platform_data(
                     within_8_days=national_metrics_by_month.integrated.within_8_days,
                     beyond_8_days=national_metrics_by_month.integrated.beyond_8_days,
                 ),
+                paper_fallback=DataPlatformPaperMetrics(transfer_count=paper_fallback_count),
                 year=national_metrics_by_month.year,
                 month=national_metrics_by_month.month,
             )
