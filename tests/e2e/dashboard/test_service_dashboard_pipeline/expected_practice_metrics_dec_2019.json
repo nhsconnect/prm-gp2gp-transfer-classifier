@@ -9,7 +9,7 @@
           "year": 2019,
           "month": 12,
           "requester": {
-            "timeToIntegrateSla": {
+            "integrated": {
               "within3Days": 1,
               "within8Days": 1,
               "beyond8Days": 1
