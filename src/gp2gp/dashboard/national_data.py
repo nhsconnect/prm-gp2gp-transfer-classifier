@@ -10,6 +10,7 @@ from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth
 @dataclass
 class DataPlatformPaperMetrics:
     transfer_count: int
+    transfer_percentage: float
 
 
 @dataclass
@@ -36,7 +37,7 @@ class NationalDataPlatformData:
     metrics: List[DataPlatformNationalMetrics]
 
 
-def calculate_percentage(total: int, portion: int):
+def calculate_percentage(portion: int, total: int):
     if total == 0:
         return None
     return round((portion / total) * 100, 2)
@@ -60,15 +61,20 @@ def construct_national_data_platform_data(
                 transfer_count=national_metrics_by_month.transfer_count,
                 integrated=DataPlatformIntegratedMetrics(
                     transfer_percentage=calculate_percentage(
-                        total=national_metrics_by_month.transfer_count,
                         portion=national_metrics_by_month.integrated.transfer_count,
+                        total=national_metrics_by_month.transfer_count,
                     ),
                     transfer_count=national_metrics_by_month.integrated.transfer_count,
                     within_3_days=national_metrics_by_month.integrated.within_3_days,
                     within_8_days=national_metrics_by_month.integrated.within_8_days,
                     beyond_8_days=national_metrics_by_month.integrated.beyond_8_days,
                 ),
-                paper_fallback=DataPlatformPaperMetrics(transfer_count=paper_fallback_count),
+                paper_fallback=DataPlatformPaperMetrics(
+                    transfer_count=paper_fallback_count,
+                    transfer_percentage=calculate_percentage(
+                        portion=paper_fallback_count, total=national_metrics_by_month.transfer_count
+                    ),
+                ),
                 year=national_metrics_by_month.year,
                 month=national_metrics_by_month.month,
             )

@@ -102,3 +102,15 @@ def test_has_paper_fallback_transfer_count():
     expected = 3
 
     assert actual.metrics[0].paper_fallback.transfer_count == expected
+
+
+def test_has_paper_fallback_transfer_percentage():
+    transfer_count = 18
+    national_metrics_by_month = build_national_metrics_by_month(
+        transfer_count=transfer_count, within_3_days=10, within_8_days=5, beyond_8_days=3
+    )
+
+    expected_percentage = 16.67
+    actual = construct_national_data_platform_data(national_metrics_by_month)
+
+    assert actual.metrics[0].paper_fallback.transfer_percentage == expected_percentage

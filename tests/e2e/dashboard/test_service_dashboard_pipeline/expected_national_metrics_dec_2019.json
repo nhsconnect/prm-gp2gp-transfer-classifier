@@ -13,7 +13,8 @@
         "beyond8Days": 1
       },
       "paperFallback": {
-        "transferCount": 1
+        "transferCount": 1,
+        "transferPercentage": 33.33
       }
     }
   ]
