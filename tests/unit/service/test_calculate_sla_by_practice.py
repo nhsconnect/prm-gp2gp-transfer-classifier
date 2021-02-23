@@ -4,20 +4,24 @@ from typing import Set, Iterator
 
 import pytest
 from gp2gp.odsportal.models import PracticeDetails
-from gp2gp.service.practiceMetrics import PracticeSlaMetrics, calculate_sla_by_practice
+from gp2gp.service.practiceMetrics import (
+    PracticeMetrics,
+    calculate_sla_by_practice,
+    IntegratedPracticeMetrics,
+)
 
 from tests.builders.common import a_string
 from tests.builders.service import build_transfer
 
 
-def _assert_has_ods_codes(practices: Iterator[PracticeSlaMetrics], expected: Set[str]):
+def _assert_has_ods_codes(practices: Iterator[PracticeMetrics], expected: Set[str]):
     actual_counts = Counter((practice.ods_code for practice in practices))
     expected_counts = Counter(expected)
     assert actual_counts == expected_counts
 
 
 def _assert_first_summary_has_sla_counts(
-    practices: Iterator[PracticeSlaMetrics],
+    practices: Iterator[PracticeMetrics],
     within_3_days: int,
     within_8_days: int,
     beyond_8_days: int,
@@ -27,9 +31,9 @@ def _assert_first_summary_has_sla_counts(
     expected_slas = (within_3_days, within_8_days, beyond_8_days)
 
     actual_slas = (
-        first_summary.within_3_days,
-        first_summary.within_8_days,
-        first_summary.beyond_8_days,
+        first_summary.integrated.within_3_days,
+        first_summary.integrated.within_8_days,
+        first_summary.integrated.beyond_8_days,
     )
 
     assert actual_slas == expected_slas
@@ -165,21 +169,19 @@ def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practice
     ]
 
     expected = [
-        PracticeSlaMetrics(
+        PracticeMetrics(
             ods_code="A12345",
             name="A Practice",
-            transfer_count=2,
-            within_3_days=1,
-            within_8_days=0,
-            beyond_8_days=1,
+            integrated=IntegratedPracticeMetrics(
+                transfer_count=2, within_3_days=1, within_8_days=0, beyond_8_days=1
+            ),
         ),
-        PracticeSlaMetrics(
+        PracticeMetrics(
             ods_code="B12345",
             name="Another Practice",
-            transfer_count=3,
-            within_3_days=0,
-            within_8_days=2,
-            beyond_8_days=1,
+            integrated=IntegratedPracticeMetrics(
+                transfer_count=3, within_3_days=0, within_8_days=2, beyond_8_days=1
+            ),
         ),
     ]
 
@@ -226,9 +228,17 @@ def test_returns_sum_of_all_integrated_transfers():
     transfers = [
         build_transfer(
             requesting_practice_asid="121212121212",
+            sla_duration=timedelta(days=0, hours=1, minutes=10),
+        ),
+        build_transfer(
+            requesting_practice_asid="121212121212",
             sla_duration=timedelta(days=7, hours=1, minutes=10),
-        )
+        ),
+        build_transfer(
+            requesting_practice_asid="121212121212",
+            sla_duration=timedelta(days=10, hours=1, minutes=10),
+        ),
     ]
     actual = list(calculate_sla_by_practice(practice_list, transfers))
 
-    assert actual[0].transfer_count == 1
+    assert actual[0].integrated.transfer_count == 3

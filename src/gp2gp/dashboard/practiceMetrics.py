@@ -4,7 +4,7 @@ from typing import Iterable, List
 
 from dateutil.tz import tzutc
 
-from gp2gp.service.practiceMetrics import PracticeSlaMetrics
+from gp2gp.service.practiceMetrics import PracticeMetrics
 
 
 @dataclass
@@ -40,7 +40,7 @@ class PracticeMetricsData:
 
 
 def construct_practice_metrics_data(
-    sla_metrics: Iterable[PracticeSlaMetrics], year: int, month: int
+    sla_metrics: Iterable[PracticeMetrics], year: int, month: int
 ) -> PracticeMetricsData:
 
     return PracticeMetricsData(
@@ -55,9 +55,9 @@ def construct_practice_metrics_data(
                         month=month,
                         requester=RequesterMetrics(
                             time_to_integrate_sla=TimeToIntegrateSla(
-                                within_3_days=practice.within_3_days,
-                                within_8_days=practice.within_8_days,
-                                beyond_8_days=practice.beyond_8_days,
+                                within_3_days=practice.integrated.within_3_days,
+                                within_8_days=practice.integrated.within_8_days,
+                                beyond_8_days=practice.integrated.beyond_8_days,
                             )
                         ),
                     )
