@@ -9,6 +9,7 @@ from gp2gp.service.practiceMetrics import PracticeMetrics
 
 @dataclass
 class IntegratedPracticeMetrics:
+    transfer_count: int
     within_3_days: int
     within_8_days: int
     beyond_8_days: int
@@ -55,6 +56,7 @@ def construct_practice_metrics_data(
                         month=month,
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
+                                transfer_count=practice.integrated.transfer_count,
                                 within_3_days=practice.integrated.within_3_days,
                                 within_8_days=practice.integrated.within_8_days,
                                 beyond_8_days=practice.integrated.beyond_8_days,

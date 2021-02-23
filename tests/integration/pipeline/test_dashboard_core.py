@@ -155,6 +155,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
                         month=12,
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
+                                transfer_count=1,
                                 within_3_days=1,
                                 within_8_days=0,
                                 beyond_8_days=0,

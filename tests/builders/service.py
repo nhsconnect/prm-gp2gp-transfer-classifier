@@ -19,7 +19,7 @@ def build_transfer(**kwargs):
     )
 
 
-def build_practice_sla_metrics(**kwargs):
+def build_practice_metrics(**kwargs):
     return PracticeMetrics(
         ods_code=kwargs.get("ods_code", a_string(6)),
         name=kwargs.get("name", a_string()),
