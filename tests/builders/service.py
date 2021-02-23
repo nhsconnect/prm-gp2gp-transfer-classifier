@@ -23,6 +23,7 @@ def build_practice_sla_metrics(**kwargs):
     return PracticeSlaMetrics(
         ods_code=kwargs.get("ods_code", a_string(6)),
         name=kwargs.get("name", a_string()),
+        transfer_count=kwargs.get("transfer_count", an_integer()),
         within_3_days=kwargs.get("within_3_days", an_integer()),
         within_8_days=kwargs.get("within_8_days", an_integer()),
         beyond_8_days=kwargs.get("beyond_8_days", an_integer()),

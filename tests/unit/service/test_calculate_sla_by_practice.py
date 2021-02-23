@@ -166,11 +166,17 @@ def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practice
 
     expected = [
         PracticeSlaMetrics(
-            ods_code="A12345", name="A Practice", within_3_days=1, within_8_days=0, beyond_8_days=1
+            ods_code="A12345",
+            name="A Practice",
+            transfer_count=2,
+            within_3_days=1,
+            within_8_days=0,
+            beyond_8_days=1,
         ),
         PracticeSlaMetrics(
             ods_code="B12345",
             name="Another Practice",
+            transfer_count=3,
             within_3_days=0,
             within_8_days=2,
             beyond_8_days=1,
@@ -213,3 +219,16 @@ def test_counts_both_asids_for_practice_with_two_asids():
     actual = calculate_sla_by_practice(practice_list, transfers)
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=1, within_8_days=1, beyond_8_days=0)
+
+
+def test_returns_sum_of_all_integrated_transfers():
+    practice_list = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    transfers = [
+        build_transfer(
+            requesting_practice_asid="121212121212",
+            sla_duration=timedelta(days=7, hours=1, minutes=10),
+        )
+    ]
+    actual = list(calculate_sla_by_practice(practice_list, transfers))
+
+    assert actual[0].transfer_count == 1
