@@ -5,7 +5,7 @@ from freezegun import freeze_time
 
 from gp2gp.dashboard.nationalData import NationalDataPlatformData
 from gp2gp.dashboard.practiceMetrics import (
-    TimeToIntegrateSla,
+    IntegratedPracticeMetrics,
     RequesterMetrics,
     MonthlyMetrics,
     PracticeSummary,
@@ -149,7 +149,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
                         year=2019,
                         month=12,
                         requester=RequesterMetrics(
-                            time_to_integrate_sla=TimeToIntegrateSla(
+                            integrated=IntegratedPracticeMetrics(
                                 within_3_days=1,
                                 within_8_days=0,
                                 beyond_8_days=0,

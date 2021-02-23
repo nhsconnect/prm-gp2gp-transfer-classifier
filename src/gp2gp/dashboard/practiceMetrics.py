@@ -8,7 +8,7 @@ from gp2gp.service.practiceMetrics import PracticeMetrics
 
 
 @dataclass
-class TimeToIntegrateSla:
+class IntegratedPracticeMetrics:
     within_3_days: int
     within_8_days: int
     beyond_8_days: int
@@ -16,7 +16,7 @@ class TimeToIntegrateSla:
 
 @dataclass
 class RequesterMetrics:
-    time_to_integrate_sla: TimeToIntegrateSla
+    integrated: IntegratedPracticeMetrics
 
 
 @dataclass
@@ -54,7 +54,7 @@ def construct_practice_metrics_data(
                         year=year,
                         month=month,
                         requester=RequesterMetrics(
-                            time_to_integrate_sla=TimeToIntegrateSla(
+                            integrated=IntegratedPracticeMetrics(
                                 within_3_days=practice.integrated.within_3_days,
                                 within_8_days=practice.integrated.within_8_days,
                                 beyond_8_days=practice.integrated.beyond_8_days,

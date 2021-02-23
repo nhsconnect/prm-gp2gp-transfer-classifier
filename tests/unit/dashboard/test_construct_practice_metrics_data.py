@@ -7,7 +7,7 @@ from freezegun import freeze_time
 
 from gp2gp.dashboard.practiceMetrics import (
     construct_practice_metrics_data,
-    TimeToIntegrateSla,
+    IntegratedPracticeMetrics,
     RequesterMetrics,
     MonthlyMetrics,
     PracticeSummary,
@@ -92,12 +92,12 @@ def test_has_correct_month_given_a_single_practice():
 def test_has_correct_requester_sla_metrics_given_single_practice():
     sla_metrics = [build_practice_sla_metrics(within_3_days=1, within_8_days=0, beyond_8_days=2)]
 
-    expected_requester_sla_metrics = TimeToIntegrateSla(
+    expected_requester_sla_metrics = IntegratedPracticeMetrics(
         within_3_days=1, within_8_days=0, beyond_8_days=2
     )
 
     actual = construct_practice_metrics_data(sla_metrics, A_YEAR, A_MONTH)
-    time_to_integrate_sla = actual.practices[0].metrics[0].requester.time_to_integrate_sla
+    time_to_integrate_sla = actual.practices[0].metrics[0].requester.integrated
 
     assert time_to_integrate_sla == expected_requester_sla_metrics
 
@@ -128,7 +128,7 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                         year=2020,
                         month=1,
                         requester=RequesterMetrics(
-                            time_to_integrate_sla=TimeToIntegrateSla(
+                            integrated=IntegratedPracticeMetrics(
                                 within_3_days=1, within_8_days=0, beyond_8_days=2
                             )
                         ),
@@ -143,7 +143,7 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                         year=2020,
                         month=1,
                         requester=RequesterMetrics(
-                            time_to_integrate_sla=TimeToIntegrateSla(
+                            integrated=IntegratedPracticeMetrics(
                                 within_3_days=0, within_8_days=5, beyond_8_days=2
                             )
                         ),
