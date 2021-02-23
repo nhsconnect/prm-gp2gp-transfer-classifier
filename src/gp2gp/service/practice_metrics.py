@@ -15,6 +15,19 @@ class PracticeSlaMetrics(NamedTuple):
     beyond_8_days: int
 
 
+def _derive_practice_sla_metrics(practice, sla_metrics):
+    return PracticeSlaMetrics(
+        practice.ods_code,
+        practice.name,
+        transfer_count=sla_metrics[SlaBand.WITHIN_3_DAYS]
+        + sla_metrics[SlaBand.WITHIN_8_DAYS]
+        + sla_metrics[SlaBand.BEYOND_8_DAYS],
+        within_3_days=sla_metrics[SlaBand.WITHIN_3_DAYS],
+        within_8_days=sla_metrics[SlaBand.WITHIN_8_DAYS],
+        beyond_8_days=sla_metrics[SlaBand.BEYOND_8_DAYS],
+    )
+
+
 def calculate_sla_by_practice(
     practice_list: Iterable[PracticeDetails], transfers: Iterable[Transfer]
 ) -> Iterator[PracticeSlaMetrics]:
@@ -40,15 +53,6 @@ def calculate_sla_by_practice(
         warn(f"Unexpected ASID count: {len(unexpected_asids)}", RuntimeWarning)
 
     return (
-        PracticeSlaMetrics(
-            practice.ods_code,
-            practice.name,
-            transfer_count=practice_counts[practice.ods_code][SlaBand.WITHIN_3_DAYS]
-            + practice_counts[practice.ods_code][SlaBand.WITHIN_8_DAYS]
-            + practice_counts[practice.ods_code][SlaBand.BEYOND_8_DAYS],
-            within_3_days=practice_counts[practice.ods_code][SlaBand.WITHIN_3_DAYS],
-            within_8_days=practice_counts[practice.ods_code][SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=practice_counts[practice.ods_code][SlaBand.BEYOND_8_DAYS],
-        )
+        _derive_practice_sla_metrics(practice, practice_counts[practice.ods_code])
         for practice in practice_list
     )
