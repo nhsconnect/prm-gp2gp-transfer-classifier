@@ -4,7 +4,7 @@ from typing import Iterable, List
 
 from dateutil.tz import tzutc
 
-from gp2gp.service.practiceMetrics import PracticeMetrics
+from gp2gp.service.practice_metrics import PracticeMetrics
 
 
 @dataclass

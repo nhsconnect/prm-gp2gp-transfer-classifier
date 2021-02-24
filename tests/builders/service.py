@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from gp2gp.service.practiceMetrics import PracticeMetrics, IntegratedPracticeMetrics
+from gp2gp.service.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
 from gp2gp.service.transfer import Transfer, TransferStatus
 from tests.builders.common import a_string, a_duration, an_integer, a_datetime
 
