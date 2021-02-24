@@ -46,6 +46,7 @@ def _get_time_range(year, month):
     next_month = metric_month + relativedelta(months=1)
     return DateTimeRange(metric_month, next_month)
 
+
 def _is_outputting_to_file(args):
     return args.output_directory
 
