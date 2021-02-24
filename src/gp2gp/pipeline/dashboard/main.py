@@ -46,21 +46,12 @@ def _get_time_range(year, month):
     next_month = metric_month + relativedelta(months=1)
     return DateTimeRange(metric_month, next_month)
 
-
 def _is_outputting_to_file(args):
-    return (
-        args.organisation_metadata_output_file
-        and args.practice_metrics_output_file
-        and args.transfers_output_file
-    )
+    return args.output_directory
 
 
 def _is_outputting_to_s3(args):
-    return (
-        args.organisation_metadata_output_key
-        and args.practice_metrics_output_key
-        and args.transfers_output_key
-    )
+    return args.output_bucket
 
 
 def main():
@@ -81,31 +72,49 @@ def main():
     organisation_metadata = construct_service_dashboard_metadata(organisation_metadata)
     transfer_table = convert_transfers_to_table(transfers)
 
+    practice_metrics_file_name = "practiceMetrics.json"
+    organisation_metadata_file_name = "organisationMetadata.json"
+    national_metrics_file_name = "nationalMetrics.json"
+    transfers_file_name = "transfers.parquet"
+
     if _is_outputting_to_file(args):
-        _write_dashboard_json_file(practice_metrics_data, args.practice_metrics_output_file)
-        _write_dashboard_json_file(organisation_metadata, args.organisation_metadata_output_file)
-        _write_dashboard_json_file(national_metrics_data, args.national_metrics_output_file)
-        write_table(transfer_table, args.transfers_output_file)
+        _write_dashboard_json_file(
+            practice_metrics_data,
+            f"{args.output_directory}/{args.month}-{args.year}-{practice_metrics_file_name}",
+        )
+        _write_dashboard_json_file(
+            organisation_metadata,
+            f"{args.output_directory}/{args.month}-{args.year}-{organisation_metadata_file_name}",
+        )
+        _write_dashboard_json_file(
+            national_metrics_data,
+            f"{args.output_directory}/{args.month}-{args.year}-{national_metrics_file_name}",
+        )
+        write_table(
+            transfer_table,
+            f"{args.output_directory}/{args.month}-{args.year}-{transfers_file_name}",
+        )
     elif _is_outputting_to_s3(args):
         s3 = boto3.resource("s3", endpoint_url=args.s3_endpoint_url)
 
         bucket_name = args.output_bucket
         version = "v2"
-        s3_path = f"{version}/{args.year}/{args.month}/"
+        s3_path = f"{version}/{args.year}/{args.month}"
+
         _upload_dashboard_json_object(
             practice_metrics_data,
-            s3.Object(bucket_name, f"{s3_path}{args.practice_metrics_output_key}"),
+            s3.Object(bucket_name, f"{s3_path}/{practice_metrics_file_name}"),
         )
         _upload_dashboard_json_object(
             organisation_metadata,
-            s3.Object(bucket_name, f"{s3_path}{args.organisation_metadata_output_key}"),
+            s3.Object(bucket_name, f"{s3_path}/{organisation_metadata_file_name}"),
         )
         _upload_dashboard_json_object(
             national_metrics_data,
-            s3.Object(bucket_name, f"{s3_path}{args.national_metrics_output_key}"),
+            s3.Object(bucket_name, f"{s3_path}/{national_metrics_file_name}"),
         )
         write_table(
             table=transfer_table,
-            where=bucket_name + "/" + f"{s3_path}{args.transfers_output_key}",
+            where=bucket_name + "/" + f"{s3_path}/{transfers_file_name}",
             filesystem=S3FileSystem(endpoint_override=args.s3_endpoint_url),
         )

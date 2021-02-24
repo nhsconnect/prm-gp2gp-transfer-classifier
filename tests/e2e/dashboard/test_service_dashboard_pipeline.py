@@ -96,10 +96,10 @@ def test_with_local_files(datadir):
     organisation_metadata_file_path = datadir / "organisation_metadata.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
-    practice_metrics_output_file_path = datadir / "practice_metrics_dec_2019.json"
-    organisation_metadata_output_file_path = datadir / "organisation_metadata_dec_2019.json"
-    national_metrics_output_file_path = datadir / "national_metrics_dec_2019.json"
-    transfers_output_file_path = datadir / "transfers_dec_2019.parquet"
+    practice_metrics_output_file_path = datadir / "12-2019-practiceMetrics.json"
+    organisation_metadata_output_file_path = datadir / "12-2019-organisationMetadata.json"
+    national_metrics_output_file_path = datadir / "12-2019-nationalMetrics.json"
+    transfers_output_file_path = datadir / "12-2019-transfers.parquet"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
@@ -115,10 +115,7 @@ def test_with_local_files(datadir):
         --year {year}\
         --organisation-list-file {organisation_metadata_file_path}\
         --input-files {input_file_paths_str}\
-        --practice-metrics-output-file {practice_metrics_output_file_path}\
-        --organisation-metadata-output-file {organisation_metadata_output_file_path}\
-        --national-metrics-output-file {national_metrics_output_file_path}\
-        --transfers-output-file {transfers_output_file_path}\
+        --output-directory {datadir}\
     "
 
     pipeline_output = check_output(pipeline_command, shell=True)
@@ -165,10 +162,10 @@ def test_with_s3_output(datadir):
     organisation_metadata_file_path = datadir / "organisation_metadata.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
-    practice_metrics_output_key = "practice_metrics_dec_2019.json"
-    organisation_metadata_output_key = "organisation_metadata_dec_2019.json"
-    national_metrics_output_key = "national_metrics_dec_2019.json"
-    transfers_output_key = "transfers_dec_2019.parquet"
+    expected_practice_metrics_output_key = "practiceMetrics.json"
+    expected_organisation_metadata_output_key = "organisationMetadata.json"
+    expected_national_metrics_output_key = "nationalMetrics.json"
+    expected_transfers_output_key = "transfers.parquet"
 
     expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
     expected_organisation_metadata = _read_json(
@@ -192,10 +189,6 @@ def test_with_s3_output(datadir):
         --organisation-list-file {organisation_metadata_file_path}\
         --input-files {input_file_paths_str}\
         --output-bucket {output_bucket_name}\
-        --practice-metrics-output-key {practice_metrics_output_key} \
-        --organisation-metadata-output-key {organisation_metadata_output_key} \
-        --national-metrics-output-key {national_metrics_output_key}\
-        --transfers-output-key {transfers_output_key} \
         --s3-endpoint-url {fake_s3_url} \
     "
     pipeline_output = check_output(pipeline_command, shell=True, env=pipeline_env)
@@ -203,15 +196,17 @@ def test_with_s3_output(datadir):
     try:
         s3_path = "v2/2019/12/"
         actual_practice_metrics = _read_s3_json(
-            output_bucket, f"{s3_path}{practice_metrics_output_key}"
+            output_bucket, f"{s3_path}{expected_practice_metrics_output_key}"
         )
         actual_organisation_metadata = _read_s3_json(
-            output_bucket, f"{s3_path}{organisation_metadata_output_key}"
+            output_bucket, f"{s3_path}{expected_organisation_metadata_output_key}"
         )
         actual_national_metrics = _read_s3_json(
-            output_bucket, f"{s3_path}{national_metrics_output_key}"
+            output_bucket, f"{s3_path}{expected_national_metrics_output_key}"
         )
-        actual_transfers = _read_s3_parquet(output_bucket, f"{s3_path}{transfers_output_key}")
+        actual_transfers = _read_s3_parquet(
+            output_bucket, f"{s3_path}{expected_transfers_output_key}"
+        )
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
         assert (

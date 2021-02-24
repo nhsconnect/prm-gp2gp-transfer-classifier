@@ -71,16 +71,17 @@ Then run the pipeline command:
 
 This pipeline will derive GP2GP metrics and metadata for practices produced by the ODS Portal Pipeline. It does this by performing a number of transformations on GP2GP messages provided by NMS.
 
-The following examples show how to run this pipeline.
+The following examples show how to run this pipeline. Run `gp2gp-dashboard-pipeline --help` for usage details.
 
-Example 1 - Outputting to file
+#### Outputting to local directory
 
-`gp2gp-dashboard-pipeline --month 6 --year 2019 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --practice-metrics-output-file "data/jun-practice-metrics.json" --national-metrics-output-file "data/jun-national-metrics.json" --organisation-metadata-output-file "data/jun-organisation-metadata.json" --transfers-output-file "data/jun-transfers.parquet"`
+Example: `gp2gp-dashboard-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jan.csv.gz,data/feb.csv.gz" --output-directory "data"`
 
-Example 2 - Outputting to S3
+#### Outputting to S3 bucket
 
-`gp2gp-dashboard-pipeline --month 6 --year 2019 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket" --practice-metrics-output-key "practice-metrics.json" --organisation-metadata-output-key "organisation-metadata.json" --national-metrics-output-key "national-metrics.json" --transfers-output-key "transfers.parquet"`
+Example: `gp2gp-dashboard-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket"`
 
+- When outputting to AWS ensure the environment has the appropriate access.
 - Note this will use the year and month as part of the s3 key structure, as well 'v2' (data pipeline output version). 
 
 ## Troubleshooting
