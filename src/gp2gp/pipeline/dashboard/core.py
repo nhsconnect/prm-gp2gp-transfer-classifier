@@ -1,8 +1,8 @@
 from typing import Iterable, List, Iterator
 
-from gp2gp.dashboard.national_data import (
+from gp2gp.dashboard.national_metrics import (
     NationalMetricsPresentation,
-    construct_national_data_platform_data,
+    construct_national_metrics,
 )
 from gp2gp.dashboard.practice_metrics import construct_practice_metrics_data, PracticeMetricsData
 from gp2gp.utils.date.range import DateTimeRange
@@ -58,6 +58,4 @@ def calculate_national_metrics_data(
     national_metrics_by_month = calculate_national_metrics(
         transfers=transfers, year=time_range.start.year, month=time_range.start.month
     )
-    return construct_national_data_platform_data(
-        national_metrics_by_month=national_metrics_by_month
-    )
+    return construct_national_metrics(national_metrics_by_month=national_metrics_by_month)

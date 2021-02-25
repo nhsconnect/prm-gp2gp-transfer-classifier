@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from dateutil.tz import UTC, tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.national_data import (
+from gp2gp.dashboard.national_metrics import (
     NationalMetricsPresentation,
     IntegratedMetrics,
     MonthlyNationalMetrics,

@@ -43,7 +43,7 @@ def calculate_percentage(portion: int, total: int):
     return round((portion / total) * 100, 2)
 
 
-def construct_national_data_platform_data(
+def construct_national_metrics(
     national_metrics_by_month: NationalMetrics,
 ) -> NationalMetricsPresentation:
     current_datetime = datetime.now(tzutc())
