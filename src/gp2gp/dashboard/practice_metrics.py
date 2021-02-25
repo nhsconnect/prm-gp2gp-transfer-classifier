@@ -45,16 +45,16 @@ class PracticeSummary:
 
 
 @dataclass
-class PracticeMetricsData:
+class PracticeMetricsPresentation:
     generated_on: datetime
     practices: List[PracticeSummary]
 
 
-def construct_practice_metrics_data(
+def construct_practice_metrics(
     sla_metrics: Iterable[PracticeMetrics], year: int, month: int
-) -> PracticeMetricsData:
+) -> PracticeMetricsPresentation:
 
-    return PracticeMetricsData(
+    return PracticeMetricsPresentation(
         generated_on=datetime.now(tzutc()),
         practices=[
             PracticeSummary(

@@ -4,7 +4,7 @@ from gp2gp.dashboard.national_metrics import (
     NationalMetricsPresentation,
     construct_national_metrics,
 )
-from gp2gp.dashboard.practice_metrics import construct_practice_metrics_data, PracticeMetricsData
+from gp2gp.dashboard.practice_metrics import construct_practice_metrics, PracticeMetricsPresentation
 from gp2gp.utils.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.national_metrics import calculate_national_metrics
@@ -43,10 +43,10 @@ def calculate_practice_metrics_data(
     transfers: Iterable[Transfer],
     practice_list: List[PracticeDetails],
     time_range: DateTimeRange,
-) -> PracticeMetricsData:
+) -> PracticeMetricsPresentation:
     completed_transfers = filter_for_successful_transfers(transfers)
     sla_metrics = calculate_sla_by_practice(practice_list, completed_transfers)
-    dashboard_data = construct_practice_metrics_data(
+    dashboard_data = construct_practice_metrics(
         sla_metrics, year=time_range.start.year, month=time_range.start.month
     )
     return dashboard_data

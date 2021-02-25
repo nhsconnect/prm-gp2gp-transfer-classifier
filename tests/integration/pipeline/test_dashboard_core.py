@@ -14,7 +14,7 @@ from gp2gp.dashboard.practice_metrics import (
     RequesterMetrics,
     MonthlyMetrics,
     PracticeSummary,
-    PracticeMetricsData,
+    PracticeMetricsPresentation,
     TimeToIntegrateSlaDeprecated,
 )
 from gp2gp.utils.date.range import DateTimeRange
@@ -144,7 +144,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         )
     ]
 
-    expected = PracticeMetricsData(
+    expected = PracticeMetricsPresentation(
         generated_on=datetime(year=2020, month=1, day=15, hour=23, second=42, tzinfo=UTC),
         practices=[
             PracticeSummary(
