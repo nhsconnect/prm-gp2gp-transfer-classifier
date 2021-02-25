@@ -28,13 +28,12 @@ def calculate_national_metrics_by_month(
     integrated_transfer_count = 0
     sla_count = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
 
-    for transfer in transfers:
-        transfer_count += 1
-        if transfer.status == TransferStatus.INTEGRATED:
-            integrated_transfer_count += 1
-            sla_band = assign_to_sla_band(transfer.sla_duration)
-            sla_count[sla_band] += 1
+    integrated_transfer_count, transfer_count = calculate_transfer_count(integrated_transfer_count, sla_count, transfer_count, transfers)
 
+    return createNationalMetrics(integrated_transfer_count, month, sla_count, transfer_count, year)
+
+
+def createNationalMetrics(integrated_transfer_count, month, sla_count, transfer_count, year):
     return NationalMetricsByMonth(
         year=year,
         month=month,
@@ -46,3 +45,18 @@ def calculate_national_metrics_by_month(
             beyond_8_days=sla_count[SlaBand.BEYOND_8_DAYS],
         ),
     )
+
+
+def calculate_transfer_count(integrated_transfer_count, sla_count, transfer_count, transfers):
+    for transfer in transfers:
+        transfer_count += 1
+        integrated_transfer_count = calculate_integrated_transfer_count(integrated_transfer_count, sla_count, transfer)
+    return integrated_transfer_count, transfer_count
+
+
+def calculate_integrated_transfer_count(integrated_transfer_count, sla_count, transfer):
+    if transfer.status == TransferStatus.INTEGRATED:
+        integrated_transfer_count += 1
+        sla_band = assign_to_sla_band(transfer.sla_duration)
+        sla_count[sla_band] += 1
+    return integrated_transfer_count
