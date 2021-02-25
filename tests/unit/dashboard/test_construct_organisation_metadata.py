@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from gp2gp.dashboard.organisation_metadata import (
-    construct_service_dashboard_metadata,
+    construct_organisation_metadata,
     OrganisationDetails,
 )
 from gp2gp.odsportal.models import OrganisationMetadata, CcgDetails, PracticeDetails
@@ -16,7 +16,7 @@ def test_maps_generated_on():
 
     expected_datetime = datetime(2020, 1, 1)
 
-    actual = construct_service_dashboard_metadata(organisation_metadata)
+    actual = construct_organisation_metadata(organisation_metadata)
 
     assert actual.generated_on == expected_datetime
 
@@ -30,7 +30,7 @@ def test_maps_ccg_details_to_organisation_details():
 
     expected_ccgs = [OrganisationDetails(ods_code="12X", name="A CCG")]
 
-    actual = construct_service_dashboard_metadata(organisation_metadata)
+    actual = construct_organisation_metadata(organisation_metadata)
 
     assert actual.ccgs == expected_ccgs
 
@@ -52,7 +52,7 @@ def test_maps_multiple_ccg_details_to_organisation_details():
         OrganisationDetails(ods_code="10P", name="A CCG 3"),
     ]
 
-    actual = construct_service_dashboard_metadata(organisation_metadata)
+    actual = construct_organisation_metadata(organisation_metadata)
 
     assert actual.ccgs == expected_ccgs
 
@@ -66,7 +66,7 @@ def test_maps_practice_details_to_organisation_details():
 
     expected_practices = [OrganisationDetails(ods_code="A12345", name="A Practice")]
 
-    actual = construct_service_dashboard_metadata(organisation_metadata)
+    actual = construct_organisation_metadata(organisation_metadata)
 
     assert actual.practices == expected_practices
 
@@ -88,6 +88,6 @@ def test_maps_multiple_practice_details_to_organisation_details():
         OrganisationDetails(ods_code="C12345", name="A Practice 3"),
     ]
 
-    actual = construct_service_dashboard_metadata(organisation_metadata)
+    actual = construct_organisation_metadata(organisation_metadata)
 
     assert actual.practices == expected_practices

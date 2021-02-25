@@ -12,16 +12,16 @@ class OrganisationDetails:
 
 
 @dataclass
-class ServiceDashboardMetadata:
+class OrganisationMetadataPresentation:
     generated_on: datetime
     practices: List[OrganisationDetails]
     ccgs: List[OrganisationDetails]
 
 
-def construct_service_dashboard_metadata(
+def construct_organisation_metadata(
     organisation_metadata: OrganisationMetadata,
-) -> ServiceDashboardMetadata:
-    return ServiceDashboardMetadata(
+) -> OrganisationMetadataPresentation:
+    return OrganisationMetadataPresentation(
         generated_on=organisation_metadata.generated_on,
         practices=[
             OrganisationDetails(ods_code=practice.ods_code, name=practice.name)

@@ -5,7 +5,7 @@ from datetime import datetime
 import boto3
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
-from gp2gp.dashboard.organisation_metadata import construct_service_dashboard_metadata
+from gp2gp.dashboard.organisation_metadata import construct_organisation_metadata
 from gp2gp.utils.date.range import DateTimeRange
 
 from gp2gp.utils.io.csv import read_gzip_csv_files
@@ -70,7 +70,7 @@ def main():
     national_metrics_data = calculate_national_metrics_data(
         transfers=transfers, time_range=time_range
     )
-    organisation_metadata = construct_service_dashboard_metadata(organisation_metadata)
+    organisation_metadata = construct_organisation_metadata(organisation_metadata)
     transfer_table = convert_transfers_to_table(transfers)
 
     practice_metrics_file_name = "practiceMetrics.json"
