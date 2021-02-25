@@ -1,4 +1,4 @@
-from gp2gp.io.csv import read_gzip_csv_files
+from gp2gp.utils.io.csv import read_gzip_csv_files
 from tests.builders.file import build_gzip_csv
 
 

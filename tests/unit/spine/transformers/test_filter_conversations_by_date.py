@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from gp2gp.date.range import DateTimeRange
+from gp2gp.utils.date.range import DateTimeRange
 from gp2gp.spine.transformers import filter_conversations_by_request_started_time
 from tests.builders.spine import build_parsed_conversation, build_message
 

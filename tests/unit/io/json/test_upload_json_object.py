@@ -1,7 +1,7 @@
 from datetime import datetime
 from unittest.mock import MagicMock
 
-from gp2gp.io.json import upload_json_object
+from gp2gp.utils.io.json import upload_json_object
 
 
 def test_uploads_dictionary():

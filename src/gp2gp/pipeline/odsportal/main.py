@@ -2,8 +2,8 @@ import sys
 from argparse import ArgumentParser
 from dataclasses import asdict
 
-from gp2gp.io.csv import read_gzip_csv_file
-from gp2gp.io.json import write_json_file
+from gp2gp.utils.io.csv import read_gzip_csv_file
+from gp2gp.utils.io.json import write_json_file
 from gp2gp.odsportal.sources import (
     OdsDataFetcher,
     construct_organisation_metadata_from_ods_portal_response,

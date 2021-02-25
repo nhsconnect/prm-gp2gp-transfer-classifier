@@ -5,7 +5,7 @@ from gp2gp.dashboard.national_data import (
     construct_national_data_platform_data,
 )
 from gp2gp.dashboard.practice_metrics import construct_practice_metrics_data, PracticeMetricsData
-from gp2gp.date.range import DateTimeRange
+from gp2gp.utils.date.range import DateTimeRange
 from gp2gp.odsportal.models import PracticeDetails
 from gp2gp.service.national_metrics_by_month import calculate_national_metrics_by_month
 from gp2gp.service.transfer import Transfer, derive_transfers, filter_for_successful_transfers

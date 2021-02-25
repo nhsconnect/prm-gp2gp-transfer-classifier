@@ -1,4 +1,4 @@
-from gp2gp.io.json import read_json_file
+from gp2gp.utils.io.json import read_json_file
 
 
 def test_returns_dictionary(fs):
