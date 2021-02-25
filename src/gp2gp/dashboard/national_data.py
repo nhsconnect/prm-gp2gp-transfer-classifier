@@ -4,17 +4,17 @@ from typing import List
 
 from dateutil.tz import tzutc
 
-from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth
+from gp2gp.service.national_metrics import NationalMetrics
 
 
 @dataclass
-class DataPlatformPaperMetrics:
+class PaperMetrics:
     transfer_count: int
     transfer_percentage: float
 
 
 @dataclass
-class DataPlatformIntegratedMetrics:
+class IntegratedMetrics:
     transfer_count: int
     transfer_percentage: float
     within_3_days: int
@@ -23,18 +23,18 @@ class DataPlatformIntegratedMetrics:
 
 
 @dataclass
-class DataPlatformNationalMetrics:
+class MonthlyNationalMetrics:
     transfer_count: int
-    integrated: DataPlatformIntegratedMetrics
-    paper_fallback: DataPlatformPaperMetrics
+    integrated: IntegratedMetrics
+    paper_fallback: PaperMetrics
     year: int
     month: int
 
 
 @dataclass
-class NationalDataPlatformData:
+class NationalMetricsPresentation:
     generated_on: datetime
-    metrics: List[DataPlatformNationalMetrics]
+    metrics: List[MonthlyNationalMetrics]
 
 
 def calculate_percentage(portion: int, total: int):
@@ -44,8 +44,8 @@ def calculate_percentage(portion: int, total: int):
 
 
 def construct_national_data_platform_data(
-    national_metrics_by_month: NationalMetricsByMonth,
-) -> NationalDataPlatformData:
+    national_metrics_by_month: NationalMetrics,
+) -> NationalMetricsPresentation:
     current_datetime = datetime.now(tzutc())
 
     paper_fallback_count = (
@@ -54,12 +54,12 @@ def construct_national_data_platform_data(
         - national_metrics_by_month.integrated.within_8_days
     )
 
-    return NationalDataPlatformData(
+    return NationalMetricsPresentation(
         generated_on=current_datetime,
         metrics=[
-            DataPlatformNationalMetrics(
+            MonthlyNationalMetrics(
                 transfer_count=national_metrics_by_month.transfer_count,
-                integrated=DataPlatformIntegratedMetrics(
+                integrated=IntegratedMetrics(
                     transfer_percentage=calculate_percentage(
                         portion=national_metrics_by_month.integrated.transfer_count,
                         total=national_metrics_by_month.transfer_count,
@@ -69,7 +69,7 @@ def construct_national_data_platform_data(
                     within_8_days=national_metrics_by_month.integrated.within_8_days,
                     beyond_8_days=national_metrics_by_month.integrated.beyond_8_days,
                 ),
-                paper_fallback=DataPlatformPaperMetrics(
+                paper_fallback=PaperMetrics(
                     transfer_count=paper_fallback_count,
                     transfer_percentage=calculate_percentage(
                         portion=paper_fallback_count, total=national_metrics_by_month.transfer_count

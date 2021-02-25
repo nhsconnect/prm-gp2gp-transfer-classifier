@@ -4,10 +4,10 @@ from dateutil.tz import UTC, tzutc
 from freezegun import freeze_time
 
 from gp2gp.dashboard.national_data import (
-    NationalDataPlatformData,
-    DataPlatformIntegratedMetrics,
-    DataPlatformNationalMetrics,
-    DataPlatformPaperMetrics,
+    NationalMetricsPresentation,
+    IntegratedMetrics,
+    MonthlyNationalMetrics,
+    PaperMetrics,
 )
 from gp2gp.dashboard.practice_metrics import (
     IntegratedPracticeMetrics,
@@ -200,21 +200,21 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     )
     current_datetime = datetime.now(tzutc())
 
-    expected_national_metrics_by_month = DataPlatformNationalMetrics(
+    expected_national_metrics_by_month = MonthlyNationalMetrics(
         transfer_count=7,
-        integrated=DataPlatformIntegratedMetrics(
+        integrated=IntegratedMetrics(
             transfer_percentage=85.71,
             transfer_count=6,
             within_3_days=1,
             within_8_days=2,
             beyond_8_days=3,
         ),
-        paper_fallback=DataPlatformPaperMetrics(transfer_count=4, transfer_percentage=57.14),
+        paper_fallback=PaperMetrics(transfer_count=4, transfer_percentage=57.14),
         year=2019,
         month=12,
     )
 
-    expected = NationalDataPlatformData(
+    expected = NationalMetricsPresentation(
         generated_on=current_datetime, metrics=[expected_national_metrics_by_month]
     )
     actual = calculate_national_metrics_data(transfers, time_range)

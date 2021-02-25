@@ -5,17 +5,17 @@ from dateutil.tz import tzutc
 from freezegun import freeze_time
 
 from gp2gp.dashboard.national_data import construct_national_data_platform_data
-from gp2gp.service.national_metrics_by_month import NationalMetricsByMonth, IntegratedMetrics
+from gp2gp.service.national_metrics import NationalMetrics, IntegratedMetrics
 from tests.builders.common import an_integer, a_datetime
 
 
-def build_national_metrics_by_month(**kwargs) -> NationalMetricsByMonth:
+def build_national_metrics_by_month(**kwargs) -> NationalMetrics:
     within_3_days = kwargs.get("within_3_days", an_integer())
     within_8_days = kwargs.get("within_8_days", an_integer())
     beyond_8_days = kwargs.get("beyond_8_days", an_integer())
     summed_transfer_count = within_3_days + within_8_days + beyond_8_days
 
-    return NationalMetricsByMonth(
+    return NationalMetrics(
         year=a_datetime().year,
         month=a_datetime().month,
         transfer_count=kwargs.get("transfer_count", summed_transfer_count),
