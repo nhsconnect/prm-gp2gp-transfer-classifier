@@ -5,7 +5,7 @@ from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
     filter_for_successful_transfers,
 )
-from tests.builders.service import build_transfer
+from tests.builders.gp2gp import build_transfer
 from tests.builders.common import a_datetime
 
 date_requested = a_datetime()

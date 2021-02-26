@@ -4,7 +4,7 @@ import pytest
 
 from prmdata.domain.gp2gp.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
-from tests.builders.service import build_transfers
+from tests.builders.gp2gp import build_transfers
 from tests.builders.common import an_integer, a_datetime
 
 year = a_datetime().year

@@ -29,7 +29,7 @@ from prmdata.domain.gp2gp.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SEC
 from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
-from tests.builders.service import build_transfer
+from tests.builders.gp2gp import build_transfer
 
 
 def _build_successful_conversation(**kwargs):

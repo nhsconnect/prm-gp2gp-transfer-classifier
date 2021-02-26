@@ -11,7 +11,7 @@ from prmdata.domain.gp2gp.practice_metrics import (
 )
 
 from tests.builders.common import a_string
-from tests.builders.service import build_transfer
+from tests.builders.gp2gp import build_transfer
 
 
 def _assert_has_ods_codes(practices: Iterator[PracticeMetrics], expected: Set[str]):

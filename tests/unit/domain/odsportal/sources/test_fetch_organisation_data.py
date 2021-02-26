@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from prmdata.domain.ods_portal.sources import OdsDataFetcher, OdsPortalException
-from tests.builders.odsportal import build_mock_response
+from tests.builders.ods_portal import build_mock_response
 from typing import Dict
 
 MOCK_PARAMS: Dict[str, str] = {}

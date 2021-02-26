@@ -14,7 +14,7 @@ from prmdata.domain.data_platform.practice_metrics import (
     PracticeMetricsPresentation,
     TimeToIntegrateSlaDeprecated,
 )
-from tests.builders.service import build_practice_metrics
+from tests.builders.gp2gp import build_practice_metrics
 
 A_YEAR = 1890
 A_MONTH = 3
