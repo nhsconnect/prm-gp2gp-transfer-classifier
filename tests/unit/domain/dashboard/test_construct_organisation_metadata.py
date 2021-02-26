@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from gp2gp.domain.dashboard.organisation_metadata import (
+from gp2gp.domain.data_platform.organisation_metadata import (
     construct_organisation_metadata,
     OrganisationDetails,
 )

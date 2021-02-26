@@ -1,10 +1,10 @@
 from typing import Iterable, List, Iterator
 
-from gp2gp.domain.dashboard.national_metrics import (
+from gp2gp.domain.data_platform.national_metrics import (
     NationalMetricsPresentation,
     construct_national_metrics,
 )
-from gp2gp.domain.dashboard.practice_metrics import (
+from gp2gp.domain.data_platform.practice_metrics import (
     construct_practice_metrics,
     PracticeMetricsPresentation,
 )
