@@ -14,7 +14,7 @@ setup(
     entry_points={
         "console_scripts": [
             "gp2gp-dashboard-pipeline=gp2gp.pipeline.dashboard.main:main",
-            "ods-portal-pipeline=gp2gp.pipeline.odsportal.main:main",
+            "ods-portal-pipeline=gp2gp.pipeline.ods_downloader.main:main",
         ]
     },
 )

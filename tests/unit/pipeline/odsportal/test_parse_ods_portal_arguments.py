@@ -1,4 +1,4 @@
-from gp2gp.pipeline.odsportal.main import parse_ods_portal_pipeline_arguments
+from gp2gp.pipeline.ods_downloader.main import parse_ods_portal_pipeline_arguments
 
 from argparse import Namespace
 
