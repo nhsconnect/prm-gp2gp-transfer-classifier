@@ -1,4 +1,4 @@
-from gp2gp.domain.odsportal.sources import construct_asid_to_ods_mappings
+from gp2gp.domain.ods_portal.sources import construct_asid_to_ods_mappings
 
 
 def test_returns_dict_with_one_asid_mapping():

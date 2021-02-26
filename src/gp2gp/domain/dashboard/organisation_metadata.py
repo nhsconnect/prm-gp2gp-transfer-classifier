@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List
 
-from gp2gp.domain.odsportal.models import OrganisationMetadata
+from gp2gp.domain.ods_portal.models import OrganisationMetadata
 
 
 @dataclass

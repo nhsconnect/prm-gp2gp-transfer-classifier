@@ -4,7 +4,7 @@ from gp2gp.domain.dashboard.organisation_metadata import (
     construct_organisation_metadata,
     OrganisationDetails,
 )
-from gp2gp.domain.odsportal.models import OrganisationMetadata, CcgDetails, PracticeDetails
+from gp2gp.domain.ods_portal.models import OrganisationMetadata, CcgDetails, PracticeDetails
 
 
 def test_maps_generated_on():

@@ -9,7 +9,7 @@ from gp2gp.domain.dashboard.practice_metrics import (
     PracticeMetricsPresentation,
 )
 from gp2gp.utils.date.range import DateTimeRange
-from gp2gp.domain.odsportal.models import PracticeDetails
+from gp2gp.domain.ods_portal.models import PracticeDetails
 from gp2gp.domain.service.national_metrics import calculate_national_metrics
 from gp2gp.domain.service.transfer import (
     Transfer,

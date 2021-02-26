@@ -18,7 +18,7 @@ from gp2gp.domain.dashboard.practice_metrics import (
     TimeToIntegrateSlaDeprecated,
 )
 from gp2gp.utils.date.range import DateTimeRange
-from gp2gp.domain.odsportal.models import PracticeDetails
+from gp2gp.domain.ods_portal.models import PracticeDetails
 from gp2gp.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,

@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from gp2gp.domain.odsportal.models import CcgDetails, PracticeDetails
-from gp2gp.domain.odsportal.sources import construct_organisation_list_from_dict
+from gp2gp.domain.ods_portal.models import CcgDetails, PracticeDetails
+from gp2gp.domain.ods_portal.sources import construct_organisation_list_from_dict
 
 
 def test_returns_model_with_generated_on_timestamp():

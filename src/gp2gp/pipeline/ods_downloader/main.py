@@ -4,7 +4,7 @@ from dataclasses import asdict
 
 from gp2gp.utils.io.csv import read_gzip_csv_file
 from gp2gp.utils.io.json import write_json_file
-from gp2gp.domain.odsportal.sources import (
+from gp2gp.domain.ods_portal.sources import (
     OdsDataFetcher,
     construct_organisation_metadata_from_ods_portal_response,
     ODS_PORTAL_SEARCH_URL,
