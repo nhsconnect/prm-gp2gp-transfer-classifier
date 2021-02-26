@@ -1,10 +1,13 @@
 from typing import Iterable, List, Iterator
 
-from gp2gp.dashboard.national_metrics import (
+from gp2gp.domain.dashboard.national_metrics import (
     NationalMetricsPresentation,
     construct_national_metrics,
 )
-from gp2gp.dashboard.practice_metrics import construct_practice_metrics, PracticeMetricsPresentation
+from gp2gp.domain.dashboard.practice_metrics import (
+    construct_practice_metrics,
+    PracticeMetricsPresentation,
+)
 from gp2gp.utils.date.range import DateTimeRange
 from gp2gp.domain.odsportal.models import PracticeDetails
 from gp2gp.service.national_metrics import calculate_national_metrics

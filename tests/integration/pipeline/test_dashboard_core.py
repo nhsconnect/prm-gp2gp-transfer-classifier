@@ -3,13 +3,13 @@ from datetime import datetime, timedelta
 from dateutil.tz import UTC, tzutc
 from freezegun import freeze_time
 
-from gp2gp.dashboard.national_metrics import (
+from gp2gp.domain.dashboard.national_metrics import (
     NationalMetricsPresentation,
     IntegratedMetrics,
     MonthlyNationalMetrics,
     PaperMetrics,
 )
-from gp2gp.dashboard.practice_metrics import (
+from gp2gp.domain.dashboard.practice_metrics import (
     IntegratedPracticeMetrics,
     RequesterMetrics,
     MonthlyMetrics,
