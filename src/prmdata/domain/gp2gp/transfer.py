@@ -1,4 +1,4 @@
-from _warnings import warn
+from warnings import warn
 from datetime import timedelta, datetime
 from typing import NamedTuple, Optional, List, Iterable, Iterator
 from enum import Enum

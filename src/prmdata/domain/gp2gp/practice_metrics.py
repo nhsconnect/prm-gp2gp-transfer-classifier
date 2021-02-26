@@ -1,4 +1,4 @@
-from _warnings import warn
+from warnings import warn
 from typing import NamedTuple, Iterable, Iterator
 
 from prmdata.domain.ods_portal.models import PracticeDetails
