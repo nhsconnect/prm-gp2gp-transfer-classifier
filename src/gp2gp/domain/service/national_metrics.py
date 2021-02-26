@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable, Tuple, Dict
-from gp2gp.service.common import SlaBand, assign_to_sla_band
-from gp2gp.service.transfer import Transfer, TransferStatus
+from gp2gp.domain.service.common import SlaBand, assign_to_sla_band
+from gp2gp.domain.service.transfer import Transfer, TransferStatus
 
 
 @dataclass

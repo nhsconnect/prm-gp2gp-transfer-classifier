@@ -10,9 +10,13 @@ from gp2gp.domain.dashboard.practice_metrics import (
 )
 from gp2gp.utils.date.range import DateTimeRange
 from gp2gp.domain.odsportal.models import PracticeDetails
-from gp2gp.service.national_metrics import calculate_national_metrics
-from gp2gp.service.transfer import Transfer, derive_transfers, filter_for_successful_transfers
-from gp2gp.service.practice_metrics import calculate_sla_by_practice
+from gp2gp.domain.service.national_metrics import calculate_national_metrics
+from gp2gp.domain.service.transfer import (
+    Transfer,
+    derive_transfers,
+    filter_for_successful_transfers,
+)
+from gp2gp.domain.service.practice_metrics import calculate_sla_by_practice
 from gp2gp.domain.spine.models import Message
 from gp2gp.domain.spine.transformers import (
     parse_conversation,

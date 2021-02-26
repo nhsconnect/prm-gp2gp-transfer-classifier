@@ -4,7 +4,12 @@ from typing import List, Iterator
 import pytest
 from tests.builders.spine import build_parsed_conversation, build_message
 from tests.builders.common import a_datetime
-from gp2gp.service.transfer import Transfer, TransferStatus, ERROR_SUPPRESSED, derive_transfers
+from gp2gp.domain.service.transfer import (
+    Transfer,
+    TransferStatus,
+    ERROR_SUPPRESSED,
+    derive_transfers,
+)
 
 
 def _assert_attributes(attr_name: str, actual: Iterator[Transfer], expected: List):

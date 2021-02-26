@@ -24,9 +24,9 @@ from gp2gp.pipeline.dashboard.core import (
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
-from gp2gp.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
+from gp2gp.domain.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 
-from gp2gp.service.transfer import Transfer, TransferStatus
+from gp2gp.domain.service.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
 from tests.builders.service import build_transfer
