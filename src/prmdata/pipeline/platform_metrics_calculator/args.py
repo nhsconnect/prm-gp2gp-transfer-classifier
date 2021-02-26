@@ -6,7 +6,7 @@ def _list_str(values):
 
 
 def parse_platform_metrics_calculator_pipeline_arguments(argument_list):
-    parser = ArgumentParser(description="GP2GP Service dashboard data pipeline")
+    parser = ArgumentParser(description="GP2GP Data Platform pipeline")
     parser.add_argument("--month", type=int, required=True, help="The target month.")
     parser.add_argument("--year", type=int, required=True, help="The target year.")
     parser.add_argument(

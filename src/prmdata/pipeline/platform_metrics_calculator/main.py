@@ -26,14 +26,14 @@ from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
 
 
-def _write_dashboard_json_file(dashboard_data, output_file_path):
-    content_dict = asdict(dashboard_data)
+def _write_data_platform_json_file(platform_data, output_file_path):
+    content_dict = asdict(platform_data)
     camelized_dict = camelize_dict(content_dict)
     write_json_file(camelized_dict, output_file_path)
 
 
-def _upload_dashboard_json_object(dashboard_data, s3_object):
-    content_dict = asdict(dashboard_data)
+def _upload_data_platform_json_object(platform_data, s3_object):
+    content_dict = asdict(platform_data)
     camelized_dict = camelize_dict(content_dict)
     upload_json_object(camelized_dict, s3_object)
 
@@ -81,15 +81,15 @@ def main():
     transfers_file_name = "transfers.parquet"
 
     if _is_outputting_to_file(args):
-        _write_dashboard_json_file(
+        _write_data_platform_json_file(
             practice_metrics_data,
             f"{args.output_directory}/{args.month}-{args.year}-{practice_metrics_file_name}",
         )
-        _write_dashboard_json_file(
+        _write_data_platform_json_file(
             organisation_metadata,
             f"{args.output_directory}/{args.month}-{args.year}-{organisation_metadata_file_name}",
         )
-        _write_dashboard_json_file(
+        _write_data_platform_json_file(
             national_metrics_data,
             f"{args.output_directory}/{args.month}-{args.year}-{national_metrics_file_name}",
         )
@@ -104,15 +104,15 @@ def main():
         version = "v2"
         s3_path = f"{version}/{args.year}/{args.month}"
 
-        _upload_dashboard_json_object(
+        _upload_data_platform_json_object(
             practice_metrics_data,
             s3.Object(bucket_name, f"{s3_path}/{practice_metrics_file_name}"),
         )
-        _upload_dashboard_json_object(
+        _upload_data_platform_json_object(
             organisation_metadata,
             s3.Object(bucket_name, f"{s3_path}/{organisation_metadata_file_name}"),
         )
-        _upload_dashboard_json_object(
+        _upload_data_platform_json_object(
             national_metrics_data,
             s3.Object(bucket_name, f"{s3_path}/{national_metrics_file_name}"),
         )

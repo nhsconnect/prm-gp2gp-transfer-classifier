@@ -111,7 +111,7 @@ def test_with_local_files(datadir):
     year = 2019
 
     pipeline_command = f"\
-        gp2gp-dashboard-pipeline --month {month}\
+        platform-metrics-pipeline --month {month}\
         --year {year}\
         --organisation-list-file {organisation_metadata_file_path}\
         --input-files {input_file_paths_str}\
@@ -184,7 +184,7 @@ def test_with_s3_output(datadir):
     }
 
     pipeline_command = f"\
-        gp2gp-dashboard-pipeline --month {month}\
+        platform-metrics-pipeline --month {month}\
         --year {year}\
         --organisation-list-file {organisation_metadata_file_path}\
         --input-files {input_file_paths_str}\

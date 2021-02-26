@@ -53,10 +53,10 @@ def calculate_practice_metrics_data(
 ) -> PracticeMetricsPresentation:
     completed_transfers = filter_for_successful_transfers(transfers)
     sla_metrics = calculate_sla_by_practice(practice_list, completed_transfers)
-    dashboard_data = construct_practice_metrics(
+    practice_metrics = construct_practice_metrics(
         sla_metrics, year=time_range.start.year, month=time_range.start.month
     )
-    return dashboard_data
+    return practice_metrics
 
 
 def calculate_national_metrics_data(

@@ -67,19 +67,19 @@ Then run the pipeline command:
 
 `ods-portal-pipeline --output-file "<organisation-list>.json" --mapping-file "<asid-lookup-file>.csv.gz"`
 
-### Dashboard Pipeline
+### Data Platform Pipeline
 
 This pipeline will derive GP2GP metrics and metadata for practices produced by the ODS Portal Pipeline. It does this by performing a number of transformations on GP2GP messages provided by NMS.
 
-The following examples show how to run this pipeline. Run `gp2gp-dashboard-pipeline --help` for usage details.
+The following examples show how to run this pipeline. Run `platform-metrics-pipeline --help` for usage details.
 
 #### Outputting to local directory
 
-Example: `gp2gp-dashboard-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jan.csv.gz,data/feb.csv.gz" --output-directory "data"`
+Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jan.csv.gz,data/feb.csv.gz" --output-directory "data"`
 
 #### Outputting to S3 bucket
 
-Example: `gp2gp-dashboard-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket"`
+Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket"`
 
 - When outputting to AWS ensure the environment has the appropriate access.
 - Note this will use the year and month as part of the s3 key structure, as well 'v2' (data pipeline output version). 
