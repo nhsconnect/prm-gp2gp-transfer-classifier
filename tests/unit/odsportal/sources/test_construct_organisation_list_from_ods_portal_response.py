@@ -4,8 +4,8 @@ import pytest
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.odsportal.models import CcgDetails, PracticeDetails
-from gp2gp.odsportal.sources import construct_organisation_metadata_from_ods_portal_response
+from gp2gp.domain.odsportal.models import CcgDetails, PracticeDetails
+from gp2gp.domain.odsportal.sources import construct_organisation_metadata_from_ods_portal_response
 from tests.builders.common import a_string
 
 

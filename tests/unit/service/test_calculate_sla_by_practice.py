@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import Set, Iterator
 
 import pytest
-from gp2gp.odsportal.models import PracticeDetails
+from gp2gp.domain.odsportal.models import PracticeDetails
 from gp2gp.service.practice_metrics import (
     PracticeMetrics,
     calculate_sla_by_practice,

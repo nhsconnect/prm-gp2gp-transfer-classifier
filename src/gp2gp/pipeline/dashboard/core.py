@@ -6,7 +6,7 @@ from gp2gp.dashboard.national_metrics import (
 )
 from gp2gp.dashboard.practice_metrics import construct_practice_metrics, PracticeMetricsPresentation
 from gp2gp.utils.date.range import DateTimeRange
-from gp2gp.odsportal.models import PracticeDetails
+from gp2gp.domain.odsportal.models import PracticeDetails
 from gp2gp.service.national_metrics import calculate_national_metrics
 from gp2gp.service.transfer import Transfer, derive_transfers, filter_for_successful_transfers
 from gp2gp.service.practice_metrics import calculate_sla_by_practice

@@ -8,7 +8,7 @@ import requests
 from dateutil.tz import tzutc
 from dateutil import parser
 
-from gp2gp.odsportal.models import (
+from gp2gp.domain.odsportal.models import (
     CcgDetails,
     OrganisationMetadata,
     PracticeDetails,

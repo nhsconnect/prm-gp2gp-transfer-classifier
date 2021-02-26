@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 import pytest
 
-from gp2gp.odsportal.sources import OdsDataFetcher, OdsPortalException
+from gp2gp.domain.odsportal.sources import OdsDataFetcher, OdsPortalException
 from tests.builders.odsportal import build_mock_response
 from typing import Dict
 
