@@ -3,7 +3,7 @@ from typing import NamedTuple, Iterable, Iterator
 
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.domain.gp2gp.transfer import Transfer
-from prmdata.domain.gp2gp.common import assign_to_sla_band, SlaBand
+from prmdata.domain.gp2gp.sla import assign_to_sla_band, SlaBand
 
 
 class IntegratedPracticeMetrics(NamedTuple):

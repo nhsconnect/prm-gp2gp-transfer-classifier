@@ -1,7 +1,7 @@
 import datetime
 import pytest
 
-from prmdata.domain.gp2gp.common import (
+from prmdata.domain.gp2gp.sla import (
     assign_to_sla_band,
     SlaBand,
     THREE_DAYS_IN_SECONDS,
