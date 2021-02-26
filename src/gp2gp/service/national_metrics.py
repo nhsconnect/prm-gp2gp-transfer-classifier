@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable
-
+from typing import Iterable, Tuple, Dict
 from gp2gp.service.common import SlaBand, assign_to_sla_band
 from gp2gp.service.transfer import Transfer, TransferStatus
 
@@ -24,17 +23,25 @@ class NationalMetrics:
 def calculate_national_metrics(
     transfers: Iterable[Transfer], year: int, month: int
 ) -> NationalMetrics:
-    transfer_count = 0
-    integrated_transfer_count = 0
-    sla_count = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
 
-    for transfer in transfers:
-        transfer_count += 1
-        if transfer.status == TransferStatus.INTEGRATED:
-            integrated_transfer_count += 1
-            sla_band = assign_to_sla_band(transfer.sla_duration)
-            sla_count[sla_band] += 1
+    integrated_transfer_count, transfer_count, sla_count = _calculate_transfer_count(transfers)
 
+    return _create_national_metrics(
+        year,
+        month,
+        transfer_count,
+        integrated_transfer_count,
+        sla_count,
+    )
+
+
+def _create_national_metrics(
+    year: int,
+    month: int,
+    transfer_count: int,
+    integrated_transfer_count: int,
+    sla_count: Dict[SlaBand, int],
+):
     return NationalMetrics(
         year=year,
         month=month,
@@ -46,3 +53,26 @@ def calculate_national_metrics(
             beyond_8_days=sla_count[SlaBand.BEYOND_8_DAYS],
         ),
     )
+
+
+def _calculate_transfer_count(transfers: Iterable[Transfer]) -> Tuple[int, int, Dict[SlaBand, int]]:
+    sla_count = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
+    integrated_transfer_count = 0
+    transfer_count = 0
+
+    for transfer in transfers:
+        transfer_count += 1
+        integrated_transfer_count = _calculate_integrated_transfer_count(
+            integrated_transfer_count, sla_count, transfer
+        )
+    return integrated_transfer_count, transfer_count, sla_count
+
+
+def _calculate_integrated_transfer_count(
+    integrated_transfer_count: int, sla_count: Dict[SlaBand, int], transfer: Transfer
+) -> int:
+    if transfer.status == TransferStatus.INTEGRATED:
+        integrated_transfer_count += 1
+        sla_band = assign_to_sla_band(transfer.sla_duration)
+        sla_count[sla_band] += 1
+    return integrated_transfer_count
