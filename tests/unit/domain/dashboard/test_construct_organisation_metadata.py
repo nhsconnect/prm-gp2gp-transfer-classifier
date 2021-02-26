@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from gp2gp.domain.data_platform.organisation_metadata import (
+from prmdata.domain.data_platform.organisation_metadata import (
     construct_organisation_metadata,
     OrganisationDetails,
 )
-from gp2gp.domain.ods_portal.models import OrganisationMetadata, CcgDetails, PracticeDetails
+from prmdata.domain.ods_portal.models import OrganisationMetadata, CcgDetails, PracticeDetails
 
 
 def test_maps_generated_on():

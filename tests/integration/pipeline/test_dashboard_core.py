@@ -3,13 +3,13 @@ from datetime import datetime, timedelta
 from dateutil.tz import UTC, tzutc
 from freezegun import freeze_time
 
-from gp2gp.domain.data_platform.national_metrics import (
+from prmdata.domain.data_platform.national_metrics import (
     NationalMetricsPresentation,
     IntegratedMetrics,
     MonthlyNationalMetrics,
     PaperMetrics,
 )
-from gp2gp.domain.data_platform.practice_metrics import (
+from prmdata.domain.data_platform.practice_metrics import (
     IntegratedPracticeMetrics,
     RequesterMetrics,
     MonthlyMetrics,
@@ -17,16 +17,16 @@ from gp2gp.domain.data_platform.practice_metrics import (
     PracticeMetricsPresentation,
     TimeToIntegrateSlaDeprecated,
 )
-from gp2gp.utils.date.range import DateTimeRange
-from gp2gp.domain.ods_portal.models import PracticeDetails
-from gp2gp.pipeline.platform_metrics_calculator.core import (
+from prmdata.utils.date.range import DateTimeRange
+from prmdata.domain.ods_portal.models import PracticeDetails
+from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
-from gp2gp.domain.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
+from prmdata.domain.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 
-from gp2gp.domain.service.transfer import Transfer, TransferStatus
+from prmdata.domain.service.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
 from tests.builders.service import build_transfer

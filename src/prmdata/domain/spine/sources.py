@@ -2,7 +2,7 @@ from typing import Iterator, Iterable
 
 from dateutil import parser
 
-from gp2gp.domain.spine.models import Message
+from prmdata.domain.spine.models import Message
 
 
 def _parse_error_code(error):

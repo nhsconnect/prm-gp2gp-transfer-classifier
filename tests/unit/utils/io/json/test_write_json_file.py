@@ -1,7 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 
-from gp2gp.utils.io.json import write_json_file
+from prmdata.utils.io.json import write_json_file
 
 
 def test_writes_dictionary(fs):

@@ -1,24 +1,24 @@
 from typing import Iterable, List, Iterator
 
-from gp2gp.domain.data_platform.national_metrics import (
+from prmdata.domain.data_platform.national_metrics import (
     NationalMetricsPresentation,
     construct_national_metrics,
 )
-from gp2gp.domain.data_platform.practice_metrics import (
+from prmdata.domain.data_platform.practice_metrics import (
     construct_practice_metrics,
     PracticeMetricsPresentation,
 )
-from gp2gp.utils.date.range import DateTimeRange
-from gp2gp.domain.ods_portal.models import PracticeDetails
-from gp2gp.domain.service.national_metrics import calculate_national_metrics
-from gp2gp.domain.service.transfer import (
+from prmdata.utils.date.range import DateTimeRange
+from prmdata.domain.ods_portal.models import PracticeDetails
+from prmdata.domain.service.national_metrics import calculate_national_metrics
+from prmdata.domain.service.transfer import (
     Transfer,
     derive_transfers,
     filter_for_successful_transfers,
 )
-from gp2gp.domain.service.practice_metrics import calculate_sla_by_practice
-from gp2gp.domain.spine.models import Message
-from gp2gp.domain.spine.transformers import (
+from prmdata.domain.service.practice_metrics import calculate_sla_by_practice
+from prmdata.domain.spine.models import Message
+from prmdata.domain.spine.transformers import (
     parse_conversation,
     group_into_conversations,
     filter_conversations_by_request_started_time,

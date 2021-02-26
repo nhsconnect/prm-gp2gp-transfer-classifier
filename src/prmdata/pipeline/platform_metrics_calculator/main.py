@@ -5,21 +5,21 @@ from datetime import datetime
 import boto3
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
-from gp2gp.domain.data_platform.organisation_metadata import construct_organisation_metadata
-from gp2gp.utils.date.range import DateTimeRange
+from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
+from prmdata.utils.date.range import DateTimeRange
 
-from gp2gp.utils.io.csv import read_gzip_csv_files
-from gp2gp.utils.io.dictionary import camelize_dict
-from gp2gp.utils.io.json import write_json_file, read_json_file, upload_json_object
-from gp2gp.domain.ods_portal.sources import construct_organisation_list_from_dict
-from gp2gp.pipeline.platform_metrics_calculator.args import parse_dashboard_pipeline_arguments
-from gp2gp.pipeline.platform_metrics_calculator.core import (
+from prmdata.utils.io.csv import read_gzip_csv_files
+from prmdata.utils.io.dictionary import camelize_dict
+from prmdata.utils.io.json import write_json_file, read_json_file, upload_json_object
+from prmdata.domain.ods_portal.sources import construct_organisation_list_from_dict
+from prmdata.pipeline.platform_metrics_calculator.args import parse_dashboard_pipeline_arguments
+from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
-from gp2gp.domain.service.transfer import convert_transfers_to_table
-from gp2gp.domain.spine.sources import construct_messages_from_splunk_items
+from prmdata.domain.service.transfer import convert_transfers_to_table
+from prmdata.domain.spine.sources import construct_messages_from_splunk_items
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
 

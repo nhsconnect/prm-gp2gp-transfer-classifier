@@ -5,7 +5,7 @@ from typing import Set, Iterable
 from dateutil.tz import tzutc
 from freezegun import freeze_time
 
-from gp2gp.domain.data_platform.practice_metrics import (
+from prmdata.domain.data_platform.practice_metrics import (
     construct_practice_metrics,
     IntegratedPracticeMetrics,
     RequesterMetrics,

@@ -2,7 +2,7 @@ import subprocess
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-from gp2gp.utils.io.json import read_json_file
+from prmdata.utils.io.json import read_json_file
 from urllib.parse import parse_qs
 from tests.builders.file import gzip_file
 

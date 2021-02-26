@@ -4,7 +4,7 @@ from typing import List
 
 from dateutil.tz import tzutc
 
-from gp2gp.domain.service.national_metrics import NationalMetrics
+from prmdata.domain.service.national_metrics import NationalMetrics
 
 
 @dataclass

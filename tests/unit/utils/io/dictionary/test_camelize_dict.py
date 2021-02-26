@@ -1,4 +1,4 @@
-from gp2gp.utils.io.dictionary import camelize_dict
+from prmdata.utils.io.dictionary import camelize_dict
 
 
 def test_single_string_property():

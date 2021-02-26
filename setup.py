@@ -13,8 +13,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "gp2gp-dashboard-pipeline=gp2gp.pipeline.platform_metrics_calculator.main:main",
-            "ods-portal-pipeline=gp2gp.pipeline.ods_downloader.main:main",
+            "gp2gp-dashboard-pipeline=prmdata.pipeline.platform_metrics_calculator.main:main",
+            "ods-portal-pipeline=prmdata.pipeline.ods_downloader.main:main",
         ]
     },
 )
