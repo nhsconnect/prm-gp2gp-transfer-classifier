@@ -5,7 +5,7 @@ from dateutil.tz import tzutc
 from freezegun import freeze_time
 
 from prmdata.domain.data_platform.national_metrics import construct_national_metrics
-from prmdata.domain.service.national_metrics import NationalMetrics, IntegratedMetrics
+from prmdata.domain.gp2gp.national_metrics import NationalMetrics, IntegratedMetrics
 from tests.builders.common import an_integer, a_datetime
 
 

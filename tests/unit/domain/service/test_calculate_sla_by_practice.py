@@ -4,7 +4,7 @@ from typing import Set, Iterator
 
 import pytest
 from prmdata.domain.ods_portal.models import PracticeDetails
-from prmdata.domain.service.practice_metrics import (
+from prmdata.domain.gp2gp.practice_metrics import (
     PracticeMetrics,
     calculate_sla_by_practice,
     IntegratedPracticeMetrics,

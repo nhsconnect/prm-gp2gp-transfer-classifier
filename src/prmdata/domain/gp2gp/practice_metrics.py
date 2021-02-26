@@ -2,8 +2,8 @@ from _warnings import warn
 from typing import NamedTuple, Iterable, Iterator
 
 from prmdata.domain.ods_portal.models import PracticeDetails
-from prmdata.domain.service.transfer import Transfer
-from prmdata.domain.service.common import assign_to_sla_band, SlaBand
+from prmdata.domain.gp2gp.transfer import Transfer
+from prmdata.domain.gp2gp.common import assign_to_sla_band, SlaBand
 
 
 class IntegratedPracticeMetrics(NamedTuple):

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from prmdata.domain.service.transfer import (
+from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
     filter_for_successful_transfers,

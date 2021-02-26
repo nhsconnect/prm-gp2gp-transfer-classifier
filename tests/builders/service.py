@@ -1,7 +1,7 @@
 from typing import Iterable
 
-from prmdata.domain.service.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
-from prmdata.domain.service.transfer import Transfer, TransferStatus
+from prmdata.domain.gp2gp.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
+from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 from tests.builders.common import a_string, a_duration, an_integer, a_datetime
 
 

@@ -10,13 +10,13 @@ from prmdata.domain.data_platform.practice_metrics import (
 )
 from prmdata.utils.date.range import DateTimeRange
 from prmdata.domain.ods_portal.models import PracticeDetails
-from prmdata.domain.service.national_metrics import calculate_national_metrics
-from prmdata.domain.service.transfer import (
+from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
+from prmdata.domain.gp2gp.transfer import (
     Transfer,
     derive_transfers,
     filter_for_successful_transfers,
 )
-from prmdata.domain.service.practice_metrics import calculate_sla_by_practice
+from prmdata.domain.gp2gp.practice_metrics import calculate_sla_by_practice
 from prmdata.domain.spine.models import Message
 from prmdata.domain.spine.transformers import (
     parse_conversation,

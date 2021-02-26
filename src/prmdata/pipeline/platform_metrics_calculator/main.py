@@ -18,7 +18,7 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
-from prmdata.domain.service.transfer import convert_transfers_to_table
+from prmdata.domain.gp2gp.transfer import convert_transfers_to_table
 from prmdata.domain.spine.sources import construct_messages_from_splunk_items
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem

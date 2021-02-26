@@ -24,9 +24,9 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
-from prmdata.domain.service.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
+from prmdata.domain.gp2gp.common import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 
-from prmdata.domain.service.transfer import Transfer, TransferStatus
+from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 
 from tests.builders.spine import build_message
 from tests.builders.service import build_transfer

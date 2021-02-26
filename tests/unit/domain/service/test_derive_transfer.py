@@ -4,7 +4,7 @@ from typing import List, Iterator
 import pytest
 from tests.builders.spine import build_parsed_conversation, build_message
 from tests.builders.common import a_datetime
-from prmdata.domain.service.transfer import (
+from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
     ERROR_SUPPRESSED,

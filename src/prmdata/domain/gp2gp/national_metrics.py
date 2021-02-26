@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable, Tuple, Dict
-from prmdata.domain.service.common import SlaBand, assign_to_sla_band
-from prmdata.domain.service.transfer import Transfer, TransferStatus
+from prmdata.domain.gp2gp.common import SlaBand, assign_to_sla_band
+from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 
 
 @dataclass
