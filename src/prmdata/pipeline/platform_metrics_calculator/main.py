@@ -12,7 +12,9 @@ from prmdata.utils.io.csv import read_gzip_csv_files
 from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.utils.io.json import write_json_file, read_json_file, upload_json_object
 from prmdata.domain.ods_portal.sources import construct_organisation_list_from_dict
-from prmdata.pipeline.platform_metrics_calculator.args import parse_dashboard_pipeline_arguments
+from prmdata.pipeline.platform_metrics_calculator.args import (
+    parse_platform_metrics_calculator_pipeline_arguments,
+)
 from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
@@ -56,7 +58,7 @@ def _is_outputting_to_s3(args):
 
 
 def main():
-    args = parse_dashboard_pipeline_arguments(sys.argv[1:])
+    args = parse_platform_metrics_calculator_pipeline_arguments(sys.argv[1:])
     time_range = _get_time_range(args.year, args.month)
 
     organisation_data = read_json_file(args.organisation_list_file)

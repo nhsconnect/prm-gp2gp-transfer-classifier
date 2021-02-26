@@ -5,7 +5,7 @@ def _list_str(values):
     return values.split(",")
 
 
-def parse_dashboard_pipeline_arguments(argument_list):
+def parse_platform_metrics_calculator_pipeline_arguments(argument_list):
     parser = ArgumentParser(description="GP2GP Service dashboard data pipeline")
     parser.add_argument("--month", type=int, required=True, help="The target month.")
     parser.add_argument("--year", type=int, required=True, help="The target year.")

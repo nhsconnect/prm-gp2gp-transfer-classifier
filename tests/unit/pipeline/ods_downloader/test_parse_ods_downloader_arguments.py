@@ -1,9 +1,9 @@
-from prmdata.pipeline.ods_downloader.main import parse_ods_portal_pipeline_arguments
+from prmdata.pipeline.ods_downloader.main import parse_ods_downloader_pipeline_arguments
 
 from argparse import Namespace
 
 
-def test_parse_ods_portal_arguments():
+def test_parse_arguments():
     args = [
         "--output-file",
         "data/practice-list.json",
@@ -17,12 +17,12 @@ def test_parse_ods_portal_arguments():
         search_url="https://directory.spineservices.nhs.uk/ORD/2-0-0/organisations",
     )
 
-    actual = parse_ods_portal_pipeline_arguments(args)
+    actual = parse_ods_downloader_pipeline_arguments(args)
 
     assert actual == expected
 
 
-def test_parse_optional_ods_portal_arguments():
+def test_parse_optional_arguments():
     args = [
         "--output-file",
         "data/practice-list.json",
@@ -38,6 +38,6 @@ def test_parse_optional_ods_portal_arguments():
         search_url="http://test.com",
     )
 
-    actual = parse_ods_portal_pipeline_arguments(args)
+    actual = parse_ods_downloader_pipeline_arguments(args)
 
     assert actual == expected

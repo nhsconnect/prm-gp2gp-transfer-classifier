@@ -1,4 +1,6 @@
-from prmdata.pipeline.platform_metrics_calculator.args import parse_dashboard_pipeline_arguments
+from prmdata.pipeline.platform_metrics_calculator.args import (
+    parse_platform_metrics_calculator_pipeline_arguments,
+)
 
 from argparse import Namespace
 
@@ -27,7 +29,7 @@ def test_parse_arguments_with_local_files():
         s3_endpoint_url=None,
     )
 
-    actual = parse_dashboard_pipeline_arguments(args)
+    actual = parse_platform_metrics_calculator_pipeline_arguments(args)
 
     assert actual == expected
 
@@ -58,6 +60,6 @@ def test_parse_arguments_with_s3_upload():
         s3_endpoint_url="https://localhost:6789",
     )
 
-    actual = parse_dashboard_pipeline_arguments(args)
+    actual = parse_platform_metrics_calculator_pipeline_arguments(args)
 
     assert actual == expected

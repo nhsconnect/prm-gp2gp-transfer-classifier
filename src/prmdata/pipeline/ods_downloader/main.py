@@ -14,7 +14,7 @@ from prmdata.domain.ods_portal.sources import (
 )
 
 
-def parse_ods_portal_pipeline_arguments(args):
+def parse_ods_downloader_pipeline_arguments(args):
     parser = ArgumentParser(description="ODS portal pipeline")
     parser.add_argument("--output-file", type=str, required=True)
     parser.add_argument("--mapping-file", type=str, required=True)
@@ -23,7 +23,7 @@ def parse_ods_portal_pipeline_arguments(args):
 
 
 def main():
-    args = parse_ods_portal_pipeline_arguments(sys.argv[1:])
+    args = parse_ods_downloader_pipeline_arguments(sys.argv[1:])
 
     data_fetcher = OdsDataFetcher(search_url=args.search_url)
 
