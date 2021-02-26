@@ -12,8 +12,8 @@ from gp2gp.utils.io.csv import read_gzip_csv_files
 from gp2gp.utils.io.dictionary import camelize_dict
 from gp2gp.utils.io.json import write_json_file, read_json_file, upload_json_object
 from gp2gp.domain.odsportal.sources import construct_organisation_list_from_dict
-from gp2gp.pipeline.dashboard.args import parse_dashboard_pipeline_arguments
-from gp2gp.pipeline.dashboard.core import (
+from gp2gp.pipeline.platform_metrics_calculator.args import parse_dashboard_pipeline_arguments
+from gp2gp.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
     calculate_national_metrics_data,
