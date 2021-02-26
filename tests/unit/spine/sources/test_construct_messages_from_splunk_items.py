@@ -2,8 +2,8 @@ from datetime import datetime
 
 from dateutil.tz import tzutc
 
-from gp2gp.spine.models import Message
-from gp2gp.spine.sources import construct_messages_from_splunk_items
+from gp2gp.domain.spine.models import Message
+from gp2gp.domain.spine.sources import construct_messages_from_splunk_items
 from tests.builders.spine import build_spine_item
 
 

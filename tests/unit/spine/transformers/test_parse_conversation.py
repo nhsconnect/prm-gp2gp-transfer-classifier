@@ -1,6 +1,6 @@
 import pytest
 
-from gp2gp.spine.models import (
+from gp2gp.domain.spine.models import (
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
@@ -8,7 +8,7 @@ from gp2gp.spine.models import (
     Conversation,
     ParsedConversation,
 )
-from gp2gp.spine.transformers import parse_conversation, ConversationMissingStart
+from gp2gp.domain.spine.transformers import parse_conversation, ConversationMissingStart
 from tests.builders.spine import build_message
 from tests.builders.common import a_string
 

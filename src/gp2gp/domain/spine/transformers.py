@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Iterator, Dict, List, Iterable
 
 from gp2gp.utils.date.range import DateTimeRange
-from gp2gp.spine.models import (
+from gp2gp.domain.spine.models import (
     Message,
     Conversation,
     ParsedConversation,

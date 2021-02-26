@@ -19,7 +19,7 @@ from gp2gp.pipeline.dashboard.core import (
     calculate_national_metrics_data,
 )
 from gp2gp.service.transfer import convert_transfers_to_table
-from gp2gp.spine.sources import construct_messages_from_splunk_items
+from gp2gp.domain.spine.sources import construct_messages_from_splunk_items
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
 

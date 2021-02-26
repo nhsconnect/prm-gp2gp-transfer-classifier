@@ -6,7 +6,7 @@ from enum import Enum
 import pyarrow as pa
 import pyarrow as Table
 
-from gp2gp.spine.models import ParsedConversation
+from gp2gp.domain.spine.models import ParsedConversation
 
 ERROR_SUPPRESSED = 15
 
