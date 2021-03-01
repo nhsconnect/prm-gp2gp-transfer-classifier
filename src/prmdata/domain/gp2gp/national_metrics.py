@@ -16,19 +16,13 @@ class IntegratedMetrics:
 class NationalMetrics:
     transfer_count: int
     integrated: IntegratedMetrics
-    year: int
-    month: int
 
 
-def calculate_national_metrics(
-    transfers: Iterable[Transfer], year: int, month: int
-) -> NationalMetrics:
+def calculate_national_metrics(transfers: Iterable[Transfer]) -> NationalMetrics:
 
     integrated_transfer_count, transfer_count, sla_count = _calculate_transfer_count(transfers)
 
     return _create_national_metrics(
-        year,
-        month,
         transfer_count,
         integrated_transfer_count,
         sla_count,
@@ -36,15 +30,11 @@ def calculate_national_metrics(
 
 
 def _create_national_metrics(
-    year: int,
-    month: int,
     transfer_count: int,
     integrated_transfer_count: int,
     sla_count: Dict[SlaBand, int],
 ):
     return NationalMetrics(
-        year=year,
-        month=month,
         transfer_count=transfer_count,
         integrated=IntegratedMetrics(
             transfer_count=integrated_transfer_count,

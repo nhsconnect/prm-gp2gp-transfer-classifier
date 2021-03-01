@@ -45,6 +45,8 @@ def calculate_percentage(portion: int, total: int):
 
 def construct_national_metrics(
     national_metrics_by_month: NationalMetrics,
+    year: int,
+    month: int,
 ) -> NationalMetricsPresentation:
     current_datetime = datetime.now(tzutc())
 
@@ -75,8 +77,8 @@ def construct_national_metrics(
                         portion=paper_fallback_count, total=national_metrics_by_month.transfer_count
                     ),
                 ),
-                year=national_metrics_by_month.year,
-                month=national_metrics_by_month.month,
+                year=year,
+                month=month,
             )
         ],
     )
