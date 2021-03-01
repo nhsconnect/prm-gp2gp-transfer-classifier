@@ -200,7 +200,7 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     )
     current_datetime = datetime.now(tzutc())
 
-    expected_national_metrics_by_month = MonthlyNationalMetrics(
+    expected_national_metrics = MonthlyNationalMetrics(
         transfer_count=7,
         integrated=IntegratedMetrics(
             transfer_percentage=85.71,
@@ -215,7 +215,7 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     )
 
     expected = NationalMetricsPresentation(
-        generated_on=current_datetime, metrics=[expected_national_metrics_by_month]
+        generated_on=current_datetime, metrics=[expected_national_metrics]
     )
     actual = calculate_national_metrics_data(transfers, time_range)
 

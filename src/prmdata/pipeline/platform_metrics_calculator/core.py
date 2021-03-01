@@ -62,9 +62,9 @@ def calculate_practice_metrics_data(
 def calculate_national_metrics_data(
     transfers: Iterable[Transfer], time_range: DateTimeRange
 ) -> NationalMetricsPresentation:
-    national_metrics_by_month = calculate_national_metrics(transfers=transfers)
+    national_metrics = calculate_national_metrics(transfers=transfers)
     return construct_national_metrics(
-        national_metrics_by_month=national_metrics_by_month,
+        national_metrics=national_metrics,
         year=time_range.start.year,
         month=time_range.start.month,
     )

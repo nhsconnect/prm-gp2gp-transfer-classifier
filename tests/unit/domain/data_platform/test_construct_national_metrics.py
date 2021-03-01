@@ -12,7 +12,7 @@ a_year = a_datetime().year
 a_month = a_datetime().month
 
 
-def build_national_metrics_by_month(**kwargs) -> NationalMetrics:
+def build_national_metrics(**kwargs) -> NationalMetrics:
     within_3_days = kwargs.get("within_3_days", an_integer())
     within_8_days = kwargs.get("within_8_days", an_integer())
     beyond_8_days = kwargs.get("beyond_8_days", an_integer())
@@ -32,28 +32,26 @@ def build_national_metrics_by_month(**kwargs) -> NationalMetrics:
 @freeze_time(datetime(year=2019, month=6, day=2, hour=23, second=42), tz_offset=0)
 def test_has_correct_generated_on_given_time():
     expected_generated_on = datetime(year=2019, month=6, day=2, hour=23, second=42, tzinfo=tzutc())
-    national_metrics_by_month = build_national_metrics_by_month()
-    actual = construct_national_metrics(national_metrics_by_month, a_year, a_month)
+    national_metrics = build_national_metrics()
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
 
     assert actual.generated_on == expected_generated_on
 
 
 def test_has_transfer_count_of_all_transfers():
     expected_transfer_count = an_integer(2, 7)
-    national_metrics_by_month = build_national_metrics_by_month(
-        transfer_count=expected_transfer_count
-    )
-    actual = construct_national_metrics(national_metrics_by_month, a_year, a_month)
+    national_metrics = build_national_metrics(transfer_count=expected_transfer_count)
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
 
     assert actual.metrics[0].transfer_count == expected_transfer_count
 
 
 def test_has_integrated_transfer_count():
     expected_integrated_transfer_count = an_integer(2, 7)
-    national_metrics_by_month = build_national_metrics_by_month(
+    national_metrics = build_national_metrics(
         integrated_transfer_count=expected_integrated_transfer_count
     )
-    actual = construct_national_metrics(national_metrics_by_month, a_year, a_month)
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
 
     assert actual.metrics[0].integrated.transfer_count == expected_integrated_transfer_count
 
@@ -69,13 +67,13 @@ def test_has_integrated_transfer_count():
     ],
 )
 def test_returns_integrated_transfer_count_by_sla_duration(national_metrics_integrated):
-    national_metrics_by_month = build_national_metrics_by_month(
+    national_metrics = build_national_metrics(
         within_3_days=national_metrics_integrated["within_3_days"],
         within_8_days=national_metrics_integrated["within_8_days"],
         beyond_8_days=national_metrics_integrated["beyond_8_days"],
     )
     actual_integrated_metrics = (
-        construct_national_metrics(national_metrics_by_month, a_year, a_month).metrics[0].integrated
+        construct_national_metrics(national_metrics, a_year, a_month).metrics[0].integrated
     )
 
     assert actual_integrated_metrics.within_3_days == national_metrics_integrated["within_3_days"]
@@ -85,21 +83,21 @@ def test_returns_integrated_transfer_count_by_sla_duration(national_metrics_inte
 
 def test_has_integrated_percentage():
     expected_transfer_count = 3
-    national_metrics_by_month = build_national_metrics_by_month(
+    national_metrics = build_national_metrics(
         transfer_count=expected_transfer_count, integrated_transfer_count=1
     )
     expected_percentage = 33.33
-    actual = construct_national_metrics(national_metrics_by_month, a_year, a_month)
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
 
     assert actual.metrics[0].integrated.transfer_percentage == expected_percentage
 
 
 def test_has_paper_fallback_transfer_count():
     transfer_count = 10
-    national_metrics_by_month = build_national_metrics_by_month(
+    national_metrics = build_national_metrics(
         transfer_count=transfer_count, within_3_days=5, within_8_days=2, beyond_8_days=1
     )
-    actual = construct_national_metrics(national_metrics_by_month, a_year, a_month)
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
     expected = 3
 
     assert actual.metrics[0].paper_fallback.transfer_count == expected
@@ -107,12 +105,12 @@ def test_has_paper_fallback_transfer_count():
 
 def test_has_paper_fallback_transfer_percentage():
     transfer_count = 18
-    national_metrics_by_month = build_national_metrics_by_month(
+    national_metrics = build_national_metrics(
         transfer_count=transfer_count, within_3_days=10, within_8_days=5, beyond_8_days=3
     )
 
     expected_percentage = 16.67
-    actual = construct_national_metrics(national_metrics_by_month, a_year, a_month)
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
 
     assert actual.metrics[0].paper_fallback.transfer_percentage == expected_percentage
 
@@ -121,9 +119,9 @@ def test_has_2021_year_and_jan_month():
     expected_year = 2021
     expected_month = 1
 
-    national_metrics_by_month = build_national_metrics_by_month()
+    national_metrics = build_national_metrics()
 
-    actual = construct_national_metrics(national_metrics_by_month, expected_year, expected_month)
+    actual = construct_national_metrics(national_metrics, expected_year, expected_month)
 
     assert actual.metrics[0].year == expected_year
     assert actual.metrics[0].month == expected_month
