@@ -11,6 +11,9 @@
           "requester": {
             "integrated": {
               "transferCount": 3,
+              "within3DaysPercentage": 33.3,
+              "within8DaysPercentage": 33.3,
+              "beyond8DaysPercentage": 33.3,
               "within3Days": 1,
               "within8Days": 1,
               "beyond8Days": 1

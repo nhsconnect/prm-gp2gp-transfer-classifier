@@ -5,6 +5,7 @@ from typing import List
 from dateutil.tz import tzutc
 
 from prmdata.domain.gp2gp.national_metrics import NationalMetrics
+from prmdata.utils.calculate_percentage import calculate_percentage
 
 
 @dataclass
@@ -37,12 +38,6 @@ class NationalMetricsPresentation:
     metrics: List[MonthlyNationalMetrics]
 
 
-def calculate_percentage(portion: int, total: int):
-    if total == 0:
-        return None
-    return round((portion / total) * 100, 2)
-
-
 def construct_national_metrics(
     national_metrics: NationalMetrics,
     year: int,
@@ -65,6 +60,7 @@ def construct_national_metrics(
                     transfer_percentage=calculate_percentage(
                         portion=national_metrics.integrated.transfer_count,
                         total=national_metrics.transfers_initiated_count,
+                        num_digits=2,
                     ),
                     transfer_count=national_metrics.integrated.transfer_count,
                     within_3_days=national_metrics.integrated.within_3_days,
@@ -76,6 +72,7 @@ def construct_national_metrics(
                     transfer_percentage=calculate_percentage(
                         portion=paper_fallback_count,
                         total=national_metrics.transfers_initiated_count,
+                        num_digits=2,
                     ),
                 ),
                 year=year,

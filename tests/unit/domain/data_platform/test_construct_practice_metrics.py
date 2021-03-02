@@ -95,7 +95,13 @@ def test_has_correct_requester_sla_metrics_given_single_practice():
     ]
 
     expected_requester_sla_metrics = IntegratedPracticeMetrics(
-        transfer_count=3, within_3_days=1, within_8_days=0, beyond_8_days=2
+        transfer_count=3,
+        within_3_days_percentage=33.3,
+        within_8_days_percentage=0,
+        beyond_8_days_percentage=66.7,
+        within_3_days=1,
+        within_8_days=0,
+        beyond_8_days=2,
     )
 
     actual = construct_practice_metrics(sla_metrics, A_YEAR, A_MONTH)
@@ -137,7 +143,13 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                         month=1,
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
-                                transfer_count=3, within_3_days=1, within_8_days=0, beyond_8_days=2
+                                transfer_count=3,
+                                within_3_days_percentage=33.3,
+                                within_8_days_percentage=0,
+                                beyond_8_days_percentage=66.7,
+                                within_3_days=1,
+                                within_8_days=0,
+                                beyond_8_days=2,
                             ),
                         ),
                     )
@@ -152,7 +164,13 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                         month=1,
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
-                                transfer_count=7, within_3_days=0, within_8_days=5, beyond_8_days=2
+                                transfer_count=7,
+                                within_3_days_percentage=0,
+                                within_8_days_percentage=71.4,
+                                beyond_8_days_percentage=28.6,
+                                within_3_days=0,
+                                within_8_days=5,
+                                beyond_8_days=2,
                             ),
                         ),
                     )
