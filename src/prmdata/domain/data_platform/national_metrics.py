@@ -9,7 +9,7 @@ from prmdata.utils.calculate_percentage import calculate_percentage
 
 
 @dataclass
-class PaperMetrics:
+class PaperFallbackMetrics:
     transfer_count: int
     transfer_percentage: float
 
@@ -27,7 +27,7 @@ class IntegratedMetrics:
 class MonthlyNationalMetrics:
     transfer_count: int
     integrated: IntegratedMetrics
-    paper_fallback: PaperMetrics
+    paper_fallback: PaperFallbackMetrics
     year: int
     month: int
 
@@ -38,6 +38,13 @@ class NationalMetricsPresentation:
     metrics: List[MonthlyNationalMetrics]
 
 
+def _calculate_paper_fallback(national_metrics: NationalMetrics):
+    integrated_within_sla = (
+        national_metrics.integrated.within_3_days + national_metrics.integrated.within_8_days
+    )
+    return national_metrics.initiated_transfers_count - integrated_within_sla
+
+
 def construct_national_metrics(
     national_metrics: NationalMetrics,
     year: int,
@@ -45,21 +52,17 @@ def construct_national_metrics(
 ) -> NationalMetricsPresentation:
     current_datetime = datetime.now(tzutc())
 
-    paper_fallback_count = (
-        national_metrics.transfers_initiated_count
-        - national_metrics.integrated.within_3_days
-        - national_metrics.integrated.within_8_days
-    )
+    paper_fallback_count = _calculate_paper_fallback(national_metrics)
 
     return NationalMetricsPresentation(
         generated_on=current_datetime,
         metrics=[
             MonthlyNationalMetrics(
-                transfer_count=national_metrics.transfers_initiated_count,
+                transfer_count=national_metrics.initiated_transfers_count,
                 integrated=IntegratedMetrics(
                     transfer_percentage=calculate_percentage(
                         portion=national_metrics.integrated.transfer_count,
-                        total=national_metrics.transfers_initiated_count,
+                        total=national_metrics.initiated_transfers_count,
                         num_digits=2,
                     ),
                     transfer_count=national_metrics.integrated.transfer_count,
@@ -67,11 +70,11 @@ def construct_national_metrics(
                     within_8_days=national_metrics.integrated.within_8_days,
                     beyond_8_days=national_metrics.integrated.beyond_8_days,
                 ),
-                paper_fallback=PaperMetrics(
+                paper_fallback=PaperFallbackMetrics(
                     transfer_count=paper_fallback_count,
                     transfer_percentage=calculate_percentage(
                         portion=paper_fallback_count,
-                        total=national_metrics.transfers_initiated_count,
+                        total=national_metrics.initiated_transfers_count,
                         num_digits=2,
                     ),
                 ),

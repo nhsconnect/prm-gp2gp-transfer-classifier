@@ -14,18 +14,18 @@ class IntegratedMetrics:
 
 @dataclass
 class NationalMetrics:
-    transfers_initiated_count: int
+    initiated_transfers_count: int
     integrated: IntegratedMetrics
 
 
 def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
-    transfers_initiated_count = len(transfers)
+    initiated_transfers_count = len(transfers)
     integrated_transfers = _filter_for_integrated_transfers(transfers)
     integrated_transfer_count = len(integrated_transfers)
     sla_band_counts = _calculate_sla_band_counts(integrated_transfers)
 
     return NationalMetrics(
-        transfers_initiated_count=transfers_initiated_count,
+        initiated_transfers_count=initiated_transfers_count,
         integrated=IntegratedMetrics(
             transfer_count=integrated_transfer_count,
             within_3_days=sla_band_counts[SlaBand.WITHIN_3_DAYS],
