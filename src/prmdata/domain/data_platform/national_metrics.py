@@ -51,7 +51,7 @@ def construct_national_metrics(
     current_datetime = datetime.now(tzutc())
 
     paper_fallback_count = (
-        national_metrics.transfer_count
+        national_metrics.transfers_initiated_count
         - national_metrics.integrated.within_3_days
         - national_metrics.integrated.within_8_days
     )
@@ -60,11 +60,11 @@ def construct_national_metrics(
         generated_on=current_datetime,
         metrics=[
             MonthlyNationalMetrics(
-                transfer_count=national_metrics.transfer_count,
+                transfer_count=national_metrics.transfers_initiated_count,
                 integrated=IntegratedMetrics(
                     transfer_percentage=calculate_percentage(
                         portion=national_metrics.integrated.transfer_count,
-                        total=national_metrics.transfer_count,
+                        total=national_metrics.transfers_initiated_count,
                     ),
                     transfer_count=national_metrics.integrated.transfer_count,
                     within_3_days=national_metrics.integrated.within_3_days,
@@ -74,7 +74,8 @@ def construct_national_metrics(
                 paper_fallback=PaperMetrics(
                     transfer_count=paper_fallback_count,
                     transfer_percentage=calculate_percentage(
-                        portion=paper_fallback_count, total=national_metrics.transfer_count
+                        portion=paper_fallback_count,
+                        total=national_metrics.transfers_initiated_count,
                     ),
                 ),
                 year=year,

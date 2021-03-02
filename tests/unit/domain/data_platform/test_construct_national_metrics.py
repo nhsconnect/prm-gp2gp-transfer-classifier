@@ -19,7 +19,7 @@ def build_national_metrics(**kwargs) -> NationalMetrics:
     summed_transfer_count = within_3_days + within_8_days + beyond_8_days
 
     return NationalMetrics(
-        transfer_count=kwargs.get("transfer_count", summed_transfer_count),
+        transfers_initiated_count=kwargs.get("transfers_initiated_count", summed_transfer_count),
         integrated=IntegratedMetrics(
             transfer_count=kwargs.get("integrated_transfer_count", summed_transfer_count),
             within_3_days=within_3_days,
@@ -39,11 +39,13 @@ def test_has_correct_generated_on_given_time():
 
 
 def test_has_transfer_count_of_all_transfers():
-    expected_transfer_count = an_integer(2, 7)
-    national_metrics = build_national_metrics(transfer_count=expected_transfer_count)
+    expected_transfers_initiated_count = an_integer(2, 7)
+    national_metrics = build_national_metrics(
+        transfers_initiated_count=expected_transfers_initiated_count
+    )
     actual = construct_national_metrics(national_metrics, a_year, a_month)
 
-    assert actual.metrics[0].transfer_count == expected_transfer_count
+    assert actual.metrics[0].transfer_count == expected_transfers_initiated_count
 
 
 def test_has_integrated_transfer_count():
@@ -82,9 +84,9 @@ def test_returns_integrated_transfer_count_by_sla_duration(national_metrics_inte
 
 
 def test_has_integrated_percentage():
-    expected_transfer_count = 3
+    expected_transfers_initiated_count = 3
     national_metrics = build_national_metrics(
-        transfer_count=expected_transfer_count, integrated_transfer_count=1
+        transfers_initiated_count=expected_transfers_initiated_count, integrated_transfer_count=1
     )
     expected_percentage = 33.33
     actual = construct_national_metrics(national_metrics, a_year, a_month)
@@ -93,9 +95,12 @@ def test_has_integrated_percentage():
 
 
 def test_has_paper_fallback_transfer_count():
-    transfer_count = 10
+    transfers_initiated_count = 10
     national_metrics = build_national_metrics(
-        transfer_count=transfer_count, within_3_days=5, within_8_days=2, beyond_8_days=1
+        transfers_initiated_count=transfers_initiated_count,
+        within_3_days=5,
+        within_8_days=2,
+        beyond_8_days=1,
     )
     actual = construct_national_metrics(national_metrics, a_year, a_month)
     expected = 3
