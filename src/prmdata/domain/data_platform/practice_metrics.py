@@ -15,19 +15,9 @@ class IntegratedPracticeMetrics:
     beyond_8_days: int
 
 
-# REMOVE below as cleanup for PRMT-1366
-@dataclass
-class TimeToIntegrateSlaDeprecated:
-    within_3_days: int
-    within_8_days: int
-    beyond_8_days: int
-
-
 @dataclass
 class RequesterMetrics:
     integrated: IntegratedPracticeMetrics
-    # REMOVE below as cleanup for PRMT-1366
-    time_to_integrate_sla: TimeToIntegrateSlaDeprecated
 
 
 @dataclass
@@ -67,12 +57,6 @@ def construct_practice_metrics(
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
                                 transfer_count=practice.integrated.transfer_count,
-                                within_3_days=practice.integrated.within_3_days,
-                                within_8_days=practice.integrated.within_8_days,
-                                beyond_8_days=practice.integrated.beyond_8_days,
-                            ),
-                            # REMOVE below as cleanup for PRMT-1366
-                            time_to_integrate_sla=TimeToIntegrateSlaDeprecated(
                                 within_3_days=practice.integrated.within_3_days,
                                 within_8_days=practice.integrated.within_8_days,
                                 beyond_8_days=practice.integrated.beyond_8_days,

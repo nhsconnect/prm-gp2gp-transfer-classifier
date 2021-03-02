@@ -15,7 +15,6 @@ from prmdata.domain.data_platform.practice_metrics import (
     MonthlyMetrics,
     PracticeSummary,
     PracticeMetricsPresentation,
-    TimeToIntegrateSlaDeprecated,
 )
 from prmdata.utils.date.range import DateTimeRange
 from prmdata.domain.ods_portal.models import PracticeDetails
@@ -157,12 +156,6 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
                                 transfer_count=1,
-                                within_3_days=1,
-                                within_8_days=0,
-                                beyond_8_days=0,
-                            ),
-                            # REMOVE below as cleanup for PRMT-1366
-                            time_to_integrate_sla=TimeToIntegrateSlaDeprecated(
                                 within_3_days=1,
                                 within_8_days=0,
                                 beyond_8_days=0,

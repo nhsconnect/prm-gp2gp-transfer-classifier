@@ -12,7 +12,6 @@ from prmdata.domain.data_platform.practice_metrics import (
     MonthlyMetrics,
     PracticeSummary,
     PracticeMetricsPresentation,
-    TimeToIntegrateSlaDeprecated,
 )
 from tests.builders.gp2gp import build_practice_metrics
 
@@ -140,10 +139,6 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                             integrated=IntegratedPracticeMetrics(
                                 transfer_count=3, within_3_days=1, within_8_days=0, beyond_8_days=2
                             ),
-                            # REMOVE below as cleanup for PRMT-1366
-                            time_to_integrate_sla=TimeToIntegrateSlaDeprecated(
-                                within_3_days=1, within_8_days=0, beyond_8_days=2
-                            ),
                         ),
                     )
                 ],
@@ -158,10 +153,6 @@ def test_has_correct_requester_sla_metrics_given_two_practices():
                         requester=RequesterMetrics(
                             integrated=IntegratedPracticeMetrics(
                                 transfer_count=7, within_3_days=0, within_8_days=5, beyond_8_days=2
-                            ),
-                            # REMOVE below as cleanup for PRMT-1366
-                            time_to_integrate_sla=TimeToIntegrateSlaDeprecated(
-                                within_3_days=0, within_8_days=5, beyond_8_days=2
                             ),
                         ),
                     )
