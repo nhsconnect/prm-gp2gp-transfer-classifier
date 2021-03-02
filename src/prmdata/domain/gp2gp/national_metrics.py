@@ -18,9 +18,7 @@ class NationalMetrics:
     integrated: IntegratedMetrics
 
     def calculate_paper_fallback(self):
-        integrated_within_sla = (
-                self.integrated.within_3_days + self.integrated.within_8_days
-        )
+        integrated_within_sla = self.integrated.within_3_days + self.integrated.within_8_days
         return self.initiated_transfers_count - integrated_within_sla
 
 
