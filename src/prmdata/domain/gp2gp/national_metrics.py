@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, Tuple, Dict
+from typing import Iterable, List
 from prmdata.domain.gp2gp.sla import SlaBand, assign_to_sla_band
 from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 
@@ -18,53 +18,30 @@ class NationalMetrics:
     integrated: IntegratedMetrics
 
 
-def calculate_national_metrics(transfers: Iterable[Transfer]) -> NationalMetrics:
+def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
+    transfers_initiated_count = len(transfers)
+    integrated_transfers = _filter_for_integrated_transfers(transfers)
+    integrated_transfer_count = len(integrated_transfers)
+    sla_band_counts = _calculate_sla_band_counts(integrated_transfers)
 
-    integrated_transfer_count, transfers_initiated_count, sla_count = _calculate_transfer_count(
-        transfers
-    )
-
-    return _create_national_metrics(
-        transfers_initiated_count,
-        integrated_transfer_count,
-        sla_count,
-    )
-
-
-def _create_national_metrics(
-    transfers_initiated_count: int,
-    integrated_transfer_count: int,
-    sla_count: Dict[SlaBand, int],
-):
     return NationalMetrics(
         transfers_initiated_count=transfers_initiated_count,
         integrated=IntegratedMetrics(
             transfer_count=integrated_transfer_count,
-            within_3_days=sla_count[SlaBand.WITHIN_3_DAYS],
-            within_8_days=sla_count[SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=sla_count[SlaBand.BEYOND_8_DAYS],
+            within_3_days=sla_band_counts[SlaBand.WITHIN_3_DAYS],
+            within_8_days=sla_band_counts[SlaBand.WITHIN_8_DAYS],
+            beyond_8_days=sla_band_counts[SlaBand.BEYOND_8_DAYS],
         ),
     )
 
 
-def _calculate_transfer_count(transfers: Iterable[Transfer]) -> Tuple[int, int, Dict[SlaBand, int]]:
-    sla_count = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
-    integrated_transfer_count = 0
-    transfers_initiated_count = 0
-
-    for transfer in transfers:
-        transfers_initiated_count += 1
-        integrated_transfer_count = _calculate_integrated_transfer_count(
-            integrated_transfer_count, sla_count, transfer
-        )
-    return integrated_transfer_count, transfers_initiated_count, sla_count
+def _filter_for_integrated_transfers(transfers: Iterable[Transfer]) -> List[Transfer]:
+    return [t for t in transfers if t.status == TransferStatus.INTEGRATED]
 
 
-def _calculate_integrated_transfer_count(
-    integrated_transfer_count: int, sla_count: Dict[SlaBand, int], transfer: Transfer
-) -> int:
-    if transfer.status == TransferStatus.INTEGRATED:
-        integrated_transfer_count += 1
+def _calculate_sla_band_counts(integrated_transfers: List[Transfer]):
+    sla_band_counts = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
+    for transfer in integrated_transfers:
         sla_band = assign_to_sla_band(transfer.sla_duration)
-        sla_count[sla_band] += 1
-    return integrated_transfer_count
+        sla_band_counts[sla_band] += 1
+    return sla_band_counts

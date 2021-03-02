@@ -60,7 +60,7 @@ def calculate_practice_metrics_data(
 
 
 def calculate_national_metrics_data(
-    transfers: Iterable[Transfer], time_range: DateTimeRange
+    transfers: List[Transfer], time_range: DateTimeRange
 ) -> NationalMetricsPresentation:
     national_metrics = calculate_national_metrics(transfers=transfers)
     return construct_national_metrics(
