@@ -17,6 +17,12 @@ class NationalMetrics:
     initiated_transfers_count: int
     integrated: IntegratedMetrics
 
+    def calculate_paper_fallback(self):
+        integrated_within_sla = (
+                self.integrated.within_3_days + self.integrated.within_8_days
+        )
+        return self.initiated_transfers_count - integrated_within_sla
+
 
 def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
     initiated_transfers_count = len(transfers)

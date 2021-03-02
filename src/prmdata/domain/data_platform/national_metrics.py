@@ -38,13 +38,6 @@ class NationalMetricsPresentation:
     metrics: List[MonthlyNationalMetrics]
 
 
-def _calculate_paper_fallback(national_metrics: NationalMetrics):
-    integrated_within_sla = (
-        national_metrics.integrated.within_3_days + national_metrics.integrated.within_8_days
-    )
-    return national_metrics.initiated_transfers_count - integrated_within_sla
-
-
 def construct_national_metrics(
     national_metrics: NationalMetrics,
     year: int,
@@ -52,7 +45,7 @@ def construct_national_metrics(
 ) -> NationalMetricsPresentation:
     current_datetime = datetime.now(tzutc())
 
-    paper_fallback_count = _calculate_paper_fallback(national_metrics)
+    paper_fallback_count = national_metrics.calculate_paper_fallback()
 
     return NationalMetricsPresentation(
         generated_on=current_datetime,
