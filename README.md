@@ -79,7 +79,7 @@ Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-fi
 
 #### Outputting to S3 bucket
 
-Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jun.csv.gz,data/july.csv.gz" --output-bucket "example-bucket"`
+Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jan.csv.gz,data/feb.csv.gz" --output-bucket "example-bucket"`
 
 - When outputting to AWS ensure the environment has the appropriate access.
 - Note this will use the year and month as part of the s3 key structure, as well 'v2' (data pipeline output version). 
