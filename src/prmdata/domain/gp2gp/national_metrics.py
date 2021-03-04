@@ -14,30 +14,26 @@ class IntegratedMetrics:
 
 @dataclass
 class NationalMetrics:
-    initiated_transfers_count: int
-    pending_transfers_count: int
-    failed_transfers_count: int
+    initiated_transfer_count: int
+    pending_transfer_count: int
+    failed_transfer_count: int
     integrated: IntegratedMetrics
 
     def calculate_paper_fallback(self):
         integrated_within_sla = self.integrated.within_3_days + self.integrated.within_8_days
-        return self.initiated_transfers_count - integrated_within_sla
+        return self.initiated_transfer_count - integrated_within_sla
 
 
 def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
-    initiated_transfers_count = len(transfers)
-    pending_transfers_count = _count_transfers_with_status(transfers, TransferStatus.PENDING)
-    failed_transfers_count = _count_transfers_with_status(transfers, TransferStatus.FAILED)
     integrated_transfers = _filter_for_integrated_transfers(transfers)
-    integrated_transfer_count = len(integrated_transfers)
     sla_band_counts = _calculate_sla_band_counts(integrated_transfers)
 
     return NationalMetrics(
-        initiated_transfers_count=initiated_transfers_count,
-        pending_transfers_count=pending_transfers_count,
-        failed_transfers_count=failed_transfers_count,
+        initiated_transfer_count=len(transfers),
+        pending_transfer_count=_count_transfers_with_status(transfers, TransferStatus.PENDING),
+        failed_transfer_count=_count_transfers_with_status(transfers, TransferStatus.FAILED),
         integrated=IntegratedMetrics(
-            transfer_count=integrated_transfer_count,
+            transfer_count=len(integrated_transfers),
             within_3_days=sla_band_counts[SlaBand.WITHIN_3_DAYS],
             within_8_days=sla_band_counts[SlaBand.WITHIN_8_DAYS],
             beyond_8_days=sla_band_counts[SlaBand.BEYOND_8_DAYS],

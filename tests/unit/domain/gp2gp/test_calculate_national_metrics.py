@@ -13,16 +13,16 @@ from tests.builders.gp2gp import (
 from tests.builders.common import an_integer
 
 
-def test_returns_initiated_transfers_count_default_given_no_transfers():
+def test_returns_initiated_transfer_count_default_given_no_transfers():
     national_metrics = calculate_national_metrics([])
-    assert national_metrics.initiated_transfers_count == 0
+    assert national_metrics.initiated_transfer_count == 0
 
 
-def test_returns_initiated_transfers_count():
-    initiated_transfers_count = an_integer(2, 10)
-    transfers = build_transfers(transfer_count=initiated_transfers_count)
+def test_returns_initiated_transfer_count():
+    initiated_transfer_count = an_integer(2, 10)
+    transfers = build_transfers(transfer_count=initiated_transfer_count)
     national_metrics = calculate_national_metrics(transfers)
-    assert national_metrics.initiated_transfers_count == initiated_transfers_count
+    assert national_metrics.initiated_transfer_count == initiated_transfer_count
 
 
 def test_returns_integrated_transfer_count_defaults_given_no_successful_transfers():
@@ -76,19 +76,19 @@ def test_returns_integrated_transfer_count_by_sla_duration(sla_duration, expecte
     assert national_metrics.integrated.beyond_8_days == expected["beyond_8_days"]
 
 
-def test_returns_failed_transfers_count_default_given_no_transfers():
+def test_returns_failed_transfer_count_default_given_no_transfers():
     national_metrics = calculate_national_metrics([])
-    assert national_metrics.failed_transfers_count == 0
+    assert national_metrics.failed_transfer_count == 0
 
 
 def test_returns_failed_transfer_count():
     transfer_count = an_integer(7, 10)
-    failed_transfers_count = an_integer(2, 4)
+    failed_transfer_count = an_integer(2, 4)
     transfers = build_transfers(
-        transfer_count=transfer_count, failed_transfers_count=failed_transfers_count
+        transfer_count=transfer_count, failed_transfer_count=failed_transfer_count
     )
     national_metrics = calculate_national_metrics(transfers)
-    assert national_metrics.failed_transfers_count == failed_transfers_count
+    assert national_metrics.failed_transfer_count == failed_transfer_count
 
 
 def test_returns_pending_transfer_count_default_given_no_transfers():
@@ -98,7 +98,7 @@ def test_returns_pending_transfer_count_default_given_no_transfers():
 
     expected_pending_transfer_count = 0
 
-    assert national_metrics.pending_transfers_count == expected_pending_transfer_count
+    assert national_metrics.pending_transfer_count == expected_pending_transfer_count
 
 
 def test_returns_pending_transfer_count_given_only_pending_transfers():
@@ -108,7 +108,7 @@ def test_returns_pending_transfer_count_given_only_pending_transfers():
 
     expected_pending_transfer_count = 2
 
-    assert national_metrics.pending_transfers_count == expected_pending_transfer_count
+    assert national_metrics.pending_transfer_count == expected_pending_transfer_count
 
 
 def test_returns_pending_transfer_count_given_a_mixture_of_transfers():
@@ -118,4 +118,4 @@ def test_returns_pending_transfer_count_given_a_mixture_of_transfers():
 
     expected_pending_transfer_count = 1
 
-    assert national_metrics.pending_transfers_count == expected_pending_transfer_count
+    assert national_metrics.pending_transfer_count == expected_pending_transfer_count

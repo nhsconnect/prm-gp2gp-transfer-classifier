@@ -49,7 +49,7 @@ def a_failed_transfer():
 def build_transfers(**kwargs) -> List[Transfer]:
     transfer_count = kwargs.get("transfer_count", an_integer(2, 7))
     integrated_transfer_count = kwargs.get("integrated_transfer_count", 0)
-    failed_transfers_count = kwargs.get("failed_transfers_count", 0)
+    failed_transfer_count = kwargs.get("failed_transfer_count", 0)
     sla_duration = kwargs.get("sla_duration", a_duration())
     transfers: List[Transfer] = []
     transfers.extend((build_transfer() for _ in range(transfer_count)))
@@ -59,5 +59,5 @@ def build_transfers(**kwargs) -> List[Transfer]:
             for _ in range(integrated_transfer_count)
         )
     )
-    transfers.extend((a_failed_transfer() for _ in range(failed_transfers_count)))
+    transfers.extend((a_failed_transfer() for _ in range(failed_transfer_count)))
     return transfers

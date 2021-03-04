@@ -51,11 +51,11 @@ def construct_national_metrics(
         generated_on=current_datetime,
         metrics=[
             MonthlyNationalMetrics(
-                transfer_count=national_metrics.initiated_transfers_count,
+                transfer_count=national_metrics.initiated_transfer_count,
                 integrated=IntegratedMetrics(
                     transfer_percentage=calculate_percentage(
                         portion=national_metrics.integrated.transfer_count,
-                        total=national_metrics.initiated_transfers_count,
+                        total=national_metrics.initiated_transfer_count,
                         num_digits=2,
                     ),
                     transfer_count=national_metrics.integrated.transfer_count,
@@ -67,7 +67,7 @@ def construct_national_metrics(
                     transfer_count=paper_fallback_count,
                     transfer_percentage=calculate_percentage(
                         portion=paper_fallback_count,
-                        total=national_metrics.initiated_transfers_count,
+                        total=national_metrics.initiated_transfer_count,
                         num_digits=2,
                     ),
                 ),
