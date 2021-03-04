@@ -264,7 +264,7 @@ def test_has_failed_status_if_error_in_final_ack():
     _assert_attributes("status", actual, expected_statuses)
 
 
-def test_has_failed_status_if_error_in_intermediate_message():
+def test_has_pending_with_error_status_if_error_in_intermediate_message():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
@@ -276,7 +276,7 @@ def test_has_failed_status_if_error_in_intermediate_message():
 
     actual = derive_transfers(conversations)
 
-    expected_statuses = [TransferStatus.FAILED]
+    expected_statuses = [TransferStatus.PENDING_WITH_ERROR]
 
     _assert_attributes("status", actual, expected_statuses)
 

@@ -12,9 +12,10 @@ ERROR_SUPPRESSED = 15
 
 
 class TransferStatus(Enum):
-    PENDING = "PENDING"
     INTEGRATED = "INTEGRATED"
     FAILED = "FAILED"
+    PENDING = "PENDING"
+    PENDING_WITH_ERROR = "PENDING_WITH_ERROR"
 
 
 class Transfer(NamedTuple):
@@ -75,8 +76,10 @@ def _extract_date_completed(conversation: ParsedConversation) -> Optional[dateti
 def _assign_status(conversation: ParsedConversation) -> TransferStatus:
     if _is_integrated(conversation):
         return TransferStatus.INTEGRATED
-    elif _has_error(conversation):
+    elif _has_final_ack_error(conversation):
         return TransferStatus.FAILED
+    elif _has_intermediate_error_and_no_final_ack(conversation):
+        return TransferStatus.PENDING_WITH_ERROR
     else:
         return TransferStatus.PENDING
 
@@ -86,16 +89,12 @@ def _is_integrated(conversation: ParsedConversation) -> bool:
     return final_ack and (final_ack.error_code is None or final_ack.error_code == ERROR_SUPPRESSED)
 
 
-def _has_error(conversation: ParsedConversation) -> bool:
-    return _has_final_ack_error(conversation) or _has_intermediate_message_error(conversation)
-
-
 def _has_final_ack_error(conversation: ParsedConversation) -> bool:
     final_ack = conversation.request_completed_ack
     return final_ack and final_ack.error_code and final_ack.error_code != ERROR_SUPPRESSED
 
 
-def _has_intermediate_message_error(conversation: ParsedConversation) -> bool:
+def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -> bool:
     intermediate_errors = _extract_intermediate_error_code(conversation)
     return conversation.request_completed_ack is None and len(intermediate_errors) > 0
 
