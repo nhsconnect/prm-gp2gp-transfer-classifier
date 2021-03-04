@@ -32,20 +32,21 @@ def build_practice_metrics(**kwargs):
     )
 
 
+def _integrated_transfer(duration):
+    return build_transfer(status=TransferStatus.INTEGRATED, sla_duration=duration)
+
+
+def _failed_transfer():
+    return build_transfer(status=TransferStatus.FAILED)
+
+
 def build_transfers(**kwargs) -> List[Transfer]:
     transfer_count = kwargs.get("transfer_count", an_integer(2, 7))
     integrated_transfer_count = kwargs.get("integrated_transfer_count", 0)
     failed_transfers_count = kwargs.get("failed_transfers_count", 0)
     sla_duration = kwargs.get("sla_duration", a_duration())
-    transfers = []
-    for _ in range(transfer_count):
-        transfers.append(build_transfer())
-    for _ in range(integrated_transfer_count):
-        transfers.append(
-            build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration)
-        )
-    for _ in range(failed_transfers_count):
-        transfers.append(
-            build_transfer(status=TransferStatus.FAILED)
-        )
+    transfers: List[Transfer] = []
+    transfers.extend((build_transfer() for _ in range(transfer_count)))
+    transfers.extend((_integrated_transfer(sla_duration) for _ in range(integrated_transfer_count)))
+    transfers.extend((_failed_transfer() for _ in range(failed_transfers_count)))
     return transfers
