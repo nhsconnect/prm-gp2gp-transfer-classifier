@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import List
 
 from prmdata.domain.gp2gp.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
 from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
@@ -32,9 +32,10 @@ def build_practice_metrics(**kwargs):
     )
 
 
-def build_transfers(**kwargs) -> Iterable[Transfer]:
+def build_transfers(**kwargs) -> List[Transfer]:
     transfer_count = kwargs.get("transfer_count", an_integer(2, 7))
     integrated_transfer_count = kwargs.get("integrated_transfer_count", 0)
+    failed_transfers_count = kwargs.get("failed_transfers_count", 0)
     sla_duration = kwargs.get("sla_duration", a_duration())
     transfers = []
     for _ in range(transfer_count):
@@ -42,5 +43,9 @@ def build_transfers(**kwargs) -> Iterable[Transfer]:
     for _ in range(integrated_transfer_count):
         transfers.append(
             build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration)
+        )
+    for _ in range(failed_transfers_count):
+        transfers.append(
+            build_transfer(status=TransferStatus.FAILED)
         )
     return transfers

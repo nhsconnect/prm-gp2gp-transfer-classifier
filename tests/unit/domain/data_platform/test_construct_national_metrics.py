@@ -20,6 +20,7 @@ def _build_national_metrics(**kwargs) -> NationalMetrics:
 
     return NationalMetrics(
         initiated_transfers_count=kwargs.get("initiated_transfers_count", summed_transfer_count),
+        failed_transfers_count=kwargs.get("failed_transfers_count", an_integer()),
         integrated=IntegratedMetrics(
             transfer_count=kwargs.get("integrated_transfer_count", summed_transfer_count),
             within_3_days=within_3_days,
