@@ -4,7 +4,12 @@ import pytest
 
 from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
-from tests.builders.gp2gp import build_transfers
+from tests.builders.gp2gp import (
+    build_transfers,
+    a_pending_transfer,
+    an_integrated_transfer,
+    a_failed_transfer,
+)
 from tests.builders.common import an_integer
 
 
@@ -84,3 +89,33 @@ def test_returns_failed_transfer_count():
     )
     national_metrics = calculate_national_metrics(transfers)
     assert national_metrics.failed_transfers_count == failed_transfers_count
+
+
+def test_returns_pending_transfer_count_default_given_no_transfers():
+    transfers = []
+
+    national_metrics = calculate_national_metrics(transfers)
+
+    expected_pending_transfer_count = 0
+
+    assert national_metrics.pending_transfers_count == expected_pending_transfer_count
+
+
+def test_returns_pending_transfer_count_given_only_pending_transfers():
+    transfers = [a_pending_transfer(), a_pending_transfer()]
+
+    national_metrics = calculate_national_metrics(transfers)
+
+    expected_pending_transfer_count = 2
+
+    assert national_metrics.pending_transfers_count == expected_pending_transfer_count
+
+
+def test_returns_pending_transfer_count_given_a_mixture_of_transfers():
+    transfers = [a_pending_transfer(), a_failed_transfer(), an_integrated_transfer()]
+
+    national_metrics = calculate_national_metrics(transfers)
+
+    expected_pending_transfer_count = 1
+
+    assert national_metrics.pending_transfers_count == expected_pending_transfer_count
