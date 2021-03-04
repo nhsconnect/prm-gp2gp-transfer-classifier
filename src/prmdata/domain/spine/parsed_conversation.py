@@ -1,27 +1,21 @@
-from collections import defaultdict
-from typing import Iterator, Dict, List, Iterable
+from typing import NamedTuple, List, Optional, Iterable, Iterator
 
+from prmdata.domain.spine.conversation import Conversation
+from prmdata.domain.spine.message import Message
 from prmdata.utils.date.range import DateTimeRange
-from prmdata.domain.spine.models import (
-    Message,
-    Conversation,
-    ParsedConversation,
-    APPLICATION_ACK,
-    EHR_REQUEST_STARTED,
-    EHR_REQUEST_COMPLETED,
-)
+
+EHR_REQUEST_STARTED = "urn:nhs:names:services:gp2gp/RCMR_IN010000UK05"
+EHR_REQUEST_COMPLETED = "urn:nhs:names:services:gp2gp/RCMR_IN030000UK06"
+APPLICATION_ACK = "urn:nhs:names:services:gp2gp/MCCI_IN010000UK13"
+COMMON_POINT_TO_POINT = "urn:nhs:names:services:gp2gp/COPC_IN000001UK01"
 
 
-def group_into_conversations(messages: Iterable[Message]) -> Iterator[Conversation]:
-    conversations: Dict[str, List[Message]] = defaultdict(list)
-
-    for message in messages:
-        conversations[message.conversation_id].append(message)
-
-    return (
-        Conversation(conversation_id, sorted(messages, key=lambda m: m.time))
-        for conversation_id, messages in conversations.items()
-    )
+class ParsedConversation(NamedTuple):
+    id: str
+    request_started: Message
+    request_completed: Message
+    intermediate_messages: List[Message]
+    request_completed_ack: Optional[Message]
 
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:

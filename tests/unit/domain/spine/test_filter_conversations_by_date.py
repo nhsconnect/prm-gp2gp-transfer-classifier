@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from prmdata.utils.date.range import DateTimeRange
-from prmdata.domain.spine.transformers import filter_conversations_by_request_started_time
+from prmdata.domain.spine.parsed_conversation import filter_conversations_by_request_started_time
 from tests.builders.spine import build_parsed_conversation, build_message
 
 

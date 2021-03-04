@@ -1,8 +1,18 @@
-from typing import Iterator, Iterable
+from datetime import datetime
+from typing import NamedTuple, Optional, Iterable, Iterator
 
 from dateutil import parser
 
-from prmdata.domain.spine.models import Message
+
+class Message(NamedTuple):
+    time: datetime
+    conversation_id: str
+    guid: str
+    interaction_id: str
+    from_party_asid: str
+    to_party_asid: str
+    message_ref: Optional[str]
+    error_code: Optional[int]
 
 
 def _parse_error_code(error):

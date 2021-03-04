@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from prmdata.domain.spine.models import Conversation
-from prmdata.domain.spine.transformers import group_into_conversations
+from prmdata.domain.spine.conversation import Conversation, group_into_conversations
 from tests.builders.spine import build_message
 
 

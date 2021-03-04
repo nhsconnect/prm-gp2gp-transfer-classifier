@@ -1,4 +1,5 @@
-from prmdata.domain.spine.models import Message, ParsedConversation
+from prmdata.domain.spine.parsed_conversation import ParsedConversation
+from prmdata.domain.spine.message import Message
 from tests.builders.common import a_string, a_datetime
 
 

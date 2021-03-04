@@ -6,7 +6,7 @@ from enum import Enum
 import pyarrow as pa
 import pyarrow as Table
 
-from prmdata.domain.spine.models import ParsedConversation
+from prmdata.domain.spine.parsed_conversation import ParsedConversation
 
 ERROR_SUPPRESSED = 15
 

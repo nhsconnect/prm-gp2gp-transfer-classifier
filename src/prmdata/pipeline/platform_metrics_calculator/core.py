@@ -17,13 +17,10 @@ from prmdata.domain.gp2gp.transfer import (
     filter_for_successful_transfers,
 )
 from prmdata.domain.gp2gp.practice_metrics import calculate_sla_by_practice
-from prmdata.domain.spine.models import Message
-from prmdata.domain.spine.transformers import (
-    parse_conversation,
-    group_into_conversations,
-    filter_conversations_by_request_started_time,
-    ConversationMissingStart,
-)
+from prmdata.domain.spine.message import Message
+from prmdata.domain.spine.parsed_conversation import parse_conversation, ConversationMissingStart, \
+    filter_conversations_by_request_started_time
+from prmdata.domain.spine.conversation import group_into_conversations
 
 
 def _parse_conversations(conversations):

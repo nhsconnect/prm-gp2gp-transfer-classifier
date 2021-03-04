@@ -2,8 +2,7 @@ from datetime import datetime
 
 from dateutil.tz import tzutc
 
-from prmdata.domain.spine.models import Message
-from prmdata.domain.spine.sources import construct_messages_from_splunk_items
+from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from tests.builders.spine import build_spine_item
 
 
