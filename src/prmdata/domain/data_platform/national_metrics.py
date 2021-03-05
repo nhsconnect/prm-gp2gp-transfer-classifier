@@ -15,6 +15,12 @@ class PaperFallbackMetrics:
 
 
 @dataclass
+class FailedMetrics:
+    transfer_count: int
+    transfer_percentage: float
+
+
+@dataclass
 class IntegratedMetrics:
     transfer_count: int
     transfer_percentage: float
@@ -27,6 +33,7 @@ class IntegratedMetrics:
 class MonthlyNationalMetrics:
     transfer_count: int
     integrated: IntegratedMetrics
+    failed: FailedMetrics
     paper_fallback: PaperFallbackMetrics
     year: int
     month: int
@@ -62,6 +69,14 @@ def construct_national_metrics(
                     within_3_days=national_metrics.integrated.within_3_days,
                     within_8_days=national_metrics.integrated.within_8_days,
                     beyond_8_days=national_metrics.integrated.beyond_8_days,
+                ),
+                failed=FailedMetrics(
+                    transfer_count=national_metrics.failed_transfer_count,
+                    transfer_percentage=calculate_percentage(
+                        portion=national_metrics.failed_transfer_count,
+                        total=national_metrics.initiated_transfer_count,
+                        num_digits=2,
+                    ),
                 ),
                 paper_fallback=PaperFallbackMetrics(
                     transfer_count=paper_fallback_count,

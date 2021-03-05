@@ -8,6 +8,7 @@ from prmdata.domain.data_platform.national_metrics import (
     IntegratedMetrics,
     MonthlyNationalMetrics,
     PaperFallbackMetrics,
+    FailedMetrics,
 )
 from prmdata.domain.data_platform.practice_metrics import (
     IntegratedPracticeMetrics,
@@ -182,13 +183,15 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     sla_duration_beyond_8_days = timedelta(seconds=EIGHT_DAYS_IN_SECONDS + 1)
 
     transfers = [
-        build_transfer(),
+        build_transfer(status=TransferStatus.PENDING),
+        build_transfer(status=TransferStatus.PENDING_WITH_ERROR),
         build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_3_days),
         build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_8_days),
         build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_8_days),
         build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
         build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
         build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
+        build_transfer(status=TransferStatus.FAILED),
     ]
 
     time_range = DateTimeRange(
@@ -197,15 +200,16 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     current_datetime = datetime.now(tzutc())
 
     expected_national_metrics = MonthlyNationalMetrics(
-        transfer_count=7,
+        transfer_count=9,
         integrated=IntegratedMetrics(
-            transfer_percentage=85.71,
+            transfer_percentage=66.67,
             transfer_count=6,
             within_3_days=1,
             within_8_days=2,
             beyond_8_days=3,
         ),
-        paper_fallback=PaperFallbackMetrics(transfer_count=4, transfer_percentage=57.14),
+        failed=FailedMetrics(transfer_count=1, transfer_percentage=11.11),
+        paper_fallback=PaperFallbackMetrics(transfer_count=6, transfer_percentage=66.67),
         year=2019,
         month=12,
     )

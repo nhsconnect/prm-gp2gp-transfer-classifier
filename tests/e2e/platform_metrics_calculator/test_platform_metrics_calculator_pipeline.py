@@ -17,23 +17,30 @@ from subprocess import check_output
 logger = logging.getLogger(__name__)
 
 EXPECTED_TRANSFERS = {
-    "conversation_id": ["integrated-within-8-days", "integrated-beyond-8-days", "abc"],
+    "conversation_id": [
+        "integrated-within-8-days",
+        "integrated-beyond-8-days",
+        "completed-in-jan",
+        "failed",
+    ],
     "date_completed": [
         datetime(2019, 12, 6, 8, 41, 48, 337000),
         datetime(2019, 12, 15, 8, 41, 48, 337000),
         datetime(2020, 1, 1, 8, 41, 48, 337000),
+        datetime(2019, 12, 20, 8, 41, 48, 337000),
     ],
     "date_requested": [
         datetime(2019, 12, 1, 18, 2, 29, 985000),
         datetime(2019, 12, 5, 18, 2, 29, 985000),
         datetime(2019, 12, 30, 18, 2, 29, 985000),
+        datetime(2019, 12, 19, 18, 2, 29, 985000),
     ],
-    "final_error_code": [None, None, None],
-    "intermediate_error_codes": [[], [], []],
-    "requesting_practice_asid": ["123456789123", "123456789123", "123456789123"],
-    "sending_practice_asid": ["003456789123", "003456789123", "003456789123"],
-    "sla_duration": [398306, 830306, 139106],
-    "status": ["INTEGRATED", "INTEGRATED", "INTEGRATED"],
+    "final_error_code": [None, None, None, 30],
+    "intermediate_error_codes": [[], [], [], []],
+    "requesting_practice_asid": ["123456789123", "123456789123", "123456789123", "123456789123"],
+    "sending_practice_asid": ["003456789123", "003456789123", "003456789123", "003456789123"],
+    "sla_duration": [398306, 830306, 139106, 52706],
+    "status": ["INTEGRATED", "INTEGRATED", "INTEGRATED", "FAILED"],
 }
 
 
