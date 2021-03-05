@@ -42,6 +42,10 @@ def a_pending_transfer():
     return build_transfer(status=TransferStatus.PENDING)
 
 
+def a_pending_with_error_transfer():
+    return build_transfer(status=TransferStatus.PENDING_WITH_ERROR)
+
+
 def a_failed_transfer():
     return build_transfer(status=TransferStatus.FAILED)
 

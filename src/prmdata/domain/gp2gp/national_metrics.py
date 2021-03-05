@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, List
+from typing import Iterable, List, Set
 from prmdata.domain.gp2gp.sla import SlaBand, assign_to_sla_band
 from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 
@@ -30,8 +30,10 @@ def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
 
     return NationalMetrics(
         initiated_transfer_count=len(transfers),
-        pending_transfer_count=_count_transfers_with_status(transfers, TransferStatus.PENDING),
-        failed_transfer_count=_count_transfers_with_status(transfers, TransferStatus.FAILED),
+        pending_transfer_count=_count_transfers_with_statuses(
+            transfers, {TransferStatus.PENDING, TransferStatus.PENDING_WITH_ERROR}
+        ),
+        failed_transfer_count=_count_transfers_with_statuses(transfers, {TransferStatus.FAILED}),
         integrated=IntegratedMetrics(
             transfer_count=len(integrated_transfers),
             within_3_days=sla_band_counts[SlaBand.WITHIN_3_DAYS],
@@ -41,8 +43,10 @@ def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
     )
 
 
-def _count_transfers_with_status(transfers: Iterable[Transfer], status: TransferStatus) -> int:
-    return len([t for t in transfers if t.status == status])
+def _count_transfers_with_statuses(
+    transfers: Iterable[Transfer], statuses: Set[TransferStatus]
+) -> int:
+    return len([t for t in transfers if t.status in statuses])
 
 
 def _filter_for_integrated_transfers(transfers: Iterable[Transfer]) -> List[Transfer]:

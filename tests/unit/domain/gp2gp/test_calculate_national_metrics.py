@@ -7,6 +7,7 @@ from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
 from tests.builders.gp2gp import (
     build_transfers,
     a_pending_transfer,
+    a_pending_with_error_transfer,
     an_integrated_transfer,
     a_failed_transfer,
 )
@@ -117,5 +118,15 @@ def test_returns_pending_transfer_count_given_a_mixture_of_transfers():
     national_metrics = calculate_national_metrics(transfers)
 
     expected_pending_transfer_count = 1
+
+    assert national_metrics.pending_transfer_count == expected_pending_transfer_count
+
+
+def test_returns_pending_transfer_count_given_pending_and_pending_with_error_transfers():
+    transfers = [a_pending_transfer(), a_pending_with_error_transfer()]
+
+    national_metrics = calculate_national_metrics(transfers)
+
+    expected_pending_transfer_count = 2
 
     assert national_metrics.pending_transfer_count == expected_pending_transfer_count
