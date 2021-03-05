@@ -9,6 +9,7 @@ from prmdata.domain.data_platform.national_metrics import (
     MonthlyNationalMetrics,
     PaperFallbackMetrics,
     FailedMetrics,
+    PendingMetrics,
 )
 from prmdata.domain.data_platform.practice_metrics import (
     IntegratedPracticeMetrics,
@@ -209,6 +210,7 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
             beyond_8_days=3,
         ),
         failed=FailedMetrics(transfer_count=1, transfer_percentage=11.11),
+        pending=PendingMetrics(transfer_count=2, transfer_percentage=22.22),
         paper_fallback=PaperFallbackMetrics(transfer_count=6, transfer_percentage=66.67),
         year=2019,
         month=12,

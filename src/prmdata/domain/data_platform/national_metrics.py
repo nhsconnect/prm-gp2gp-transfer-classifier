@@ -21,6 +21,12 @@ class FailedMetrics:
 
 
 @dataclass
+class PendingMetrics:
+    transfer_count: int
+    transfer_percentage: float
+
+
+@dataclass
 class IntegratedMetrics:
     transfer_count: int
     transfer_percentage: float
@@ -34,6 +40,7 @@ class MonthlyNationalMetrics:
     transfer_count: int
     integrated: IntegratedMetrics
     failed: FailedMetrics
+    pending: PendingMetrics
     paper_fallback: PaperFallbackMetrics
     year: int
     month: int
@@ -70,6 +77,17 @@ def _construct_failed_metrics(national_metrics: NationalMetrics) -> FailedMetric
     )
 
 
+def _construct_pending_metrics(national_metrics: NationalMetrics) -> PendingMetrics:
+    return PendingMetrics(
+        transfer_count=national_metrics.pending_transfer_count,
+        transfer_percentage=calculate_percentage(
+            portion=national_metrics.pending_transfer_count,
+            total=national_metrics.initiated_transfer_count,
+            num_digits=2,
+        ),
+    )
+
+
 def _construct_paper_fallback_metrics(national_metrics: NationalMetrics) -> PaperFallbackMetrics:
     paper_fallback_count = national_metrics.calculate_paper_fallback()
 
@@ -97,6 +115,7 @@ def construct_national_metrics(
                 transfer_count=national_metrics.initiated_transfer_count,
                 integrated=_construct_integrated_metrics(national_metrics),
                 failed=_construct_failed_metrics(national_metrics),
+                pending=_construct_pending_metrics(national_metrics),
                 paper_fallback=_construct_paper_fallback_metrics(national_metrics),
                 year=year,
                 month=month,

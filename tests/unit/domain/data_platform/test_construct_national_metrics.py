@@ -115,6 +115,27 @@ def test_has_failed_percentage():
     assert actual.metrics[0].failed.transfer_percentage == expected_percentage
 
 
+def test_has_pending_transfer_count():
+    expected_pending_transfer_count = an_integer(2, 6)
+    national_metrics = _build_national_metrics(
+        pending_transfer_count=expected_pending_transfer_count
+    )
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
+
+    assert actual.metrics[0].pending.transfer_count == expected_pending_transfer_count
+
+
+def test_has_pending_percentage():
+    initiated_transfer_count = 4
+    national_metrics = _build_national_metrics(
+        initiated_transfer_count=initiated_transfer_count, pending_transfer_count=3
+    )
+    expected_percentage = 75.0
+    actual = construct_national_metrics(national_metrics, a_year, a_month)
+
+    assert actual.metrics[0].pending.transfer_percentage == expected_percentage
+
+
 def test_has_paper_fallback_transfer_count():
     initiated_transfer_count = 10
     national_metrics = _build_national_metrics(

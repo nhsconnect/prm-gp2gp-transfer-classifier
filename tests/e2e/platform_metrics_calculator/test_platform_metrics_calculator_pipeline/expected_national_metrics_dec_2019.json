@@ -16,6 +16,10 @@
         "transferCount": 1,
         "transferPercentage": 25.0
       },
+      "pending": {
+        "transferCount": 0,
+        "transferPercentage": 0.0
+      },
       "paperFallback": {
         "transferCount": 2,
         "transferPercentage": 50.0
