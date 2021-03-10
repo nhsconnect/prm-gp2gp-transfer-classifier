@@ -36,6 +36,7 @@ EXPECTED_TRANSFERS = {
         datetime(2019, 12, 19, 18, 2, 29, 985000),
     ],
     "final_error_code": [None, None, None, 30],
+    "sender_error_code": [None, None, None, None],
     "intermediate_error_codes": [[], [], [], []],
     "requesting_practice_asid": ["123456789123", "123456789123", "123456789123", "123456789123"],
     "sending_practice_asid": ["003456789123", "003456789123", "003456789123", "003456789123"],

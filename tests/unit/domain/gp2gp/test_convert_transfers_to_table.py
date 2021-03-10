@@ -74,6 +74,28 @@ def test_sending_practice_asid_is_converted_to_column():
     assert actual_asid_column == expected_asid_column
 
 
+def test_sender_error_code_is_converted_to_column():
+    transfer = build_transfer(sender_error_code=10)
+
+    expected_error_code_column = {"sender_error_code": [10]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_error_code_column = table.select(["sender_error_code"]).to_pydict()
+
+    assert actual_error_code_column == expected_error_code_column
+
+
+def test_sender_error_code_is_converted_to_column_when_missing():
+    transfer = build_transfer(sender_error_code=None)
+
+    expected_error_code_column = {"sender_error_code": [None]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_error_code_column = table.select(["sender_error_code"]).to_pydict()
+
+    assert actual_error_code_column == expected_error_code_column
+
+
 def test_final_error_code_is_converted_to_column():
     transfer = build_transfer(final_error_code=5)
 
@@ -186,6 +208,7 @@ def test_table_has_correct_schema():
             ("sla_duration", pa.uint64()),
             ("requesting_practice_asid", pa.string()),
             ("sending_practice_asid", pa.string()),
+            ("sender_error_code", pa.int64()),
             ("final_error_code", pa.int64()),
             ("intermediate_error_codes", pa.list_(pa.int64())),
             ("status", pa.string()),
