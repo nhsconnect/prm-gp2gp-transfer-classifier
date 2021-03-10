@@ -13,7 +13,8 @@ COMMON_POINT_TO_POINT = "urn:nhs:names:services:gp2gp/COPC_IN000001UK01"
 class ParsedConversation(NamedTuple):
     id: str
     request_started: Message
-    request_completed: Message
+    request_started_ack: Optional[Message]
+    request_completed: Optional[Message]
     intermediate_messages: List[Message]
     request_completed_ack: Optional[Message]
 
@@ -31,46 +32,57 @@ class SpineConversationParser:
     def __init__(self, conversation: Conversation):
         self._id = conversation.id
         self._messages = iter(conversation.messages)
+        self._req_started_message: Optional[Message] = None
+        self._req_completed_message: Optional[Message] = None
+        self._request_started_ack: Optional[Message] = None
+        self._intermediate_messages: List[Message] = []
+        self._request_completed_ack: Optional[Message] = None
 
     def _is_request_completed(self, message):
         return message.interaction_id == EHR_REQUEST_COMPLETED
 
-    def _is_final_ack(self, message, req_completed_message):
-        if req_completed_message is None:
+    def _is_acknowledging(self, acknowledging_message, acknowledged_message):
+        if acknowledged_message is None:
             return False
         else:
-            is_ack = message.interaction_id == APPLICATION_ACK
-            is_request_completed_ack = message.message_ref == req_completed_message.guid
-            return is_ack and is_request_completed_ack
+            is_ack = acknowledging_message.interaction_id == APPLICATION_ACK
+            is_acknowledging_candidate_message = (
+                acknowledging_message.message_ref == acknowledged_message.guid
+            )
+            return is_ack and is_acknowledging_candidate_message
 
     def _get_next_or_none(self):
         next_message = next(self._messages, None)
         return next_message
 
+    def _process_message(self, message):
+        if self._is_request_completed(message):
+            self._req_completed_message = message
+        elif self._is_acknowledging(message, self._req_completed_message):
+            self._request_completed_ack = message
+        elif self._is_acknowledging(message, self._req_started_message):
+            self._request_started_ack = message
+        else:
+            self._intermediate_messages.append(message)
+
     def parse(self):
-        req_started_message = self._get_next_or_none()
-        if req_started_message.interaction_id != EHR_REQUEST_STARTED:
+        self._req_started_message = self._get_next_or_none()
+
+        if self._req_started_message.interaction_id != EHR_REQUEST_STARTED:
             raise ConversationMissingStart()
-        req_completed_message = None
-        final_ack = None
-        intermediate_messages = []
 
         next_message = self._get_next_or_none()
         while next_message is not None:
-            if self._is_request_completed(next_message):
-                req_completed_message = next_message
-            elif self._is_final_ack(next_message, req_completed_message):
-                final_ack = next_message
-            else:
-                intermediate_messages.append(next_message)
+            self._process_message(next_message)
             next_message = self._get_next_or_none()
 
         return ParsedConversation(
             self._id,
-            request_started=req_started_message,
-            request_completed=req_completed_message,
-            intermediate_messages=intermediate_messages,
-            request_completed_ack=final_ack,
+            request_started=self._req_started_message,
+            request_started_ack=self._request_started_ack,
+            request_completed=self._req_completed_message,
+            intermediate_messages=self._intermediate_messages,
+            request_completed_ack=self._request_completed_ack,
         )
 
 

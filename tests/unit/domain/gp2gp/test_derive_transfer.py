@@ -281,6 +281,24 @@ def test_has_pending_with_error_status_if_error_in_intermediate_message():
     _assert_attributes("status", actual, expected_statuses)
 
 
+def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_started_ack=build_message(error_code=10),
+            request_completed=build_message(),
+            intermediate_messages=[],
+            request_completed_ack=None,
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_statuses = [TransferStatus.PENDING_WITH_ERROR]
+
+    _assert_attributes("status", actual, expected_statuses)
+
+
 def test_extracts_date_requested_from_request_started_message():
     date_requested = a_datetime()
 

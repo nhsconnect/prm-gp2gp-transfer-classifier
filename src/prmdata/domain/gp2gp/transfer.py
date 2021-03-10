@@ -23,6 +23,7 @@ class Transfer(NamedTuple):
     sla_duration: Optional[timedelta]
     requesting_practice_asid: str
     sending_practice_asid: str
+    # sender_error_code
     final_error_code: Optional[int]
     intermediate_error_codes: List[int]
     status: TransferStatus
@@ -47,6 +48,12 @@ def _extract_requesting_practice_asid(conversation: ParsedConversation) -> str:
 
 def _extract_sending_practice_asid(conversation: ParsedConversation) -> str:
     return conversation.request_started.to_party_asid
+
+
+def _extract_sender_error(conversation: ParsedConversation) -> Optional[int]:
+    if conversation.request_started_ack:
+        return conversation.request_started_ack.error_code
+    return None
 
 
 def _extract_final_error_code(conversation: ParsedConversation) -> Optional[int]:
@@ -96,7 +103,10 @@ def _has_final_ack_error(conversation: ParsedConversation) -> bool:
 
 def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -> bool:
     intermediate_errors = _extract_intermediate_error_code(conversation)
-    return conversation.request_completed_ack is None and len(intermediate_errors) > 0
+    sender_error = _extract_sender_error(conversation)
+    has_intermediate_error = len(intermediate_errors) > 0 or sender_error is not None
+    lacking_final_ack = conversation.request_completed_ack is None
+    return lacking_final_ack and has_intermediate_error
 
 
 def _derive_transfer(conversation: ParsedConversation) -> Transfer:
