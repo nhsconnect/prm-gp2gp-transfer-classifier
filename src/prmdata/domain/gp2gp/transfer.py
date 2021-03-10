@@ -23,7 +23,7 @@ class Transfer(NamedTuple):
     sla_duration: Optional[timedelta]
     requesting_practice_asid: str
     sending_practice_asid: str
-    # sender_error_code
+    sender_error_code: Optional[int]
     final_error_code: Optional[int]
     intermediate_error_codes: List[int]
     status: TransferStatus
@@ -115,6 +115,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         sla_duration=_calculate_sla(conversation),
         requesting_practice_asid=_extract_requesting_practice_asid(conversation),
         sending_practice_asid=_extract_sending_practice_asid(conversation),
+        sender_error_code=_extract_sender_error(conversation),
         final_error_code=_extract_final_error_code(conversation),
         intermediate_error_codes=_extract_intermediate_error_code(conversation),
         status=_assign_status(conversation),

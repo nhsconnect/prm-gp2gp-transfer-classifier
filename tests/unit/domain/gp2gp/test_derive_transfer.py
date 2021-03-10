@@ -103,7 +103,7 @@ def test_extracts_sending_practice_asid():
     _assert_attributes("sending_practice_asid", actual, expected_asids)
 
 
-def test_extracts_error_code():
+def test_extracts_final_error_code():
     conversations = [build_parsed_conversation(request_completed_ack=build_message(error_code=99))]
 
     actual = derive_transfers(conversations)
@@ -111,6 +111,26 @@ def test_extracts_error_code():
     expected_errors = [99]
 
     _assert_attributes("final_error_code", actual, expected_errors)
+
+
+def test_extracts_sender_error_code_when_no_sender_errror():
+    conversations = [build_parsed_conversation(request_started_ack=build_message(error_code=None))]
+
+    actual = derive_transfers(conversations)
+
+    expected_errors = [None]
+
+    _assert_attributes("sender_error_code", actual, expected_errors)
+
+
+def test_extracts_sender_error_code_when_sender_error():
+    conversations = [build_parsed_conversation(request_started_ack=build_message(error_code=10))]
+
+    actual = derive_transfers(conversations)
+
+    expected_errors = [10]
+
+    _assert_attributes("sender_error_code", actual, expected_errors)
 
 
 def test_doesnt_extract_error_code_given_pending_request_completed_ack():
