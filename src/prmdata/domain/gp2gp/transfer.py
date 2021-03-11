@@ -128,7 +128,7 @@ def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Tr
     return (_derive_transfer(conversation) for conversation in conversations)
 
 
-def filter_for_successful_transfers(transfers: Iterable[Transfer]) -> Iterator[Transfer]:
+def filter_for_successful_transfers(transfers: List[Transfer]) -> Iterator[Transfer]:
     return (
         transfer
         for transfer in transfers

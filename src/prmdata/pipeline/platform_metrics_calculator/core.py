@@ -47,7 +47,7 @@ def parse_transfers_from_messages(
 
 
 def calculate_practice_metrics_data(
-    transfers: Iterable[Transfer],
+    transfers: List[Transfer],
     practice_list: List[PracticeDetails],
     time_range: DateTimeRange,
 ) -> PracticeMetricsPresentation:
