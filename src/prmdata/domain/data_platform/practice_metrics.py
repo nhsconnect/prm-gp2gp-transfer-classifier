@@ -14,10 +14,6 @@ class IntegratedPracticeMetrics:
     within_3_days_percentage: float
     within_8_days_percentage: float
     beyond_8_days_percentage: float
-    # TODO PRMT-1279 to be removed
-    within_3_days: int
-    within_8_days: int
-    beyond_8_days: int
 
 
 @dataclass
@@ -76,10 +72,6 @@ def construct_practice_metrics(
                                     total=practice.integrated.transfer_count,
                                     num_digits=1,
                                 ),
-                                # TODO PRMT-1279 to be removed
-                                within_3_days=practice.integrated.within_3_days,
-                                within_8_days=practice.integrated.within_8_days,
-                                beyond_8_days=practice.integrated.beyond_8_days,
                             ),
                         ),
                     )

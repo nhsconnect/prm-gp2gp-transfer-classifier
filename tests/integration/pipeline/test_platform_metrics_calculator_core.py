@@ -163,9 +163,6 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
                                 within_3_days_percentage=100,
                                 within_8_days_percentage=0,
                                 beyond_8_days_percentage=0,
-                                within_3_days=1,
-                                within_8_days=0,
-                                beyond_8_days=0,
                             ),
                         ),
                     )
