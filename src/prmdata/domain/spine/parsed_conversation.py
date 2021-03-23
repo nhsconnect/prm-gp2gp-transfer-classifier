@@ -38,10 +38,12 @@ class SpineConversationParser:
         self._intermediate_messages: List[Message] = []
         self._request_completed_ack: Optional[Message] = None
 
-    def _is_request_completed(self, message):
+    @staticmethod
+    def _is_request_completed(message):
         return message.interaction_id == EHR_REQUEST_COMPLETED
 
-    def _is_acknowledging(self, acknowledging_message, acknowledged_message):
+    @staticmethod
+    def _is_acknowledging(acknowledging_message, acknowledged_message):
         if acknowledged_message is None:
             return False
         else:

@@ -44,6 +44,15 @@ def calculate_sla_by_practice(
         asid: practice.ods_code for practice in practice_list for asid in practice.asids
     }
 
+    _process_asid(asid_to_ods_mapping, practice_counts, transfers)
+
+    return (
+        _derive_practice_sla_metrics(practice, practice_counts[practice.ods_code])
+        for practice in practice_list
+    )
+
+
+def _process_asid(asid_to_ods_mapping, practice_counts, transfers):
     unexpected_asids = set()
     for transfer in transfers:
         asid = transfer.requesting_practice_asid
@@ -54,11 +63,5 @@ def calculate_sla_by_practice(
             practice_counts[ods_code][sla_band] += 1
         else:
             unexpected_asids.add(asid)
-
     if len(unexpected_asids) > 0:
         warn(f"Unexpected ASID count: {len(unexpected_asids)}", RuntimeWarning)
-
-    return (
-        _derive_practice_sla_metrics(practice, practice_counts[practice.ods_code])
-        for practice in practice_list
-    )
