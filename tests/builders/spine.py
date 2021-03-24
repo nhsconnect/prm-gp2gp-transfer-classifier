@@ -24,6 +24,8 @@ def build_message(**kwargs):
         to_party_asid=kwargs.get("to_party_asid", a_string(6)),
         message_ref=kwargs.get("message_ref", None),
         error_code=kwargs.get("error_code", None),
+        to_system=kwargs.get("to_system", a_string(4)),
+        from_system=kwargs.get("from_system", a_string(4)),
     )
 
 
@@ -37,5 +39,7 @@ def build_spine_item(**kwargs):
         "messageRecipient": kwargs.get("message_recipient", a_string(6)),
         "messageRef": kwargs.get("message_ref", "NotProvided"),
         "jdiEvent": kwargs.get("jdi_event", "NONE"),
+        "fromSystem": kwargs.get("from_system", a_string(4)),
+        "toSystem": kwargs.get("to_system", a_string(4)),
         "_raw": kwargs.get("raw", ""),
     }

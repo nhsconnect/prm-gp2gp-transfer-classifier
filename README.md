@@ -9,8 +9,8 @@ This repo contains the data pipeline responsible for deriving GP2GP metrics from
 Run the following query for the desired time range and save the results as a csv.
 
 ```
-index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053c"
-| table _time, conversationID, GUID, interactionID, messageSender, messageRecipient, messageRef, jdiEvent
+index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053d"
+| table _time, conversationID, GUID, interactionID, messageSender, messageRecipient, messageRef, jdiEvent, toSystem, fromSystem
 ```
 
 ## Developing
