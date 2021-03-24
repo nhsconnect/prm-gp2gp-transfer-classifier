@@ -40,6 +40,8 @@ EXPECTED_TRANSFERS = {
     "intermediate_error_codes": [[], [], [], []],
     "requesting_practice_asid": ["123456789123", "123456789123", "123456789123", "123456789123"],
     "sending_practice_asid": ["003456789123", "003456789123", "003456789123", "003456789123"],
+    "requesting_supplier": ["", "SystmOne", "SystmOne", "Vision"],
+    "sending_supplier": ["", "EMIS", "Vision", "Unknown"],
     "sla_duration": [398306, 830306, 139106, 52706],
     "status": ["INTEGRATED", "INTEGRATED", "INTEGRATED", "FAILED"],
 }

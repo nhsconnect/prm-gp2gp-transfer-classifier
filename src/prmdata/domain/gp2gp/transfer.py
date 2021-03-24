@@ -23,6 +23,8 @@ class Transfer(NamedTuple):
     sla_duration: Optional[timedelta]
     requesting_practice_asid: str
     sending_practice_asid: str
+    requesting_supplier: str
+    sending_supplier: str
     sender_error_code: Optional[int]
     final_error_code: Optional[int]
     intermediate_error_codes: List[int]
@@ -48,6 +50,14 @@ def _extract_requesting_practice_asid(conversation: ParsedConversation) -> str:
 
 def _extract_sending_practice_asid(conversation: ParsedConversation) -> str:
     return conversation.request_started.to_party_asid
+
+
+def _extract_requesting_supplier(conversation: ParsedConversation) -> str:
+    return conversation.request_started.from_system
+
+
+def _extract_sending_supplier(conversation: ParsedConversation) -> str:
+    return conversation.request_started.to_system
 
 
 def _extract_sender_error(conversation: ParsedConversation) -> Optional[int]:
@@ -115,6 +125,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         sla_duration=_calculate_sla(conversation),
         requesting_practice_asid=_extract_requesting_practice_asid(conversation),
         sending_practice_asid=_extract_sending_practice_asid(conversation),
+        requesting_supplier=_extract_requesting_supplier(conversation),
+        sending_supplier=_extract_sending_supplier(conversation),
         sender_error_code=_extract_sender_error(conversation),
         final_error_code=_extract_final_error_code(conversation),
         intermediate_error_codes=_extract_intermediate_error_code(conversation),
@@ -150,6 +162,8 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "sla_duration": [_convert_to_seconds(t.sla_duration) for t in transfers],
             "requesting_practice_asid": [t.requesting_practice_asid for t in transfers],
             "sending_practice_asid": [t.sending_practice_asid for t in transfers],
+            "requesting_supplier": [t.requesting_supplier for t in transfers],
+            "sending_supplier": [t.sending_supplier for t in transfers],
             "sender_error_code": [t.sender_error_code for t in transfers],
             "final_error_code": [t.final_error_code for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
@@ -163,6 +177,8 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
                 ("sla_duration", pa.uint64()),
                 ("requesting_practice_asid", pa.string()),
                 ("sending_practice_asid", pa.string()),
+                ("requesting_supplier", pa.string()),
+                ("sending_supplier", pa.string()),
                 ("sender_error_code", pa.int64()),
                 ("final_error_code", pa.int64()),
                 ("intermediate_error_codes", pa.list_(pa.int64())),

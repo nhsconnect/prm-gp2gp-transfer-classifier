@@ -42,6 +42,8 @@ def _build_successful_conversation(**kwargs):
             interaction_id="urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",
             from_party_asid=kwargs.get("requesting_asid"),
             to_party_asid=kwargs.get("sending_asid"),
+            from_system=kwargs.get("requesting_supplier"),
+            to_system=kwargs.get("sending_supplier"),
         ),
         build_message(
             time=kwargs.get("ehr_request_completed_on"),
@@ -50,6 +52,8 @@ def _build_successful_conversation(**kwargs):
             interaction_id="urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",
             from_party_asid=kwargs.get("sending_asid"),
             to_party_asid=kwargs.get("requesting_asid"),
+            from_system=kwargs.get("requesting_supplier"),
+            to_system=kwargs.get("sending_supplier"),
         ),
         build_message(
             time=kwargs.get("ehr_request_started_acknowledged_on"),
@@ -58,6 +62,8 @@ def _build_successful_conversation(**kwargs):
             interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
             from_party_asid=kwargs.get("sending_asid"),
             to_party_asid=kwargs.get("requesting_asid"),
+            from_system=kwargs.get("requesting_supplier"),
+            to_system=kwargs.get("sending_supplier"),
             message_ref="abc",
         ),
         build_message(
@@ -67,6 +73,8 @@ def _build_successful_conversation(**kwargs):
             interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
             from_party_asid=kwargs.get("requesting_asid"),
             to_party_asid=kwargs.get("sending_asid"),
+            from_system=kwargs.get("requesting_supplier"),
+            to_system=kwargs.get("sending_supplier"),
             message_ref="abc_1",
         ),
     ]
@@ -80,12 +88,16 @@ def test_parses_transfer_correctly_given_valid_message_list():
 
     requesting_asid_with_transfer = "343434343434"
     sending_asid_with_transfer = "111134343434"
+    requesting_supplier = "EMIS"
+    sending_supplier = "Vision"
     conversation_id = "abcdefg_1234"
 
     spine_messages = _build_successful_conversation(
         conversation_id=conversation_id,
         requesting_asid=requesting_asid_with_transfer,
         sending_asid=sending_asid_with_transfer,
+        requesting_supplier=requesting_supplier,
+        sending_supplier=sending_supplier,
         ehr_request_started_on=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
         ehr_request_completed_on=datetime(2019, 12, 30, 18, 3, 21, tzinfo=UTC),
         ehr_request_started_acknowledged_on=datetime(2019, 12, 30, 18, 3, 23, tzinfo=UTC),
@@ -98,6 +110,8 @@ def test_parses_transfer_correctly_given_valid_message_list():
             sla_duration=timedelta(days=1, seconds=52707),
             requesting_practice_asid=requesting_asid_with_transfer,
             sending_practice_asid=sending_asid_with_transfer,
+            requesting_supplier=requesting_supplier,
+            sending_supplier=sending_supplier,
             status=TransferStatus.INTEGRATED,
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
@@ -122,6 +136,8 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
     requesting_ods_code = "A12345"
     requesting_asid_with_transfer = "343434343434"
     sending_asid_with_transfer = "111134343434"
+    requesting_supplier = "SystemOne"
+    sending_supplier = "Unknown"
     conversation_id = "abcdefg_1234"
 
     transfers = [
@@ -130,6 +146,8 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
             sla_duration=timedelta(days=1, seconds=52707),
             requesting_practice_asid=requesting_asid_with_transfer,
             sending_practice_asid=sending_asid_with_transfer,
+            requesting_supplier=requesting_supplier,
+            sending_supplier=sending_supplier,
             status=TransferStatus.INTEGRATED,
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),

@@ -208,6 +208,8 @@ def test_table_has_correct_schema():
             ("sla_duration", pa.uint64()),
             ("requesting_practice_asid", pa.string()),
             ("sending_practice_asid", pa.string()),
+            ("requesting_supplier", pa.string()),
+            ("sending_supplier", pa.string()),
             ("sender_error_code", pa.int64()),
             ("final_error_code", pa.int64()),
             ("intermediate_error_codes", pa.list_(pa.int64())),
