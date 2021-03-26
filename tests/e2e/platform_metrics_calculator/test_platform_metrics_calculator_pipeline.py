@@ -103,7 +103,7 @@ def test_with_local_files(datadir):
     input_file_paths = _gzip_files(
         [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
     )
-    organisation_metadata_file_path = datadir / "organisation_metadata.json"
+    organisation_metadata_file_path = datadir / "organisation-list.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
     practice_metrics_output_file_path = datadir / "12-2019-practiceMetrics.json"
@@ -111,11 +111,15 @@ def test_with_local_files(datadir):
     national_metrics_output_file_path = datadir / "12-2019-nationalMetrics.json"
     transfers_output_file_path = datadir / "12-2019-transfers.parquet"
 
-    expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
-    expected_organisation_metadata = _read_json(
-        datadir / "expected_organisation_metadata_dec_2019.json"
+    expected_practice_metrics = _read_json(
+        datadir / "expected_json_output" / "practiceMetrics.json"
     )
-    expected_national_metrics = _read_json(datadir / "expected_national_metrics_dec_2019.json")
+    expected_organisation_metadata = _read_json(
+        datadir / "expected_json_output" / "organisationMetadata.json"
+    )
+    expected_national_metrics = _read_json(
+        datadir / "expected_json_output" / "nationalMetrics.json"
+    )
 
     month = 12
     year = 2019
@@ -169,7 +173,7 @@ def test_with_s3_output(datadir):
     input_file_paths = _gzip_files(
         [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
     )
-    organisation_metadata_file_path = datadir / "organisation_metadata.json"
+    organisation_metadata_file_path = datadir / "organisation-list.json"
     input_file_paths_str = _csv_join_paths(input_file_paths)
 
     expected_practice_metrics_output_key = "practiceMetrics.json"
@@ -177,11 +181,15 @@ def test_with_s3_output(datadir):
     expected_national_metrics_output_key = "nationalMetrics.json"
     expected_transfers_output_key = "transfers.parquet"
 
-    expected_practice_metrics = _read_json(datadir / "expected_practice_metrics_dec_2019.json")
-    expected_organisation_metadata = _read_json(
-        datadir / "expected_organisation_metadata_dec_2019.json"
+    expected_practice_metrics = _read_json(
+        datadir / "expected_json_output" / "practiceMetrics.json"
     )
-    expected_national_metrics = _read_json(datadir / "expected_national_metrics_dec_2019.json")
+    expected_organisation_metadata = _read_json(
+        datadir / "expected_json_output" / "organisationMetadata.json"
+    )
+    expected_national_metrics = _read_json(
+        datadir / "expected_json_output" / "nationalMetrics.json"
+    )
 
     month = 12
     year = 2019
