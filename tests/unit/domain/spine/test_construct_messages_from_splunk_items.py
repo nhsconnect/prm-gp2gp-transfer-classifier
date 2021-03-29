@@ -66,3 +66,38 @@ def test_returns_correct_messages_given_two_items():
     actual = construct_messages_from_splunk_items(items)
 
     assert list(actual) == expected
+
+
+def test_returns_correct_message_when_from_system_and_to_system_is_not_present():
+    items = [
+        build_spine_item(
+            time="2019-12-31T23:37:55.334+0000",
+            conversation_id="convo_abc",
+            guid="message_a",
+            interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
+            message_sender="123456789012",
+            message_recipient="121212121212",
+            message_ref="NotProvided",
+            jdi_event="NONE",
+            raw="",
+        ),
+    ]
+
+    expected = [
+        Message(
+            time=datetime(2019, 12, 31, 23, 37, 55, 334000, tzutc()),
+            conversation_id="convo_abc",
+            guid="message_a",
+            interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
+            from_party_asid="123456789012",
+            to_party_asid="121212121212",
+            message_ref=None,
+            error_code=None,
+            from_system=None,
+            to_system=None,
+        )
+    ]
+
+    actual = construct_messages_from_splunk_items(items)
+
+    assert list(actual) == expected

@@ -13,8 +13,8 @@ class Message(NamedTuple):
     to_party_asid: str
     message_ref: Optional[str]
     error_code: Optional[int]
-    from_system: str
-    to_system: str
+    from_system: Optional[str]
+    to_system: Optional[str]
 
 
 def _parse_error_code(error):
@@ -23,6 +23,13 @@ def _parse_error_code(error):
 
 def _parse_message_ref(ref):
     return None if ref == "NotProvided" else ref
+
+
+def _get_attribute(item, attr):
+    if attr in item:
+        return item[attr]
+    else:
+        return None
 
 
 def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Message]:
@@ -36,6 +43,6 @@ def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Mess
             to_party_asid=item["messageRecipient"],
             message_ref=_parse_message_ref(item["messageRef"]),
             error_code=_parse_error_code(item["jdiEvent"]),
-            from_system=item["fromSystem"],
-            to_system=item["toSystem"],
+            from_system=_get_attribute(item, "fromSystem"),
+            to_system=_get_attribute(item, "toSystem"),
         )
