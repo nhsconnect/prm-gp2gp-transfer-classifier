@@ -31,6 +31,7 @@ class Transfer(NamedTuple):
     status: TransferStatus
     date_requested: datetime
     date_completed: Optional[datetime]
+    request_completed_ack_codes: List[int]
 
 
 def _calculate_sla(conversation: ParsedConversation):
@@ -133,6 +134,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         status=_assign_status(conversation),
         date_requested=_extract_date_requested(conversation),
         date_completed=_extract_date_completed(conversation),
+        request_completed_ack_codes=conversation.request_completed_acks,
     )
 
 
@@ -170,6 +172,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "status": [t.status.value for t in transfers],
             "date_requested": [t.date_requested for t in transfers],
             "date_completed": [t.date_completed for t in transfers],
+            "request_completed_ack_codes": [t.request_completed_ack_codes for t in transfers],
         },
         schema=pa.schema(
             [
@@ -185,6 +188,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
                 ("status", pa.string()),
                 ("date_requested", pa.timestamp("us")),
                 ("date_completed", pa.timestamp("us")),
+                ("request_completed_ack_codes", pa.list_(pa.int64())),
             ]
         ),
     )

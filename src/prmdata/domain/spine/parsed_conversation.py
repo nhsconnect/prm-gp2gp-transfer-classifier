@@ -17,6 +17,8 @@ class ParsedConversation(NamedTuple):
     request_completed: Optional[Message]
     intermediate_messages: List[Message]
     request_completed_ack: Optional[Message]
+    request_completed_messages: List[Message]
+    request_completed_acks: List[int]
 
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:
@@ -37,6 +39,8 @@ class SpineConversationParser:
         self._request_started_ack: Optional[Message] = None
         self._intermediate_messages: List[Message] = []
         self._request_completed_ack: Optional[Message] = None
+        self._request_completed_messages: List[Message] = []
+        self._request_completed_acks: List[int] = []
 
     @staticmethod
     def _is_request_completed(message):
@@ -60,12 +64,22 @@ class SpineConversationParser:
     def _process_message(self, message):
         if self._is_request_completed(message):
             self._req_completed_message = message
+            self._request_completed_messages.append(message)
         elif self._is_acknowledging(message, self._req_completed_message):
             self._request_completed_ack = message
+            self._request_completed_acks.append(message.error_code)
+        elif self._is_acknowledging_any_request_completed_message(message):
+            self._request_completed_acks.append(message.error_code)
         elif self._is_acknowledging(message, self._req_started_message):
             self._request_started_ack = message
         else:
             self._intermediate_messages.append(message)
+
+    def _is_acknowledging_any_request_completed_message(self, message):
+        for req_completed in self._request_completed_messages:
+            if self._is_acknowledging(message, req_completed):
+                return True
+        return False
 
     def parse(self):
         self._req_started_message = self._get_next_or_none()
@@ -85,6 +99,8 @@ class SpineConversationParser:
             request_completed=self._req_completed_message,
             intermediate_messages=self._intermediate_messages,
             request_completed_ack=self._request_completed_ack,
+            request_completed_messages=self._request_completed_messages,
+            request_completed_acks=self._request_completed_acks,
         )
 
 
