@@ -134,7 +134,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         status=_assign_status(conversation),
         date_requested=_extract_date_requested(conversation),
         date_completed=_extract_date_completed(conversation),
-        request_completed_ack_codes=conversation.request_completed_acks,
+        request_completed_ack_codes=conversation.request_completed_ack_codes,
     )
 
 

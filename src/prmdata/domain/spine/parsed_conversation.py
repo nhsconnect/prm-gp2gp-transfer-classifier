@@ -18,7 +18,7 @@ class ParsedConversation(NamedTuple):
     intermediate_messages: List[Message]
     request_completed_ack: Optional[Message]
     request_completed_messages: List[Message]
-    request_completed_acks: List[int]
+    request_completed_ack_codes: List[int]
 
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:
@@ -40,7 +40,7 @@ class SpineConversationParser:
         self._intermediate_messages: List[Message] = []
         self._request_completed_ack: Optional[Message] = None
         self._request_completed_messages: List[Message] = []
-        self._request_completed_acks: List[int] = []
+        self.request_completed_ack_codes: List[int] = []
 
     @staticmethod
     def _is_request_completed(message):
@@ -67,9 +67,9 @@ class SpineConversationParser:
             self._request_completed_messages.append(message)
         elif self._is_acknowledging(message, self._req_completed_message):
             self._request_completed_ack = message
-            self._request_completed_acks.append(message.error_code)
+            self.request_completed_ack_codes.append(message.error_code)
         elif self._is_acknowledging_any_request_completed_message(message):
-            self._request_completed_acks.append(message.error_code)
+            self.request_completed_ack_codes.append(message.error_code)
         elif self._is_acknowledging(message, self._req_started_message):
             self._request_started_ack = message
         else:
@@ -100,7 +100,7 @@ class SpineConversationParser:
             intermediate_messages=self._intermediate_messages,
             request_completed_ack=self._request_completed_ack,
             request_completed_messages=self._request_completed_messages,
-            request_completed_acks=self._request_completed_acks,
+            request_completed_ack_codes=self.request_completed_ack_codes,
         )
 
 

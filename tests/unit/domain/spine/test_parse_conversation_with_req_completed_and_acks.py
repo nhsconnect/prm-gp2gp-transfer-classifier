@@ -12,7 +12,7 @@ from tests.builders.spine import build_message
 def test_returns_a_list_of_request_completed_messages():
     request_started_message = build_message(guid="abc", interaction_id=EHR_REQUEST_STARTED)
     request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
-    request_completed_message_2 = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
+    request_completed_message_2 = build_message(guid="abc-2", interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc")
     request_completed_ack_message = build_message(
         interaction_id=APPLICATION_ACK, message_ref="abc-1"
@@ -39,33 +39,7 @@ def test_returns_a_list_of_request_completed_messages():
 def test_returns_a_list_of_request_completed_acks():
     request_started_message = build_message(guid="abc", interaction_id=EHR_REQUEST_STARTED)
     request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
-    request_completed_message_2 = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
-    request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc")
-    request_completed_ack_message = build_message(
-        interaction_id=APPLICATION_ACK, message_ref="abc-1", error_code=None
-    )
-
-    messages = [
-        request_started_message,
-        request_completed_message,
-        request_completed_message_2,
-        request_started_ack_message,
-        request_completed_ack_message,
-    ]
-
-    conversation = Conversation("abc-0", messages)
-
-    actual = parse_conversation(conversation)
-
-    assert actual.request_completed_acks == [None]
-
-
-def test_returns_a_list_of_request_completed_messages_and_its_acks_with_different_guids():
-    request_started_message = build_message(guid="abc", interaction_id=EHR_REQUEST_STARTED)
-    request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
-    request_completed_message_2 = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
-    request_completed_message_3 = build_message(guid="abc-2", interaction_id=EHR_REQUEST_COMPLETED)
-    request_completed_message_4 = build_message(guid="abc-2", interaction_id=EHR_REQUEST_COMPLETED)
+    request_completed_message_2 = build_message(guid="abc-2", interaction_id=EHR_REQUEST_COMPLETED)
     common_point_to_point = build_message(guid="abc-3", interaction_id=COMMON_POINT_TO_POINT)
     common_point_to_point_ack = build_message(
         interaction_id=COMMON_POINT_TO_POINT, message_ref="abc-3"
@@ -75,39 +49,22 @@ def test_returns_a_list_of_request_completed_messages_and_its_acks_with_differen
         interaction_id=APPLICATION_ACK, message_ref="abc-2", error_code=12
     )
     request_completed_ack_message_2 = build_message(
-        interaction_id=APPLICATION_ACK, message_ref="abc-2", error_code=12
-    )
-    request_completed_ack_message_3 = build_message(
-        interaction_id=APPLICATION_ACK, message_ref="abc-2", error_code=None
-    )
-    request_completed_ack_message_4 = build_message(
-        interaction_id=APPLICATION_ACK, message_ref="abc-2", error_code=None
+        interaction_id=APPLICATION_ACK, message_ref="abc-1", error_code=None
     )
 
     messages = [
         request_started_message,
         request_completed_message,
         request_completed_message_2,
-        request_completed_message_3,
-        request_completed_message_4,
         common_point_to_point,
         common_point_to_point_ack,
         request_started_ack_message,
         request_completed_ack_message,
         request_completed_ack_message_2,
-        request_completed_ack_message_3,
-        request_completed_ack_message_4,
     ]
 
     conversation = Conversation("abc-0", messages)
 
     actual = parse_conversation(conversation)
 
-    assert actual.request_completed_messages == [
-        request_completed_message,
-        request_completed_message_2,
-        request_completed_message_3,
-        request_completed_message_4,
-    ]
-
-    assert actual.request_completed_acks == [12, 12, None, None]
+    assert actual.request_completed_ack_codes == [12, None]

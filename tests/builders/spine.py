@@ -12,7 +12,7 @@ def build_parsed_conversation(**kwargs):
         intermediate_messages=kwargs.get("intermediate_messages", []),
         request_completed_ack=kwargs.get("request_completed_ack", build_message()),
         request_completed_messages=kwargs.get("request_completed_messages", []),
-        request_completed_acks=kwargs.get("request_completed_acks", []),
+        request_completed_ack_codes=kwargs.get("request_completed_ack_codes", []),
     )
 
 
