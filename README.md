@@ -51,21 +51,10 @@ This will run the validation commands in the same container used by the GoCD pip
 
 `./tasks check-deps`
 
-### ODS Portal Pipeline
+### ODS Data
 
-This pipeline will fetch ODS codes and names of all active GP practices and save to json file.
-
-To run the ODS Portal pipeline first create virtual dev environment:
-
-`./tasks devenv`
-
-Activate virtual dev environment:
-
-`source venv/bin/activate`
-
-Then run the pipeline command:
-
-`ods-portal-pipeline --output-file "<organisation-list>.json" --mapping-file "<asid-lookup-file>.csv.gz"`
+If you need ODS codes and names of all active GP practices
+[please check this out.](https://github.com/nhsconnect/prm-gp2gp-ods-downloader#readme)
 
 ### Data Platform Pipeline
 

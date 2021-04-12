@@ -11,7 +11,7 @@ from prmdata.utils.date.range import DateTimeRange
 from prmdata.utils.io.csv import read_gzip_csv_files
 from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.utils.io.json import write_json_file, read_json_file, upload_json_object
-from prmdata.domain.ods_portal.sources import construct_organisation_list_from_dict
+from prmdata.domain.ods_portal.models import construct_organisation_list_from_dict
 from prmdata.pipeline.platform_metrics_calculator.args import (
     parse_platform_metrics_calculator_pipeline_arguments,
 )
