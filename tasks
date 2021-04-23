@@ -49,7 +49,7 @@ do
         ./tasks check-deps > audit-output.txt
         ;;
     dojo-dep)
-        dojo "./tasks check-deps"
+        dojo "./tasks dep"
         ;;
     *)
         echo "Invalid command: '${command}'"
