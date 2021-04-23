@@ -1,0 +1,27 @@
+format_version: 4
+pipelines:
+  "prm-gp2gp-data-pipeline.audit":
+    group: gp2gp-audit
+    label_template: "${git[:8]}"
+    materials:
+      git:
+        type: configrepo
+    timer:
+      spec: 0 0 9 ? * MON,TUE,WED,THU,FRI *
+    stages:
+      - audit:
+          clean_workspace: true
+          jobs:
+            dependency_check:
+              resources:
+                - docker
+              artifacts:
+                - build:
+                    source: audit-output.txt
+                    destination: reports
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks dojo-dep

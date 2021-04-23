@@ -45,6 +45,12 @@ do
     dojo-validate)
         dojo "./tasks validate"
         ;;
+    dep)
+        ./tasks check-deps > audit-output.txt
+        ;;
+    dojo-dep)
+        dojo "./tasks check-deps"
+        ;;
     *)
         echo "Invalid command: '${command}'"
         exit 1

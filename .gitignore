@@ -10,3 +10,4 @@ venv/
 gp2gp_data_pipeline.egg-info
 .tox
 .coverage
+audit-output.txt
