@@ -17,12 +17,10 @@ index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053d"
 
 Common development workflows are defined in the `tasks` script.
 
-These generally work by running a command in a virtual environment configured via `tox.ini`.
-
 ### Prerequisites
 
 - Python 3.9
-- [Tox](https://tox.readthedocs.io/en/latest/#) `pip install tox`
+- Pipenv
 - [Docker](https://www.docker.com/get-started)
 
 ### Running the unit and integration tests
@@ -73,10 +71,3 @@ Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-fi
 - When outputting to AWS ensure the environment has the appropriate access.
 - Note this will use the year and month as part of the s3 key structure, as well 'v2' (data pipeline output version). 
 
-## Troubleshooting
-
-```
-ERROR: InvocationError for command /YOUR_PROJECT_DIRECTORY/prm-gp2gp-data-pipeline/.tox/check-format/bin/black --check -t py38 -l100 src/ tests/ setup.py (exited with code 2)
-```
-
-If you see this error, you need to delete the .tox package and try again

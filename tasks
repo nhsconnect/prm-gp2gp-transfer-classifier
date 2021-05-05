@@ -7,23 +7,23 @@ do
   echo "--- ${command} ---"
   case "${command}" in
     test)
-        tox -e py39
+        pipenv run test
         ;;
     format)
-        tox -e format
+        pipenv run format
         ;;
     check-format)
-        tox -e check-format
+        pipenv run check-format
         ;;
     lint)
-        tox -e flake8
-        tox -e bandit
+        pipenv run lint-flake8
+        pipenv run lint-bandit
         ;;
     typecheck)
-        tox -e mypy
+        pipenv run typecheck
         ;;
     check-deps)
-        tox -e check-deps
+        pipenv check
         ;;
     clean)
         find ./tests -type f -name "*.pyc" -delete
@@ -37,19 +37,19 @@ do
     devenv)
         echo "./tasks validate" > .git/hooks/pre-commit
         chmod +x .git/hooks/pre-commit
-        tox --recreate --devenv venv -e py39
+        pipenv install -d
         ;;
     validate)
         ./tasks check-format typecheck lint test
         ;;
     dojo-validate)
-        dojo "./tasks validate"
+        dojo "./tasks devenv validate"
         ;;
     dep)
         ./tasks check-deps > audit-output.txt
         ;;
     dojo-dep)
-        dojo "./tasks dep"
+        dojo "./tasks devenv dep"
         ;;
     *)
         echo "Invalid command: '${command}'"
