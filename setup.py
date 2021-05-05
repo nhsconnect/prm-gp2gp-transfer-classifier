@@ -14,7 +14,6 @@ setup(
     entry_points={
         "console_scripts": [
             "platform-metrics-pipeline=prmdata.pipeline.platform_metrics_calculator.main:main",
-            "ods-portal-pipeline=prmdata.pipeline.ods_downloader.main:main",
         ]
     },
 )
