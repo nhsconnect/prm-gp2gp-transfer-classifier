@@ -48,6 +48,7 @@ This will run the validation commands in the same container used by the GoCD pip
 ### Dependency Scanning
 
 `./tasks check-deps`
+- If this fails when running outside of Dojo, see [troubleshooting section](### Troubleshooting) 
 
 ### ODS Data
 
@@ -68,6 +69,23 @@ Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-fi
 
 Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jan.csv.gz,data/feb.csv.gz" --output-bucket "example-bucket"`
 
-- When outputting to AWS ensure the environment has the appropriate access.
+- When outputting to AWS, ensure the environment has the appropriate access.
 - Note this will use the year and month as part of the s3 key structure, as well 'v2' (data pipeline output version). 
 
+### Troubleshooting
+
+#### Checking dependencies fails locally due to pip
+
+If running `./tasks check-deps` fails due to an outdated version of pip, yet works when running it in dojo (i.e. `./tasks dojo-deps`), then the local python environment containing pipenv may need to be updated (using pyenv instead of brew - to better control the pip version).
+Ensure you have pyenv installed (use `brew install pyenv`).
+Perform the following steps:
+
+1. Run `brew uninstall pipenv`
+4. Run `pyenv install <required-python-version>`
+5. Run `pyenv global <required-python-version>`
+6. Run `python -m pip install pipenv` to install pipenv using the updated python environment.
+7. Run `python -m pip install -U "pip>=<required-pip-version>"`
+8. Now running `./tasks check-deps` should pass.
+   - `pyenv global` should output the specific python version specified rather than `system`.
+   - Both `python --version` and `pip --version` should point to the versions you have specified.
+   - `ls -l $(which pipenv)` should output `.../.pyenv/shims/pipenv` rather than `...Cellar...` (which is a brew install).
