@@ -21,6 +21,9 @@ class Message(NamedTuple):
     from_system: Optional[str]
     to_system: Optional[str]
 
+    def is_ehr_request_started(self):
+        return self.interaction_id == EHR_REQUEST_STARTED
+
     def is_ehr_request_completed(self):
         return self.interaction_id == EHR_REQUEST_COMPLETED
 

@@ -1,10 +1,7 @@
 from typing import NamedTuple, List, Optional, Iterable, Iterator
 
 from prmdata.domain.spine.conversation import Conversation
-from prmdata.domain.spine.message import (
-    Message,
-    EHR_REQUEST_STARTED,
-)
+from prmdata.domain.spine.message import Message
 from prmdata.utils.date.range import DateTimeRange
 
 
@@ -56,16 +53,19 @@ class SpineConversationParser:
         else:
             self._intermediate_messages.append(message)
 
-    def parse(self):
-        self._req_started = self._get_next_or_none()
-
-        if self._req_started.interaction_id != EHR_REQUEST_STARTED:
+    def _process_first_message(self):
+        first_message = self._get_next_or_none()
+        if first_message.is_ehr_request_started():
+            self._req_started = first_message
+        else:
             raise ConversationMissingStart()
 
-        next_message = self._get_next_or_none()
-        while next_message is not None:
+    def parse(self):
+
+        self._process_first_message()
+
+        while (next_message := self._get_next_or_none()) is not None:
             self._process_message(next_message)
-            next_message = self._get_next_or_none()
 
         return ParsedConversation(
             self._id,
