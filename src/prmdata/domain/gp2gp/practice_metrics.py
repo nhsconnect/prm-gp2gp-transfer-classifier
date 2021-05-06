@@ -3,7 +3,7 @@ from typing import NamedTuple, Iterable, Iterator
 
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.domain.gp2gp.transfer import Transfer
-from prmdata.domain.gp2gp.sla import assign_to_sla_band, SlaBand
+from prmdata.domain.gp2gp.sla import SlaCounter
 
 
 class IntegratedPracticeMetrics(NamedTuple):
@@ -24,12 +24,10 @@ def _derive_practice_sla_metrics(practice, sla_metrics):
         practice.ods_code,
         practice.name,
         integrated=IntegratedPracticeMetrics(
-            transfer_count=sla_metrics[SlaBand.WITHIN_3_DAYS]
-            + sla_metrics[SlaBand.WITHIN_8_DAYS]
-            + sla_metrics[SlaBand.BEYOND_8_DAYS],
-            within_3_days=sla_metrics[SlaBand.WITHIN_3_DAYS],
-            within_8_days=sla_metrics[SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=sla_metrics[SlaBand.BEYOND_8_DAYS],
+            transfer_count=sla_metrics.total(),
+            within_3_days=sla_metrics.within_3_days(),
+            within_8_days=sla_metrics.within_8_days(),
+            beyond_8_days=sla_metrics.beyond_8_days(),
         ),
     )
 
@@ -37,8 +35,7 @@ def _derive_practice_sla_metrics(practice, sla_metrics):
 def calculate_sla_by_practice(
     practice_list: Iterable[PracticeDetails], transfers: Iterable[Transfer]
 ) -> Iterator[PracticeMetrics]:
-    default_sla = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
-    practice_counts = {practice.ods_code: default_sla.copy() for practice in practice_list}
+    practice_counts = {practice.ods_code: SlaCounter() for practice in practice_list}
 
     asid_to_ods_mapping = {
         asid: practice.ods_code for practice in practice_list for asid in practice.asids
@@ -59,8 +56,7 @@ def _process_asid(asid_to_ods_mapping, practice_counts, transfers):
 
         if asid in asid_to_ods_mapping:
             ods_code = asid_to_ods_mapping[asid]
-            sla_band = assign_to_sla_band(transfer.sla_duration)
-            practice_counts[ods_code][sla_band] += 1
+            practice_counts[ods_code].increment(transfer.sla_duration)
         else:
             unexpected_asids.add(asid)
     if len(unexpected_asids) > 0:
