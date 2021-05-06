@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Iterable, List, Set
-from prmdata.domain.gp2gp.sla import SlaBand, assign_to_sla_band
+from prmdata.domain.gp2gp.sla import SlaCounter
 from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 
 
@@ -36,9 +36,9 @@ def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
         failed_transfer_count=_count_transfers_with_statuses(transfers, {TransferStatus.FAILED}),
         integrated=IntegratedMetrics(
             transfer_count=len(integrated_transfers),
-            within_3_days=sla_band_counts[SlaBand.WITHIN_3_DAYS],
-            within_8_days=sla_band_counts[SlaBand.WITHIN_8_DAYS],
-            beyond_8_days=sla_band_counts[SlaBand.BEYOND_8_DAYS],
+            within_3_days=sla_band_counts.within_3_days(),
+            within_8_days=sla_band_counts.within_8_days(),
+            beyond_8_days=sla_band_counts.beyond_8_days(),
         ),
     )
 
@@ -54,8 +54,7 @@ def _filter_for_integrated_transfers(transfers: Iterable[Transfer]) -> List[Tran
 
 
 def _calculate_sla_band_counts(integrated_transfers: List[Transfer]):
-    sla_band_counts = {SlaBand.WITHIN_3_DAYS: 0, SlaBand.WITHIN_8_DAYS: 0, SlaBand.BEYOND_8_DAYS: 0}
+    counter = SlaCounter()
     for transfer in integrated_transfers:
-        sla_band = assign_to_sla_band(transfer.sla_duration)
-        sla_band_counts[sla_band] += 1
-    return sla_band_counts
+        counter.increment(transfer.sla_duration)
+    return counter
