@@ -24,6 +24,9 @@ class Message(NamedTuple):
     def is_ehr_request_completed(self):
         return self.interaction_id == EHR_REQUEST_COMPLETED
 
+    def is_acknowledgement_of(self, other_message):
+        return self.interaction_id == APPLICATION_ACK and self.message_ref == other_message.guid
+
 
 def _parse_error_code(error):
     return None if error == "NONE" else int(error)

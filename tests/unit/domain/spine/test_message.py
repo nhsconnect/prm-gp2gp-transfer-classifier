@@ -1,4 +1,8 @@
-from prmdata.domain.spine.message import EHR_REQUEST_COMPLETED, APPLICATION_ACK
+from prmdata.domain.spine.message import (
+    EHR_REQUEST_COMPLETED,
+    APPLICATION_ACK,
+    COMMON_POINT_TO_POINT,
+)
 from tests.builders.spine import build_message
 
 
@@ -18,5 +22,38 @@ def test_is_ehr_request_completed_returns_false_when_interaction_is_not_ehr_req_
     expected = False
 
     actual = message.is_ehr_request_completed()
+
+    assert actual == expected
+
+
+def test_is_acknowledgement_of_returns_false_when_message_is_not_an_ack():
+    message = build_message(interaction_id=COMMON_POINT_TO_POINT, message_ref="123")
+    other_message = build_message(guid="123")
+
+    expected = False
+
+    actual = message.is_acknowledgement_of(other_message)
+
+    assert actual == expected
+
+
+def test_is_acknowledgement_of_returns_false_when_message_ref_is_wrong():
+    message = build_message(interaction_id=APPLICATION_ACK, message_ref="123")
+    other_message = build_message(guid="456")
+
+    expected = False
+
+    actual = message.is_acknowledgement_of(other_message)
+
+    assert actual == expected
+
+
+def test_is_acknowledgement_of_returns_true_when_given_message_with_matching_ref():
+    message = build_message(interaction_id=APPLICATION_ACK, message_ref="123")
+    other_message = build_message(guid="123")
+
+    expected = True
+
+    actual = message.is_acknowledgement_of(other_message)
 
     assert actual == expected
