@@ -3,7 +3,6 @@ from typing import NamedTuple, List, Optional, Iterable, Iterator
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.message import (
     Message,
-    APPLICATION_ACK,
     EHR_REQUEST_STARTED,
 )
 from prmdata.utils.date.range import DateTimeRange
@@ -31,41 +30,36 @@ class SpineConversationParser:
     def __init__(self, conversation: Conversation):
         self._id = conversation.id
         self._messages = iter(conversation.messages)
-        self._req_started_message: Optional[Message] = None
-        self._req_completed_message: Optional[Message] = None
+        self._req_started: Optional[Message] = None
+        self._req_completed: Optional[Message] = None
         self._request_started_ack: Optional[Message] = None
         self._intermediate_messages: List[Message] = []
         self._request_completed_ack: Optional[Message] = None
-
-    @staticmethod
-    def _is_acknowledging(acknowledging_message, acknowledged_message):
-        if acknowledged_message is None:
-            return False
-        else:
-            is_ack = acknowledging_message.interaction_id == APPLICATION_ACK
-            is_acknowledging_candidate_message = (
-                acknowledging_message.message_ref == acknowledged_message.guid
-            )
-            return is_ack and is_acknowledging_candidate_message
 
     def _get_next_or_none(self):
         next_message = next(self._messages, None)
         return next_message
 
+    def _has_seen_req_completed(self):
+        return self._req_completed is not None
+
+    def _has_seen_req_started(self):
+        return self._req_started is not None
+
     def _process_message(self, message):
         if message.is_ehr_request_completed():
-            self._req_completed_message = message
-        elif self._is_acknowledging(message, self._req_completed_message):
+            self._req_completed = message
+        elif self._has_seen_req_completed() and message.is_acknowledgement_of(self._req_completed):
             self._request_completed_ack = message
-        elif self._is_acknowledging(message, self._req_started_message):
+        elif self._has_seen_req_started() and message.is_acknowledgement_of(self._req_started):
             self._request_started_ack = message
         else:
             self._intermediate_messages.append(message)
 
     def parse(self):
-        self._req_started_message = self._get_next_or_none()
+        self._req_started = self._get_next_or_none()
 
-        if self._req_started_message.interaction_id != EHR_REQUEST_STARTED:
+        if self._req_started.interaction_id != EHR_REQUEST_STARTED:
             raise ConversationMissingStart()
 
         next_message = self._get_next_or_none()
@@ -75,9 +69,9 @@ class SpineConversationParser:
 
         return ParsedConversation(
             self._id,
-            request_started=self._req_started_message,
+            request_started=self._req_started,
             request_started_ack=self._request_started_ack,
-            request_completed=self._req_completed_message,
+            request_completed=self._req_completed,
             intermediate_messages=self._intermediate_messages,
             request_completed_ack=self._request_completed_ack,
         )
