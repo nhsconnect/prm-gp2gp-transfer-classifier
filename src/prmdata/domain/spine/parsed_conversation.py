@@ -1,13 +1,13 @@
 from typing import NamedTuple, List, Optional, Iterable, Iterator
 
 from prmdata.domain.spine.conversation import Conversation
-from prmdata.domain.spine.message import Message
+from prmdata.domain.spine.message import (
+    Message,
+    EHR_REQUEST_COMPLETED,
+    APPLICATION_ACK,
+    EHR_REQUEST_STARTED,
+)
 from prmdata.utils.date.range import DateTimeRange
-
-EHR_REQUEST_STARTED = "urn:nhs:names:services:gp2gp/RCMR_IN010000UK05"
-EHR_REQUEST_COMPLETED = "urn:nhs:names:services:gp2gp/RCMR_IN030000UK06"
-APPLICATION_ACK = "urn:nhs:names:services:gp2gp/MCCI_IN010000UK13"
-COMMON_POINT_TO_POINT = "urn:nhs:names:services:gp2gp/COPC_IN000001UK01"
 
 
 class ParsedConversation(NamedTuple):

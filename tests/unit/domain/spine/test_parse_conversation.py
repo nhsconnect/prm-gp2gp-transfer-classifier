@@ -1,11 +1,13 @@
 import pytest
 
-from prmdata.domain.spine.parsed_conversation import (
-    ParsedConversation,
+from prmdata.domain.spine.message import (
+    COMMON_POINT_TO_POINT,
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
-    COMMON_POINT_TO_POINT,
+)
+from prmdata.domain.spine.parsed_conversation import (
+    ParsedConversation,
     parse_conversation,
     ConversationMissingStart,
 )

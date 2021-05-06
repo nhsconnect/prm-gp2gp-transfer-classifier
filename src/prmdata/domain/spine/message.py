@@ -3,6 +3,11 @@ from typing import NamedTuple, Optional, Iterable, Iterator
 
 from dateutil import parser
 
+EHR_REQUEST_STARTED = "urn:nhs:names:services:gp2gp/RCMR_IN010000UK05"
+EHR_REQUEST_COMPLETED = "urn:nhs:names:services:gp2gp/RCMR_IN030000UK06"
+APPLICATION_ACK = "urn:nhs:names:services:gp2gp/MCCI_IN010000UK13"
+COMMON_POINT_TO_POINT = "urn:nhs:names:services:gp2gp/COPC_IN000001UK01"
+
 
 class Message(NamedTuple):
     time: datetime
@@ -15,6 +20,9 @@ class Message(NamedTuple):
     error_code: Optional[int]
     from_system: Optional[str]
     to_system: Optional[str]
+
+    def is_ehr_request_completed(self):
+        return self.interaction_id == EHR_REQUEST_COMPLETED
 
 
 def _parse_error_code(error):
