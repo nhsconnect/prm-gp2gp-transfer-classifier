@@ -3,7 +3,6 @@ from typing import NamedTuple, List, Optional, Iterable, Iterator
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.message import (
     Message,
-    EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
     EHR_REQUEST_STARTED,
 )
@@ -39,10 +38,6 @@ class SpineConversationParser:
         self._request_completed_ack: Optional[Message] = None
 
     @staticmethod
-    def _is_request_completed(message):
-        return message.interaction_id == EHR_REQUEST_COMPLETED
-
-    @staticmethod
     def _is_acknowledging(acknowledging_message, acknowledged_message):
         if acknowledged_message is None:
             return False
@@ -58,7 +53,7 @@ class SpineConversationParser:
         return next_message
 
     def _process_message(self, message):
-        if self._is_request_completed(message):
+        if message.is_ehr_request_completed():
             self._req_completed_message = message
         elif self._is_acknowledging(message, self._req_completed_message):
             self._request_completed_ack = message
