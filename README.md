@@ -21,7 +21,8 @@ Common development workflows are defined in the `tasks` script.
 
 - Python 3.9. Use [pyenv](https://github.com/pyenv/pyenv) to easily switch Python versions.
 - [Pipenv](https://pypi.org/project/pipenv/). Install by running `python -m pip install pipenv`
-- [Docker](https://www.docker.com/get-started)
+- [Docker](https://www.docker.com/get-started) - version 3.1.0 or higher
+- [dojo](https://github.com/kudulab/dojo) 
 
 ### Running the unit and integration tests
 
@@ -82,8 +83,9 @@ Perform the following steps:
 
 1. Run `brew uninstall pipenv`
 2. Run `pyenv install <required-python-version>`
-3. Run `pyenv global <required-python-version>`
-4. Open another terminal for further steps.   
+3. Follow step 3 from [here](https://github.com/pyenv/pyenv#basic-github-checkout )  
+4. Run `pyenv global <required-python-version>`
+5. For the following steps open another terminal.   
 6. Run `python -m pip install pipenv` to install pipenv using the updated python environment.
 7. Run `python -m pip install -U "pip>=<required-pip-version>"`
 8. Now running `./tasks check-deps` should pass.
