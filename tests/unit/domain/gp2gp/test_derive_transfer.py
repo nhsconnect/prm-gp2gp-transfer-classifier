@@ -30,9 +30,11 @@ def test_produces_sla_of_successful_conversation():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(
-                time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-            ),
+            request_completed_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
+                )
+            ],
             request_completed_ack=build_message(
                 time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
                 error_code=None,
@@ -51,7 +53,7 @@ def test_produces_no_sla_given_pending_ehr_completed():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=None,
+            request_completed_messages=[],
             request_completed_ack=None,
         )
     ]
@@ -67,7 +69,7 @@ def test_produces_no_sla_given_pending_request_completed_ack():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             request_completed_ack=None,
         )
     ]
@@ -209,7 +211,9 @@ def test_has_pending_status_if_no_final_ack():
 def test_has_pending_status_if_no_request_completed_message():
     conversations = [
         build_parsed_conversation(
-            request_started=build_message(), request_completed=None, request_completed_ack=None
+            request_started=build_message(),
+            request_completed_messages=[],
+            request_completed_ack=None,
         )
     ]
 
@@ -240,7 +244,7 @@ def test_has_integrated_status_if_no_error_in_final_ack():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             request_completed_ack=build_message(error_code=None),
         )
     ]
@@ -256,7 +260,7 @@ def test_has_integrated_status_if_error_is_supressed():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             request_completed_ack=build_message(error_code=ERROR_SUPPRESSED),
         )
     ]
@@ -272,7 +276,7 @@ def test_has_failed_status_if_error_in_final_ack():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             request_completed_ack=build_message(error_code=30),
         )
     ]
@@ -288,7 +292,7 @@ def test_has_pending_with_error_status_if_error_in_intermediate_message():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             intermediate_messages=[build_message(error_code=30)],
             request_completed_ack=None,
         )
@@ -306,7 +310,7 @@ def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
         build_parsed_conversation(
             request_started=build_message(),
             request_started_ack=build_message(error_code=10),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             intermediate_messages=[],
             request_completed_ack=None,
         )
@@ -325,7 +329,7 @@ def test_extracts_date_requested_from_request_started_message():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(time=date_requested),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             request_completed_ack=build_message(),
         )
     ]
@@ -341,7 +345,7 @@ def test_extracts_date_completed_from_request_completed_ack():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             request_completed_ack=build_message(
                 time=date_completed,
             ),
@@ -357,7 +361,7 @@ def test_date_completed_is_none_when_request_completed_ack_not_present():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(),
+            request_completed_messages=[build_message()],
             request_completed_ack=None,
         )
     ]
@@ -391,7 +395,7 @@ def test_negative_sla_duration_clamped_to_zero():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(time=datetime(year=2021, month=1, day=5)),
+            request_completed_messages=[build_message(time=datetime(year=2021, month=1, day=5))],
             request_completed_ack=build_message(time=datetime(year=2021, month=1, day=4)),
         )
     ]
@@ -407,7 +411,7 @@ def test_warns_about_conversation_with_negative_sla():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed=build_message(time=datetime(year=2021, month=1, day=5)),
+            request_completed_messages=[build_message(time=datetime(year=2021, month=1, day=5))],
             request_completed_ack=build_message(time=datetime(year=2021, month=1, day=4)),
         )
     ]

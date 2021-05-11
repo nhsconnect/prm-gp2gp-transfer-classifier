@@ -9,7 +9,7 @@ class ParsedConversation(NamedTuple):
     id: str
     request_started: Message
     request_started_ack: Optional[Message]
-    request_completed: Optional[Message]
+    request_completed_messages: List[Message]
     intermediate_messages: List[Message]
     request_completed_ack: Optional[Message]
 
@@ -28,7 +28,7 @@ class SpineConversationParser:
         self._id = conversation.id
         self._messages = iter(conversation.messages)
         self._req_started: Optional[Message] = None
-        self._req_completed: Optional[Message] = None
+        self._req_completed_messages: List[Message] = []
         self._request_started_ack: Optional[Message] = None
         self._intermediate_messages: List[Message] = []
         self._request_completed_ack: Optional[Message] = None
@@ -38,15 +38,17 @@ class SpineConversationParser:
         return next_message
 
     def _has_seen_req_completed(self):
-        return self._req_completed is not None
+        return len(self._req_completed_messages) > 0
 
     def _has_seen_req_started(self):
         return self._req_started is not None
 
     def _process_message(self, message):
         if message.is_ehr_request_completed():
-            self._req_completed = message
-        elif self._has_seen_req_completed() and message.is_acknowledgement_of(self._req_completed):
+            self._req_completed_messages.append(message)
+        elif self._has_seen_req_completed() and message.is_acknowledgement_of(
+            self._req_completed_messages[-1]
+        ):
             self._request_completed_ack = message
         elif self._has_seen_req_started() and message.is_acknowledgement_of(self._req_started):
             self._request_started_ack = message
@@ -71,7 +73,7 @@ class SpineConversationParser:
             self._id,
             request_started=self._req_started,
             request_started_ack=self._request_started_ack,
-            request_completed=self._req_completed,
+            request_completed_messages=self._req_completed_messages,
             intermediate_messages=self._intermediate_messages,
             request_completed_ack=self._request_completed_ack,
         )

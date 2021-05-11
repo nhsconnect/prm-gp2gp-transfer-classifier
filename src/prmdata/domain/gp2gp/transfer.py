@@ -34,10 +34,14 @@ class Transfer(NamedTuple):
 
 
 def _calculate_sla(conversation: ParsedConversation):
-    if conversation.request_completed is None or conversation.request_completed_ack is None:
+    if (
+        len(conversation.request_completed_messages) == 0
+        or conversation.request_completed_ack is None
+    ):
         return None
 
-    sla_duration = conversation.request_completed_ack.time - conversation.request_completed.time
+    last_message = conversation.request_completed_messages[-1]
+    sla_duration = conversation.request_completed_ack.time - last_message.time
     if sla_duration.total_seconds() < 0:
         warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
 

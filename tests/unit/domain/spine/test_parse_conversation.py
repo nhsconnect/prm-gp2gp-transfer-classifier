@@ -38,7 +38,7 @@ def test_parses_a_complete_conversation():
         id="abc-0",
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
-        request_completed=request_completed_message,
+        request_completed_messages=[request_completed_message],
         intermediate_messages=[],
         request_completed_ack=request_completed_ack_message,
     )
@@ -73,7 +73,7 @@ def test_parses_incomplete_conversation():
     expected = ParsedConversation(
         id="abc-0",
         request_started=request_started_message,
-        request_completed=request_completed_message,
+        request_completed_messages=[request_completed_message],
         request_started_ack=request_started_ack_message,
         intermediate_messages=[],
         request_completed_ack=None,
@@ -108,7 +108,7 @@ def test_parses_conversation_with_large_messages():
     expected = ParsedConversation(
         id="abc-0",
         request_started=request_started_message,
-        request_completed=request_completed_message,
+        request_completed_messages=[request_completed_message],
         request_started_ack=request_started_ack_message,
         intermediate_messages=[
             common_p2p_message,
@@ -137,7 +137,7 @@ def test_parses_conversation_without_request_completed():
         id=guid,
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
-        request_completed=None,
+        request_completed_messages=[],
         intermediate_messages=[],
         request_completed_ack=None,
     )
@@ -175,7 +175,11 @@ def test_saves_the_last_message_when_multiple_request_completed_messages_or_fina
         id="cde",
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
-        request_completed=request_completed_message_3,
+        request_completed_messages=[
+            request_completed_message_1,
+            request_completed_message_2,
+            request_completed_message_3,
+        ],
         intermediate_messages=[],
         request_completed_ack=request_completed_ack_message_2,
     )
