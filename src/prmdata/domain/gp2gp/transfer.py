@@ -46,17 +46,17 @@ def _calculate_sla(conversation: ParsedConversation):
         conversation, failed_acknowledgements
     )
 
-    if len(successful_request_completed_messages) > 0:
-        sla_duration = (
-            successful_acknowledgements[0].time - successful_request_completed_messages[0].time
-        )
+    if len(failed_request_completed_messages) > 0:
+        sla_duration = failed_acknowledgements[0].time - failed_request_completed_messages[0].time
 
         if sla_duration.total_seconds() < 0:
             warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
 
         return max(timedelta(0), sla_duration)
-    elif len(failed_request_completed_messages) > 0:
-        sla_duration = failed_acknowledgements[0].time - failed_request_completed_messages[0].time
+    elif len(successful_request_completed_messages) > 0:
+        sla_duration = (
+            successful_acknowledgements[0].time - successful_request_completed_messages[0].time
+        )
 
         if sla_duration.total_seconds() < 0:
             warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
@@ -153,16 +153,22 @@ def _assign_status(conversation: ParsedConversation) -> TransferStatus:
 
 def _is_integrated(conversation: ParsedConversation) -> bool:
     final_ack_messages = conversation.request_completed_ack_messages
-    return len(final_ack_messages) > 0 and any(
-        final_ack_message.error_code is None or final_ack_message.error_code == ERROR_SUPPRESSED
-        for final_ack_message in final_ack_messages
+    return (
+        len(final_ack_messages) > 0
+        and any(
+            final_ack_message.error_code is None or final_ack_message.error_code == ERROR_SUPPRESSED
+            for final_ack_message in final_ack_messages
+        )
+        and not _has_final_ack_error(conversation)
     )
 
 
 def _has_final_ack_error(conversation: ParsedConversation) -> bool:
     final_ack_messages = conversation.request_completed_ack_messages
     return len(final_ack_messages) > 0 and any(
-        final_ack_message.error_code and final_ack_message.error_code != ERROR_SUPPRESSED
+        final_ack_message.error_code
+        and final_ack_message.error_code != ERROR_SUPPRESSED
+        and final_ack_message.error_code != DUPLICATE_ERROR
         for final_ack_message in final_ack_messages
     )
 
