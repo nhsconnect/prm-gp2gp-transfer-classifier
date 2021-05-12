@@ -24,7 +24,7 @@ Common development workflows are defined in the `tasks` script.
 - [Docker](https://www.docker.com/get-started) - version 3.1.0 or higher
 - [dojo](https://github.com/kudulab/dojo)
 
-#### Installing correct version of pip and python
+#### Installing the correct versions of pip and python
 
 Ensure you are not within a virtual environment (run `deactivate` if you are in one)
 
@@ -42,9 +42,11 @@ Ensure you are not within a virtual environment (run `deactivate` if you are in 
 
 From the base directory of the project, create a python3 virtual environment by running `./tasks devenv`, then to activate it run `pipenv shell`
 
-To deactivate the virtual environment or if you see the text, run `deactivate`.
+To deactivate the virtual environment run `deactivate`.
 
 To remove the virtual environment and clear the cache, run `pipenv --rm && pipenv --clear`.
+
+Run the following commands in the virtual environment:
 
 ### Running the unit and integration tests
 
