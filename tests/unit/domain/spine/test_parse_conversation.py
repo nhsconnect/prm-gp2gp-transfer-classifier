@@ -40,7 +40,7 @@ def test_parses_a_complete_conversation():
         request_started_ack=request_started_ack_message,
         request_completed_messages=[request_completed_message],
         intermediate_messages=[],
-        request_completed_ack=request_completed_ack_message,
+        request_completed_ack_messages=[request_completed_ack_message],
     )
     actual = parse_conversation(conversation)
 
@@ -76,7 +76,7 @@ def test_parses_incomplete_conversation():
         request_completed_messages=[request_completed_message],
         request_started_ack=request_started_ack_message,
         intermediate_messages=[],
-        request_completed_ack=None,
+        request_completed_ack_messages=[],
     )
     actual = parse_conversation(conversation)
 
@@ -114,7 +114,7 @@ def test_parses_conversation_with_large_messages():
             common_p2p_message,
             common_p2p_ack_message,
         ],
-        request_completed_ack=request_completed_ack_message,
+        request_completed_ack_messages=[request_completed_ack_message],
     )
     actual = parse_conversation(conversation)
 
@@ -139,14 +139,14 @@ def test_parses_conversation_without_request_completed():
         request_started_ack=request_started_ack_message,
         request_completed_messages=[],
         intermediate_messages=[],
-        request_completed_ack=None,
+        request_completed_ack_messages=[],
     )
     actual = parse_conversation(conversation)
 
     assert actual == expected
 
 
-def test_saves_the_last_message_when_multiple_request_completed_messages_or_final_acks():
+def test_saves_all_request_completed_messages_and_all_final_acks():
     request_started_message = build_message(guid="cde", interaction_id=EHR_REQUEST_STARTED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="cde")
     request_completed_message_1 = build_message(guid="cde-1", interaction_id=EHR_REQUEST_COMPLETED)
@@ -158,6 +158,9 @@ def test_saves_the_last_message_when_multiple_request_completed_messages_or_fina
     request_completed_ack_message_2 = build_message(
         interaction_id=APPLICATION_ACK, message_ref="cde-3", error_code=None
     )
+    request_completed_ack_message_3 = build_message(
+        interaction_id=APPLICATION_ACK, message_ref="cde-2", error_code=None
+    )
 
     messages = [
         request_started_message,
@@ -167,6 +170,7 @@ def test_saves_the_last_message_when_multiple_request_completed_messages_or_fina
         request_completed_message_3,
         request_completed_ack_message_1,
         request_completed_ack_message_2,
+        request_completed_ack_message_3,
     ]
 
     conversation = Conversation("cde", messages)
@@ -181,7 +185,11 @@ def test_saves_the_last_message_when_multiple_request_completed_messages_or_fina
             request_completed_message_3,
         ],
         intermediate_messages=[],
-        request_completed_ack=request_completed_ack_message_2,
+        request_completed_ack_messages=[
+            request_completed_ack_message_1,
+            request_completed_ack_message_2,
+            request_completed_ack_message_3,
+        ],
     )
     actual = parse_conversation(conversation)
 

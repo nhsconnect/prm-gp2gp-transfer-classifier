@@ -116,7 +116,7 @@ def test_parses_transfer_correctly_given_valid_message_list():
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
             sender_error_code=None,
-            final_error_code=None,
+            final_error_codes=[None],
             intermediate_error_codes=[],
         )
     ]
@@ -152,7 +152,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
             sender_error_code=None,
-            final_error_code=None,
+            final_error_codes=[],
             intermediate_error_codes=[],
         )
     ]

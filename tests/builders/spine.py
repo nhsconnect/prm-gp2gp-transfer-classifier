@@ -10,7 +10,9 @@ def build_parsed_conversation(**kwargs):
         request_started_ack=kwargs.get("request_started_ack", build_message()),
         request_completed_messages=kwargs.get("request_completed_messages", [build_message()]),
         intermediate_messages=kwargs.get("intermediate_messages", []),
-        request_completed_ack=kwargs.get("request_completed_ack", build_message()),
+        request_completed_ack_messages=kwargs.get(
+            "request_completed_ack_messages", [build_message()]
+        ),
     )
 
 

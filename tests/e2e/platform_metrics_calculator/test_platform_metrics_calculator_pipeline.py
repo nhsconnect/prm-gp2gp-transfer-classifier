@@ -41,7 +41,7 @@ EXPECTED_TRANSFERS = {
         datetime(2019, 12, 3, 18, 2, 29, 985000),
         datetime(2019, 12, 31, 18, 2, 29, 985000),
     ],
-    "final_error_code": [None, None, None, 30, None, None],
+    "final_error_codes": [[None], [None], [None], [30], [None], [None]],
     "intermediate_error_codes": [[], [], [], [], [], []],
     "requesting_practice_asid": [
         "123456789123",

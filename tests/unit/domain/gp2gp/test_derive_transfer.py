@@ -8,6 +8,7 @@ from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
     ERROR_SUPPRESSED,
+    DUPLICATE_ERROR,
     derive_transfers,
 )
 
@@ -33,12 +34,106 @@ def test_produces_sla_of_successful_conversation():
             request_completed_messages=[
                 build_message(
                     time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
+                    guid="abc",
                 )
             ],
-            request_completed_ack=build_message(
-                time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
-                error_code=None,
-            ),
+            request_completed_ack_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    message_ref="abc",
+                    error_code=None,
+                )
+            ],
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_sla_durations = [timedelta(hours=1, minutes=10)]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+
+
+def test_produces_sla_of_successful_conversation_given_multiple_final_acks():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
+                    guid="ddd",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
+                    guid="aaa",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
+                    guid="xxx",
+                ),
+            ],
+            request_completed_ack_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
+                    message_ref="aaa",
+                    error_code=DUPLICATE_ERROR,
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    message_ref="aaa",
+                    error_code=None,
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=1),
+                    message_ref="ddd",
+                    error_code=DUPLICATE_ERROR,
+                ),
+            ],
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_sla_durations = [timedelta(hours=1, minutes=10)]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+
+
+def test_produces_sla_of_failed_conversation_given_multiple_final_acks():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
+                    guid="ddd",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
+                    guid="aaa",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
+                    guid="xxx",
+                ),
+            ],
+            request_completed_ack_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
+                    message_ref="xxx",
+                    error_code=DUPLICATE_ERROR,
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    message_ref="aaa",
+                    error_code=99,
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=1),
+                    message_ref="ddd",
+                    error_code=DUPLICATE_ERROR,
+                ),
+            ],
         )
     ]
 
@@ -54,7 +149,7 @@ def test_produces_no_sla_given_pending_ehr_completed():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[],
-            request_completed_ack=None,
+            request_completed_ack_messages=[],
         )
     ]
 
@@ -70,7 +165,7 @@ def test_produces_no_sla_given_pending_request_completed_ack():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
-            request_completed_ack=None,
+            request_completed_ack_messages=[],
         )
     ]
 
@@ -105,14 +200,22 @@ def test_extracts_sending_practice_asid():
     _assert_attributes("sending_practice_asid", actual, expected_asids)
 
 
-def test_extracts_final_error_code():
-    conversations = [build_parsed_conversation(request_completed_ack=build_message(error_code=99))]
+def test_extracts_final_error_codes():
+    conversations = [
+        build_parsed_conversation(
+            request_completed_ack_messages=[
+                build_message(error_code=99),
+                build_message(error_code=1),
+                build_message(error_code=None),
+            ]
+        )
+    ]
 
     actual = derive_transfers(conversations)
 
-    expected_errors = [99]
+    expected_errors = [[99, 1, None]]
 
-    _assert_attributes("final_error_code", actual, expected_errors)
+    _assert_attributes("final_error_codes", actual, expected_errors)
 
 
 def test_extracts_sender_error_code_when_no_sender_errror():
@@ -136,13 +239,13 @@ def test_extracts_sender_error_code_when_sender_error():
 
 
 def test_doesnt_extract_error_code_given_pending_request_completed_ack():
-    conversations = [build_parsed_conversation(request_completed_ack=None)]
+    conversations = [build_parsed_conversation(request_completed_ack_messages=[])]
 
     actual = derive_transfers(conversations)
 
-    expected_errors = [None]
+    expected_errors = [[]]
 
-    _assert_attributes("final_error_code", actual, expected_errors)
+    _assert_attributes("final_error_codes", actual, expected_errors)
 
 
 def test_extracts_conversation_ids_for_conversations():
@@ -198,7 +301,9 @@ def test_extracts_multiple_intermediate_message_error_codes():
 
 def test_has_pending_status_if_no_final_ack():
     conversations = [
-        build_parsed_conversation(request_started=build_message(), request_completed_ack=None)
+        build_parsed_conversation(
+            request_started=build_message(), request_completed_ack_messages=[]
+        )
     ]
 
     actual = derive_transfers(conversations)
@@ -213,7 +318,7 @@ def test_has_pending_status_if_no_request_completed_message():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[],
-            request_completed_ack=None,
+            request_completed_ack_messages=[],
         )
     ]
 
@@ -229,7 +334,7 @@ def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
         build_parsed_conversation(
             request_started=build_message(),
             intermediate_messages=[build_message(error_code=None)],
-            request_completed_ack=None,
+            request_completed_ack_messages=[],
         )
     ]
 
@@ -245,7 +350,7 @@ def test_has_integrated_status_if_no_error_in_final_ack():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
-            request_completed_ack=build_message(error_code=None),
+            request_completed_ack_messages=[build_message(error_code=None)],
         )
     ]
 
@@ -261,7 +366,26 @@ def test_has_integrated_status_if_error_is_supressed():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
-            request_completed_ack=build_message(error_code=ERROR_SUPPRESSED),
+            request_completed_ack_messages=[build_message(error_code=ERROR_SUPPRESSED)],
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_statuses = [TransferStatus.INTEGRATED]
+
+    _assert_attributes("status", actual, expected_statuses)
+
+
+def test_has_integrated_status_given_one_ack_with_duplicate_error_and_another_without_error():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed_messages=[build_message()],
+            request_completed_ack_messages=[
+                build_message(error_code=DUPLICATE_ERROR),
+                build_message(error_code=None),
+            ],
         )
     ]
 
@@ -277,7 +401,7 @@ def test_has_failed_status_if_error_in_final_ack():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
-            request_completed_ack=build_message(error_code=30),
+            request_completed_ack_messages=[build_message(error_code=30)],
         )
     ]
 
@@ -294,7 +418,7 @@ def test_has_pending_with_error_status_if_error_in_intermediate_message():
             request_started=build_message(),
             request_completed_messages=[build_message()],
             intermediate_messages=[build_message(error_code=30)],
-            request_completed_ack=None,
+            request_completed_ack_messages=[],
         )
     ]
 
@@ -312,7 +436,7 @@ def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
             request_started_ack=build_message(error_code=10),
             request_completed_messages=[build_message()],
             intermediate_messages=[],
-            request_completed_ack=None,
+            request_completed_ack_messages=[],
         )
     ]
 
@@ -330,7 +454,7 @@ def test_extracts_date_requested_from_request_started_message():
         build_parsed_conversation(
             request_started=build_message(time=date_requested),
             request_completed_messages=[build_message()],
-            request_completed_ack=build_message(),
+            request_completed_ack_messages=[build_message()],
         )
     ]
 
@@ -346,9 +470,11 @@ def test_extracts_date_completed_from_request_completed_ack():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
-            request_completed_ack=build_message(
-                time=date_completed,
-            ),
+            request_completed_ack_messages=[
+                build_message(
+                    time=date_completed,
+                )
+            ],
         )
     ]
 
@@ -362,7 +488,7 @@ def test_date_completed_is_none_when_request_completed_ack_not_present():
         build_parsed_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
-            request_completed_ack=None,
+            request_completed_ack_messages=[],
         )
     ]
 
@@ -395,8 +521,12 @@ def test_negative_sla_duration_clamped_to_zero():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed_messages=[build_message(time=datetime(year=2021, month=1, day=5))],
-            request_completed_ack=build_message(time=datetime(year=2021, month=1, day=4)),
+            request_completed_messages=[
+                build_message(time=datetime(year=2021, month=1, day=5), guid="abc")
+            ],
+            request_completed_ack_messages=[
+                build_message(time=datetime(year=2021, month=1, day=4), message_ref="abc")
+            ],
         )
     ]
 
@@ -411,8 +541,12 @@ def test_warns_about_conversation_with_negative_sla():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed_messages=[build_message(time=datetime(year=2021, month=1, day=5))],
-            request_completed_ack=build_message(time=datetime(year=2021, month=1, day=4)),
+            request_completed_messages=[
+                build_message(time=datetime(year=2021, month=1, day=5), guid="abc")
+            ],
+            request_completed_ack_messages=[
+                build_message(time=datetime(year=2021, month=1, day=4), message_ref="abc")
+            ],
         )
     ]
 

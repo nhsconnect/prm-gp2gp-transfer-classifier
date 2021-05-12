@@ -6,9 +6,11 @@ from enum import Enum
 import pyarrow as pa
 import pyarrow as Table
 
+from prmdata.domain.spine.message import Message
 from prmdata.domain.spine.parsed_conversation import ParsedConversation
 
 ERROR_SUPPRESSED = 15
+DUPLICATE_ERROR = 12
 
 
 class TransferStatus(Enum):
@@ -26,7 +28,7 @@ class Transfer(NamedTuple):
     requesting_supplier: str
     sending_supplier: str
     sender_error_code: Optional[int]
-    final_error_code: Optional[int]
+    final_error_codes: List[Optional[int]]
     intermediate_error_codes: List[int]
     status: TransferStatus
     date_requested: datetime
@@ -34,18 +36,63 @@ class Transfer(NamedTuple):
 
 
 def _calculate_sla(conversation: ParsedConversation):
-    if (
-        len(conversation.request_completed_messages) == 0
-        or conversation.request_completed_ack is None
-    ):
+    successful_acknowledgements = _find_successful_acknowledgements(conversation)
+    successful_request_completed_messages = _find_acknowledged_request_completed_messages(
+        conversation, successful_acknowledgements
+    )
+
+    failed_acknowledgements = _find_failed_acknowledgements(conversation)
+    failed_request_completed_messages = _find_acknowledged_request_completed_messages(
+        conversation, failed_acknowledgements
+    )
+
+    if len(successful_request_completed_messages) > 0:
+        sla_duration = (
+            successful_acknowledgements[0].time - successful_request_completed_messages[0].time
+        )
+
+        if sla_duration.total_seconds() < 0:
+            warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
+
+        return max(timedelta(0), sla_duration)
+    elif len(failed_request_completed_messages) > 0:
+        sla_duration = failed_acknowledgements[0].time - failed_request_completed_messages[0].time
+
+        if sla_duration.total_seconds() < 0:
+            warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
+
+        return max(timedelta(0), sla_duration)
+    else:
         return None
 
-    last_message = conversation.request_completed_messages[-1]
-    sla_duration = conversation.request_completed_ack.time - last_message.time
-    if sla_duration.total_seconds() < 0:
-        warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
 
-    return max(timedelta(0), sla_duration)
+def _find_acknowledged_request_completed_messages(
+    conversation: ParsedConversation, acknowledgements: List[Message]
+) -> List[Message]:
+    return [
+        request_completed_message
+        for request_completed_message in conversation.request_completed_messages
+        if len(acknowledgements) > 0
+        and request_completed_message.guid == acknowledgements[0].message_ref
+    ]
+
+
+def _find_successful_acknowledgements(conversation: ParsedConversation) -> List[Message]:
+    return [
+        message
+        for message in conversation.request_completed_ack_messages
+        if message.error_code is None or message.error_code == ERROR_SUPPRESSED
+    ]
+
+
+def _find_failed_acknowledgements(conversation: ParsedConversation) -> List[Message]:
+    return [
+        message
+        for message in conversation.request_completed_ack_messages
+        if message.error_code is not None
+        and message.error_code != ERROR_SUPPRESSED
+        and message.error_code != DUPLICATE_ERROR
+    ]
 
 
 def _extract_requesting_practice_asid(conversation: ParsedConversation) -> str:
@@ -70,10 +117,8 @@ def _extract_sender_error(conversation: ParsedConversation) -> Optional[int]:
     return None
 
 
-def _extract_final_error_code(conversation: ParsedConversation) -> Optional[int]:
-    if conversation.request_completed_ack:
-        return conversation.request_completed_ack.error_code
-    return None
+def _extract_final_error_codes(conversation: ParsedConversation) -> List[Optional[int]]:
+    return [message.error_code for message in conversation.request_completed_ack_messages]
 
 
 def _extract_intermediate_error_code(conversation: ParsedConversation) -> List[int]:
@@ -89,8 +134,9 @@ def _extract_date_requested(conversation: ParsedConversation) -> datetime:
 
 
 def _extract_date_completed(conversation: ParsedConversation) -> Optional[datetime]:
-    if conversation.request_completed_ack:
-        return conversation.request_completed_ack.time
+    if conversation.request_completed_ack_messages:
+        # TODO: fix below when there are more than 1 request_completed_ack_message
+        return conversation.request_completed_ack_messages[-1].time
     return None
 
 
@@ -106,20 +152,26 @@ def _assign_status(conversation: ParsedConversation) -> TransferStatus:
 
 
 def _is_integrated(conversation: ParsedConversation) -> bool:
-    final_ack = conversation.request_completed_ack
-    return final_ack and (final_ack.error_code is None or final_ack.error_code == ERROR_SUPPRESSED)
+    final_ack_messages = conversation.request_completed_ack_messages
+    return len(final_ack_messages) > 0 and any(
+        final_ack_message.error_code is None or final_ack_message.error_code == ERROR_SUPPRESSED
+        for final_ack_message in final_ack_messages
+    )
 
 
 def _has_final_ack_error(conversation: ParsedConversation) -> bool:
-    final_ack = conversation.request_completed_ack
-    return final_ack and final_ack.error_code and final_ack.error_code != ERROR_SUPPRESSED
+    final_ack_messages = conversation.request_completed_ack_messages
+    return len(final_ack_messages) > 0 and any(
+        final_ack_message.error_code and final_ack_message.error_code != ERROR_SUPPRESSED
+        for final_ack_message in final_ack_messages
+    )
 
 
 def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -> bool:
     intermediate_errors = _extract_intermediate_error_code(conversation)
     sender_error = _extract_sender_error(conversation)
     has_intermediate_error = len(intermediate_errors) > 0 or sender_error is not None
-    lacking_final_ack = conversation.request_completed_ack is None
+    lacking_final_ack = len(conversation.request_completed_ack_messages) == 0
     return lacking_final_ack and has_intermediate_error
 
 
@@ -132,7 +184,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         requesting_supplier=_extract_requesting_supplier(conversation),
         sending_supplier=_extract_sending_supplier(conversation),
         sender_error_code=_extract_sender_error(conversation),
-        final_error_code=_extract_final_error_code(conversation),
+        final_error_codes=_extract_final_error_codes(conversation),
         intermediate_error_codes=_extract_intermediate_error_code(conversation),
         status=_assign_status(conversation),
         date_requested=_extract_date_requested(conversation),
@@ -169,7 +221,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "requesting_supplier": [t.requesting_supplier for t in transfers],
             "sending_supplier": [t.sending_supplier for t in transfers],
             "sender_error_code": [t.sender_error_code for t in transfers],
-            "final_error_code": [t.final_error_code for t in transfers],
+            "final_error_codes": [t.final_error_codes for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
             "status": [t.status.value for t in transfers],
             "date_requested": [t.date_requested for t in transfers],
@@ -184,7 +236,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
                 ("requesting_supplier", pa.string()),
                 ("sending_supplier", pa.string()),
                 ("sender_error_code", pa.int64()),
-                ("final_error_code", pa.int64()),
+                ("final_error_codes", pa.list_(pa.int64())),
                 ("intermediate_error_codes", pa.list_(pa.int64())),
                 ("status", pa.string()),
                 ("date_requested", pa.timestamp("us")),

@@ -97,23 +97,23 @@ def test_sender_error_code_is_converted_to_column_when_missing():
 
 
 def test_final_error_code_is_converted_to_column():
-    transfer = build_transfer(final_error_code=5)
+    transfer = build_transfer(final_error_codes=[5])
 
-    expected_error_code_column = {"final_error_code": [5]}
+    expected_error_code_column = {"final_error_codes": [[5]]}
 
     table = convert_transfers_to_table([transfer])
-    actual_error_code_column = table.select(["final_error_code"]).to_pydict()
+    actual_error_code_column = table.select(["final_error_codes"]).to_pydict()
 
     assert actual_error_code_column == expected_error_code_column
 
 
 def test_final_error_code_is_converted_to_column_when_missing():
-    transfer = build_transfer(final_error_code=None)
+    transfer = build_transfer(final_error_codes=[])
 
-    expected_error_code_column = {"final_error_code": [None]}
+    expected_error_code_column = {"final_error_codes": [[]]}
 
     table = convert_transfers_to_table([transfer])
-    actual_error_code_column = table.select(["final_error_code"]).to_pydict()
+    actual_error_code_column = table.select(["final_error_codes"]).to_pydict()
 
     assert actual_error_code_column == expected_error_code_column
 
@@ -186,15 +186,18 @@ def test_date_completed_is_converted_to_column_when_missing():
 
 def test_converts_multiple_rows_into_table():
     transfers = [
-        build_transfer(conversation_id="123", final_error_code=1),
-        build_transfer(conversation_id="456", final_error_code=2),
-        build_transfer(conversation_id="789", final_error_code=3),
+        build_transfer(conversation_id="123", final_error_codes=[1]),
+        build_transfer(conversation_id="456", final_error_codes=[2]),
+        build_transfer(conversation_id="789", final_error_codes=[3]),
     ]
 
-    expected_columns = {"conversation_id": ["123", "456", "789"], "final_error_code": [1, 2, 3]}
+    expected_columns = {
+        "conversation_id": ["123", "456", "789"],
+        "final_error_codes": [[1], [2], [3]],
+    }
 
     table = convert_transfers_to_table(transfers)
-    actual_columns = table.select(["conversation_id", "final_error_code"]).to_pydict()
+    actual_columns = table.select(["conversation_id", "final_error_codes"]).to_pydict()
 
     assert actual_columns == expected_columns
 
@@ -211,7 +214,7 @@ def test_table_has_correct_schema():
             ("requesting_supplier", pa.string()),
             ("sending_supplier", pa.string()),
             ("sender_error_code", pa.int64()),
-            ("final_error_code", pa.int64()),
+            ("final_error_codes", pa.list_(pa.int64())),
             ("intermediate_error_codes", pa.list_(pa.int64())),
             ("status", pa.string()),
             ("date_requested", pa.timestamp("us")),
