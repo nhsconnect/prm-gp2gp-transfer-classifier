@@ -35,35 +35,37 @@ class Transfer(NamedTuple):
     date_completed: Optional[datetime]
 
 
-def _calculate_sla(conversation: ParsedConversation):
-    successful_acknowledgements = _find_successful_acknowledgements(conversation)
-    successful_request_completed_messages = _find_acknowledged_request_completed_messages(
-        conversation, successful_acknowledgements
-    )
-
+def _generate_sla(conversation: ParsedConversation):
     failed_acknowledgements = _find_failed_acknowledgements(conversation)
     failed_request_completed_messages = _find_acknowledged_request_completed_messages(
         conversation, failed_acknowledgements
     )
 
     if len(failed_request_completed_messages) > 0:
-        sla_duration = failed_acknowledgements[0].time - failed_request_completed_messages[0].time
-
-        if sla_duration.total_seconds() < 0:
-            warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
-
-        return max(timedelta(0), sla_duration)
-    elif len(successful_request_completed_messages) > 0:
-        sla_duration = (
-            successful_acknowledgements[0].time - successful_request_completed_messages[0].time
+        return _calculate_sla(
+            failed_acknowledgements[0], failed_request_completed_messages[0], conversation.id
         )
 
-        if sla_duration.total_seconds() < 0:
-            warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
+    successful_acknowledgements = _find_successful_acknowledgements(conversation)
+    successful_request_completed_messages = _find_acknowledged_request_completed_messages(
+        conversation, successful_acknowledgements
+    )
 
-        return max(timedelta(0), sla_duration)
+    if len(successful_request_completed_messages) > 0:
+        return _calculate_sla(
+            successful_acknowledgements[0],
+            successful_request_completed_messages[0],
+            conversation.id,
+        )
     else:
         return None
+
+
+def _calculate_sla(acknowledgement_message, request_completed_message, conversation_id):
+    sla_duration = acknowledgement_message.time - request_completed_message.time
+    if sla_duration.total_seconds() < 0:
+        warn(f"Negative SLA duration for conversation: {conversation_id}", RuntimeWarning)
+    return max(timedelta(0), sla_duration)
 
 
 def _find_acknowledged_request_completed_messages(
@@ -182,7 +184,7 @@ def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -
 def _derive_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
-        sla_duration=_calculate_sla(conversation),
+        sla_duration=_generate_sla(conversation),
         requesting_practice_asid=_extract_requesting_practice_asid(conversation),
         sending_practice_asid=_extract_sending_practice_asid(conversation),
         requesting_supplier=_extract_requesting_supplier(conversation),
