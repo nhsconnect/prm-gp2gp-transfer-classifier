@@ -55,6 +55,9 @@ def test_produces_sla_of_successful_conversation():
 
 
 def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_without_error():
+    successful_acknowledgement_datetime = datetime(
+        year=2020, month=6, day=1, hour=13, minute=52, second=0
+    )
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
@@ -79,7 +82,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
                     error_code=DUPLICATE_ERROR,
                 ),
                 build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    time=successful_acknowledgement_datetime,
                     message_ref="aaa",
                     error_code=None,
                 ),
@@ -99,9 +102,13 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
 
     _assert_attributes("sla_duration", actual, expected_sla_durations)
     _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
 
 
 def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_suppressed_error():
+    successful_acknowledgement_datetime = datetime(
+        year=2020, month=6, day=1, hour=13, minute=52, second=0
+    )
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
@@ -126,7 +133,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
                     error_code=DUPLICATE_ERROR,
                 ),
                 build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    time=successful_acknowledgement_datetime,
                     message_ref="aaa",
                     error_code=ERROR_SUPPRESSED,
                 ),
@@ -146,6 +153,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
 
     _assert_attributes("sla_duration", actual, expected_sla_durations)
     _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
 
 
 def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error():
@@ -175,9 +183,13 @@ def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error
 
     _assert_attributes("sla_duration", actual, expected_sla_durations)
     _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [None])
 
 
 def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_other_error():
+    failed_acknowledgement_datetime = datetime(
+        year=2020, month=6, day=1, hour=13, minute=52, second=0
+    )
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
@@ -202,7 +214,7 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_othe
                     error_code=ERROR_SUPPRESSED,
                 ),
                 build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    time=failed_acknowledgement_datetime,
                     message_ref="aaa",
                     error_code=99,
                 ),
@@ -222,9 +234,13 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_othe
 
     _assert_attributes("sla_duration", actual, expected_sla_durations)
     _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [failed_acknowledgement_datetime])
 
 
 def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_no_error_and_other_error():
+    failed_acknowledgement_datetime = datetime(
+        year=2020, month=6, day=1, hour=16, minute=42, second=1
+    )
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
@@ -254,7 +270,7 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_no_error
                     error_code=None,
                 ),
                 build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=1),
+                    time=failed_acknowledgement_datetime,
                     message_ref="ddd",
                     error_code=99,
                 ),
@@ -269,6 +285,7 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_no_error
 
     _assert_attributes("sla_duration", actual, expected_sla_durations)
     _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [failed_acknowledgement_datetime])
 
 
 def test_produces_no_sla_given_pending_ehr_completed():

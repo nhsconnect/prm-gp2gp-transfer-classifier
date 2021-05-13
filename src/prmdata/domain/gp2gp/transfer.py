@@ -134,9 +134,14 @@ def _extract_date_requested(conversation: ParsedConversation) -> datetime:
 
 
 def _extract_date_completed(conversation: ParsedConversation) -> Optional[datetime]:
-    if conversation.request_completed_ack_messages:
-        # TODO: fix below when there are more than 1 request_completed_ack_message
-        return conversation.request_completed_ack_messages[-1].time
+    failed_acknowledgements = _find_failed_acknowledgements(conversation)
+    if len(failed_acknowledgements) > 0:
+        return failed_acknowledgements[0].time
+
+    successful_acknowledgements = _find_successful_acknowledgements(conversation)
+    if len(successful_acknowledgements) > 0:
+        return successful_acknowledgements[0].time
+
     return None
 
 
