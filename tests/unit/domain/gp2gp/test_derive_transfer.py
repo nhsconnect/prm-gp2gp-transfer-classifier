@@ -101,6 +101,53 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
     _assert_attributes("status", actual, expected_statuses)
 
 
+def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_suppressed_error():
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
+                    guid="ddd",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
+                    guid="aaa",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
+                    guid="xxx",
+                ),
+            ],
+            request_completed_ack_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
+                    message_ref="aaa",
+                    error_code=DUPLICATE_ERROR,
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    message_ref="aaa",
+                    error_code=ERROR_SUPPRESSED,
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=1),
+                    message_ref="ddd",
+                    error_code=DUPLICATE_ERROR,
+                ),
+            ],
+        )
+    ]
+
+    actual = list(derive_transfers(conversations))
+
+    expected_sla_durations = [timedelta(hours=1, minutes=10)]
+    expected_statuses = [TransferStatus.INTEGRATED]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+    _assert_attributes("status", actual, expected_statuses)
+
+
 def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error():
     conversations = [
         build_parsed_conversation(
@@ -152,7 +199,7 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_othe
                 build_message(
                     time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
                     message_ref="xxx",
-                    error_code=DUPLICATE_ERROR,
+                    error_code=ERROR_SUPPRESSED,
                 ),
                 build_message(
                     time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),

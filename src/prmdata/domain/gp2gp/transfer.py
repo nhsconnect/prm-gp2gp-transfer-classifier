@@ -81,7 +81,7 @@ def _find_successful_acknowledgements(conversation: ParsedConversation) -> List[
     return [
         message
         for message in conversation.request_completed_ack_messages
-        if message.error_code is None or message.error_code == ERROR_SUPPRESSED
+        if _is_successful_ack(message)
     ]
 
 
@@ -89,9 +89,7 @@ def _find_failed_acknowledgements(conversation: ParsedConversation) -> List[Mess
     return [
         message
         for message in conversation.request_completed_ack_messages
-        if message.error_code is not None
-        and message.error_code != ERROR_SUPPRESSED
-        and message.error_code != DUPLICATE_ERROR
+        if not _is_successful_ack(message) and message.error_code != DUPLICATE_ERROR
     ]
 
 
@@ -155,19 +153,19 @@ def _is_integrated(conversation: ParsedConversation) -> bool:
     final_ack_messages = conversation.request_completed_ack_messages
     return (
         len(final_ack_messages) > 0
-        and any(
-            final_ack_message.error_code is None or final_ack_message.error_code == ERROR_SUPPRESSED
-            for final_ack_message in final_ack_messages
-        )
+        and any(_is_successful_ack(final_ack_message) for final_ack_message in final_ack_messages)
         and not _has_final_ack_error(conversation)
     )
+
+
+def _is_successful_ack(message: Message) -> bool:
+    return message.error_code is None or message.error_code == ERROR_SUPPRESSED
 
 
 def _has_final_ack_error(conversation: ParsedConversation) -> bool:
     final_ack_messages = conversation.request_completed_ack_messages
     return len(final_ack_messages) > 0 and any(
-        final_ack_message.error_code
-        and final_ack_message.error_code != ERROR_SUPPRESSED
+        not _is_successful_ack(final_ack_message)
         and final_ack_message.error_code != DUPLICATE_ERROR
         for final_ack_message in final_ack_messages
     )
