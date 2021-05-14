@@ -36,16 +36,6 @@ class Transfer(NamedTuple):
 
 
 def _generate_sla(conversation: ParsedConversation):
-    failed_acknowledgement = _find_failed_acknowledgement(conversation)
-    failed_request_completed_message = _find_acknowledged_request_completed_message(
-        conversation, failed_acknowledgement
-    )
-
-    if failed_request_completed_message:
-        return _calculate_sla(
-            failed_acknowledgement, failed_request_completed_message, conversation.id
-        )
-
     successful_acknowledgement = _find_successful_acknowledgement(conversation)
     successful_request_completed_message = _find_acknowledged_request_completed_message(
         conversation, successful_acknowledgement
@@ -56,6 +46,16 @@ def _generate_sla(conversation: ParsedConversation):
             successful_acknowledgement,
             successful_request_completed_message,
             conversation.id,
+        )
+
+    failed_acknowledgement = _find_failed_acknowledgement(conversation)
+    failed_request_completed_message = _find_acknowledged_request_completed_message(
+        conversation, failed_acknowledgement
+    )
+
+    if failed_request_completed_message:
+        return _calculate_sla(
+            failed_acknowledgement, failed_request_completed_message, conversation.id
         )
     else:
         return None
@@ -142,13 +142,13 @@ def _extract_date_requested(conversation: ParsedConversation) -> datetime:
 
 
 def _extract_date_completed(conversation: ParsedConversation) -> Optional[datetime]:
-    failed_acknowledgement = _find_failed_acknowledgement(conversation)
-    if failed_acknowledgement:
-        return failed_acknowledgement.time
-
     successful_acknowledgement = _find_successful_acknowledgement(conversation)
     if successful_acknowledgement:
         return successful_acknowledgement.time
+
+    failed_acknowledgement = _find_failed_acknowledgement(conversation)
+    if failed_acknowledgement:
+        return failed_acknowledgement.time
 
     return None
 
@@ -166,10 +166,8 @@ def _assign_status(conversation: ParsedConversation) -> TransferStatus:
 
 def _is_integrated(conversation: ParsedConversation) -> bool:
     final_ack_messages = conversation.request_completed_ack_messages
-    return (
-        len(final_ack_messages) > 0
-        and any(_is_successful_ack(final_ack_message) for final_ack_message in final_ack_messages)
-        and not _has_final_ack_error(conversation)
+    return len(final_ack_messages) > 0 and any(
+        _is_successful_ack(final_ack_message) for final_ack_message in final_ack_messages
     )
 
 

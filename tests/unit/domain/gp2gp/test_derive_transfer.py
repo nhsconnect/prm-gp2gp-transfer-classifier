@@ -211,7 +211,7 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_othe
                 build_message(
                     time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
                     message_ref="xxx",
-                    error_code=ERROR_SUPPRESSED,
+                    error_code=DUPLICATE_ERROR,
                 ),
                 build_message(
                     time=failed_acknowledgement_datetime,
@@ -237,8 +237,8 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_othe
     _assert_attributes("date_completed", actual, [failed_acknowledgement_datetime])
 
 
-def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_no_error_and_other_error():
-    failed_acknowledgement_datetime = datetime(
+def test_produces_sla_and_integrated_status_given_acks_with_duplicate_no_error_and_other_error():
+    successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
     conversations = [
@@ -267,12 +267,12 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_no_error
                 build_message(
                     time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
                     message_ref="aaa",
-                    error_code=None,
+                    error_code=11,
                 ),
                 build_message(
-                    time=failed_acknowledgement_datetime,
-                    message_ref="ddd",
-                    error_code=99,
+                    time=successful_acknowledgement_datetime,
+                    message_ref="aaa",
+                    error_code=None,
                 ),
             ],
         )
@@ -280,12 +280,63 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_no_error
 
     actual = list(derive_transfers(conversations))
 
-    expected_sla_durations = [timedelta(hours=12, minutes=0, seconds=1)]
-    expected_statuses = [TransferStatus.FAILED]
+    expected_sla_durations = [timedelta(hours=4, minutes=0, seconds=1)]
+    expected_statuses = [TransferStatus.INTEGRATED]
 
     _assert_attributes("sla_duration", actual, expected_sla_durations)
     _assert_attributes("status", actual, expected_statuses)
-    _assert_attributes("date_completed", actual, [failed_acknowledgement_datetime])
+    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
+
+
+def test_produces_sla_and_integrated_status_given_acks_with_duplicate_suppressed_and_other_errors():
+    successful_acknowledgement_datetime = datetime(
+        year=2020, month=6, day=1, hour=16, minute=42, second=1
+    )
+    conversations = [
+        build_parsed_conversation(
+            request_started=build_message(),
+            request_completed_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
+                    guid="ddd",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
+                    guid="aaa",
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
+                    guid="xxx",
+                ),
+            ],
+            request_completed_ack_messages=[
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
+                    message_ref="aaa",
+                    error_code=DUPLICATE_ERROR,
+                ),
+                build_message(
+                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
+                    message_ref="aaa",
+                    error_code=11,
+                ),
+                build_message(
+                    time=successful_acknowledgement_datetime,
+                    message_ref="aaa",
+                    error_code=ERROR_SUPPRESSED,
+                ),
+            ],
+        )
+    ]
+
+    actual = list(derive_transfers(conversations))
+
+    expected_sla_durations = [timedelta(hours=4, minutes=0, seconds=1)]
+    expected_statuses = [TransferStatus.INTEGRATED]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+    _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
 
 
 def test_produces_no_sla_given_pending_ehr_completed():
