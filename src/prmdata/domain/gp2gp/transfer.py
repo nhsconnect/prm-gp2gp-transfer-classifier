@@ -36,25 +36,25 @@ class Transfer(NamedTuple):
 
 
 def _generate_sla(conversation: ParsedConversation):
-    failed_acknowledgements = _find_failed_acknowledgements(conversation)
-    failed_request_completed_messages = _find_acknowledged_request_completed_messages(
-        conversation, failed_acknowledgements
+    failed_acknowledgement = _find_failed_acknowledgement(conversation)
+    failed_request_completed_message = _find_acknowledged_request_completed_message(
+        conversation, failed_acknowledgement
     )
 
-    if len(failed_request_completed_messages) > 0:
+    if failed_request_completed_message:
         return _calculate_sla(
-            failed_acknowledgements[0], failed_request_completed_messages[0], conversation.id
+            failed_acknowledgement, failed_request_completed_message, conversation.id
         )
 
-    successful_acknowledgements = _find_successful_acknowledgements(conversation)
-    successful_request_completed_messages = _find_acknowledged_request_completed_messages(
-        conversation, successful_acknowledgements
+    successful_acknowledgement = _find_successful_acknowledgement(conversation)
+    successful_request_completed_message = _find_acknowledged_request_completed_message(
+        conversation, successful_acknowledgement
     )
 
-    if len(successful_request_completed_messages) > 0:
+    if successful_request_completed_message:
         return _calculate_sla(
-            successful_acknowledgements[0],
-            successful_request_completed_messages[0],
+            successful_acknowledgement,
+            successful_request_completed_message,
             conversation.id,
         )
     else:
@@ -68,31 +68,39 @@ def _calculate_sla(acknowledgement_message, request_completed_message, conversat
     return max(timedelta(0), sla_duration)
 
 
-def _find_acknowledged_request_completed_messages(
-    conversation: ParsedConversation, acknowledgements: List[Message]
-) -> List[Message]:
-    return [
-        request_completed_message
-        for request_completed_message in conversation.request_completed_messages
-        if len(acknowledgements) > 0
-        and request_completed_message.guid == acknowledgements[0].message_ref
-    ]
+def _find_acknowledged_request_completed_message(
+    conversation: ParsedConversation, acknowledgement: Message
+) -> Message:
+    return next(
+        (
+            request_completed_message
+            for request_completed_message in conversation.request_completed_messages
+            if acknowledgement and request_completed_message.guid == acknowledgement.message_ref
+        ),
+        None,
+    )
 
 
-def _find_successful_acknowledgements(conversation: ParsedConversation) -> List[Message]:
-    return [
-        message
-        for message in conversation.request_completed_ack_messages
-        if _is_successful_ack(message)
-    ]
+def _find_successful_acknowledgement(conversation: ParsedConversation) -> Message:
+    return next(
+        (
+            message
+            for message in conversation.request_completed_ack_messages
+            if _is_successful_ack(message)
+        ),
+        None,
+    )
 
 
-def _find_failed_acknowledgements(conversation: ParsedConversation) -> List[Message]:
-    return [
-        message
-        for message in conversation.request_completed_ack_messages
-        if not _is_successful_ack(message) and message.error_code != DUPLICATE_ERROR
-    ]
+def _find_failed_acknowledgement(conversation: ParsedConversation) -> Message:
+    return next(
+        (
+            message
+            for message in conversation.request_completed_ack_messages
+            if not _is_successful_ack(message) and message.error_code != DUPLICATE_ERROR
+        ),
+        None,
+    )
 
 
 def _extract_requesting_practice_asid(conversation: ParsedConversation) -> str:
@@ -134,13 +142,13 @@ def _extract_date_requested(conversation: ParsedConversation) -> datetime:
 
 
 def _extract_date_completed(conversation: ParsedConversation) -> Optional[datetime]:
-    failed_acknowledgements = _find_failed_acknowledgements(conversation)
-    if len(failed_acknowledgements) > 0:
-        return failed_acknowledgements[0].time
+    failed_acknowledgement = _find_failed_acknowledgement(conversation)
+    if failed_acknowledgement:
+        return failed_acknowledgement.time
 
-    successful_acknowledgements = _find_successful_acknowledgements(conversation)
-    if len(successful_acknowledgements) > 0:
-        return successful_acknowledgements[0].time
+    successful_acknowledgement = _find_successful_acknowledgement(conversation)
+    if successful_acknowledgement:
+        return successful_acknowledgement.time
 
     return None
 
