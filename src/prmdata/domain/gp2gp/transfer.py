@@ -103,14 +103,6 @@ def _find_failed_acknowledgement(conversation: ParsedConversation) -> Message:
     )
 
 
-def _extract_requesting_supplier(conversation: ParsedConversation) -> str:
-    return conversation.request_started.from_system
-
-
-def _extract_sending_supplier(conversation: ParsedConversation) -> str:
-    return conversation.request_started.to_system
-
-
 def _extract_sender_error(conversation: ParsedConversation) -> Optional[int]:
     if conversation.request_started_ack:
         return conversation.request_started_ack.error_code
@@ -190,8 +182,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         sla_duration=_generate_sla(conversation),
         requesting_practice_asid=conversation.requesting_practice_asid(),
         sending_practice_asid=conversation.sending_practice_asid(),
-        requesting_supplier=_extract_requesting_supplier(conversation),
-        sending_supplier=_extract_sending_supplier(conversation),
+        requesting_supplier=conversation.requesting_supplier(),
+        sending_supplier=conversation.sending_supplier(),
         sender_error_code=_extract_sender_error(conversation),
         final_error_codes=_extract_final_error_codes(conversation),
         intermediate_error_codes=_extract_intermediate_error_code(conversation),

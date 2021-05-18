@@ -19,6 +19,12 @@ class ParsedConversation(NamedTuple):
     def requesting_practice_asid(self) -> str:
         return self.request_started.from_party_asid
 
+    def requesting_supplier(self) -> str:
+        return self.request_started.from_system
+
+    def sending_supplier(self) -> str:
+        return self.request_started.to_system
+
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:
     parser = SpineConversationParser(conversation)

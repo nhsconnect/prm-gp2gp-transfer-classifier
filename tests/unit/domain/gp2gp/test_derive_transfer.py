@@ -649,26 +649,6 @@ def test_date_completed_is_none_when_request_completed_ack_not_present():
     _assert_attributes("date_completed", actual, [None])
 
 
-def test_extracts_requesting_supplier():
-    conversations = [build_parsed_conversation(request_started=build_message(from_system="EMIS"))]
-
-    actual = derive_transfers(conversations)
-
-    expected_supplier_name = ["EMIS"]
-
-    _assert_attributes("requesting_supplier", actual, expected_supplier_name)
-
-
-def test_extracts_sending_supplier():
-    conversations = [build_parsed_conversation(request_started=build_message(to_system="Vision"))]
-
-    actual = derive_transfers(conversations)
-
-    expected_supplier_name = ["Vision"]
-
-    _assert_attributes("sending_supplier", actual, expected_supplier_name)
-
-
 def test_negative_sla_duration_clamped_to_zero():
     conversations = [
         build_parsed_conversation(
