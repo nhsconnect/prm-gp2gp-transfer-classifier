@@ -371,30 +371,6 @@ def test_produces_no_sla_given_pending_request_completed_ack():
     _assert_attributes("sla_duration", actual, expected_sla_durations)
 
 
-def test_extracts_requesting_practice_asid():
-    conversations = [
-        build_parsed_conversation(request_started=build_message(from_party_asid="123456789012"))
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_asids = ["123456789012"]
-
-    _assert_attributes("requesting_practice_asid", actual, expected_asids)
-
-
-def test_extracts_sending_practice_asid():
-    conversations = [
-        build_parsed_conversation(request_started=build_message(to_party_asid="121212121212"))
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_asids = ["121212121212"]
-
-    _assert_attributes("sending_practice_asid", actual, expected_asids)
-
-
 def test_extracts_final_error_codes():
     conversations = [
         build_parsed_conversation(

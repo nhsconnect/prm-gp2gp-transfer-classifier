@@ -103,14 +103,6 @@ def _find_failed_acknowledgement(conversation: ParsedConversation) -> Message:
     )
 
 
-def _extract_requesting_practice_asid(conversation: ParsedConversation) -> str:
-    return conversation.request_started.from_party_asid
-
-
-def _extract_sending_practice_asid(conversation: ParsedConversation) -> str:
-    return conversation.request_started.to_party_asid
-
-
 def _extract_requesting_supplier(conversation: ParsedConversation) -> str:
     return conversation.request_started.from_system
 
@@ -196,8 +188,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_generate_sla(conversation),
-        requesting_practice_asid=_extract_requesting_practice_asid(conversation),
-        sending_practice_asid=_extract_sending_practice_asid(conversation),
+        requesting_practice_asid=conversation.requesting_practice_asid(),
+        sending_practice_asid=conversation.sending_practice_asid(),
         requesting_supplier=_extract_requesting_supplier(conversation),
         sending_supplier=_extract_sending_supplier(conversation),
         sender_error_code=_extract_sender_error(conversation),

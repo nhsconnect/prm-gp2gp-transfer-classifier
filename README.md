@@ -33,7 +33,7 @@ Ensure you are not within a virtual environment (run `deactivate` if you are in 
 3. Run `pyenv global 3.9.4`
 4. For the following steps open another terminal.
 5. Run `python -m pip install pipenv` to install pipenv using the updated python environment.
-6. Run `python -m pip install -U "pip>=21.1`
+6. Run `python -m pip install -U "pip>=21.1"`
    - `pyenv global` should output the specific python version specified rather than `system`.
    - Both `python --version` and `pip --version` should point to the versions you have specified.
    - `ls -l $(which pipenv)` should output `.../.pyenv/shims/pipenv` rather than `...Cellar...` (which is a brew install).

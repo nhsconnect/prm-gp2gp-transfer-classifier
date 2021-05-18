@@ -13,6 +13,12 @@ class ParsedConversation(NamedTuple):
     intermediate_messages: List[Message]
     request_completed_ack_messages: List[Message]
 
+    def sending_practice_asid(self) -> str:
+        return self.request_started.to_party_asid
+
+    def requesting_practice_asid(self) -> str:
+        return self.request_started.from_party_asid
+
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:
     parser = SpineConversationParser(conversation)
