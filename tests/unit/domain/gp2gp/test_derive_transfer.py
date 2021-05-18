@@ -385,43 +385,6 @@ def test_extracts_conversation_ids_for_conversations():
     _assert_attributes("conversation_id", actual, expected_conversation_ids)
 
 
-def test_intermediate_error_code_is_empty_list_if_no_errors():
-    intermediate_messages = [build_message(), build_message(), build_message()]
-    conversations = [build_parsed_conversation(intermediate_messages=intermediate_messages)]
-
-    actual = derive_transfers(conversations)
-
-    expected_intermediate_error_codes = [[]]
-
-    _assert_attributes("intermediate_error_codes", actual, expected_intermediate_error_codes)
-
-
-def test_extracts_an_intermediate_message_error_code():
-    intermediate_messages = [build_message(error_code=20)]
-    conversations = [build_parsed_conversation(intermediate_messages=intermediate_messages)]
-
-    actual = derive_transfers(conversations)
-
-    expected_intermediate_error_codes = [[20]]
-
-    _assert_attributes("intermediate_error_codes", actual, expected_intermediate_error_codes)
-
-
-def test_extracts_multiple_intermediate_message_error_codes():
-    intermediate_messages = [
-        build_message(error_code=11),
-        build_message(),
-        build_message(error_code=10),
-    ]
-    conversations = [build_parsed_conversation(intermediate_messages=intermediate_messages)]
-
-    actual = derive_transfers(conversations)
-
-    expected_intermediate_error_codes = [[11, 10]]
-
-    _assert_attributes("intermediate_error_codes", actual, expected_intermediate_error_codes)
-
-
 def test_has_pending_status_if_no_final_ack():
     conversations = [
         build_parsed_conversation(

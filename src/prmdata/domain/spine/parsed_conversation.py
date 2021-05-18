@@ -33,6 +33,13 @@ class ParsedConversation(NamedTuple):
             return self.request_started_ack.error_code
         return None
 
+    def intermediate_error_codes(self) -> List[int]:
+        return [
+            message.error_code
+            for message in self.intermediate_messages
+            if message.error_code is not None
+        ]
+
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:
     parser = SpineConversationParser(conversation)
