@@ -1,3 +1,4 @@
+from tests.builders.common import a_datetime
 from tests.builders.spine import build_parsed_conversation, build_message
 
 
@@ -125,3 +126,48 @@ def test_extracts_multiple_intermediate_message_error_codes():
     expected_intermediate_error_codes = [11, 10]
 
     assert actual == expected_intermediate_error_codes
+
+
+def test_extracts_date_requested_from_request_started_message():
+    date_requested = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(time=date_requested),
+        request_completed_messages=[build_message()],
+        request_completed_ack_messages=[build_message()],
+    )
+
+    actual = conversation.date_requested()
+
+    assert actual == date_requested
+
+
+def test_extracts_date_completed_from_request_completed_ack():
+    date_completed = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_completed_messages=[build_message()],
+        request_completed_ack_messages=[
+            build_message(
+                time=date_completed,
+            )
+        ],
+    )
+
+    actual = conversation.date_completed()
+
+    assert actual == date_completed
+
+
+def test_date_completed_is_none_when_request_completed_ack_not_present():
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_completed_messages=[build_message()],
+        request_completed_ack_messages=[],
+    )
+
+    actual = conversation.date_completed()
+    expected_date_completed = None
+
+    assert actual == expected_date_completed

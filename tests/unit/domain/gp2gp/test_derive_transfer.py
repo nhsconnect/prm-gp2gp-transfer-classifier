@@ -2,13 +2,12 @@ from datetime import datetime, timedelta
 from typing import List, Iterator
 
 import pytest
+
+from prmdata.domain.spine.message import ERROR_SUPPRESSED, DUPLICATE_ERROR
 from tests.builders.spine import build_parsed_conversation, build_message
-from tests.builders.common import a_datetime
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
-    ERROR_SUPPRESSED,
-    DUPLICATE_ERROR,
     derive_transfers,
 )
 
@@ -512,56 +511,6 @@ def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
     expected_statuses = [TransferStatus.PENDING_WITH_ERROR]
 
     _assert_attributes("status", actual, expected_statuses)
-
-
-def test_extracts_date_requested_from_request_started_message():
-    date_requested = a_datetime()
-
-    conversations = [
-        build_parsed_conversation(
-            request_started=build_message(time=date_requested),
-            request_completed_messages=[build_message()],
-            request_completed_ack_messages=[build_message()],
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    _assert_attributes("date_requested", actual, [date_requested])
-
-
-def test_extracts_date_completed_from_request_completed_ack():
-    date_completed = a_datetime()
-
-    conversations = [
-        build_parsed_conversation(
-            request_started=build_message(),
-            request_completed_messages=[build_message()],
-            request_completed_ack_messages=[
-                build_message(
-                    time=date_completed,
-                )
-            ],
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    _assert_attributes("date_completed", actual, [date_completed])
-
-
-def test_date_completed_is_none_when_request_completed_ack_not_present():
-    conversations = [
-        build_parsed_conversation(
-            request_started=build_message(),
-            request_completed_messages=[build_message()],
-            request_completed_ack_messages=[],
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    _assert_attributes("date_completed", actual, [None])
 
 
 def test_negative_sla_duration_clamped_to_zero():

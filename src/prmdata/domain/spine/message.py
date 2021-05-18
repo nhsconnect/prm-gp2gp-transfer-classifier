@@ -8,6 +8,9 @@ EHR_REQUEST_COMPLETED = "urn:nhs:names:services:gp2gp/RCMR_IN030000UK06"
 APPLICATION_ACK = "urn:nhs:names:services:gp2gp/MCCI_IN010000UK13"
 COMMON_POINT_TO_POINT = "urn:nhs:names:services:gp2gp/COPC_IN000001UK01"
 
+ERROR_SUPPRESSED = 15
+DUPLICATE_ERROR = 12
+
 
 class Message(NamedTuple):
     time: datetime

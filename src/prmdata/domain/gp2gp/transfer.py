@@ -6,11 +6,8 @@ from enum import Enum
 import pyarrow as pa
 import pyarrow as Table
 
-from prmdata.domain.spine.message import Message
+from prmdata.domain.spine.message import Message, ERROR_SUPPRESSED, DUPLICATE_ERROR
 from prmdata.domain.spine.parsed_conversation import ParsedConversation
-
-ERROR_SUPPRESSED = 15
-DUPLICATE_ERROR = 12
 
 
 class TransferStatus(Enum):
@@ -103,22 +100,6 @@ def _find_failed_acknowledgement(conversation: ParsedConversation) -> Message:
     )
 
 
-def _extract_date_requested(conversation: ParsedConversation) -> datetime:
-    return conversation.request_started.time
-
-
-def _extract_date_completed(conversation: ParsedConversation) -> Optional[datetime]:
-    successful_acknowledgement = _find_successful_acknowledgement(conversation)
-    if successful_acknowledgement:
-        return successful_acknowledgement.time
-
-    failed_acknowledgement = _find_failed_acknowledgement(conversation)
-    if failed_acknowledgement:
-        return failed_acknowledgement.time
-
-    return None
-
-
 def _assign_status(conversation: ParsedConversation) -> TransferStatus:
     if _is_integrated(conversation):
         return TransferStatus.INTEGRATED
@@ -170,8 +151,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         final_error_codes=conversation.final_error_codes(),
         intermediate_error_codes=conversation.intermediate_error_codes(),
         status=_assign_status(conversation),
-        date_requested=_extract_date_requested(conversation),
-        date_completed=_extract_date_completed(conversation),
+        date_requested=conversation.date_requested(),
+        date_completed=conversation.date_completed(),
     )
 
 
