@@ -371,54 +371,6 @@ def test_produces_no_sla_given_pending_request_completed_ack():
     _assert_attributes("sla_duration", actual, expected_sla_durations)
 
 
-def test_extracts_final_error_codes():
-    conversations = [
-        build_parsed_conversation(
-            request_completed_ack_messages=[
-                build_message(error_code=99),
-                build_message(error_code=1),
-                build_message(error_code=None),
-            ]
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_errors = [[99, 1, None]]
-
-    _assert_attributes("final_error_codes", actual, expected_errors)
-
-
-def test_extracts_sender_error_code_when_no_sender_error():
-    conversations = [build_parsed_conversation(request_started_ack=build_message(error_code=None))]
-
-    actual = derive_transfers(conversations)
-
-    expected_errors = [None]
-
-    _assert_attributes("sender_error_code", actual, expected_errors)
-
-
-def test_extracts_sender_error_code_when_sender_error():
-    conversations = [build_parsed_conversation(request_started_ack=build_message(error_code=10))]
-
-    actual = derive_transfers(conversations)
-
-    expected_errors = [10]
-
-    _assert_attributes("sender_error_code", actual, expected_errors)
-
-
-def test_doesnt_extract_error_code_given_pending_request_completed_ack():
-    conversations = [build_parsed_conversation(request_completed_ack_messages=[])]
-
-    actual = derive_transfers(conversations)
-
-    expected_errors = [[]]
-
-    _assert_attributes("final_error_codes", actual, expected_errors)
-
-
 def test_extracts_conversation_ids_for_conversations():
     conversations = [
         build_parsed_conversation(id="1234"),

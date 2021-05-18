@@ -43,3 +43,49 @@ def test_extracts_sending_supplier():
     expected = "Vision"
 
     assert actual == expected
+
+
+def test_extracts_final_error_codes():
+    conversation = build_parsed_conversation(
+        request_completed_ack_messages=[
+            build_message(error_code=99),
+            build_message(error_code=1),
+            build_message(error_code=None),
+        ]
+    )
+
+    actual = conversation.final_error_codes()
+
+    expected = [99, 1, None]
+
+    assert actual == expected
+
+
+def test_doesnt_extract_error_code_given_pending_request_completed_ack():
+    conversation = build_parsed_conversation(request_completed_ack_messages=[])
+
+    actual = conversation.final_error_codes()
+
+    expected = []
+
+    assert actual == expected
+
+
+def test_extracts_sender_error_code_when_no_sender_error():
+    conversation = build_parsed_conversation(request_started_ack=build_message(error_code=None))
+
+    actual = conversation.sender_error()
+
+    expected = None
+
+    assert actual == expected
+
+
+def test_extracts_sender_error_code_when_sender_error():
+    conversation = build_parsed_conversation(request_started_ack=build_message(error_code=10))
+
+    actual = conversation.sender_error()
+
+    expected = 10
+
+    assert actual == expected

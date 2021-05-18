@@ -103,16 +103,6 @@ def _find_failed_acknowledgement(conversation: ParsedConversation) -> Message:
     )
 
 
-def _extract_sender_error(conversation: ParsedConversation) -> Optional[int]:
-    if conversation.request_started_ack:
-        return conversation.request_started_ack.error_code
-    return None
-
-
-def _extract_final_error_codes(conversation: ParsedConversation) -> List[Optional[int]]:
-    return [message.error_code for message in conversation.request_completed_ack_messages]
-
-
 def _extract_intermediate_error_code(conversation: ParsedConversation) -> List[int]:
     return [
         message.error_code
@@ -170,7 +160,7 @@ def _has_final_ack_error(conversation: ParsedConversation) -> bool:
 
 def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -> bool:
     intermediate_errors = _extract_intermediate_error_code(conversation)
-    sender_error = _extract_sender_error(conversation)
+    sender_error = conversation.sender_error()
     has_intermediate_error = len(intermediate_errors) > 0 or sender_error is not None
     lacking_final_ack = len(conversation.request_completed_ack_messages) == 0
     return lacking_final_ack and has_intermediate_error
@@ -184,8 +174,8 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         sending_practice_asid=conversation.sending_practice_asid(),
         requesting_supplier=conversation.requesting_supplier(),
         sending_supplier=conversation.sending_supplier(),
-        sender_error_code=_extract_sender_error(conversation),
-        final_error_codes=_extract_final_error_codes(conversation),
+        sender_error_code=conversation.sender_error(),
+        final_error_codes=conversation.final_error_codes(),
         intermediate_error_codes=_extract_intermediate_error_code(conversation),
         status=_assign_status(conversation),
         date_requested=_extract_date_requested(conversation),

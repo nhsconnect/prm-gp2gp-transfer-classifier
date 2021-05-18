@@ -25,6 +25,14 @@ class ParsedConversation(NamedTuple):
     def sending_supplier(self) -> str:
         return self.request_started.to_system
 
+    def final_error_codes(self) -> List[Optional[int]]:
+        return [message.error_code for message in self.request_completed_ack_messages]
+
+    def sender_error(self) -> Optional[int]:
+        if self.request_started_ack:
+            return self.request_started_ack.error_code
+        return None
+
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:
     parser = SpineConversationParser(conversation)
