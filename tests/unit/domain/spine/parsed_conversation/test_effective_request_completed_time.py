@@ -75,7 +75,7 @@ def test_returns_time_when_conversation_has_concluded_successfully():
         request_completed_messages=[
             build_message(time=effective_request_completed_time, guid="abc")
         ],
-        request_completed_ack_messages=[build_message(message_ref="abc")],
+        request_completed_ack_messages=[build_message(message_ref="abc", error_code=None)],
     )
 
     actual = conversation.effective_request_completed_time()
@@ -130,7 +130,7 @@ def test_returns_time_given_duplicate_and_success():
             build_message(time=effective_request_completed_time, guid="abc"),
         ],
         request_completed_ack_messages=[
-            build_message(message_ref="abc"),
+            build_message(message_ref="abc", error_code=None),
             build_message(message_ref="bcd", error_code=12),
         ],
     )
@@ -175,7 +175,7 @@ def test_returns_time_given_success_and_failure():
             build_message(guid="abc"),
         ],
         request_completed_ack_messages=[
-            build_message(message_ref="bcd"),
+            build_message(message_ref="bcd", error_code=None),
             build_message(message_ref="abc", error_code=99),
         ],
     )
