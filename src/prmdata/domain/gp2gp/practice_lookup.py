@@ -13,6 +13,9 @@ class PracticeLookup:
     def all_practices(self) -> Iterable[PracticeDetails]:
         return iter(self._practices)
 
+    def all_ods_codes(self):
+        return (practice.ods_code for practice in self._practices)
+
     def has_asid_code(self, asid):
         return asid in self._asid_to_ods_mapping
 
