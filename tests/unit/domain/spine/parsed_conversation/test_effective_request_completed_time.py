@@ -11,10 +11,11 @@ def test_returns_none_when_request_has_been_made():
         request_completed_ack_messages=[],
     )
 
-    actual = conversation.effective_request_completed_time()
-    expected_effective_request_completed_time = None
+    expected = None
 
-    assert actual == expected_effective_request_completed_time
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == expected
 
 
 def test_returns_none_when_request_has_been_acknowledged():
@@ -25,10 +26,11 @@ def test_returns_none_when_request_has_been_acknowledged():
         request_completed_ack_messages=[],
     )
 
-    actual = conversation.effective_request_completed_time()
-    expected_effective_request_completed_time = None
+    expected = None
 
-    assert actual == expected_effective_request_completed_time
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == expected
 
 
 def test_returns_none_when_ehr_has_been_returned():
@@ -39,10 +41,11 @@ def test_returns_none_when_ehr_has_been_returned():
         request_completed_ack_messages=[],
     )
 
-    actual = conversation.effective_request_completed_time()
-    expected_effective_request_completed_time = None
+    expected = None
 
-    assert actual == expected_effective_request_completed_time
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == expected
 
 
 def test_returns_none_given_duplicate_and_pending():
@@ -58,11 +61,11 @@ def test_returns_none_given_duplicate_and_pending():
         ],
     )
 
+    expected = None
+
     actual = conversation.effective_request_completed_time()
 
-    effective_request_completed_time = None
-
-    assert actual == effective_request_completed_time
+    assert actual == expected
 
 
 def test_returns_correct_time_when_conversation_has_concluded_successfully():
@@ -78,9 +81,11 @@ def test_returns_correct_time_when_conversation_has_concluded_successfully():
         request_completed_ack_messages=[build_message(message_ref="abc", error_code=None)],
     )
 
+    expected = effective_request_completed_time
+
     actual = conversation.effective_request_completed_time()
 
-    assert actual == effective_request_completed_time
+    assert actual == expected
 
 
 def test_returns_correct_time_when_record_is_suppressed():
@@ -97,9 +102,11 @@ def test_returns_correct_time_when_record_is_suppressed():
         ],
     )
 
+    expected = effective_request_completed_time
+
     actual = conversation.effective_request_completed_time()
 
-    assert actual == effective_request_completed_time
+    assert actual == expected
 
 
 def test_returns_correct_time_when_conversation_concluded_with_failure():
@@ -114,9 +121,11 @@ def test_returns_correct_time_when_conversation_concluded_with_failure():
         request_completed_ack_messages=[build_message(message_ref="abc", error_code=99)],
     )
 
+    expected = effective_request_completed_time
+
     actual = conversation.effective_request_completed_time()
 
-    assert actual == effective_request_completed_time
+    assert actual == expected
 
 
 def test_returns_correct_time_given_duplicate_and_success():
@@ -135,9 +144,11 @@ def test_returns_correct_time_given_duplicate_and_success():
         ],
     )
 
+    expected = effective_request_completed_time
+
     actual = conversation.effective_request_completed_time()
 
-    assert actual == effective_request_completed_time
+    assert actual == expected
 
 
 def test_returns_correct_time_given_duplicate_and_failure():
@@ -156,9 +167,11 @@ def test_returns_correct_time_given_duplicate_and_failure():
         ],
     )
 
+    expected = effective_request_completed_time
+
     actual = conversation.effective_request_completed_time()
 
-    assert actual == effective_request_completed_time
+    assert actual == expected
 
 
 def test_returns_correct_time_given_success_and_failure():
@@ -180,6 +193,34 @@ def test_returns_correct_time_given_success_and_failure():
         ],
     )
 
+    expected = effective_request_completed_time
+
     actual = conversation.effective_request_completed_time()
 
-    assert actual == effective_request_completed_time
+    assert actual == expected
+
+
+def test_returns_correct_time_given_failure_and_success():
+    effective_request_completed_time = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[
+            build_message(guid="bcd", time=effective_request_completed_time),
+            build_message(guid="abc"),
+        ],
+        request_completed_ack_messages=[
+            build_message(message_ref="abc", error_code=99),
+            build_message(
+                message_ref="bcd",
+                error_code=None,
+            ),
+        ],
+    )
+
+    expected = effective_request_completed_time
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == expected
