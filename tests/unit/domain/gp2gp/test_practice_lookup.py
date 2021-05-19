@@ -26,3 +26,51 @@ def test_all_practices_returns_practices():
     actual = list(practice_lookup.all_practices())
 
     assert actual == expected
+
+
+def test_has_asid_code_returns_false_given_no_matching_practice():
+    practices = [build_practice_details(asids=["123"])]
+
+    practice_lookup = PracticeLookup(practices)
+
+    expected = False
+
+    actual = practice_lookup.has_asid_code("456")
+
+    assert actual == expected
+
+
+def test_has_asid_code_returns_true_given_a_matching_practice():
+    practices = [build_practice_details(asids=["123"])]
+
+    practice_lookup = PracticeLookup(practices)
+
+    expected = True
+
+    actual = practice_lookup.has_asid_code("123")
+
+    assert actual == expected
+
+
+def test_has_asid_code_returns_true_given_a_matching_practice_with_multiple_asid():
+    practices = [build_practice_details(asids=["123", "456"])]
+
+    practice_lookup = PracticeLookup(practices)
+
+    expected = True
+
+    actual = practice_lookup.has_asid_code("456")
+
+    assert actual == expected
+
+
+def test_has_asid_code_returns_true_given_multiple_practices():
+    practices = [build_practice_details(asids=["123"]), build_practice_details(asids=["456"])]
+
+    practice_lookup = PracticeLookup(practices)
+
+    expected = True
+
+    actual = practice_lookup.has_asid_code("456")
+
+    assert actual == expected
