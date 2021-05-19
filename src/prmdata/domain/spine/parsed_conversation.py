@@ -77,7 +77,10 @@ class ParsedConversation(NamedTuple):
         )
 
     def _find_effective_request_completed_ack_message(self) -> Optional[Message]:
-        return self._find_successful_request_completed_ack_message() or self._find_failed_request_completed_ack_message()
+        return (
+            self._find_successful_request_completed_ack_message()
+            or self._find_failed_request_completed_ack_message()
+        )
 
     def _find_request_completed_by_guid(self, guid: str) -> Optional[Message]:
         return next(
@@ -85,7 +88,9 @@ class ParsedConversation(NamedTuple):
         )
 
     def effective_request_completed_time(self) -> Optional[datetime]:
-        effective_request_completed_ack_message = self._find_effective_request_completed_ack_message()
+        effective_request_completed_ack_message = (
+            self._find_effective_request_completed_ack_message()
+        )
 
         if effective_request_completed_ack_message is None:
             return None
