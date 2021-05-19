@@ -45,17 +45,6 @@ class ParsedConversation(NamedTuple):
     def date_requested(self) -> datetime:
         return self.request_started.time
 
-    def date_completed(self) -> Optional[datetime]:
-        successful_acknowledgement = _find_successful_acknowledgement(self)
-        if successful_acknowledgement:
-            return successful_acknowledgement.time
-
-        failed_acknowledgement = _find_failed_acknowledgement(self)
-        if failed_acknowledgement:
-            return failed_acknowledgement.time
-
-        return None
-
     def _find_successful_request_completed_ack_message(self) -> Optional[Message]:
         return next(
             (
@@ -100,6 +89,20 @@ class ParsedConversation(NamedTuple):
         )
         if effective_request_completed_message:
             return effective_request_completed_message.time
+
+        return None
+
+    def effective_final_acknowledgement_time(self):
+        return None
+
+    def date_completed(self) -> Optional[datetime]:
+        successful_acknowledgement = _find_successful_acknowledgement(self)
+        if successful_acknowledgement:
+            return successful_acknowledgement.time
+
+        failed_acknowledgement = _find_failed_acknowledgement(self)
+        if failed_acknowledgement:
+            return failed_acknowledgement.time
 
         return None
 

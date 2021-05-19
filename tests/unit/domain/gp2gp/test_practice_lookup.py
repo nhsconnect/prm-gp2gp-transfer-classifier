@@ -86,6 +86,7 @@ def test_ods_code_from_asid_returns_none_given_no_practices():
 
     assert actual == expected
 
+
 def test_ods_code_from_asid_returns_matching_practice_given_practice_with_a_single_asid():
     practice = build_practice_details(asids=["123"])
     practice_lookup = PracticeLookup([practice])
@@ -95,4 +96,3 @@ def test_ods_code_from_asid_returns_matching_practice_given_practice_with_a_sing
     actual = practice_lookup.ods_code_from_asid("123")
 
     assert actual == expected
-#def test_ods_code_from_asid_returns_matching_practice_given_multiple_practice_details():
