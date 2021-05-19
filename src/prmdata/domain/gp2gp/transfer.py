@@ -152,7 +152,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
         intermediate_error_codes=conversation.intermediate_error_codes(),
         status=_assign_status(conversation),
         date_requested=conversation.date_requested(),
-        date_completed=conversation.date_completed(),
+        date_completed=conversation.effective_final_acknowledgement_time(),
     )
 
 

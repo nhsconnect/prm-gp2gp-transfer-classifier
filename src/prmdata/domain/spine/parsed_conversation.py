@@ -98,43 +98,6 @@ class ParsedConversation(NamedTuple):
             return None
         return final_ack.time
 
-    def date_completed(self) -> Optional[datetime]:
-        successful_acknowledgement = _find_successful_acknowledgement(self)
-        if successful_acknowledgement:
-            return successful_acknowledgement.time
-
-        failed_acknowledgement = _find_failed_acknowledgement(self)
-        if failed_acknowledgement:
-            return failed_acknowledgement.time
-
-        return None
-
-
-def _find_successful_acknowledgement(conversation: ParsedConversation) -> Message:
-    return next(
-        (
-            message
-            for message in conversation.request_completed_ack_messages
-            if _is_successful_ack(message)
-        ),
-        None,
-    )
-
-
-def _find_failed_acknowledgement(conversation: ParsedConversation) -> Message:
-    return next(
-        (
-            message
-            for message in conversation.request_completed_ack_messages
-            if not _is_successful_ack(message) and message.error_code != DUPLICATE_ERROR
-        ),
-        None,
-    )
-
-
-def _is_successful_ack(message: Message) -> bool:
-    return message.error_code is None or message.error_code == ERROR_SUPPRESSED
-
 
 def parse_conversation(conversation: Conversation) -> ParsedConversation:
     parser = SpineConversationParser(conversation)
