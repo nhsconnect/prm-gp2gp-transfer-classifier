@@ -3,7 +3,7 @@ from tests.builders.spine import build_parsed_conversation, build_message
 from prmdata.domain.spine.message import ERROR_SUPPRESSED
 
 
-def test_effective_request_completed_time_returns_none_when_request_has_been_made():
+def test_returns_none_when_request_has_been_made():
     conversation = build_parsed_conversation(
         request_started=build_message(),
         request_started_ack=None,
@@ -17,7 +17,7 @@ def test_effective_request_completed_time_returns_none_when_request_has_been_mad
     assert actual == expected_effective_request_completed_time
 
 
-def test_effective_request_completed_time_returns_none_when_request_has_been_acknowledged():
+def test_returns_none_when_request_has_been_acknowledged():
     conversation = build_parsed_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
@@ -31,7 +31,7 @@ def test_effective_request_completed_time_returns_none_when_request_has_been_ack
     assert actual == expected_effective_request_completed_time
 
 
-def test_effective_request_completed_time_returns_none_when_ehr_has_been_returned():
+def test_returns_none_when_ehr_has_been_returned():
     conversation = build_parsed_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
@@ -45,61 +45,7 @@ def test_effective_request_completed_time_returns_none_when_ehr_has_been_returne
     assert actual == expected_effective_request_completed_time
 
 
-def test_effective_request_completed_time_returns_time_when_conversation_has_concluded():
-
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_parsed_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(time=effective_request_completed_time, guid="abc")
-        ],
-        request_completed_ack_messages=[build_message(message_ref="abc")],
-    )
-
-    actual = conversation.effective_request_completed_time()
-
-    assert actual == effective_request_completed_time
-
-
-def test_effective_request_completed_time_returns_time_when_record_is_suppressed():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_parsed_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(time=effective_request_completed_time, guid="abc")
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="abc", error_code=ERROR_SUPPRESSED)
-        ],
-    )
-
-    actual = conversation.effective_request_completed_time()
-
-    assert actual == effective_request_completed_time
-
-
-def test_effective_request_completed_time_returns_time_when_conversation_concluded_with_failure():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_parsed_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(time=effective_request_completed_time, guid="abc")
-        ],
-        request_completed_ack_messages=[build_message(message_ref="abc", error_code=99)],
-    )
-
-    actual = conversation.effective_request_completed_time()
-
-    assert actual == effective_request_completed_time
-
-
-def test_effective_request_completed_time_returns_none_given_duplicate_and_pending():
+def test_returns_none_given_duplicate_and_pending():
     conversation = build_parsed_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
@@ -119,7 +65,61 @@ def test_effective_request_completed_time_returns_none_given_duplicate_and_pendi
     assert actual == effective_request_completed_time
 
 
-def test_effective_request_completed_time_returns_time_given_duplicate_and_success():
+def test_returns_time_when_conversation_has_concluded_successfully():
+
+    effective_request_completed_time = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[
+            build_message(time=effective_request_completed_time, guid="abc")
+        ],
+        request_completed_ack_messages=[build_message(message_ref="abc")],
+    )
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == effective_request_completed_time
+
+
+def test_returns_time_when_record_is_suppressed():
+    effective_request_completed_time = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[
+            build_message(time=effective_request_completed_time, guid="abc")
+        ],
+        request_completed_ack_messages=[
+            build_message(message_ref="abc", error_code=ERROR_SUPPRESSED)
+        ],
+    )
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == effective_request_completed_time
+
+
+def test_returns_time_when_conversation_concluded_with_failure():
+    effective_request_completed_time = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[
+            build_message(time=effective_request_completed_time, guid="abc")
+        ],
+        request_completed_ack_messages=[build_message(message_ref="abc", error_code=99)],
+    )
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == effective_request_completed_time
+
+
+def test_returns_time_given_duplicate_and_success():
     effective_request_completed_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -140,7 +140,7 @@ def test_effective_request_completed_time_returns_time_given_duplicate_and_succe
     assert actual == effective_request_completed_time
 
 
-def test_effective_request_completed_time_returns_time_given_success_and_fail():
+def test_returns_time_given_duplicate_and_failure():
     effective_request_completed_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -151,8 +151,32 @@ def test_effective_request_completed_time_returns_time_given_success_and_fail():
             build_message(time=effective_request_completed_time, guid="abc"),
         ],
         request_completed_ack_messages=[
-            build_message(message_ref="abc"),
             build_message(message_ref="bcd", error_code=12),
+            build_message(message_ref="abc", error_code=99),
+        ],
+    )
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == effective_request_completed_time
+
+
+def test_returns_time_given_success_and_failure():
+    effective_request_completed_time = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[
+            build_message(
+                guid="bcd",
+                time=effective_request_completed_time,
+            ),
+            build_message(guid="abc"),
+        ],
+        request_completed_ack_messages=[
+            build_message(message_ref="bcd"),
+            build_message(message_ref="abc", error_code=99),
         ],
     )
 
