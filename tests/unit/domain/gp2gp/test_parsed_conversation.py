@@ -171,3 +171,61 @@ def test_date_completed_is_none_when_request_completed_ack_not_present():
     expected_date_completed = None
 
     assert actual == expected_date_completed
+
+
+def test_effective_request_completed_time_returns_none_when_request_has_been_made():
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=None,
+        request_completed_messages=[],
+        request_completed_ack_messages=[],
+    )
+
+    actual = conversation.effective_request_completed_time()
+    expected_effective_request_completed_time = None
+
+    assert actual == expected_effective_request_completed_time
+
+
+def test_effective_request_completed_time_returns_none_when_request_has_been_acknowledged():
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[],
+        request_completed_ack_messages=[],
+    )
+
+    actual = conversation.effective_request_completed_time()
+    expected_effective_request_completed_time = None
+
+    assert actual == expected_effective_request_completed_time
+
+
+def test_effective_request_completed_time_returns_none_when_ehr_has_been_returned():
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[build_message()],
+        request_completed_ack_messages=[],
+    )
+
+    actual = conversation.effective_request_completed_time()
+    expected_effective_request_completed_time = None
+
+    assert actual == expected_effective_request_completed_time
+
+
+def test_effective_request_completed_time_returns_time_when_conversation_has_concluded():
+
+    effective_request_completed_time = a_datetime()
+
+    conversation = build_parsed_conversation(
+        request_started=build_message(),
+        request_started_ack=build_message(),
+        request_completed_messages=[build_message(time=effective_request_completed_time)],
+        request_completed_ack_messages=[build_message()],
+    )
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == effective_request_completed_time

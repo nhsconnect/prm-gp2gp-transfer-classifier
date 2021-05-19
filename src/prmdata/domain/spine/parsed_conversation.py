@@ -56,6 +56,16 @@ class ParsedConversation(NamedTuple):
 
         return None
 
+    def effective_request_completed_time(self) -> Optional[datetime]:
+        if (
+            len(self.request_completed_messages) > 0
+            and len(self.request_completed_ack_messages) > 0
+        ):
+            effective_request_completed = self.request_completed_messages[0]
+            return effective_request_completed.time
+
+        return None
+
 
 def _find_successful_acknowledgement(conversation: ParsedConversation) -> Message:
     return next(
