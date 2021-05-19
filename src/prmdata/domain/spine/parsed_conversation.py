@@ -93,7 +93,10 @@ class ParsedConversation(NamedTuple):
         return None
 
     def effective_final_acknowledgement_time(self):
-        return None
+        final_ack = self._find_effective_request_completed_ack_message()
+        if final_ack is None:
+            return None
+        return final_ack.time
 
     def date_completed(self) -> Optional[datetime]:
         successful_acknowledgement = _find_successful_acknowledgement(self)
