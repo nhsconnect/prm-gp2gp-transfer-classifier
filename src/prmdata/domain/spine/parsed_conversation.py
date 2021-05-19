@@ -66,20 +66,32 @@ class ParsedConversation(NamedTuple):
             None,
         )
 
+    def _find_failed_request_completed_ack_message(self) -> Optional[Message]:
+        return next(
+            (
+                message
+                for message in self.request_completed_ack_messages
+                if message.error_code is not None and message.error_code != DUPLICATE_ERROR
+            ),
+            None,
+        )
+
+    def _find_effective_request_completed_ack_message(self) -> Optional[Message]:
+        return self._find_successful_request_completed_ack_message() or self._find_failed_request_completed_ack_message()
+
     def _find_request_completed_by_guid(self, guid: str) -> Optional[Message]:
         return next(
             (message for message in self.request_completed_messages if message.guid == guid), None
         )
 
     def effective_request_completed_time(self) -> Optional[datetime]:
-        successful_request_completed_ack_message = (
-            self._find_successful_request_completed_ack_message()
-        )
-        if successful_request_completed_ack_message is None:
+        effective_request_completed_ack_message = self._find_effective_request_completed_ack_message()
+
+        if effective_request_completed_ack_message is None:
             return None
 
         effective_request_completed_message = self._find_request_completed_by_guid(
-            guid=successful_request_completed_ack_message.message_ref
+            guid=effective_request_completed_ack_message.message_ref
         )
         if effective_request_completed_message:
             return effective_request_completed_message.time
