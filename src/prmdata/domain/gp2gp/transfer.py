@@ -32,72 +32,19 @@ class Transfer(NamedTuple):
     date_completed: Optional[datetime]
 
 
-def _generate_sla(conversation: ParsedConversation):
-    successful_acknowledgement = _find_successful_acknowledgement(conversation)
-    successful_request_completed_message = _find_acknowledged_request_completed_message(
-        conversation, successful_acknowledgement
-    )
+def _calculate_sla(conversation: ParsedConversation) -> Optional[timedelta]:
+    final_acknowledgement_time = conversation.effective_final_acknowledgement_time()
+    request_completed_time = conversation.effective_request_completed_time()
 
-    if successful_request_completed_message:
-        return _calculate_sla(
-            successful_acknowledgement,
-            successful_request_completed_message,
-            conversation.id,
-        )
-
-    failed_acknowledgement = _find_failed_acknowledgement(conversation)
-    failed_request_completed_message = _find_acknowledged_request_completed_message(
-        conversation, failed_acknowledgement
-    )
-
-    if failed_request_completed_message:
-        return _calculate_sla(
-            failed_acknowledgement, failed_request_completed_message, conversation.id
-        )
-    else:
+    if final_acknowledgement_time is None:
         return None
 
+    sla_duration = final_acknowledgement_time - request_completed_time
 
-def _calculate_sla(acknowledgement_message, request_completed_message, conversation_id):
-    sla_duration = acknowledgement_message.time - request_completed_message.time
     if sla_duration.total_seconds() < 0:
-        warn(f"Negative SLA duration for conversation: {conversation_id}", RuntimeWarning)
+        warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
+
     return max(timedelta(0), sla_duration)
-
-
-def _find_acknowledged_request_completed_message(
-    conversation: ParsedConversation, acknowledgement: Message
-) -> Message:
-    return next(
-        (
-            request_completed_message
-            for request_completed_message in conversation.request_completed_messages
-            if acknowledgement and request_completed_message.guid == acknowledgement.message_ref
-        ),
-        None,
-    )
-
-
-def _find_successful_acknowledgement(conversation: ParsedConversation) -> Message:
-    return next(
-        (
-            message
-            for message in conversation.request_completed_ack_messages
-            if _is_successful_ack(message)
-        ),
-        None,
-    )
-
-
-def _find_failed_acknowledgement(conversation: ParsedConversation) -> Message:
-    return next(
-        (
-            message
-            for message in conversation.request_completed_ack_messages
-            if not _is_successful_ack(message) and message.error_code != DUPLICATE_ERROR
-        ),
-        None,
-    )
 
 
 def _assign_status(conversation: ParsedConversation) -> TransferStatus:
@@ -142,7 +89,7 @@ def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -
 def _derive_transfer(conversation: ParsedConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
-        sla_duration=_generate_sla(conversation),
+        sla_duration=_calculate_sla(conversation),
         requesting_practice_asid=conversation.requesting_practice_asid(),
         sending_practice_asid=conversation.sending_practice_asid(),
         requesting_supplier=conversation.requesting_supplier(),

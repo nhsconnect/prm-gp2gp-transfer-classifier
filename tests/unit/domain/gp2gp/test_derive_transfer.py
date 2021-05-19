@@ -434,8 +434,8 @@ def test_has_integrated_status_if_no_error_in_final_ack():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed_messages=[build_message()],
-            request_completed_ack_messages=[build_message(error_code=None)],
+            request_completed_messages=[build_message(guid="abc")],
+            request_completed_ack_messages=[build_message(error_code=None, message_ref="abc")],
         )
     ]
 
@@ -450,8 +450,10 @@ def test_has_integrated_status_if_error_is_suppressed():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed_messages=[build_message()],
-            request_completed_ack_messages=[build_message(error_code=ERROR_SUPPRESSED)],
+            request_completed_messages=[build_message(guid="abc")],
+            request_completed_ack_messages=[
+                build_message(error_code=ERROR_SUPPRESSED, message_ref="abc")
+            ],
         )
     ]
 
@@ -466,8 +468,8 @@ def test_has_failed_status_if_error_in_final_ack():
     conversations = [
         build_parsed_conversation(
             request_started=build_message(),
-            request_completed_messages=[build_message()],
-            request_completed_ack_messages=[build_message(error_code=30)],
+            request_completed_messages=[build_message(guid="abc")],
+            request_completed_ack_messages=[build_message(error_code=30, message_ref="abc")],
         )
     ]
 
