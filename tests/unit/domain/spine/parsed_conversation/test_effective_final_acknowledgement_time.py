@@ -68,7 +68,7 @@ def test_returns_none_given_duplicate_and_pending():
     assert actual == expected
 
 
-def test_returns_time_when_conversation_has_concluded_successfully():
+def test_returns_correct_time_when_conversation_has_concluded_successfully():
     effective_final_acknowledgement_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -89,7 +89,7 @@ def test_returns_time_when_conversation_has_concluded_successfully():
     assert actual == expected
 
 
-def test_returns_time_when_record_is_suppressed():
+def test_returns_correct_time_when_record_is_suppressed():
     effective_final_acknowledgement_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -112,7 +112,7 @@ def test_returns_time_when_record_is_suppressed():
     assert actual == expected
 
 
-def test_returns_time_when_conversation_concluded_with_failure():
+def test_returns_correct_time_when_conversation_concluded_with_failure():
     effective_final_acknowledgement_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -133,7 +133,7 @@ def test_returns_time_when_conversation_concluded_with_failure():
     assert actual == expected
 
 
-def test_returns_time_given_duplicate_and_success():
+def test_returns_correct_time_given_duplicate_and_success():
     effective_final_acknowledgement_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -158,7 +158,7 @@ def test_returns_time_given_duplicate_and_success():
     assert actual == expected
 
 
-def test_returns_time_given_duplicate_and_failure():
+def test_returns_correct_time_given_duplicate_and_failure():
     effective_final_acknowledgement_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -183,7 +183,7 @@ def test_returns_time_given_duplicate_and_failure():
     assert actual == expected
 
 
-def test_returns_time_given_success_and_failure():
+def test_returns_correct_time_given_success_and_failure():
     effective_final_acknowledgement_time = a_datetime()
 
     conversation = build_parsed_conversation(
@@ -210,7 +210,7 @@ def test_returns_time_given_success_and_failure():
     assert actual == expected
 
 
-def test_returns_time_given_failure_and_success():
+def test_returns_correct_time_given_failure_and_success():
     effective_final_acknowledgement_time = a_datetime()
 
     conversation = build_parsed_conversation(
