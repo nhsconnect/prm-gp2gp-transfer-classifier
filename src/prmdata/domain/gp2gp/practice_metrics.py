@@ -1,7 +1,7 @@
 from warnings import warn
 from typing import NamedTuple, Iterable, Iterator
 
-from prmdata.domain.ods_portal.models import PracticeDetails
+from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.gp2gp.sla import SlaCounter
 
@@ -33,31 +33,24 @@ def _derive_practice_sla_metrics(practice, sla_metrics):
 
 
 def calculate_sla_by_practice(
-    practice_list: Iterable[PracticeDetails], transfers: Iterable[Transfer]
+    practice_lookup: PracticeLookup, transfers: Iterable[Transfer]
 ) -> Iterator[PracticeMetrics]:
-    practice_counts = {practice.ods_code: SlaCounter() for practice in practice_list}
+    practice_counts = {ods_code: SlaCounter() for ods_code in practice_lookup.all_ods_codes()}
 
-    asid_to_ods_mapping = {
-        asid: practice.ods_code for practice in practice_list for asid in practice.asids
-    }
-
-    _process_asid(asid_to_ods_mapping, practice_counts, transfers)
-
-    return (
-        _derive_practice_sla_metrics(practice, practice_counts[practice.ods_code])
-        for practice in practice_list
-    )
-
-
-def _process_asid(asid_to_ods_mapping, practice_counts, transfers):
     unexpected_asids = set()
     for transfer in transfers:
         asid = transfer.requesting_practice_asid
 
-        if asid in asid_to_ods_mapping:
-            ods_code = asid_to_ods_mapping[asid]
+        if practice_lookup.has_asid_code(asid):
+            ods_code = practice_lookup.ods_code_from_asid(asid)
             practice_counts[ods_code].increment(transfer.sla_duration)
         else:
             unexpected_asids.add(asid)
+
     if len(unexpected_asids) > 0:
         warn(f"Unexpected ASID count: {len(unexpected_asids)}", RuntimeWarning)
+
+    return (
+        _derive_practice_sla_metrics(practice, practice_counts[practice.ods_code])
+        for practice in practice_lookup.all_practices()
+    )

@@ -3,6 +3,8 @@ from datetime import timedelta
 from typing import Set, Iterator
 
 import pytest
+
+from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.domain.gp2gp.practice_metrics import (
     PracticeMetrics,
@@ -40,111 +42,131 @@ def _assert_first_summary_has_sla_counts(
 
 
 def test_groups_by_ods_code_given_single_practice_and_single_transfer():
-    practices = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfers = [build_transfer(requesting_practice_asid="121212121212")]
 
-    actual = calculate_sla_by_practice(practices, transfers)
+    actual = calculate_sla_by_practice(lookup, transfers)
 
     _assert_has_ods_codes(actual, {"A12345"})
 
 
 def test_groups_by_ods_code_given_single_practice_and_no_transfers():
-    practices = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfers = []
 
-    actual = calculate_sla_by_practice(practices, transfers)
+    actual = calculate_sla_by_practice(lookup, transfers)
 
     _assert_has_ods_codes(actual, {"A12345"})
 
 
 def test_warns_about_transfer_with_unexpected_asid():
-    practices = []
+    lookup = PracticeLookup([])
     transfers = [build_transfer(requesting_practice_asid="121212121212")]
 
     with pytest.warns(RuntimeWarning):
-        calculate_sla_by_practice(practices, transfers)
+        calculate_sla_by_practice(lookup, transfers)
 
 
 def test_groups_by_asid_given_two_practices_and_two_transfers_from_different_practices():
-    practices = [
-        PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string()),
-        PracticeDetails(asids=["343434343434"], ods_code="X67890", name=a_string()),
-    ]
+    lookup = PracticeLookup(
+        [
+            PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string()),
+            PracticeDetails(asids=["343434343434"], ods_code="X67890", name=a_string()),
+        ]
+    )
     transfers = [
         build_transfer(requesting_practice_asid="121212121212"),
         build_transfer(requesting_practice_asid="343434343434"),
     ]
 
-    actual = calculate_sla_by_practice(practices, transfers)
+    actual = calculate_sla_by_practice(lookup, transfers)
 
     _assert_has_ods_codes(actual, {"A12345", "X67890"})
 
 
 def test_groups_by_asid_given_single_practice_and_transfers_from_the_same_practice():
-    practices = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfers = [
         build_transfer(requesting_practice_asid="121212121212"),
         build_transfer(requesting_practice_asid="121212121212"),
     ]
 
-    actual = calculate_sla_by_practice(practices, transfers)
+    actual = calculate_sla_by_practice(lookup, transfers)
 
     _assert_has_ods_codes(actual, {"A12345"})
 
 
 def test_contains_practice_name():
     expected_name = "A Practice"
-    practices = [PracticeDetails(asids=[a_string()], ods_code=a_string(), name=expected_name)]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=[a_string()], ods_code=a_string(), name=expected_name)]
+    )
     transfers = []
 
-    actual_name = list(calculate_sla_by_practice(practices, transfers))[0].name
+    actual_name = list(calculate_sla_by_practice(lookup, transfers))[0].name
 
     assert actual_name == expected_name
 
 
 def test_returns_practice_sla_metrics_placeholder_given_a_list_with_one_practice_and_no_metrics():
-    practice_list = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfers = []
-    actual = calculate_sla_by_practice(practice_list, transfers)
+    actual = calculate_sla_by_practice(lookup, transfers)
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=0, within_8_days=0, beyond_8_days=0)
 
 
 def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_3_days():
-    practice_list = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfer = build_transfer(
         requesting_practice_asid="121212121212", sla_duration=timedelta(hours=1, minutes=10)
     )
-    actual = calculate_sla_by_practice(practice_list, [transfer])
+    actual = calculate_sla_by_practice(lookup, [transfer])
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=1, within_8_days=0, beyond_8_days=0)
 
 
 def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_8_days():
-    practice_list = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfer = build_transfer(
         requesting_practice_asid="121212121212", sla_duration=timedelta(days=7, hours=1, minutes=10)
     )
-    actual = calculate_sla_by_practice(practice_list, [transfer])
+    actual = calculate_sla_by_practice(lookup, [transfer])
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=0, within_8_days=1, beyond_8_days=0)
 
 
 def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_beyond_8_days():
-    practice_list = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfer = build_transfer(
         requesting_practice_asid="121212121212", sla_duration=timedelta(days=8, hours=1, minutes=10)
     )
-    actual = calculate_sla_by_practice(practice_list, [transfer])
+    actual = calculate_sla_by_practice(lookup, [transfer])
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=0, within_8_days=0, beyond_8_days=1)
 
 
 def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practices():
-    practice_list = [
-        PracticeDetails(asids=["121212121212"], ods_code="A12345", name="A Practice"),
-        PracticeDetails(asids=["343434343434"], ods_code="B12345", name="Another Practice"),
-    ]
+    lookup = PracticeLookup(
+        [
+            PracticeDetails(asids=["121212121212"], ods_code="A12345", name="A Practice"),
+            PracticeDetails(asids=["343434343434"], ods_code="B12345", name="Another Practice"),
+        ]
+    )
     transfers = [
         build_transfer(
             requesting_practice_asid="121212121212",
@@ -185,29 +207,37 @@ def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practice
         ),
     ]
 
-    actual = calculate_sla_by_practice(practice_list, transfers)
+    actual = calculate_sla_by_practice(lookup, transfers)
     actual_sorted = sorted(actual, key=lambda p: p.ods_code)
 
     assert actual_sorted == expected
 
 
 def test_counts_second_asid_for_practice_with_two_asids():
-    practice_list = [
-        PracticeDetails(asids=["121212121212", "343434343434"], ods_code="A12345", name=a_string())
-    ]
+    lookup = PracticeLookup(
+        [
+            PracticeDetails(
+                asids=["121212121212", "343434343434"], ods_code="A12345", name=a_string()
+            )
+        ]
+    )
     transfer = build_transfer(
         requesting_practice_asid="343434343434",
         sla_duration=timedelta(hours=1, minutes=10),
     )
-    actual = calculate_sla_by_practice(practice_list, [transfer])
+    actual = calculate_sla_by_practice(lookup, [transfer])
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=1, within_8_days=0, beyond_8_days=0)
 
 
 def test_counts_both_asids_for_practice_with_two_asids():
-    practice_list = [
-        PracticeDetails(asids=["121212121212", "343434343434"], ods_code="A12345", name=a_string())
-    ]
+    lookup = PracticeLookup(
+        [
+            PracticeDetails(
+                asids=["121212121212", "343434343434"], ods_code="A12345", name=a_string()
+            )
+        ]
+    )
     transfers = [
         build_transfer(
             requesting_practice_asid="343434343434",
@@ -218,13 +248,15 @@ def test_counts_both_asids_for_practice_with_two_asids():
             sla_duration=timedelta(days=5, hours=1, minutes=10),
         ),
     ]
-    actual = calculate_sla_by_practice(practice_list, transfers)
+    actual = calculate_sla_by_practice(lookup, transfers)
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=1, within_8_days=1, beyond_8_days=0)
 
 
 def test_returns_sum_of_all_integrated_transfers():
-    practice_list = [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    lookup = PracticeLookup(
+        [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
+    )
     transfers = [
         build_transfer(
             requesting_practice_asid="121212121212",
@@ -239,6 +271,6 @@ def test_returns_sum_of_all_integrated_transfers():
             sla_duration=timedelta(days=10, hours=1, minutes=10),
         ),
     ]
-    actual = list(calculate_sla_by_practice(practice_list, transfers))
+    actual = list(calculate_sla_by_practice(lookup, transfers))
 
     assert actual[0].integrated.transfer_count == 3

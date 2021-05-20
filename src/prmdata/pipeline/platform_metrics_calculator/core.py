@@ -8,6 +8,7 @@ from prmdata.domain.data_platform.practice_metrics import (
     construct_practice_metrics,
     PracticeMetricsPresentation,
 )
+from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
 from prmdata.utils.date.range import DateTimeRange
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
@@ -52,7 +53,8 @@ def calculate_practice_metrics_data(
     time_range: DateTimeRange,
 ) -> PracticeMetricsPresentation:
     completed_transfers = filter_for_successful_transfers(transfers)
-    sla_metrics = calculate_sla_by_practice(practice_list, completed_transfers)
+    practice_lookup = PracticeLookup(practice_list)
+    sla_metrics = calculate_sla_by_practice(practice_lookup, completed_transfers)
     practice_metrics = construct_practice_metrics(
         sla_metrics, year=time_range.start.year, month=time_range.start.month
     )
