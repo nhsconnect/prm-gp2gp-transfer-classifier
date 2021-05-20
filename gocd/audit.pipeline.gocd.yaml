@@ -7,7 +7,7 @@ pipelines:
       git:
         type: configrepo
     timer:
-      spec: 0 0 9 ? * MON,TUE,WED,THU,FRI *
+      spec: 0 0 8 ? * MON,TUE,WED,THU,FRI *
     stages:
       - audit:
           clean_workspace: true
