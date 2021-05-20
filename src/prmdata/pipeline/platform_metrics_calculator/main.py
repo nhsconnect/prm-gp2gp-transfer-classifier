@@ -8,7 +8,7 @@ from dateutil.tz import tzutc
 from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
 from prmdata.utils.date.range import DateTimeRange
 
-from prmdata.utils.io.csv import read_gzip_csv_files
+from prmdata.utils.io.csv import read_gzip_csv_files_deprecated
 from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.utils.io.json import write_json_file, read_json_file, upload_json_object
 from prmdata.domain.ods_portal.models import construct_organisation_list_from_dict
@@ -39,7 +39,7 @@ def _upload_data_platform_json_object(platform_data, s3_object):
 
 
 def _read_spine_csv_gz_files(file_paths):
-    items = read_gzip_csv_files(file_paths)
+    items = read_gzip_csv_files_deprecated(file_paths)
     return construct_messages_from_splunk_items(items)
 
 

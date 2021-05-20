@@ -1,4 +1,4 @@
-from prmdata.utils.io.csv import read_gzip_csv_files
+from prmdata.utils.io.csv import read_gzip_csv_files_deprecated
 from tests.builders.file import build_gzip_csv
 
 
@@ -20,7 +20,7 @@ def test_loads_one_file(fs):
         {"id": "C", "message": "C message"},
     ]
 
-    actual = read_gzip_csv_files(input_files)
+    actual = read_gzip_csv_files_deprecated(input_files)
 
     assert list(actual) == expected
 
@@ -54,6 +54,6 @@ def test_loads_two_files(fs):
         {"id": "E", "message": "E message"},
     ]
 
-    actual = read_gzip_csv_files(input_files)
+    actual = read_gzip_csv_files_deprecated(input_files)
 
     assert list(actual) == expected

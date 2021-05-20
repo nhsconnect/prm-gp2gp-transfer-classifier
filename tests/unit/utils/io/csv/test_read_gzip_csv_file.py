@@ -1,4 +1,4 @@
-from prmdata.utils.io.csv import read_gzip_csv_file
+from prmdata.utils.io.csv import read_gzip_csv_file_deprecated
 from tests.builders.file import build_gzip_csv
 
 
@@ -17,6 +17,6 @@ def test_returns_csv_row_as_dictionary(fs):
         {"id": "321", "message": "Another message", "comment": "Another comment"},
     ]
 
-    actual = read_gzip_csv_file(file_path)
+    actual = read_gzip_csv_file_deprecated(file_path)
 
     assert list(actual) == expected
