@@ -3,6 +3,11 @@ from datetime import datetime
 import logging
 
 import boto3
+from botocore.exceptions import ClientError
+from os import environ
+import json
+
+from itertools import chain
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
@@ -17,6 +22,7 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
+from prmdata.pipeline.platform_metrics_calculator.config import DataPipelineConfig
 from prmdata.domain.gp2gp.transfer import convert_transfers_to_table
 from prmdata.domain.spine.message import construct_messages_from_splunk_items
 from pyarrow.parquet import write_table
@@ -33,12 +39,14 @@ def _upload_data_platform_json_object(platform_data, s3_object):
     upload_json_object(camelized_dict, s3_object)
 
 
-def _read_spine_csv_gz_files(input_transfer_data, input_overflow_data):
-    input_transfer_data_items = read_gzip_csv_file(input_transfer_data)
-    input_overflow_overflow_data_items = read_gzip_csv_file(input_overflow_data)
-    return construct_messages_from_splunk_items(
-        input_transfer_data_items + input_overflow_overflow_data_items
+def _read_spine_csv_gz_files(input_transfer_data, input_transfer_overflow_data):
+    input_transfer_data_items = construct_messages_from_splunk_items(
+        read_gzip_csv_file(input_transfer_data)
     )
+    input_overflow_overflow_data_items = construct_messages_from_splunk_items(
+        read_gzip_csv_file(input_transfer_overflow_data)
+    )
+    return chain(input_transfer_data_items, input_overflow_overflow_data_items)
 
 
 def _get_time_range(year, month):
@@ -73,10 +81,15 @@ def generate_s3_path_for_input_data(year, month, input_bucket):
         11: "Nov",
         12: "Dec",
     }
-    return (
-        f"s3://{input_bucket}/{VERSION}/{year}/{month}/{month_dict[month]}-{year}.csv.gz",
-        f"s3://{input_bucket}/{VERSION}/{year}/{month}/overflow/{month_dict[month]}-{year}.csv.gz",
+    a_month = relativedelta(months=1)
+    overflow_date = datetime(year, month, 1) + a_month
+    overflow_path = (
+        f"s3://{input_bucket}/{VERSION}/{overflow_date.year}/{overflow_date.month}"
+        f"/overflow/{month_dict[overflow_date.month]}-{overflow_date.year}.csv.gz"
     )
+
+    input_path = f"s3://{input_bucket}/{VERSION}/{year}/{month}/{month_dict[month]}-{year}.csv.gz"
+    return input_path, overflow_path
 
 
 def main(config):
@@ -84,12 +97,16 @@ def main(config):
 
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
     organisation_list_path = generate_s3_path(
-        config.year, config.month, config.organisation_list_bucket, "organisationMetaData.json"
+        config.year, config.month, config.organisation_list_bucket, "organisationMetadata.json"
     )
     organisation_list_object = _create_s3_object(s3, organisation_list_path)
-    organisation_metadata = construct_organisation_list_from_dict(
-        data=organisation_list_object.get()["Body"]
-    )
+    try:
+        organisation_list_body = json.loads(
+            organisation_list_object.get()["Body"].read().decode("utf-8")
+        )
+    except ClientError as error:
+        raise error
+    organisation_metadata = construct_organisation_list_from_dict(data=organisation_list_body)
 
     input_transfer_data_s3_path, input_overflow_s3_path = generate_s3_path_for_input_data(
         config.year, config.month, config.input_bucket
@@ -134,3 +151,7 @@ def main(config):
         where=bucket_name + "/" + f"{s3_path}/{transfers_file_name}",
         filesystem=S3FileSystem(endpoint_override=config.s3_endpoint_url),
     )
+
+
+if __name__ == "__main__":
+    main(config=DataPipelineConfig.from_environment_variables(environ))
