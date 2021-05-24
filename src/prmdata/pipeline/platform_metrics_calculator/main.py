@@ -39,7 +39,7 @@ def _upload_data_platform_json_object(platform_data, s3_object):
     upload_json_object(camelized_dict, s3_object)
 
 
-def _read_spine_csv_gz_files(input_transfer_data, input_transfer_overflow_data):
+def _read_spine_transfer_csv_gz_files(input_transfer_data, input_transfer_overflow_data):
     input_transfer_data_items = construct_messages_from_splunk_items(
         read_gzip_csv_file(input_transfer_data)
     )
@@ -66,7 +66,7 @@ def _create_s3_object(s3, url_string):
     return s3.Object(s3_bucket, s3_key)
 
 
-def generate_s3_path_for_input_data(year, month, input_bucket):
+def generate_s3_path_for_input_transfer_data(year, month, input_bucket):
     month_dict = {
         1: "Jan",
         2: "Feb",
@@ -92,7 +92,9 @@ def generate_s3_path_for_input_data(year, month, input_bucket):
     return input_path, overflow_path
 
 
-def main(config):
+def main():
+    config = DataPipelineConfig.from_environment_variables(environ)
+
     logging.basicConfig(level=logging.INFO)
 
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
@@ -108,13 +110,18 @@ def main(config):
         raise error
     organisation_metadata = construct_organisation_list_from_dict(data=organisation_list_body)
 
-    input_transfer_data_s3_path, input_overflow_s3_path = generate_s3_path_for_input_data(
-        config.year, config.month, config.input_bucket
-    )
+    (
+        input_transfer_data_s3_path,
+        input_transfer_overflow_data_s3_path,
+    ) = generate_s3_path_for_input_transfer_data(config.year, config.month, config.input_bucket)
     input_transfer_data = _create_s3_object(s3, input_transfer_data_s3_path).get()["Body"]
-    input_transfer_overflow_data = _create_s3_object(s3, input_overflow_s3_path).get()["Body"]
+    input_transfer_overflow_data = _create_s3_object(
+        s3, input_transfer_overflow_data_s3_path
+    ).get()["Body"]
 
-    spine_messages = _read_spine_csv_gz_files(input_transfer_data, input_transfer_overflow_data)
+    spine_messages = _read_spine_transfer_csv_gz_files(
+        input_transfer_data, input_transfer_overflow_data
+    )
     time_range = _get_time_range(config.year, config.month)
     transfers = list(parse_transfers_from_messages(spine_messages, time_range))
     practice_metrics_data = calculate_practice_metrics_data(
@@ -154,4 +161,4 @@ def main(config):
 
 
 if __name__ == "__main__":
-    main(config=DataPipelineConfig.from_environment_variables(environ))
+    main()

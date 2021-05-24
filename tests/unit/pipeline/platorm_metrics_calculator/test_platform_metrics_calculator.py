@@ -1,5 +1,5 @@
 from prmdata.pipeline.platform_metrics_calculator.main import (
-    generate_s3_path_for_input_data,
+    generate_s3_path_for_input_transfer_data,
     generate_s3_path,
 )
 
@@ -12,7 +12,9 @@ def test_should_generate_s3_path_for_spine_input_files():
     month = 1
     year = 2020
 
-    input_path, input_overflow_path = generate_s3_path_for_input_data(year, month, input_bucket)
+    input_path, input_overflow_path = generate_s3_path_for_input_transfer_data(
+        year, month, input_bucket
+    )
 
     assert input_path == expected_input_path
     assert input_overflow_path == expected_input_overflow_path
@@ -26,7 +28,9 @@ def test_should_generate_s3_path_for_spine_input_files_over_newyears():
     month = 12
     year = 2019
 
-    input_path, input_overflow_path = generate_s3_path_for_input_data(year, month, input_bucket)
+    input_path, input_overflow_path = generate_s3_path_for_input_transfer_data(
+        year, month, input_bucket
+    )
 
     assert input_path == expected_input_path
     assert input_overflow_path == expected_input_overflow_path

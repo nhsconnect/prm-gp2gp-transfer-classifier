@@ -9,7 +9,6 @@ from threading import Thread
 import boto3
 from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
-from prmdata.pipeline.platform_metrics_calculator.config import DataPipelineConfig
 from prmdata.pipeline.platform_metrics_calculator.main import main
 from werkzeug.serving import make_server
 from tests.builders.file import gzip_file, build_gzip_csv
@@ -131,6 +130,9 @@ def test_with_s3_output(datadir):
     fake_s3_access_key = "testing"
     fake_s3_secret_key = "testing"
     fake_s3_region = "us-west-1"
+    s3_test_bucket = "testbucket"
+    month = "12"
+    year = "2019"
 
     fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
     fake_s3.start()
@@ -139,6 +141,13 @@ def test_with_s3_output(datadir):
     environ["AWS_SECRET_ACCESS_KEY"] = fake_s3_secret_key
     environ["AWS_DEFAULT_REGION"] = fake_s3_region
     environ["PATH"] = getenv("PATH")
+
+    environ["INPUT_BUCKET"] = s3_test_bucket
+    environ["OUTPUT_BUCKET"] = s3_test_bucket
+    environ["ORGANISATION_LIST_BUCKET"] = s3_test_bucket
+    environ["YEAR"] = year
+    environ["MONTH"] = month
+    environ["S3_ENDPOINT_URL"] = fake_s3_url
 
     s3 = boto3.resource(
         "s3",
@@ -149,7 +158,6 @@ def test_with_s3_output(datadir):
         region_name=fake_s3_region,
     )
 
-    s3_test_bucket = "testbucket"
     output_bucket = s3.Bucket(s3_test_bucket)
     output_bucket.create()
 
@@ -190,20 +198,8 @@ def test_with_s3_output(datadir):
         BytesIO(organisation_metadata_input_json), "v2/2019/12/organisationMetadata.json"
     )
 
-    month = 12
-    year = 2019
-
-    config = DataPipelineConfig(
-        input_bucket=s3_test_bucket,
-        output_bucket=s3_test_bucket,
-        organisation_list_bucket=s3_test_bucket,
-        year=year,
-        month=month,
-        s3_endpoint_url=fake_s3_url,
-    )
-
     try:
-        main(config)
+        main()
         actual_practice_metrics = _read_s3_json(
             output_bucket, f"{s3_path}{expected_practice_metrics_output_key}"
         )

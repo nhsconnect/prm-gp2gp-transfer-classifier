@@ -1,3 +1,4 @@
+import typing
 from datetime import datetime
 from dataclasses import dataclass, MISSING, fields
 import logging
@@ -11,10 +12,17 @@ class MissingEnvironmentVariable(Exception):
     pass
 
 
+def _convert_env_value(env_value, config_type):
+    if config_type == typing.Optional[int]:
+        return int(env_value)
+    return env_value
+
+
 def _read_env(field, env_vars):
     env_var = field.name.upper()
     if env_var in env_vars:
-        return env_vars[env_var]
+        env_value = env_vars[env_var]
+        return _convert_env_value(env_value, field.type)
     elif field.default != MISSING:
         return field.default
     else:
