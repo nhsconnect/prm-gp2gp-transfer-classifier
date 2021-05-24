@@ -1,18 +1,19 @@
+import csv
 from datetime import datetime
 import json
 import logging
 from io import BytesIO
-from os import getenv
+from os import getenv, environ
 from threading import Thread
 
 import boto3
 from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
+from prmdata.pipeline.platform_metrics_calculator.config import DataPipelineConfig
+from prmdata.pipeline.platform_metrics_calculator.main import main
 from werkzeug.serving import make_server
-from tests.builders.file import gzip_file
+from tests.builders.file import gzip_file, build_gzip_csv
 import pyarrow.parquet as pq
-
-from subprocess import check_output
 
 logger = logging.getLogger(__name__)
 
@@ -119,56 +120,11 @@ def _build_fake_s3(host, port):
     return ThreadedServer(server)
 
 
-# TODO: Remove with PRMT-1798
-def test_with_local_files_deprecated(datadir):
-    input_file_paths = _gzip_files(
-        [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
-    )
-    organisation_metadata_file_path = datadir / "organisation-list.json"
-    input_file_paths_str = _csv_join_paths(input_file_paths)
+###########################################################
+###########################################################
+###########################################################
+def test_with_s3_output(datadir):
 
-    practice_metrics_output_file_path = datadir / "12-2019-practiceMetrics.json"
-    organisation_metadata_output_file_path = datadir / "12-2019-organisationMetadata.json"
-    national_metrics_output_file_path = datadir / "12-2019-nationalMetrics.json"
-    transfers_output_file_path = datadir / "12-2019-transfers.parquet"
-
-    expected_practice_metrics = _read_json(
-        datadir / "expected_json_output" / "practiceMetrics.json"
-    )
-    expected_organisation_metadata = _read_json(
-        datadir / "expected_json_output" / "organisationMetadata.json"
-    )
-    expected_national_metrics = _read_json(
-        datadir / "expected_json_output" / "nationalMetrics.json"
-    )
-
-    month = 12
-    year = 2019
-
-    pipeline_command = f"\
-        platform-metrics-pipeline --month {month}\
-        --year {year}\
-        --organisation-list-file {organisation_metadata_file_path}\
-        --input-files {input_file_paths_str}\
-        --output-directory {datadir}\
-    "
-
-    pipeline_output = check_output(pipeline_command, shell=True)
-    logger.debug(pipeline_output)
-
-    actual_practice_metrics = _read_json(practice_metrics_output_file_path)
-    actual_organisation_metadata = _read_json(organisation_metadata_output_file_path)
-    actual_national_metrics = _read_json(national_metrics_output_file_path)
-    actual_transfers = _read_parquet(transfers_output_file_path)
-
-    assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
-    assert actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
-    assert actual_national_metrics["metrics"] == expected_national_metrics["metrics"]
-    assert actual_transfers == EXPECTED_TRANSFERS
-
-
-# TODO: Remove with PRMT-1798
-def test_with_s3_output_deprecated(datadir):
     fake_s3_host = "127.0.0.1"
     fake_s3_port = 8887
     fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"
@@ -179,6 +135,11 @@ def test_with_s3_output_deprecated(datadir):
     fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
     fake_s3.start()
 
+    environ["AWS_ACCESS_KEY_ID"] = fake_s3_access_key
+    environ["AWS_SECRET_ACCESS_KEY"] = fake_s3_secret_key
+    environ["AWS_DEFAULT_REGION"] = fake_s3_region
+    environ["PATH"] = getenv("PATH")
+
     s3 = boto3.resource(
         "s3",
         endpoint_url=fake_s3_url,
@@ -188,15 +149,9 @@ def test_with_s3_output_deprecated(datadir):
         region_name=fake_s3_region,
     )
 
-    output_bucket_name = "testbucket"
-    output_bucket = s3.Bucket(output_bucket_name)
+    s3_test_bucket = "testbucket"
+    output_bucket = s3.Bucket(s3_test_bucket)
     output_bucket.create()
-
-    input_file_paths = _gzip_files(
-        [datadir / "test_gp2gp_dec_2019.csv", datadir / "test_gp2gp_jan_2020.csv"]
-    )
-    organisation_metadata_file_path = datadir / "organisation-list.json"
-    input_file_paths_str = _csv_join_paths(input_file_paths)
 
     expected_practice_metrics_output_key = "practiceMetrics.json"
     expected_organisation_metadata_output_key = "organisationMetadata.json"
@@ -204,37 +159,51 @@ def test_with_s3_output_deprecated(datadir):
     expected_transfers_output_key = "transfers.parquet"
 
     expected_practice_metrics = _read_json(
-        datadir / "expected_json_output" / "practiceMetrics.json"
+        datadir / "expected_json_output" / "v2" / "2019" / "12" / "practiceMetrics.json"
     )
     expected_organisation_metadata = _read_json(
-        datadir / "expected_json_output" / "organisationMetadata.json"
+        datadir / "expected_json_output" / "v2" / "2019" / "12" / "organisationMetadata.json"
     )
     expected_national_metrics = _read_json(
-        datadir / "expected_json_output" / "nationalMetrics.json"
+        datadir / "expected_json_output" / "v2" / "2019" / "12" / "nationalMetrics.json"
+    )
+
+    s3_path = "v2/2019/12/"
+
+    input_csv = csv.reader(open(datadir / "v2" / "2019" / "12" / "Dec-2019.csv"))
+    input_csv = list(input_csv)
+    input_csv_gz = BytesIO(build_gzip_csv(header=input_csv[0], rows=input_csv[1:]))
+    output_bucket.upload_fileobj(input_csv_gz, "v2/2019/12/Dec-2019.csv.gz")
+
+    input_overflow_csv = csv.reader(
+        open(datadir / "v2" / "2020" / "1" / "overflow" / "Jan-2020.csv")
+    )
+    input_overflow_csv = list(input_overflow_csv)
+    input_overflow_csv_gz = BytesIO(
+        build_gzip_csv(header=input_overflow_csv[0], rows=input_overflow_csv[1:])
+    )
+    output_bucket.upload_fileobj(input_overflow_csv_gz, "v2/2020/1/overflow/Jan-2020.csv.gz")
+
+    with open(datadir / "v2" / "2019" / "12" / "organisationMetadata.json") as f:
+        organisation_metadata_input_json = json.dumps(json.load(f)).encode("UTF-8")
+    output_bucket.upload_fileobj(
+        BytesIO(organisation_metadata_input_json), "v2/2019/12/organisationMetadata.json"
     )
 
     month = 12
     year = 2019
 
-    pipeline_env = {
-        "AWS_ACCESS_KEY_ID": fake_s3_access_key,
-        "AWS_SECRET_ACCESS_KEY": fake_s3_secret_key,
-        "AWS_DEFAULT_REGION": fake_s3_region,
-        "PATH": getenv("PATH"),
-    }
-
-    pipeline_command = f"\
-        platform-metrics-pipeline --month {month}\
-        --year {year}\
-        --organisation-list-file {organisation_metadata_file_path}\
-        --input-files {input_file_paths_str}\
-        --output-bucket {output_bucket_name}\
-        --s3-endpoint-url {fake_s3_url} \
-    "
-    pipeline_output = check_output(pipeline_command, shell=True, env=pipeline_env)
+    config = DataPipelineConfig(
+        input_bucket=s3_test_bucket,
+        output_bucket=s3_test_bucket,
+        organisation_list_bucket=s3_test_bucket,
+        year=year,
+        month=month,
+        s3_endpoint_url=fake_s3_url,
+    )
 
     try:
-        s3_path = "v2/2019/12/"
+        main(config)
         actual_practice_metrics = _read_s3_json(
             output_bucket, f"{s3_path}{expected_practice_metrics_output_key}"
         )
@@ -259,4 +228,3 @@ def test_with_s3_output_deprecated(datadir):
         output_bucket.objects.all().delete()
         output_bucket.delete()
         fake_s3.stop()
-        logger.debug(pipeline_output)

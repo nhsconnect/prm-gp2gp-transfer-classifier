@@ -1,4 +1,4 @@
-from prmdata.pipeline.platform_metrics_calculator.main_new import (
+from prmdata.pipeline.platform_metrics_calculator.main import (
     generate_s3_path_for_input_data,
     generate_s3_path,
 )

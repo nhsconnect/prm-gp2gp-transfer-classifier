@@ -1,5 +1,6 @@
 from setuptools import find_packages, setup
 
+main_entrypoint = "prmdata.pipeline.platform_metrics_calculator.main_deprecated:main"
 setup(
     name="gp2gp-data-pipeline",
     version="1.0.0",
@@ -13,7 +14,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "platform-metrics-pipeline=prmdata.pipeline.platform_metrics_calculator.main:main",
+            f"platform-metrics-pipeline={main_entrypoint}",
         ]
     },
 )
