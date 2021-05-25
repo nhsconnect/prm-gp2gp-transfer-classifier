@@ -27,7 +27,8 @@ def build_gzip_csv(header, rows):
     return buffer.getvalue()
 
 
-def gzip_file(input_file_path):
+# TODO: Remove with PRMT-1798
+def gzip_file_deprecated(input_file_path):
     gzip_file_path = input_file_path.with_suffix(".gz")
     with open(input_file_path, "rb") as input_file:
         with gzip.open(gzip_file_path, "wb") as output_file:

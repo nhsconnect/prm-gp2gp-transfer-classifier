@@ -9,7 +9,7 @@ import boto3
 from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
 from werkzeug.serving import make_server
-from tests.builders.file import gzip_file
+from tests.builders.file import gzip_file_deprecated
 import pyarrow.parquet as pq
 
 from subprocess import check_output
@@ -89,7 +89,7 @@ def _read_parquet(path):
 
 
 def _gzip_files(file_paths):
-    return [gzip_file(file_path) for file_path in file_paths]
+    return [gzip_file_deprecated(file_path) for file_path in file_paths]
 
 
 def _csv_join(strings):
@@ -170,7 +170,7 @@ def test_with_local_files_deprecated(datadir):
 # TODO: Remove with PRMT-1798
 def test_with_s3_output_deprecated(datadir):
     fake_s3_host = "127.0.0.1"
-    fake_s3_port = 8887
+    fake_s3_port = 8886
     fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"
     fake_s3_access_key = "testing"
     fake_s3_secret_key = "testing"

@@ -83,14 +83,6 @@ def _read_json(path):
     return json.loads(path.read_text())
 
 
-def _csv_join(strings):
-    return ",".join(strings)
-
-
-def _csv_join_paths(paths):
-    return _csv_join([str(p) for p in paths])
-
-
 def _read_s3_json(bucket, key):
     f = BytesIO()
     bucket.download_fileobj(key, f)
@@ -130,7 +122,7 @@ def test_with_s3_output(datadir):
     environ["AWS_ACCESS_KEY_ID"] = fake_s3_access_key
     environ["AWS_SECRET_ACCESS_KEY"] = fake_s3_secret_key
     environ["AWS_DEFAULT_REGION"] = fake_s3_region
-    environ["PATH"] = getenv("PATH")
+    environ[" "] = getenv("PATH")
 
     environ["INPUT_BUCKET"] = s3_test_bucket
     environ["OUTPUT_BUCKET"] = s3_test_bucket
