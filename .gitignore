@@ -1,6 +1,7 @@
 .DS_Store
 .idea/
 .vscode/
+.env
 
 build/
 dist/
@@ -11,3 +12,4 @@ gp2gp_data_pipeline.egg-info
 .tox
 .coverage
 audit-output.txt
+typings

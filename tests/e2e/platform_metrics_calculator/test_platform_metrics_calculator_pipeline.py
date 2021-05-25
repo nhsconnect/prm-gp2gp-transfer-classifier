@@ -1,4 +1,3 @@
-import csv
 from datetime import datetime
 import json
 import logging
@@ -11,7 +10,7 @@ from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
 from prmdata.pipeline.platform_metrics_calculator.main import main
 from werkzeug.serving import make_server
-from tests.builders.file import gzip_file, build_gzip_csv
+from tests.builders.file import read_file_to_gzip_buffer
 import pyarrow.parquet as pq
 
 logger = logging.getLogger(__name__)
@@ -84,14 +83,6 @@ def _read_json(path):
     return json.loads(path.read_text())
 
 
-def _read_parquet(path):
-    return pq.read_table(path).to_pydict()
-
-
-def _gzip_files(file_paths):
-    return [gzip_file(file_path) for file_path in file_paths]
-
-
 def _csv_join(strings):
     return ",".join(strings)
 
@@ -123,7 +114,6 @@ def _build_fake_s3(host, port):
 ###########################################################
 ###########################################################
 def test_with_s3_output(datadir):
-
     fake_s3_host = "127.0.0.1"
     fake_s3_port = 8887
     fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"
@@ -178,25 +168,16 @@ def test_with_s3_output(datadir):
 
     s3_path = "v2/2019/12/"
 
-    input_csv = csv.reader(open(datadir / "v2" / "2019" / "12" / "Dec-2019.csv"))
-    input_csv = list(input_csv)
-    input_csv_gz = BytesIO(build_gzip_csv(header=input_csv[0], rows=input_csv[1:]))
+    input_csv_gz = read_file_to_gzip_buffer(datadir / "v2" / "2019" / "12" / "Dec-2019.csv")
     output_bucket.upload_fileobj(input_csv_gz, "v2/2019/12/Dec-2019.csv.gz")
 
-    input_overflow_csv = csv.reader(
-        open(datadir / "v2" / "2020" / "1" / "overflow" / "Jan-2020.csv")
-    )
-    input_overflow_csv = list(input_overflow_csv)
-    input_overflow_csv_gz = BytesIO(
-        build_gzip_csv(header=input_overflow_csv[0], rows=input_overflow_csv[1:])
+    input_overflow_csv_gz = read_file_to_gzip_buffer(
+        datadir / "v2" / "2020" / "1" / "overflow" / "Jan-2020.csv"
     )
     output_bucket.upload_fileobj(input_overflow_csv_gz, "v2/2020/1/overflow/Jan-2020.csv.gz")
 
-    with open(datadir / "v2" / "2019" / "12" / "organisationMetadata.json") as f:
-        organisation_metadata_input_json = json.dumps(json.load(f)).encode("UTF-8")
-    output_bucket.upload_fileobj(
-        BytesIO(organisation_metadata_input_json), "v2/2019/12/organisationMetadata.json"
-    )
+    organisation_metadata_file = str(datadir / "v2" / "2019" / "12" / "organisationMetadata.json")
+    output_bucket.upload_file(organisation_metadata_file, "v2/2019/12/organisationMetadata.json")
 
     try:
         main()

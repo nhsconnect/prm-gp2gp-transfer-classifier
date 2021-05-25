@@ -33,3 +33,12 @@ def gzip_file(input_file_path):
         with gzip.open(gzip_file_path, "wb") as output_file:
             shutil.copyfileobj(input_file, output_file)
     return gzip_file_path
+
+
+def read_file_to_gzip_buffer(input_file_path):
+    gzip_buffer = BytesIO()
+    with open(input_file_path, "rb") as input_file:
+        with gzip.open(gzip_buffer, "wb") as output_file:
+            shutil.copyfileobj(input_file, output_file)
+    gzip_buffer.seek(0)
+    return gzip_buffer
