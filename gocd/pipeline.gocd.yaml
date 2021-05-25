@@ -7,7 +7,7 @@ pipelines:
       git:
         type: configrepo
     stages:
-      - test_data_pipeline:
+      - test:
           clean_workspace: true
           jobs:
             test:
@@ -19,7 +19,7 @@ pipelines:
                     arguments:
                       - -c
                       - ./tasks dojo-validate
-      - build_and_publish_data_pipeline:
+      - build_and_publish:
           clean_workspace: true
           jobs:
             build:
