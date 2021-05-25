@@ -7,7 +7,7 @@ pipelines:
       git:
         type: configrepo
     stages:
-      - build:
+      - test_data_pipeline:
           clean_workspace: true
           jobs:
             test:
@@ -19,3 +19,15 @@ pipelines:
                     arguments:
                       - -c
                       - ./tasks dojo-validate
+      - build_and_publish_data_pipeline:
+          clean_workspace: true
+          jobs:
+            build:
+              resources:
+                - docker
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - IMAGE_TAG=$GO_PIPELINE_LABEL ./tasks publish-docker
