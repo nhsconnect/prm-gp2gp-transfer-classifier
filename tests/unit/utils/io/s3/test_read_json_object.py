@@ -1,7 +1,7 @@
 import boto3
 from moto import mock_s3
 
-from prmdata.utils.io.s3 import S3Storage
+from prmdata.utils.io.s3 import S3DataManager
 from tests.unit.utils.io.s3 import MOTO_MOCK_REGION
 
 
@@ -12,7 +12,7 @@ def test_read_json_object_returns_dictionary():
     s3_object = bucket.Object("test_object.json")
     s3_object.put(Body=b'{"fruit": "mango"}')
 
-    s3 = S3Storage(conn)
+    s3 = S3DataManager(conn)
 
     expected = {"fruit": "mango"}
 

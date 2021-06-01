@@ -2,7 +2,7 @@ import json
 from urllib.parse import urlparse
 
 
-class S3Storage:
+class S3DataManager:
     def __init__(self, client):
         self._client = client
 
