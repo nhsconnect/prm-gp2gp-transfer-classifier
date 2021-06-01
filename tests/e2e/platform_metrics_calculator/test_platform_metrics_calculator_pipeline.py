@@ -124,8 +124,8 @@ def test_with_s3_output(datadir):
     environ["AWS_DEFAULT_REGION"] = fake_s3_region
     environ[" "] = getenv("PATH")
 
-    environ["INPUT_BUCKET"] = s3_test_bucket
-    environ["OUTPUT_BUCKET"] = s3_test_bucket
+    environ["INPUT_TRANSFER_DATA_BUCKET"] = s3_test_bucket
+    environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_test_bucket
     environ["ORGANISATION_LIST_BUCKET"] = s3_test_bucket
     environ["YEAR"] = year
     environ["MONTH"] = month
@@ -140,8 +140,8 @@ def test_with_s3_output(datadir):
         region_name=fake_s3_region,
     )
 
-    output_bucket = s3.Bucket(s3_test_bucket)
-    output_bucket.create()
+    output_transfer_data_bucket = s3.Bucket(s3_test_bucket)
+    output_transfer_data_bucket.create()
 
     expected_practice_metrics_output_key = "practiceMetrics.json"
     expected_organisation_metadata_output_key = "organisationMetadata.json"
@@ -161,29 +161,33 @@ def test_with_s3_output(datadir):
     s3_path = "v2/2019/12/"
 
     input_csv_gz = read_file_to_gzip_buffer(datadir / "v2" / "2019" / "12" / "Dec-2019.csv")
-    output_bucket.upload_fileobj(input_csv_gz, "v2/2019/12/Dec-2019.csv.gz")
+    output_transfer_data_bucket.upload_fileobj(input_csv_gz, "v2/2019/12/Dec-2019.csv.gz")
 
     input_overflow_csv_gz = read_file_to_gzip_buffer(
         datadir / "v2" / "2020" / "1" / "overflow" / "Jan-2020.csv"
     )
-    output_bucket.upload_fileobj(input_overflow_csv_gz, "v2/2020/1/overflow/Jan-2020.csv.gz")
+    output_transfer_data_bucket.upload_fileobj(
+        input_overflow_csv_gz, "v2/2020/1/overflow/Jan-2020.csv.gz"
+    )
 
     organisation_metadata_file = str(datadir / "v2" / "2019" / "12" / "organisationMetadata.json")
-    output_bucket.upload_file(organisation_metadata_file, "v2/2019/12/organisationMetadata.json")
+    output_transfer_data_bucket.upload_file(
+        organisation_metadata_file, "v2/2019/12/organisationMetadata.json"
+    )
 
     try:
         main()
         actual_practice_metrics = _read_s3_json(
-            output_bucket, f"{s3_path}{expected_practice_metrics_output_key}"
+            output_transfer_data_bucket, f"{s3_path}{expected_practice_metrics_output_key}"
         )
         actual_organisation_metadata = _read_s3_json(
-            output_bucket, f"{s3_path}{expected_organisation_metadata_output_key}"
+            output_transfer_data_bucket, f"{s3_path}{expected_organisation_metadata_output_key}"
         )
         actual_national_metrics = _read_s3_json(
-            output_bucket, f"{s3_path}{expected_national_metrics_output_key}"
+            output_transfer_data_bucket, f"{s3_path}{expected_national_metrics_output_key}"
         )
         actual_transfers = _read_s3_parquet(
-            output_bucket, f"{s3_path}{expected_transfers_output_key}"
+            output_transfer_data_bucket, f"{s3_path}{expected_transfers_output_key}"
         )
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
@@ -194,6 +198,6 @@ def test_with_s3_output(datadir):
 
         assert actual_transfers == EXPECTED_TRANSFERS
     finally:
-        output_bucket.objects.all().delete()
-        output_bucket.delete()
+        output_transfer_data_bucket.objects.all().delete()
+        output_transfer_data_bucket.delete()
         fake_s3.stop()

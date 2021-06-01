@@ -33,8 +33,8 @@ def _read_env(field, env_vars):
 
 @dataclass
 class DataPipelineConfig:
-    output_bucket: str
-    input_bucket: str
+    output_transfer_data_bucket: str
+    input_transfer_data_bucket: str
     organisation_list_bucket: str
     month: Optional[int] = datetime.utcnow().month
     year: Optional[int] = datetime.utcnow().year

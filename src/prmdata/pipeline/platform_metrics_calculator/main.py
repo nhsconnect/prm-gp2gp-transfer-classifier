@@ -113,7 +113,9 @@ def main():
     (
         input_transfer_data_s3_path,
         input_transfer_overflow_data_s3_path,
-    ) = generate_s3_path_for_input_transfer_data(config.year, config.month, config.input_bucket)
+    ) = generate_s3_path_for_input_transfer_data(
+        config.year, config.month, config.input_transfer_data_bucket
+    )
     input_transfer_data = _create_s3_object(s3, input_transfer_data_s3_path).get()["Body"]
     input_transfer_overflow_data = _create_s3_object(
         s3, input_transfer_overflow_data_s3_path
@@ -138,7 +140,7 @@ def main():
     national_metrics_file_name = "nationalMetrics.json"
     transfers_file_name = "transfers.parquet"
 
-    bucket_name = config.output_bucket
+    bucket_name = config.output_transfer_data_bucket
     s3_path = f"{VERSION}/{config.year}/{config.month}"
 
     _upload_data_platform_json_object(
