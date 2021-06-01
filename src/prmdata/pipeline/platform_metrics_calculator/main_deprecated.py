@@ -11,7 +11,7 @@ from prmdata.utils.date.range import DateTimeRange
 from prmdata.utils.io.csv import read_gzip_csv_files_deprecated
 from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.utils.io.json import write_json_file, read_json_file, upload_json_object
-from prmdata.domain.ods_portal.models import construct_organisation_list_from_dict
+from prmdata.domain.ods_portal.models import construct_organisation_metadata_from_dict
 from prmdata.pipeline.platform_metrics_calculator.args import (
     parse_platform_metrics_calculator_pipeline_arguments,
 )
@@ -63,7 +63,7 @@ def main():
     time_range = _get_time_range(args.year, args.month)
 
     organisation_data = read_json_file(args.organisation_list_file)
-    organisation_metadata = construct_organisation_list_from_dict(data=organisation_data)
+    organisation_metadata = construct_organisation_metadata_from_dict(data=organisation_data)
 
     spine_messages = _read_spine_csv_gz_files(args.input_files)
     transfers = list(parse_transfers_from_messages(spine_messages, time_range))

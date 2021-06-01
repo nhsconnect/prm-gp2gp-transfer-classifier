@@ -24,7 +24,7 @@ class OrganisationMetadata:
     ccgs: List[CcgDetails]
 
 
-def construct_organisation_list_from_dict(data: dict) -> OrganisationMetadata:
+def construct_organisation_metadata_from_dict(data: dict) -> OrganisationMetadata:
     return OrganisationMetadata(
         generated_on=parser.isoparse(data["generated_on"]),
         practices=[

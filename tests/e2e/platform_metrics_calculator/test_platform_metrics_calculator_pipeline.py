@@ -126,7 +126,7 @@ def test_with_s3_output(datadir):
 
     environ["INPUT_TRANSFER_DATA_BUCKET"] = s3_test_bucket
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_test_bucket
-    environ["ORGANISATION_LIST_BUCKET"] = s3_test_bucket
+    environ["ORGANISATION_METADATA_BUCKET"] = s3_test_bucket
     environ["YEAR"] = year
     environ["MONTH"] = month
     environ["S3_ENDPOINT_URL"] = fake_s3_url

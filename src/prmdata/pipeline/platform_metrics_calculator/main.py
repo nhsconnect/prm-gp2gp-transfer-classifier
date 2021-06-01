@@ -14,7 +14,7 @@ from prmdata.utils.io.s3 import S3DataManager
 from urllib.parse import urlparse
 from prmdata.utils.io.csv import read_gzip_csv_file
 from prmdata.utils.io.dictionary import camelize_dict
-from prmdata.domain.ods_portal.models import construct_organisation_list_from_dict
+from prmdata.domain.ods_portal.models import construct_organisation_metadata_from_dict
 from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
@@ -29,6 +29,7 @@ from pyarrow.fs import S3FileSystem
 logger = logging.getLogger(__name__)
 
 VERSION = "v2"
+ORGANISATION_METADATA_VERSION = "v2"
 
 
 def _create_platform_json_object(platform_data):
@@ -50,10 +51,6 @@ def _get_time_range(year, month):
     metric_month = datetime(year, month, 1, tzinfo=tzutc())
     next_month = metric_month + relativedelta(months=1)
     return DateTimeRange(metric_month, next_month)
-
-
-def generate_s3_path(year: int, month: int, bucket_name: str, file_name: str) -> str:
-    return f"s3://{bucket_name}/{VERSION}/{year}/{month}/{file_name}"
 
 
 def _create_s3_object(s3, url_string):
@@ -97,12 +94,13 @@ def main():
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
     s3_manager = S3DataManager(s3)
 
-    organisation_list_path = generate_s3_path(
-        config.year, config.month, config.organisation_list_bucket, "organisationMetadata.json"
+    organisation_metadata_path = (
+        f"s3://{config.organisation_metadata_bucket}/{ORGANISATION_METADATA_VERSION}"
+        f"/{config.year}/{config.month}/organisationMetadata.json"
     )
 
-    organisation_metadata_dict = s3_manager.read_json(organisation_list_path)
-    organisation_metadata = construct_organisation_list_from_dict(data=organisation_metadata_dict)
+    organisation_metadata_dict = s3_manager.read_json(organisation_metadata_path)
+    organisation_metadata = construct_organisation_metadata_from_dict(data=organisation_metadata_dict)
 
     (
         input_transfer_data_s3_path,

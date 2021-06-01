@@ -10,13 +10,13 @@ def test_read_config_from_environment_when_optional_parameters_are_not_set():
     environment = {
         "OUTPUT_TRANSFER_DATA_BUCKET": "output-transfer-data-bucket",
         "INPUT_TRANSFER_DATA_BUCKET": "input-transfer-data-bucket",
-        "ORGANISATION_LIST_BUCKET": "",
+        "ORGANISATION_METADATA_BUCKET": "",
     }
 
     expected_config = DataPipelineConfig(
         input_transfer_data_bucket="input-transfer-data-bucket",
         output_transfer_data_bucket="output-transfer-data-bucket",
-        organisation_list_bucket="",
+        organisation_metadata_bucket="",
         year=datetime.utcnow().year,
         month=datetime.utcnow().month,
         s3_endpoint_url=None,
@@ -31,7 +31,7 @@ def test_from_environment_variables_converts_year_month_to_integer():
     environment = {
         "OUTPUT_TRANSFER_DATA_BUCKET": "output-transfer-data-bucket",
         "INPUT_TRANSFER_DATA_BUCKET": "input-transfer-data-bucket",
-        "ORGANISATION_LIST_BUCKET": "",
+        "ORGANISATION_METADATA_BUCKET": "",
         "YEAR": "2020",
         "MONTH": "01",
     }
@@ -39,7 +39,7 @@ def test_from_environment_variables_converts_year_month_to_integer():
     expected_config = DataPipelineConfig(
         input_transfer_data_bucket="input-transfer-data-bucket",
         output_transfer_data_bucket="output-transfer-data-bucket",
-        organisation_list_bucket="",
+        organisation_metadata_bucket="",
         year=2020,
         month=1,
     )
@@ -60,5 +60,5 @@ def test_error_from_environment_when_required_fields_are_not_set():
     except MissingEnvironmentVariable as ex:
         assert (
             str(ex)
-            == "Expected environment variable ORGANISATION_LIST_BUCKET was not set, exiting..."
+            == "Expected environment variable ORGANISATION_METADATA_BUCKET was not set, exiting..."
         )
