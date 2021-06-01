@@ -5,14 +5,11 @@ import logging
 import boto3
 from os import environ
 
-from itertools import chain
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
 from prmdata.utils.date.range import DateTimeRange
 from prmdata.utils.io.s3 import S3DataManager
-from urllib.parse import urlparse
-from prmdata.utils.io.csv import read_gzip_csv_file
 from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.domain.ods_portal.models import construct_organisation_metadata_from_dict
 from prmdata.pipeline.platform_metrics_calculator.core import (
@@ -37,27 +34,10 @@ def _create_platform_json_object(platform_data):
     return camelize_dict(content_dict)
 
 
-def _read_spine_transfer_csv_gz_files(input_transfer_data, input_transfer_overflow_data):
-    input_transfer_data_items = construct_messages_from_splunk_items(
-        read_gzip_csv_file(input_transfer_data)
-    )
-    input_overflow_overflow_data_items = construct_messages_from_splunk_items(
-        read_gzip_csv_file(input_transfer_overflow_data)
-    )
-    return chain(input_transfer_data_items, input_overflow_overflow_data_items)
-
-
 def _get_time_range(year, month):
     metric_month = datetime(year, month, 1, tzinfo=tzutc())
     next_month = metric_month + relativedelta(months=1)
     return DateTimeRange(metric_month, next_month)
-
-
-def _create_s3_object(s3, url_string):
-    object_url = urlparse(url_string)
-    s3_bucket = object_url.netloc
-    s3_key = object_url.path.lstrip("/")
-    return s3.Object(s3_bucket, s3_key)
 
 
 def generate_s3_path_for_input_transfer_data(year, month, input_bucket):
@@ -86,6 +66,12 @@ def generate_s3_path_for_input_transfer_data(year, month, input_bucket):
     return input_path, overflow_path
 
 
+def _read_spine_messages(s3_manager, paths):
+    for path in paths:
+        data = s3_manager.read_gzip_csv(path)
+        yield from construct_messages_from_splunk_items(data)
+
+
 def main():
     config = DataPipelineConfig.from_environment_variables(environ)
 
@@ -111,14 +97,10 @@ def main():
         config.year, config.month, config.input_transfer_data_bucket
     )
 
-    input_transfer_data = _create_s3_object(s3, input_transfer_data_s3_path).get()["Body"]
-    input_transfer_overflow_data = _create_s3_object(
-        s3, input_transfer_overflow_data_s3_path
-    ).get()["Body"]
-
-    spine_messages = _read_spine_transfer_csv_gz_files(
-        input_transfer_data, input_transfer_overflow_data
+    spine_messages = _read_spine_messages(
+        s3_manager, [input_transfer_data_s3_path, input_transfer_overflow_data_s3_path]
     )
+
     time_range = _get_time_range(config.year, config.month)
     transfers = list(parse_transfers_from_messages(spine_messages, time_range))
     practice_metrics_data = calculate_practice_metrics_data(
