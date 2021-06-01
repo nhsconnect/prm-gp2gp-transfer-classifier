@@ -150,6 +150,9 @@ def main():
         where=f"{s3_path}/transfers.parquet",
         filesystem=S3FileSystem(endpoint_override=config.s3_endpoint_url),
     )
+    logger.info(
+        f"Successfully calculated platform metrics and uploaded to s3://{bucket_name}/{s3_path}"
+    )
 
 
 if __name__ == "__main__":
