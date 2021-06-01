@@ -3,16 +3,14 @@ from datetime import datetime
 import logging
 
 import boto3
-from botocore.exceptions import ClientError
 from os import environ
-import json
 
 from itertools import chain
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
 from prmdata.utils.date.range import DateTimeRange
-from prmdata.utils.io.json import upload_json_object
+from prmdata.utils.io.s3 import S3DataManager
 from urllib.parse import urlparse
 from prmdata.utils.io.csv import read_gzip_csv_file
 from prmdata.utils.io.dictionary import camelize_dict
@@ -33,10 +31,9 @@ logger = logging.getLogger(__name__)
 VERSION = "v2"
 
 
-def _upload_data_platform_json_object(platform_data, s3_object):
+def _create_platform_json_object(platform_data):
     content_dict = asdict(platform_data)
-    camelized_dict = camelize_dict(content_dict)
-    upload_json_object(camelized_dict, s3_object)
+    return camelize_dict(content_dict)
 
 
 def _read_spine_transfer_csv_gz_files(input_transfer_data, input_transfer_overflow_data):
@@ -98,17 +95,14 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
+    s3_manager = S3DataManager(s3)
+
     organisation_list_path = generate_s3_path(
         config.year, config.month, config.organisation_list_bucket, "organisationMetadata.json"
     )
-    organisation_list_object = _create_s3_object(s3, organisation_list_path)
-    try:
-        organisation_list_body = json.loads(
-            organisation_list_object.get()["Body"].read().decode("utf-8")
-        )
-    except ClientError as error:
-        raise error
-    organisation_metadata = construct_organisation_list_from_dict(data=organisation_list_body)
+
+    organisation_metadata_dict = s3_manager.read_json(organisation_list_path)
+    organisation_metadata = construct_organisation_list_from_dict(data=organisation_metadata_dict)
 
     (
         input_transfer_data_s3_path,
@@ -116,6 +110,7 @@ def main():
     ) = generate_s3_path_for_input_transfer_data(
         config.year, config.month, config.input_transfer_data_bucket
     )
+
     input_transfer_data = _create_s3_object(s3, input_transfer_data_s3_path).get()["Body"]
     input_transfer_overflow_data = _create_s3_object(
         s3, input_transfer_overflow_data_s3_path
@@ -135,29 +130,24 @@ def main():
     organisation_metadata = construct_organisation_metadata(organisation_metadata)
     transfer_table = convert_transfers_to_table(transfers)
 
-    practice_metrics_file_name = "practiceMetrics.json"
-    organisation_metadata_file_name = "organisationMetadata.json"
-    national_metrics_file_name = "nationalMetrics.json"
-    transfers_file_name = "transfers.parquet"
-
     bucket_name = config.output_transfer_data_bucket
-    s3_path = f"{VERSION}/{config.year}/{config.month}"
+    s3_path = f"{bucket_name}/{VERSION}/{config.year}/{config.month}"
 
-    _upload_data_platform_json_object(
-        practice_metrics_data,
-        s3.Object(bucket_name, f"{s3_path}/{practice_metrics_file_name}"),
+    s3_manager.write_json(
+        object_uri=f"s3://{s3_path}/practiceMetrics.json",
+        data=_create_platform_json_object(practice_metrics_data),
     )
-    _upload_data_platform_json_object(
-        organisation_metadata,
-        s3.Object(bucket_name, f"{s3_path}/{organisation_metadata_file_name}"),
+    s3_manager.write_json(
+        object_uri=f"s3://{s3_path}/organisationMetadata.json",
+        data=_create_platform_json_object(organisation_metadata),
     )
-    _upload_data_platform_json_object(
-        national_metrics_data,
-        s3.Object(bucket_name, f"{s3_path}/{national_metrics_file_name}"),
+    s3_manager.write_json(
+        object_uri=f"s3://{s3_path}/nationalMetrics.json",
+        data=_create_platform_json_object(national_metrics_data),
     )
     write_table(
         table=transfer_table,
-        where=bucket_name + "/" + f"{s3_path}/{transfers_file_name}",
+        where=f"{s3_path}/transfers.parquet",
         filesystem=S3FileSystem(endpoint_override=config.s3_endpoint_url),
     )
 
