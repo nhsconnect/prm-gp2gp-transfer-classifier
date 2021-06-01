@@ -100,7 +100,9 @@ def main():
     )
 
     organisation_metadata_dict = s3_manager.read_json(organisation_metadata_path)
-    organisation_metadata = construct_organisation_metadata_from_dict(data=organisation_metadata_dict)
+    organisation_metadata = construct_organisation_metadata_from_dict(
+        data=organisation_metadata_dict
+    )
 
     (
         input_transfer_data_s3_path,
