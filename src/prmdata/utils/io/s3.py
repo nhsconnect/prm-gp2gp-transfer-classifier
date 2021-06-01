@@ -28,4 +28,4 @@ class S3DataManager:
     def write_json(self, object_uri, data):
         s3_object = self._object_from_uri(object_uri)
         body = json.dumps(data, default=_serialize_datetime)
-        s3_object.put(Body=body)
+        s3_object.put(Body=body, ContentType="application/json")
