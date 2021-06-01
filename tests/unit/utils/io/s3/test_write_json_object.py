@@ -43,12 +43,12 @@ def test_writes_dictionary_with_timestamp():
 def test_writes_correct_content_type():
     conn = boto3.resource("s3", region_name=MOTO_MOCK_REGION)
     bucket = conn.create_bucket(Bucket="test_bucket")
-    s3 = S3DataManager(conn)
     data = {"fruit": "mango"}
+    s3_manager = S3DataManager(conn)
 
     expected = "application/json"
 
-    s3.write_json("s3://test_bucket/test_object.json", data)
+    s3_manager.write_json("s3://test_bucket/test_object.json", data)
 
     actual = bucket.Object("test_object.json").get()["ContentType"]
 

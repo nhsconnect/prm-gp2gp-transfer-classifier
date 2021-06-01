@@ -1,3 +1,5 @@
+import csv
+import gzip
 import json
 from datetime import datetime
 from urllib.parse import urlparse
@@ -29,3 +31,11 @@ class S3DataManager:
         s3_object = self._object_from_uri(object_uri)
         body = json.dumps(data, default=_serialize_datetime)
         s3_object.put(Body=body, ContentType="application/json")
+
+    def read_gzip_csv(self, object_uri):
+        s3_object = self._object_from_uri(object_uri)
+        response = s3_object.get()
+        body = response["Body"]
+        with gzip.open(body, mode="rt") as f:
+            input_csv = csv.DictReader(f)
+            yield from input_csv
