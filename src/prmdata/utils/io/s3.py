@@ -1,5 +1,12 @@
 import json
+from datetime import datetime
 from urllib.parse import urlparse
+
+
+def _serialize_datetime(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} is not JSON serializable")
 
 
 class S3DataManager:
@@ -20,5 +27,5 @@ class S3DataManager:
 
     def write_json(self, object_uri, data):
         s3_object = self._object_from_uri(object_uri)
-        body = json.dumps(data)
+        body = json.dumps(data, default=_serialize_datetime)
         s3_object.put(Body=body)
