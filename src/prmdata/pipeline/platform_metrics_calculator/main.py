@@ -8,10 +8,11 @@ from os import environ
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
+from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
 from prmdata.utils.date.range import DateTimeRange
+from prmdata.utils.date_anchor import DateAnchor
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.utils.io.dictionary import camelize_dict
-from prmdata.domain.ods_portal.models import construct_organisation_metadata_from_dict
 from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
@@ -36,8 +37,8 @@ def _create_platform_json_object(platform_data):
 
 def _get_time_range(year, month):
     metric_month = datetime(year, month, 1, tzinfo=tzutc())
-    next_month = metric_month + relativedelta(months=1)
-    return DateTimeRange(metric_month, next_month)
+    previous_month = metric_month - relativedelta(months=1)
+    return DateTimeRange(previous_month, metric_month)
 
 
 def generate_s3_path_for_input_transfer_data(year, month, input_bucket):
@@ -56,24 +57,17 @@ def generate_s3_path_for_input_transfer_data(year, month, input_bucket):
         12: "Dec",
     }
     a_month = relativedelta(months=1)
-    overflow_date = datetime(year, month, 1) + a_month
+    overflow_date = datetime(year, month, 1)
     overflow_path = (
         f"s3://{input_bucket}/{VERSION}/{overflow_date.year}/{overflow_date.month}"
         f"/overflow/{month_dict[overflow_date.month]}-{overflow_date.year}.csv.gz"
     )
-
-    input_path = f"s3://{input_bucket}/{VERSION}/{year}/{month}/{month_dict[month]}-{year}.csv.gz"
-    return input_path, overflow_path
-
-
-def generate_s3_path_for_organisaiton_metadata(year, month, organisation_metadata_bucket):
-    a_month = relativedelta(months=1)
-    next_month_date = datetime(year, month, 1) + a_month
-
-    return (
-        f"s3://{organisation_metadata_bucket}/{ORGANISATION_METADATA_VERSION}"
-        f"/{next_month_date.year}/{next_month_date.month}/organisationMetadata.json"
+    previous_month = datetime(year, month, 1) - a_month
+    input_path = (
+        f"s3://{input_bucket}/{VERSION}/{previous_month.year}/"
+        f"{previous_month.month}/{month_dict[previous_month.month]}-{previous_month.year}.csv.gz"
     )
+    return input_path, overflow_path
 
 
 def _read_spine_messages(s3_manager, paths):
@@ -90,14 +84,14 @@ def main():
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
     s3_manager = S3DataManager(s3)
 
-    organisation_metadata_path = generate_s3_path_for_organisaiton_metadata(
-        config.year, config.month, config.organisation_metadata_bucket
+    date_anchor = DateAnchor(datetime(year=config.year, month=config.month, day=1))
+    metrics_io = PlatformMetricsIO(
+        date_anchor=date_anchor,
+        s3_data_manager=s3_manager,
+        organisation_metadata_bucket=config.organisation_metadata_bucket,
     )
 
-    organisation_metadata_dict = s3_manager.read_json(organisation_metadata_path)
-    organisation_metadata = construct_organisation_metadata_from_dict(
-        data=organisation_metadata_dict
-    )
+    organisation_metadata = metrics_io.read_ods_metadata()
 
     (
         input_transfer_data_s3_path,
@@ -122,7 +116,10 @@ def main():
     transfer_table = convert_transfers_to_table(transfers)
 
     bucket_name = config.output_transfer_data_bucket
-    s3_path = f"{bucket_name}/{VERSION}/{config.year}/{config.month}"
+
+    a_month = relativedelta(months=1)
+    previous_datetime = datetime(config.year, config.month, 1) - a_month
+    s3_path = f"{bucket_name}/{VERSION}/{previous_datetime.year}/{previous_datetime.month}"
 
     s3_manager.write_json(
         object_uri=f"s3://{s3_path}/practiceMetrics.json",

@@ -113,8 +113,8 @@ def test_with_s3_output(datadir):
     fake_s3_secret_key = "testing"
     fake_s3_region = "us-west-1"
     s3_test_bucket = "testbucket"
-    month = "12"
-    year = "2019"
+    month = "1"
+    year = "2020"
 
     fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
     fake_s3.start()
