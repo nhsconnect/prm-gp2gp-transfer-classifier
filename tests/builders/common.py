@@ -12,14 +12,14 @@ def an_integer(a=None, b=None):
     return random.randint(a if a else 0, b if b else sys.maxsize)
 
 
-def a_datetime():
+def a_datetime(**kwargs):
     return datetime(
-        year=an_integer(1, 9999),
-        month=an_integer(1, 12),
-        day=an_integer(1, 28),
-        hour=an_integer(0, 23),
-        minute=an_integer(0, 59),
-        second=an_integer(0, 59),
+        year=kwargs.get("year", an_integer(1, 9999)),
+        month=kwargs.get("month", an_integer(1, 12)),
+        day=kwargs.get("day", an_integer(1, 28)),
+        hour=kwargs.get("hour", an_integer(0, 23)),
+        minute=kwargs.get("minute", an_integer(0, 59)),
+        second=kwargs.get("second", an_integer(0, 59)),
     )
 
 
