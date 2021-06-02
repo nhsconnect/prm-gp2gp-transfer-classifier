@@ -30,10 +30,7 @@ def test_read_organisation_metadata():
 
     s3_manager.read_json.return_value = _org_metadata_as_json(organisation_metadata)
 
-    expected_path = (
-        f"s3://{ods_bucket}/v2/"
-        f"{anchor.current_year}/{anchor.current_month}/organisationMetadata.json"
-    )
+    expected_path = f"s3://{ods_bucket}/v2/{anchor.current_month_prefix}/organisationMetadata.json"
 
     expected_data = organisation_metadata
 
