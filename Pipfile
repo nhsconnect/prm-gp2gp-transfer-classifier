@@ -7,7 +7,7 @@ name = "pypi"
 gp2gp-data-pipeline = {editable = true, path = "."}
 
 [dev-packages]
-black = "==21.5b0"
+black = "==21.5b2"
 bandit = "~=1.6"
 flake8 = "~=3.0"
 flake8-bugbear = "~=20.0"
@@ -23,7 +23,6 @@ freezegun = "~=0.3"
 pytest-cov = "~=2.10"
 pytest = "~=6.1"
 boto3-stubs = {extras = ["s3"], version = "*"}
-mypy-boto3-builder = "*"
 
 [requires]
 python_version = "3.9"
@@ -35,4 +34,3 @@ check-format = "black --check -t py38 -l100 src/ tests/ setup.py"
 typecheck = "mypy --ignore-missing-imports src/ tests/"
 lint-flake8 = "flake8 src/ tests/ setup.py"
 lint-bandit = "bandit -r src/"
-install-boto-stubs = "python -m mypy_boto3_builder --installed --skip-services typings -d -s s3"

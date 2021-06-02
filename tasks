@@ -38,7 +38,6 @@ do
         echo "./tasks validate" > .git/hooks/pre-commit
         chmod +x .git/hooks/pre-commit
         pipenv install -d
-        pipenv run install-boto-stubs
         ;;
     validate)
         ./tasks check-format typecheck lint test
