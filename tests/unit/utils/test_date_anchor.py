@@ -7,7 +7,7 @@ def test_current_year():
 
     date_anchor = DateAnchor(moment)
 
-    expected = 2021
+    expected = "2021"
 
     actual = date_anchor.current_year
 
@@ -19,7 +19,7 @@ def test_current_month():
 
     date_anchor = DateAnchor(moment)
 
-    expected = 11
+    expected = "11"
 
     actual = date_anchor.current_month
 

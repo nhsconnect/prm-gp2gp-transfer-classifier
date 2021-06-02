@@ -6,9 +6,9 @@ class DateAnchor:
         self._moment = moment
 
     @property
-    def current_year(self):
-        return self._moment.year
+    def current_year(self) -> str:
+        return str(self._moment.year)
 
     @property
-    def current_month(self):
-        return self._moment.month
+    def current_month(self) -> str:
+        return str(self._moment.month)
