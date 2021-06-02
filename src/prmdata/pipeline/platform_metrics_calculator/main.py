@@ -72,7 +72,8 @@ def main():
 
     bucket_name = config.output_transfer_data_bucket
 
-    s3_path = f"{bucket_name}/{VERSION}/{date_anchor.previous_month_prefix()}"
+    previous_month = date_anchor.previous_month
+    s3_path = f"{bucket_name}/{VERSION}/{previous_month.year}/{previous_month.month}"
 
     s3_manager.write_json(
         object_uri=f"s3://{s3_path}/practiceMetrics.json",

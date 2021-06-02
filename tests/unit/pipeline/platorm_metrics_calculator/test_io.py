@@ -41,7 +41,7 @@ def _spine_messages_as_dict(spine_messages: Iterable[Message]) -> Iterable[dict]
 
 def test_read_organisation_metadata():
     s3_manager = Mock()
-    anchor = DateAnchor(a_datetime())
+    anchor = DateAnchor(a_datetime(year=2021, month=2))
 
     organisation_metadata = build_organisation_metadata()
     ods_bucket = "test_ods_bucket"
@@ -55,9 +55,7 @@ def test_read_organisation_metadata():
 
     s3_manager.read_json.return_value = _org_metadata_as_dict(organisation_metadata)
 
-    expected_path = (
-        f"s3://{ods_bucket}/v2/{anchor.current_month_prefix()}/organisationMetadata.json"
-    )
+    expected_path = f"s3://{ods_bucket}/v2/2021/2/organisationMetadata.json"
 
     expected_data = organisation_metadata
 
@@ -70,7 +68,7 @@ def test_read_organisation_metadata():
 
 def test_read_spine_messages():
     s3_manager = Mock()
-    anchor = DateAnchor(a_datetime())
+    anchor = DateAnchor(a_datetime(year=2021, month=2))
 
     spine_message_one = build_message()
     spine_message_two = build_message()
@@ -90,13 +88,9 @@ def test_read_spine_messages():
     ]
 
     expected_data = [spine_message_one, spine_message_two, spine_message_three]
-    expected_path = (
-        f"s3://{spine_bucket}/v2/messages/{anchor.previous_month_prefix()}/"
-        f"{anchor.previous_month_prefix('-')}_spine_messages.csv.gz"
-    )
+    expected_path = f"s3://{spine_bucket}/v2/messages/2021/1/2021-1_spine_messages.csv.gz"
     expected_overflow_path = (
-        f"s3://{spine_bucket}/v2/messages-overflow/{anchor.current_month_prefix()}/"
-        f"{anchor.current_month_prefix('-')}_spine_messages_overflow.csv.gz"
+        f"s3://{spine_bucket}/v2/messages-overflow/2021/2/2021-2_spine_messages_overflow.csv.gz"
     )
 
     actual_data = list(metrics_io.read_spine_messages())

@@ -1,50 +1,39 @@
+from datetime import datetime
+
 from prmdata.utils.date_anchor import DateAnchor
-from tests.builders.common import a_datetime
 
 
 def test_current_month():
-    moment = a_datetime(year=2021, month=3)
+    moment = datetime(2021, 3, 4)
 
     date_anchor = DateAnchor(moment)
 
-    expected = "2021/3"
+    expected = datetime(2021, 3, 1)
 
-    actual = date_anchor.current_month_prefix()
+    actual = date_anchor.current_month
 
     assert actual == expected
 
 
-def test_previous_month_prefix():
-    moment = a_datetime(year=2021, month=3)
+def test_previous_month():
+    moment = datetime(2021, 3, 4)
 
     date_anchor = DateAnchor(moment)
 
-    expected = "2021/2"
+    expected = datetime(2021, 2, 1)
 
-    actual = date_anchor.previous_month_prefix()
+    actual = date_anchor.previous_month
 
     assert actual == expected
 
 
-def test_previous_month_prefix_over_new_year():
-    moment = a_datetime(year=2021, month=1)
+def test_previous_month_path_over_new_year():
+    moment = datetime(2021, 1, 4)
 
     date_anchor = DateAnchor(moment)
 
-    expected = "2020/12"
+    expected = datetime(2020, 12, 1)
 
-    actual = date_anchor.previous_month_prefix()
-
-    assert actual == expected
-
-
-def test_previous_month_prefix_with_dash():
-    moment = a_datetime(year=2021, month=1)
-
-    date_anchor = DateAnchor(moment)
-
-    expected = "2020-12"
-
-    actual = date_anchor.previous_month_prefix(separator="-")
+    actual = date_anchor.previous_month
 
     assert actual == expected
