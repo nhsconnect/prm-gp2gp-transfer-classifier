@@ -24,7 +24,7 @@ class PlatformMetricsIO:
             [
                 self._org_metadata_bucket_name,
                 self._ORG_METADATA_VERSION,
-                self._anchor.current_month_prefix,
+                self._anchor.current_month_prefix(),
                 self._ORG_METADATA_FILE_NAME,
             ]
         )
