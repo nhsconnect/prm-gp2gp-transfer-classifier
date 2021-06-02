@@ -20,14 +20,12 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
 )
 from prmdata.pipeline.platform_metrics_calculator.config import DataPipelineConfig
 from prmdata.domain.gp2gp.transfer import convert_transfers_to_table
-from prmdata.domain.spine.message import construct_messages_from_splunk_items
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
 
 logger = logging.getLogger(__name__)
 
 VERSION = "v2"
-ORGANISATION_METADATA_VERSION = "v2"
 
 
 def _create_platform_json_object(platform_data):
@@ -39,41 +37,6 @@ def _get_time_range(year, month):
     metric_month = datetime(year, month, 1, tzinfo=tzutc())
     previous_month = metric_month - relativedelta(months=1)
     return DateTimeRange(previous_month, metric_month)
-
-
-def generate_s3_path_for_input_transfer_data(year, month, input_bucket):
-    month_dict = {
-        1: "Jan",
-        2: "Feb",
-        3: "Mar",
-        4: "Apr",
-        5: "May",
-        6: "Jun",
-        7: "Jul",
-        8: "Aug",
-        9: "Sep",
-        10: "Oct",
-        11: "Nov",
-        12: "Dec",
-    }
-    a_month = relativedelta(months=1)
-    overflow_date = datetime(year, month, 1)
-    overflow_path = (
-        f"s3://{input_bucket}/{VERSION}/{overflow_date.year}/{overflow_date.month}"
-        f"/overflow/{month_dict[overflow_date.month]}-{overflow_date.year}.csv.gz"
-    )
-    previous_month = datetime(year, month, 1) - a_month
-    input_path = (
-        f"s3://{input_bucket}/{VERSION}/{previous_month.year}/"
-        f"{previous_month.month}/{month_dict[previous_month.month]}-{previous_month.year}.csv.gz"
-    )
-    return input_path, overflow_path
-
-
-def _read_spine_messages(s3_manager, paths):
-    for path in paths:
-        data = s3_manager.read_gzip_csv(path)
-        yield from construct_messages_from_splunk_items(data)
 
 
 def main():
@@ -89,20 +52,12 @@ def main():
         date_anchor=date_anchor,
         s3_data_manager=s3_manager,
         organisation_metadata_bucket=config.organisation_metadata_bucket,
+        gp2gp_spine_bucket=config.output_transfer_data_bucket,
     )
 
     organisation_metadata = metrics_io.read_ods_metadata()
 
-    (
-        input_transfer_data_s3_path,
-        input_transfer_overflow_data_s3_path,
-    ) = generate_s3_path_for_input_transfer_data(
-        config.year, config.month, config.input_transfer_data_bucket
-    )
-
-    spine_messages = _read_spine_messages(
-        s3_manager, [input_transfer_data_s3_path, input_transfer_overflow_data_s3_path]
-    )
+    spine_messages = metrics_io.read_spine_messages()
 
     time_range = _get_time_range(config.year, config.month)
     transfers = list(parse_transfers_from_messages(spine_messages, time_range))
@@ -117,9 +72,7 @@ def main():
 
     bucket_name = config.output_transfer_data_bucket
 
-    a_month = relativedelta(months=1)
-    previous_datetime = datetime(config.year, config.month, 1) - a_month
-    s3_path = f"{bucket_name}/{VERSION}/{previous_datetime.year}/{previous_datetime.month}"
+    s3_path = f"{bucket_name}/{VERSION}/{date_anchor.previous_month_prefix()}"
 
     s3_manager.write_json(
         object_uri=f"s3://{s3_path}/practiceMetrics.json",

@@ -39,7 +39,6 @@ def build_spine_item(**kwargs):
         "messageRecipient": kwargs.get("message_recipient", a_string(6)),
         "messageRef": kwargs.get("message_ref", "NotProvided"),
         "jdiEvent": kwargs.get("jdi_event", "NONE"),
-        "_raw": kwargs.get("raw", ""),
     }
 
     if kwargs.get("to_system"):
