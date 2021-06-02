@@ -66,6 +66,16 @@ def generate_s3_path_for_input_transfer_data(year, month, input_bucket):
     return input_path, overflow_path
 
 
+def generate_s3_path_for_organisaiton_metadata(year, month, organisation_metadata_bucket):
+    a_month = relativedelta(months=1)
+    next_month_date = datetime(year, month, 1) + a_month
+
+    return (
+        f"s3://{organisation_metadata_bucket}/{ORGANISATION_METADATA_VERSION}"
+        f"/{next_month_date.year}/{next_month_date.month}/organisationMetadata.json"
+    )
+
+
 def _read_spine_messages(s3_manager, paths):
     for path in paths:
         data = s3_manager.read_gzip_csv(path)
@@ -80,9 +90,8 @@ def main():
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
     s3_manager = S3DataManager(s3)
 
-    organisation_metadata_path = (
-        f"s3://{config.organisation_metadata_bucket}/{ORGANISATION_METADATA_VERSION}"
-        f"/{config.year}/{config.month}/organisationMetadata.json"
+    organisation_metadata_path = generate_s3_path_for_organisaiton_metadata(
+        config.year, config.month, config.organisation_metadata_bucket
     )
 
     organisation_metadata_dict = s3_manager.read_json(organisation_metadata_path)

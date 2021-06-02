@@ -4,6 +4,8 @@ from prmdata.pipeline.platform_metrics_calculator.args import (
 
 from argparse import Namespace
 
+# TODO: Remove with PRMT-1798
+
 
 def test_parse_arguments_with_local_files():
     args = [

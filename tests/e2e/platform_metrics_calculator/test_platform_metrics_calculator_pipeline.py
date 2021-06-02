@@ -170,9 +170,9 @@ def test_with_s3_output(datadir):
         input_overflow_csv_gz, "v2/2020/1/overflow/Jan-2020.csv.gz"
     )
 
-    organisation_metadata_file = str(datadir / "v2" / "2019" / "12" / "organisationMetadata.json")
+    organisation_metadata_file = str(datadir / "v2" / "2020" / "1" / "organisationMetadata.json")
     output_transfer_data_bucket.upload_file(
-        organisation_metadata_file, "v2/2019/12/organisationMetadata.json"
+        organisation_metadata_file, "v2/2020/1/organisationMetadata.json"
     )
 
     try:
