@@ -84,19 +84,6 @@ If you need ODS codes and names of all active GP practices
 
 This pipeline will derive GP2GP metrics and metadata for practices produced by the ODS Portal Pipeline. It does this by performing a number of transformations on GP2GP messages provided by NMS.
 
-The following examples show how to run this pipeline. Run `platform-metrics-pipeline --help` for usage details.
-
-#### Outputting to local directory
-
-Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jan.csv.gz,data/feb.csv.gz" --output-directory "data"`
-
-#### Outputting to S3 bucket
-
-Example: `platform-metrics-pipeline --month 1 --year 2021 --organisation-list-file "data/organisation-list.json" --input-files "data/jan.csv.gz,data/feb.csv.gz" --output-bucket "example-bucket"`
-
-- When outputting to AWS, ensure the environment has the appropriate access.
-- Note this will use the year and month as part of the s3 key structure, as well 'v2' (data pipeline output version). 
-
 ### Troubleshooting
 
 #### Checking dependencies fails locally due to pip
