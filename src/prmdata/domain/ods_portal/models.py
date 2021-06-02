@@ -23,13 +23,15 @@ class OrganisationMetadata:
     practices: List[PracticeDetails]
     ccgs: List[CcgDetails]
 
-
-def construct_organisation_metadata_from_dict(data: dict) -> OrganisationMetadata:
-    return OrganisationMetadata(
-        generated_on=parser.isoparse(data["generated_on"]),
-        practices=[
-            PracticeDetails(asids=p["asids"], ods_code=p["ods_code"], name=p["name"])
-            for p in data["practices"]
-        ],
-        ccgs=[CcgDetails(ods_code=c["ods_code"], name=c["name"]) for c in data["ccgs"]],
-    )
+    @classmethod
+    def from_dict(cls, data):
+        return OrganisationMetadata(
+            generated_on=parser.isoparse(data["generated_on"]),
+            practices=[
+                PracticeDetails(
+                    asids=practice["asids"], ods_code=practice["ods_code"], name=practice["name"]
+                )
+                for practice in data["practices"]
+            ],
+            ccgs=[CcgDetails(ods_code=ccg["ods_code"], name=ccg["name"]) for ccg in data["ccgs"]],
+        )

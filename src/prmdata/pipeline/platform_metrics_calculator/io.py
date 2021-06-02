@@ -1,4 +1,4 @@
-from prmdata.domain.ods_portal.models import construct_organisation_metadata_from_dict
+from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.utils.date_anchor import DateAnchor
 from prmdata.utils.io.s3 import S3DataManager
 
@@ -30,4 +30,4 @@ class PlatformMetricsIO:
         )
 
         ods_metadata_dict = self._s3_manager.read_json(f"s3://{ods_metadata_s3_path}")
-        return construct_organisation_metadata_from_dict(ods_metadata_dict)
+        return OrganisationMetadata.from_dict(ods_metadata_dict)

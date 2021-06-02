@@ -1,17 +1,13 @@
 from datetime import datetime
 
-from prmdata.domain.ods_portal.models import (
-    CcgDetails,
-    PracticeDetails,
-    construct_organisation_metadata_from_dict,
-)
+from prmdata.domain.ods_portal.models import CcgDetails, PracticeDetails, OrganisationMetadata
 
 
 def test_from_dict_returns_model_with_generated_on_timestamp():
     data = {"generated_on": "2020-07-23T00:00:00", "practices": [], "ccgs": []}
 
     expected_timestamp = datetime(2020, 7, 23)
-    actual = construct_organisation_metadata_from_dict(data)
+    actual = OrganisationMetadata.from_dict(data)
 
     assert actual.generated_on == expected_timestamp
 
@@ -27,7 +23,7 @@ def test_from_dict_returns_list_with_one_practice_and_one_ccg():
         PracticeDetails(asids=["123456789123"], ods_code="A12345", name="GP Practice")
     ]
     expected_ccgs = [CcgDetails(ods_code="12A", name="CCG")]
-    actual = construct_organisation_metadata_from_dict(data)
+    actual = OrganisationMetadata.from_dict(data)
 
     assert actual.practices == expected_practices
     assert actual.ccgs == expected_ccgs
@@ -58,7 +54,7 @@ def test_from_dict_returns_list_with_multiple_practices_and_ccgs():
         CcgDetails(ods_code="34A", name="CCG 2"),
         CcgDetails(ods_code="56A", name="CCG 3"),
     ]
-    actual = construct_organisation_metadata_from_dict(data)
+    actual = OrganisationMetadata.from_dict(data)
 
     assert actual.practices == expected_practices
     assert actual.ccgs == expected_ccgs
