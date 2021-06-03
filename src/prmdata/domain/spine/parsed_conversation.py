@@ -4,7 +4,7 @@ from datetime import datetime
 from prmdata.domain.gp2gp.transfer import DUPLICATE_ERROR, ERROR_SUPPRESSED
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.message import Message
-from prmdata.utils.date.range import DateTimeRange
+from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 
 class ParsedConversation(NamedTuple):
@@ -172,10 +172,10 @@ class SpineConversationParser:
 
 
 def filter_conversations_by_request_started_time(
-    conversations: Iterable[ParsedConversation], time_range: DateTimeRange
+    conversations: Iterable[ParsedConversation], reporting_window: MonthlyReportingWindow
 ) -> Iterator[ParsedConversation]:
     return (
         conversation
         for conversation in conversations
-        if time_range.contains(conversation.request_started.time)
+        if reporting_window.contains(conversation.request_started.time)
     )

@@ -5,11 +5,8 @@ import logging
 import boto3
 from os import environ
 
-from dateutil.relativedelta import relativedelta
-from dateutil.tz import tzutc
 from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
 from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
-from prmdata.utils.date.range import DateTimeRange
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.utils.io.dictionary import camelize_dict
@@ -33,12 +30,6 @@ def _create_platform_json_object(platform_data):
     return camelize_dict(content_dict)
 
 
-def _get_time_range(year, month):
-    metric_month = datetime(year, month, 1, tzinfo=tzutc())
-    previous_month = metric_month - relativedelta(months=1)
-    return DateTimeRange(previous_month, metric_month)
-
-
 def main():
     config = DataPipelineConfig.from_environment_variables(environ)
 
@@ -60,13 +51,12 @@ def main():
 
     spine_messages = metrics_io.read_spine_messages()
 
-    time_range = _get_time_range(config.year, config.month)
-    transfers = list(parse_transfers_from_messages(spine_messages, time_range))
+    transfers = list(parse_transfers_from_messages(spine_messages, reporting_window))
     practice_metrics_data = calculate_practice_metrics_data(
-        transfers, organisation_metadata.practices, time_range
+        transfers, organisation_metadata.practices, reporting_window
     )
     national_metrics_data = calculate_national_metrics_data(
-        transfers=transfers, time_range=time_range
+        transfers=transfers, reporting_window=reporting_window
     )
     organisation_metadata = construct_organisation_metadata(organisation_metadata)
     transfer_table = convert_transfers_to_table(transfers)

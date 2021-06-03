@@ -18,7 +18,6 @@ from prmdata.domain.data_platform.practice_metrics import (
     PracticeSummary,
     PracticeMetricsPresentation,
 )
-from prmdata.utils.date.range import DateTimeRange
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
@@ -28,6 +27,7 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
 from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 
 from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
+from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 from tests.builders.spine import build_message
 from tests.builders.gp2gp import build_transfer
@@ -82,8 +82,9 @@ def _build_successful_conversation(**kwargs):
 
 @freeze_time(datetime(year=2020, month=1, day=15, hour=23, second=42), tz_offset=0)
 def test_parses_transfer_correctly_given_valid_message_list():
-    time_range = DateTimeRange(
-        start=datetime(2019, 12, 1, tzinfo=UTC), end=datetime(2020, 1, 1, tzinfo=UTC)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(2019, 12, 1, tzinfo=UTC),
+        overflow_month_start=datetime(2020, 1, 1, tzinfo=UTC),
     )
 
     requesting_asid_with_transfer = "343434343434"
@@ -121,15 +122,16 @@ def test_parses_transfer_correctly_given_valid_message_list():
         )
     ]
 
-    actual = list(parse_transfers_from_messages(spine_messages, time_range))
+    actual = list(parse_transfers_from_messages(spine_messages, reporting_window))
 
     assert actual == expected
 
 
 @freeze_time(datetime(year=2020, month=1, day=15, hour=23, second=42), tz_offset=0)
 def test_calculates_correct_metrics_given_a_successful_transfer():
-    time_range = DateTimeRange(
-        start=datetime(2019, 12, 1, tzinfo=UTC), end=datetime(2020, 1, 1, tzinfo=UTC)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(2019, 12, 1, tzinfo=UTC),
+        overflow_month_start=datetime(2020, 1, 1, tzinfo=UTC),
     )
 
     requesting_practice_name = "Test GP"
@@ -189,7 +191,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         ],
     )
 
-    actual = calculate_practice_metrics_data(transfers, practice_list, time_range)
+    actual = calculate_practice_metrics_data(transfers, practice_list, reporting_window)
 
     assert actual == expected
 
@@ -212,8 +214,9 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
         build_transfer(status=TransferStatus.FAILED),
     ]
 
-    time_range = DateTimeRange(
-        start=datetime(2019, 12, 1, tzinfo=UTC), end=datetime(2020, 1, 1, tzinfo=UTC)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(2019, 12, 1, tzinfo=UTC),
+        overflow_month_start=datetime(2020, 1, 1, tzinfo=UTC),
     )
     current_datetime = datetime.now(tzutc())
 
@@ -236,6 +239,6 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     expected = NationalMetricsPresentation(
         generated_on=current_datetime, metrics=[expected_national_metrics]
     )
-    actual = calculate_national_metrics_data(transfers, time_range)
+    actual = calculate_national_metrics_data(transfers, reporting_window)
 
     assert actual == expected

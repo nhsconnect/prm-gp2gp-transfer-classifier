@@ -9,7 +9,6 @@ from prmdata.domain.data_platform.practice_metrics import (
     PracticeMetricsPresentation,
 )
 from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
-from prmdata.utils.date.range import DateTimeRange
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
 from prmdata.domain.gp2gp.transfer import (
@@ -25,6 +24,7 @@ from prmdata.domain.spine.parsed_conversation import (
     filter_conversations_by_request_started_time,
 )
 from prmdata.domain.spine.conversation import group_into_conversations
+from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 
 def _parse_conversations(conversations):
@@ -36,12 +36,12 @@ def _parse_conversations(conversations):
 
 
 def parse_transfers_from_messages(
-    spine_messages: Iterable[Message], time_range: DateTimeRange
+    spine_messages: Iterable[Message], reporting_window: MonthlyReportingWindow
 ) -> Iterator[Transfer]:
     conversations = group_into_conversations(spine_messages)
     parsed_conversations = _parse_conversations(conversations)
     conversations_started_in_range = filter_conversations_by_request_started_time(
-        parsed_conversations, time_range
+        parsed_conversations, reporting_window
     )
     transfers = derive_transfers(conversations_started_in_range)
     return transfers
@@ -50,23 +50,23 @@ def parse_transfers_from_messages(
 def calculate_practice_metrics_data(
     transfers: List[Transfer],
     practice_list: List[PracticeDetails],
-    time_range: DateTimeRange,
+    reporting_window: MonthlyReportingWindow,
 ) -> PracticeMetricsPresentation:
     completed_transfers = filter_for_successful_transfers(transfers)
     practice_lookup = PracticeLookup(practice_list)
     sla_metrics = calculate_sla_by_practice(practice_lookup, completed_transfers)
     practice_metrics = construct_practice_metrics(
-        sla_metrics, year=time_range.start.year, month=time_range.start.month
+        sla_metrics, year=reporting_window.metric_year, month=reporting_window.metric_month
     )
     return practice_metrics
 
 
 def calculate_national_metrics_data(
-    transfers: List[Transfer], time_range: DateTimeRange
+    transfers: List[Transfer], reporting_window: MonthlyReportingWindow
 ) -> NationalMetricsPresentation:
     national_metrics = calculate_national_metrics(transfers=transfers)
     return construct_national_metrics(
         national_metrics=national_metrics,
-        year=time_range.start.year,
-        month=time_range.start.month,
+        year=reporting_window.metric_year,
+        month=reporting_window.metric_month,
     )

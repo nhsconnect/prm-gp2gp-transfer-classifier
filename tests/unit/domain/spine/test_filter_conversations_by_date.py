@@ -1,13 +1,14 @@
 from datetime import datetime
 
-from prmdata.utils.date.range import DateTimeRange
 from prmdata.domain.spine.parsed_conversation import filter_conversations_by_request_started_time
+from prmdata.utils.reporting_window import MonthlyReportingWindow
 from tests.builders.spine import build_parsed_conversation, build_message
 
 
 def test_filter_conversations_by_request_started_time_keeps_conversation_within_range():
-    date_range = DateTimeRange(
-        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(year=2020, month=6, day=1),
+        overflow_month_start=datetime(year=2020, month=7, day=1),
     )
 
     parsed_conversations = [
@@ -18,14 +19,15 @@ def test_filter_conversations_by_request_started_time_keeps_conversation_within_
 
     expected = parsed_conversations
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversation_before_range():
-    date_range = DateTimeRange(
-        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(year=2020, month=6, day=1),
+        overflow_month_start=datetime(year=2020, month=7, day=1),
     )
     parsed_conversations = [
         build_parsed_conversation(
@@ -35,14 +37,15 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_befor
 
     expected = []
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversation_after_range():
-    date_range = DateTimeRange(
-        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(year=2020, month=6, day=1),
+        overflow_month_start=datetime(year=2020, month=7, day=1),
     )
     parsed_conversations = [
         build_parsed_conversation(
@@ -52,14 +55,15 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_after
 
     expected = []
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversations_outside_of_range():
-    date_range = DateTimeRange(
-        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(year=2020, month=6, day=1),
+        overflow_month_start=datetime(year=2020, month=7, day=1),
     )
 
     conversation_within_range = build_parsed_conversation(
@@ -80,14 +84,15 @@ def test_filter_conversations_by_request_started_time_rejects_conversations_outs
 
     expected = [conversation_within_range]
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_accepts_conversation_on_range_start():
-    date_range = DateTimeRange(
-        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(year=2020, month=6, day=1),
+        overflow_month_start=datetime(year=2020, month=7, day=1),
     )
     parsed_conversations = [
         build_parsed_conversation(
@@ -97,14 +102,15 @@ def test_filter_conversations_by_request_started_time_accepts_conversation_on_ra
 
     expected = parsed_conversations
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
     assert list(actual) == expected
 
 
 def test_filter_conversations_by_request_started_time_rejects_conversation_on_range_end():
-    date_range = DateTimeRange(
-        start=datetime(year=2020, month=6, day=1), end=datetime(year=2020, month=7, day=1)
+    reporting_window = MonthlyReportingWindow(
+        metric_month_start=datetime(year=2020, month=6, day=1),
+        overflow_month_start=datetime(year=2020, month=7, day=1),
     )
     parsed_conversations = [
         build_parsed_conversation(
@@ -114,6 +120,6 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_on_ra
 
     expected = []
 
-    actual = filter_conversations_by_request_started_time(parsed_conversations, date_range)
+    actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
     assert list(actual) == expected
