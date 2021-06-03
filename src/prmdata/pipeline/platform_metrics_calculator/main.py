@@ -10,7 +10,7 @@ from dateutil.tz import tzutc
 from prmdata.domain.data_platform.organisation_metadata import construct_organisation_metadata
 from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
 from prmdata.utils.date.range import DateTimeRange
-from prmdata.utils.date_anchor import DateAnchor
+from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.pipeline.platform_metrics_calculator.core import (
@@ -47,9 +47,10 @@ def main():
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
     s3_manager = S3DataManager(s3)
 
-    date_anchor = DateAnchor(datetime(year=config.year, month=config.month, day=1))
+    this_month = datetime(year=config.year, month=config.month, day=1)
+    reporting_window = MonthlyReportingWindow.prior_to(this_month)
     metrics_io = PlatformMetricsIO(
-        date_anchor=date_anchor,
+        reporting_window=reporting_window,
         s3_data_manager=s3_manager,
         organisation_metadata_bucket=config.organisation_metadata_bucket,
         gp2gp_spine_bucket=config.output_transfer_data_bucket,
@@ -72,8 +73,9 @@ def main():
 
     bucket_name = config.output_transfer_data_bucket
 
-    previous_month = date_anchor.previous_month
-    s3_path = f"{bucket_name}/{VERSION}/{previous_month.year}/{previous_month.month}"
+    s3_path = (
+        f"{bucket_name}/{VERSION}/{reporting_window.metric_year}/{reporting_window.metric_month}"
+    )
 
     s3_manager.write_json(
         object_uri=f"s3://{s3_path}/practiceMetrics.json",

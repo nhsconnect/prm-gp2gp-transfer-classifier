@@ -2,7 +2,7 @@ from typing import Iterable
 
 from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
-from prmdata.utils.date_anchor import DateAnchor
+from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 
 
@@ -17,12 +17,12 @@ class PlatformMetricsIO:
     def __init__(
         self,
         *,
-        date_anchor: DateAnchor,
+        reporting_window: MonthlyReportingWindow,
         s3_data_manager: S3DataManager,
         organisation_metadata_bucket: str,
         gp2gp_spine_bucket: str,
     ):
-        self._anchor = date_anchor
+        self._window = reporting_window
         self._s3_manager = s3_data_manager
         self._org_metadata_bucket_name = organisation_metadata_bucket
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
@@ -31,24 +31,24 @@ class PlatformMetricsIO:
         data = self._s3_manager.read_gzip_csv(f"s3://{path}")
         return construct_messages_from_splunk_items(data)
 
-    def _current_month_file_prefix(self) -> str:
-        return f"{self._anchor.current_month.year}-{self._anchor.current_month.month}"
+    def _metric_month_file_prefix(self) -> str:
+        return f"{self._window.metric_year}-{self._window.metric_month}"
 
-    def _previous_month_file_prefix(self) -> str:
-        return f"{self._anchor.previous_month.year}-{self._anchor.previous_month.month}"
+    def _overflow_month_file_prefix(self) -> str:
+        return f"{self._window.overflow_year}-{self._window.overflow_month}"
 
-    def _current_month_path_fragment(self) -> str:
-        return f"{self._anchor.current_month.year}/{self._anchor.current_month.month}"
+    def _metric_month_path_fragment(self) -> str:
+        return f"{self._window.metric_year}/{self._window.metric_month}"
 
-    def _previous_month_path_fragment(self) -> str:
-        return f"{self._anchor.previous_month.year}/{self._anchor.previous_month.month}"
+    def _overflow_month_path_fragment(self) -> str:
+        return f"{self._window.overflow_year}/{self._window.overflow_month}"
 
     def read_ods_metadata(self) -> OrganisationMetadata:
         ods_metadata_s3_path = "/".join(
             [
                 self._org_metadata_bucket_name,
                 self._ORG_METADATA_VERSION,
-                self._current_month_path_fragment(),
+                self._overflow_month_path_fragment(),
                 self._ORG_METADATA_FILE_NAME,
             ]
         )
@@ -62,8 +62,8 @@ class PlatformMetricsIO:
                 self._gp2gp_spine_bucket,
                 self._SPINE_MESSAGES_VERSION,
                 self._SPINE_MESSAGES_PREFIX,
-                self._previous_month_path_fragment(),
-                f"{self._previous_month_file_prefix()}_spine_messages.csv.gz",
+                self._metric_month_path_fragment(),
+                f"{self._metric_month_file_prefix()}_spine_messages.csv.gz",
             ]
         )
         spine_messages_overflow_path = "/".join(
@@ -71,8 +71,8 @@ class PlatformMetricsIO:
                 self._gp2gp_spine_bucket,
                 self._SPINE_MESSAGES_VERSION,
                 self._SPINE_MESSAGES_OVERFLOW_PREFIX,
-                self._current_month_path_fragment(),
-                f"{self._current_month_file_prefix()}_spine_messages_overflow.csv.gz",
+                self._overflow_month_path_fragment(),
+                f"{self._overflow_month_file_prefix()}_spine_messages_overflow.csv.gz",
             ]
         )
         yield from self._read_spine_gzip_csv(spine_messages_path)

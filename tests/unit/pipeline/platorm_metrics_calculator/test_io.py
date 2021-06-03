@@ -4,7 +4,7 @@ from unittest.mock import Mock, call
 from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
-from prmdata.utils.date_anchor import DateAnchor
+from prmdata.utils.reporting_window import MonthlyReportingWindow
 from tests.builders.common import a_datetime, a_string
 from tests.builders.ods_portal import build_organisation_metadata
 from tests.builders.spine import build_message
@@ -41,13 +41,13 @@ def _spine_messages_as_dict(spine_messages: Iterable[Message]) -> Iterable[dict]
 
 def test_read_organisation_metadata():
     s3_manager = Mock()
-    anchor = DateAnchor(a_datetime(year=2021, month=2))
+    reporting_window = MonthlyReportingWindow.prior_to(a_datetime(year=2021, month=2))
 
     organisation_metadata = build_organisation_metadata()
     ods_bucket = "test_ods_bucket"
 
     metrics_io = PlatformMetricsIO(
-        date_anchor=anchor,
+        reporting_window=reporting_window,
         s3_data_manager=s3_manager,
         organisation_metadata_bucket=ods_bucket,
         gp2gp_spine_bucket=a_string(),
@@ -68,7 +68,7 @@ def test_read_organisation_metadata():
 
 def test_read_spine_messages():
     s3_manager = Mock()
-    anchor = DateAnchor(a_datetime(year=2021, month=2))
+    reporting_window = MonthlyReportingWindow.prior_to(a_datetime(year=2021, month=2))
 
     spine_message_one = build_message()
     spine_message_two = build_message()
@@ -76,7 +76,7 @@ def test_read_spine_messages():
     spine_bucket = "test_spine_bucket"
 
     metrics_io = PlatformMetricsIO(
-        date_anchor=anchor,
+        reporting_window=reporting_window,
         s3_data_manager=s3_manager,
         organisation_metadata_bucket=a_string(),
         gp2gp_spine_bucket=spine_bucket,
