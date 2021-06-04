@@ -1,6 +1,8 @@
 from dataclasses import asdict
 from typing import Iterable
 
+from prmdata.domain.data_platform.national_metrics import NationalMetricsPresentation
+from prmdata.domain.data_platform.organisation_metadata import OrganisationMetadataPresentation
 from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
 from prmdata.utils.io.dictionary import camelize_dict
@@ -17,6 +19,7 @@ class PlatformMetricsIO:
     _SPINE_MESSAGES_OVERFLOW_PREFIX = "messages-overflow"
     _DASHBOARD_DATA_VERSION = "v2"
     _NATIONAL_METRICS_FILE_NAME = "nationalMetrics.json"
+    _OUTPUT_ORG_METADATA_FILE_NAME = "organisationMetadata.json"
 
     def __init__(
         self,
@@ -89,7 +92,9 @@ class PlatformMetricsIO:
         yield from self._read_spine_gzip_csv(spine_messages_path)
         yield from self._read_spine_gzip_csv(spine_messages_overflow_path)
 
-    def write_national_metrics(self, national_metrics_presentation_data):
+    def write_national_metrics(
+        self, national_metrics_presentation_data: NationalMetricsPresentation
+    ):
         national_metrics_path = "/".join(
             [
                 self._dashboard_data_bucket,
@@ -102,4 +107,18 @@ class PlatformMetricsIO:
         self._s3_manager.write_json(
             f"s3://{national_metrics_path}",
             self._create_platform_json_object(national_metrics_presentation_data),
+        )
+
+    def write_organisation_metadata(self, organisation_metadata: OrganisationMetadataPresentation):
+        organisation_metadata_path = "/".join(
+            [
+                self._dashboard_data_bucket,
+                self._DASHBOARD_DATA_VERSION,
+                self._metric_month_path_fragment(),
+                self._OUTPUT_ORG_METADATA_FILE_NAME,
+            ]
+        )
+        self._s3_manager.write_json(
+            f"s3://{organisation_metadata_path}",
+            self._create_platform_json_object(organisation_metadata),
         )
