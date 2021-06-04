@@ -10,6 +10,7 @@ from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
 from prmdata.pipeline.platform_metrics_calculator.main import main
 from werkzeug.serving import make_server
+
 from tests.builders.file import read_file_to_gzip_buffer
 import pyarrow.parquet as pq
 
@@ -118,8 +119,6 @@ def test_with_s3_output(datadir):
     s3_output_transfer_data_bucket_name = "output-transfer-data-bucket"
     s3_input_transfer_data_bucket_name = "input-transfer-data-bucket"
     s3_organisation_metadata_bucket_name = "organisation-metadata-bucket"
-    month = "1"
-    year = "2020"
 
     fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
     fake_s3.start()
@@ -131,8 +130,7 @@ def test_with_s3_output(datadir):
     environ["INPUT_TRANSFER_DATA_BUCKET"] = s3_input_transfer_data_bucket_name
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
     environ["ORGANISATION_METADATA_BUCKET"] = s3_organisation_metadata_bucket_name
-    environ["YEAR"] = year
-    environ["MONTH"] = month
+    environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
     environ["S3_ENDPOINT_URL"] = fake_s3_url
 
     s3 = boto3.resource(

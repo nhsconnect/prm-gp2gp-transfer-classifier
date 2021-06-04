@@ -38,7 +38,7 @@ class PlatformMetricsIO:
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
         self._dashboard_data_bucket = dashboard_data_bucket
 
-    def _read_spine_gzip_csv(self, path):
+    def _read_spine_gzip_csv(self, path: str) -> Iterable[Message]:
         data = self._s3_manager.read_gzip_csv(f"s3://{path}")
         return construct_messages_from_splunk_items(data)
 

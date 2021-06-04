@@ -1,5 +1,4 @@
 from dataclasses import asdict
-from datetime import datetime
 import logging
 
 import boto3
@@ -38,8 +37,7 @@ def main():
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
     s3_manager = S3DataManager(s3)
 
-    this_month = datetime(year=config.year, month=config.month, day=1)
-    reporting_window = MonthlyReportingWindow.prior_to(this_month)
+    reporting_window = MonthlyReportingWindow.prior_to(config.date_anchor)
     metrics_io = PlatformMetricsIO(
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,

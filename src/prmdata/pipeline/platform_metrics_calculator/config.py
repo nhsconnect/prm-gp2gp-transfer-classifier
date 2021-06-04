@@ -1,9 +1,10 @@
-import typing
 from datetime import datetime
 from dataclasses import dataclass, MISSING, fields
 import logging
 
 from typing import Optional
+
+from dateutil.parser import isoparse
 
 logger = logging.getLogger(__name__)
 
@@ -13,8 +14,8 @@ class MissingEnvironmentVariable(Exception):
 
 
 def _convert_env_value(env_value, config_type):
-    if config_type == typing.Optional[int]:
-        return int(env_value)
+    if config_type == datetime:
+        return isoparse(env_value)
     return env_value
 
 
@@ -36,8 +37,7 @@ class DataPipelineConfig:
     output_transfer_data_bucket: str
     input_transfer_data_bucket: str
     organisation_metadata_bucket: str
-    month: Optional[int] = datetime.utcnow().month
-    year: Optional[int] = datetime.utcnow().year
+    date_anchor: datetime
     s3_endpoint_url: Optional[str] = None
 
     @classmethod
