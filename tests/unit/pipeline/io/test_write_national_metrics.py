@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest.mock import Mock
 
 from prmdata.domain.data_platform.national_metrics import (
@@ -17,9 +18,8 @@ _OVERFLOW_YEAR = 2021
 _METRIC_MONTH = 12
 _METRIC_YEAR = 2020
 
-_NATIONAL_METRICS_GENERATED_ON_DATETIME = a_datetime(year=_METRIC_YEAR, month=_METRIC_MONTH)
 _NATIONAL_METRICS_OBJECT = NationalMetricsPresentation(
-    generated_on=_NATIONAL_METRICS_GENERATED_ON_DATETIME.isoformat(),
+    generated_on=datetime(_OVERFLOW_YEAR, _OVERFLOW_MONTH, 1),
     metrics=[
         MonthlyNationalMetrics(
             transfer_count=6,
@@ -40,7 +40,7 @@ _NATIONAL_METRICS_OBJECT = NationalMetricsPresentation(
 )
 
 _NATIONAL_METRICS_DICT = {
-    "generatedOn": _NATIONAL_METRICS_GENERATED_ON_DATETIME.isoformat(),
+    "generatedOn": datetime(_OVERFLOW_YEAR, _OVERFLOW_MONTH, 1),
     "metrics": [
         {
             "transferCount": 6,

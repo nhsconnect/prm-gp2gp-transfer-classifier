@@ -68,11 +68,7 @@ def main():
         f"{bucket_name}/{VERSION}/{reporting_window.metric_year}/{reporting_window.metric_month}"
     )
 
-    s3_manager.write_json(
-        object_uri=f"s3://{s3_path}/practiceMetrics.json",
-        data=_create_platform_json_object(practice_metrics_data),
-    )
-
+    metrics_io.write_practice_metrics(practice_metrics_data)
     metrics_io.write_organisation_metadata(organisation_metadata)
     metrics_io.write_national_metrics(national_metrics_data)
 

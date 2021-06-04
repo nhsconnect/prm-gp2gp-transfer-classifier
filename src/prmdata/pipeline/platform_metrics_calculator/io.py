@@ -3,6 +3,7 @@ from typing import Iterable
 
 from prmdata.domain.data_platform.national_metrics import NationalMetricsPresentation
 from prmdata.domain.data_platform.organisation_metadata import OrganisationMetadataPresentation
+from prmdata.domain.data_platform.practice_metrics import PracticeMetricsPresentation
 from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
 from prmdata.utils.io.dictionary import camelize_dict
@@ -20,6 +21,7 @@ class PlatformMetricsIO:
     _DASHBOARD_DATA_VERSION = "v2"
     _NATIONAL_METRICS_FILE_NAME = "nationalMetrics.json"
     _OUTPUT_ORG_METADATA_FILE_NAME = "organisationMetadata.json"
+    _PRACTICE_METRICS_FILE_NAME = "practiceMetrics.json"
 
     def __init__(
         self,
@@ -39,6 +41,16 @@ class PlatformMetricsIO:
     def _read_spine_gzip_csv(self, path):
         data = self._s3_manager.read_gzip_csv(f"s3://{path}")
         return construct_messages_from_splunk_items(data)
+
+    def _dashboard_data_bucket_s3_path(self, file_name: str) -> str:
+        return "/".join(
+            [
+                self._dashboard_data_bucket,
+                self._DASHBOARD_DATA_VERSION,
+                self._metric_month_path_fragment(),
+                file_name,
+            ]
+        )
 
     @staticmethod
     def _create_platform_json_object(platform_data) -> dict:
@@ -95,30 +107,28 @@ class PlatformMetricsIO:
     def write_national_metrics(
         self, national_metrics_presentation_data: NationalMetricsPresentation
     ):
-        national_metrics_path = "/".join(
-            [
-                self._dashboard_data_bucket,
-                self._DASHBOARD_DATA_VERSION,
-                self._metric_month_path_fragment(),
-                self._NATIONAL_METRICS_FILE_NAME,
-            ]
+        national_metrics_path = self._dashboard_data_bucket_s3_path(
+            self._NATIONAL_METRICS_FILE_NAME
         )
-
         self._s3_manager.write_json(
             f"s3://{national_metrics_path}",
             self._create_platform_json_object(national_metrics_presentation_data),
         )
 
     def write_organisation_metadata(self, organisation_metadata: OrganisationMetadataPresentation):
-        organisation_metadata_path = "/".join(
-            [
-                self._dashboard_data_bucket,
-                self._DASHBOARD_DATA_VERSION,
-                self._metric_month_path_fragment(),
-                self._OUTPUT_ORG_METADATA_FILE_NAME,
-            ]
+        organisation_metadata_path = self._dashboard_data_bucket_s3_path(
+            self._OUTPUT_ORG_METADATA_FILE_NAME
         )
         self._s3_manager.write_json(
             f"s3://{organisation_metadata_path}",
             self._create_platform_json_object(organisation_metadata),
+        )
+
+    def write_practice_metrics(self, practice_metrics: PracticeMetricsPresentation):
+        practice_metrics_path = self._dashboard_data_bucket_s3_path(
+            self._PRACTICE_METRICS_FILE_NAME
+        )
+        self._s3_manager.write_json(
+            f"s3://{practice_metrics_path}",
+            self._create_platform_json_object(practice_metrics),
         )
