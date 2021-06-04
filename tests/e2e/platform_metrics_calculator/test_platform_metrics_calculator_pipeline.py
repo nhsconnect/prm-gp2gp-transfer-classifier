@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 import logging
 from io import BytesIO
-from os import getenv, environ
+from os import environ
 from threading import Thread
 
 import boto3
@@ -102,9 +102,12 @@ def _build_fake_s3(host, port):
     return ThreadedServer(server)
 
 
-###########################################################
-###########################################################
-###########################################################
+def _build_fake_s3_bucket(bucket_name: str, s3):
+    s3_fake_bucket = s3.Bucket(bucket_name)
+    s3_fake_bucket.create()
+    return s3_fake_bucket
+
+
 def test_with_s3_output(datadir):
     fake_s3_host = "127.0.0.1"
     fake_s3_port = 8887
@@ -112,7 +115,9 @@ def test_with_s3_output(datadir):
     fake_s3_access_key = "testing"
     fake_s3_secret_key = "testing"
     fake_s3_region = "us-west-1"
-    s3_test_bucket = "testbucket"
+    s3_output_transfer_data_bucket_name = "output-transfer-data-bucket"
+    s3_input_transfer_data_bucket_name = "input-transfer-data-bucket"
+    s3_organisation_metadata_bucket_name = "organisation-metadata-bucket"
     month = "1"
     year = "2020"
 
@@ -122,11 +127,10 @@ def test_with_s3_output(datadir):
     environ["AWS_ACCESS_KEY_ID"] = fake_s3_access_key
     environ["AWS_SECRET_ACCESS_KEY"] = fake_s3_secret_key
     environ["AWS_DEFAULT_REGION"] = fake_s3_region
-    environ[" "] = getenv("PATH")
 
-    environ["INPUT_TRANSFER_DATA_BUCKET"] = s3_test_bucket
-    environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_test_bucket
-    environ["ORGANISATION_METADATA_BUCKET"] = s3_test_bucket
+    environ["INPUT_TRANSFER_DATA_BUCKET"] = s3_input_transfer_data_bucket_name
+    environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
+    environ["ORGANISATION_METADATA_BUCKET"] = s3_organisation_metadata_bucket_name
     environ["YEAR"] = year
     environ["MONTH"] = month
     environ["S3_ENDPOINT_URL"] = fake_s3_url
@@ -140,8 +144,9 @@ def test_with_s3_output(datadir):
         region_name=fake_s3_region,
     )
 
-    output_transfer_data_bucket = s3.Bucket(s3_test_bucket)
-    output_transfer_data_bucket.create()
+    output_transfer_data_bucket = _build_fake_s3_bucket(s3_output_transfer_data_bucket_name, s3)
+    input_transfer_data_bucket = _build_fake_s3_bucket(s3_input_transfer_data_bucket_name, s3)
+    organisation_metadata_bucket = _build_fake_s3_bucket(s3_organisation_metadata_bucket_name, s3)
 
     expected_practice_metrics_output_key = "practiceMetrics.json"
     expected_organisation_metadata_output_key = "organisationMetadata.json"
@@ -157,17 +162,17 @@ def test_with_s3_output(datadir):
     s3_path = "v2/2019/12/"
 
     input_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Dec-2019.csv")
-    output_transfer_data_bucket.upload_fileobj(
+    input_transfer_data_bucket.upload_fileobj(
         input_csv_gz, "v2/messages/2019/12/2019-12_spine_messages.csv.gz"
     )
 
     input_overflow_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Jan-2020-overflow.csv")
-    output_transfer_data_bucket.upload_fileobj(
+    input_transfer_data_bucket.upload_fileobj(
         input_overflow_csv_gz, "v2/messages-overflow/2020/1/2020-1_spine_messages_overflow.csv.gz"
     )
 
     organisation_metadata_file = str(datadir / "inputs" / "organisationMetadata.json")
-    output_transfer_data_bucket.upload_file(
+    organisation_metadata_bucket.upload_file(
         organisation_metadata_file, "v2/2020/1/organisationMetadata.json"
     )
 

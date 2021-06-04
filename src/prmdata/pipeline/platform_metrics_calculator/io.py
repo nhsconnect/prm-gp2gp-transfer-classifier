@@ -1,7 +1,9 @@
+from dataclasses import asdict
 from typing import Iterable
 
 from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
+from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 
@@ -13,6 +15,8 @@ class PlatformMetricsIO:
     _SPINE_MESSAGES_VERSION = "v2"
     _SPINE_MESSAGES_PREFIX = "messages"
     _SPINE_MESSAGES_OVERFLOW_PREFIX = "messages-overflow"
+    _DASHBOARD_DATA_VERSION = "v2"
+    _NATIONAL_METRICS_FILE_NAME = "nationalMetrics.json"
 
     def __init__(
         self,
@@ -21,15 +25,22 @@ class PlatformMetricsIO:
         s3_data_manager: S3DataManager,
         organisation_metadata_bucket: str,
         gp2gp_spine_bucket: str,
+        dashboard_data_bucket: str,
     ):
         self._window = reporting_window
         self._s3_manager = s3_data_manager
         self._org_metadata_bucket_name = organisation_metadata_bucket
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
+        self._dashboard_data_bucket = dashboard_data_bucket
 
     def _read_spine_gzip_csv(self, path):
         data = self._s3_manager.read_gzip_csv(f"s3://{path}")
         return construct_messages_from_splunk_items(data)
+
+    @staticmethod
+    def _create_platform_json_object(platform_data) -> dict:
+        content_dict = asdict(platform_data)
+        return camelize_dict(content_dict)
 
     def _metric_month_file_prefix(self) -> str:
         return f"{self._window.metric_year}-{self._window.metric_month}"
@@ -77,3 +88,13 @@ class PlatformMetricsIO:
         )
         yield from self._read_spine_gzip_csv(spine_messages_path)
         yield from self._read_spine_gzip_csv(spine_messages_overflow_path)
+
+    def write_national_metrics(self, national_metrics_presentation_data):
+        s3_path = (
+            f"{self._dashboard_data_bucket}/{self._DASHBOARD_DATA_VERSION}/"
+            f"{self._window.metric_year}/{self._window.metric_month}"
+        )
+        self._s3_manager.write_json(
+            f"s3://{s3_path}/{self._NATIONAL_METRICS_FILE_NAME}",
+            self._create_platform_json_object(national_metrics_presentation_data),
+        )

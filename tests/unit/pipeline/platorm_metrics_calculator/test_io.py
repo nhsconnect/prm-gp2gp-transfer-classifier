@@ -1,6 +1,14 @@
 from typing import Iterable
 from unittest.mock import Mock, call
 
+from prmdata.domain.data_platform.national_metrics import (
+    NationalMetricsPresentation,
+    MonthlyNationalMetrics,
+    FailedMetrics,
+    PendingMetrics,
+    PaperFallbackMetrics,
+    IntegratedMetrics,
+)
 from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
@@ -18,6 +26,52 @@ def _org_metadata_as_dict(metadata: OrganisationMetadata) -> dict:
             for practice in metadata.practices
         ],
         "ccgs": [{"ods_code": ccg.ods_code, "name": ccg.name} for ccg in metadata.ccgs],
+    }
+
+
+def generate_national_metrics_presentation(reporting_datetime):
+    return NationalMetricsPresentation(
+        generated_on=reporting_datetime.isoformat(),
+        metrics=[
+            MonthlyNationalMetrics(
+                transfer_count=6,
+                integrated=IntegratedMetrics(
+                    transfer_percentage=83.33,
+                    transfer_count=5,
+                    within_3_days=2,
+                    within_8_days=2,
+                    beyond_8_days=1,
+                ),
+                failed=FailedMetrics(transfer_count=1, transfer_percentage=16.67),
+                pending=PendingMetrics(transfer_count=0, transfer_percentage=0.0),
+                paper_fallback=PaperFallbackMetrics(transfer_count=2, transfer_percentage=33.33),
+                year=2019,
+                month=12,
+            )
+        ],
+    )
+
+
+def _national_metrics_as_dict(reporting_datetime):
+    return {
+        "generatedOn": reporting_datetime.isoformat(),
+        "metrics": [
+            {
+                "transferCount": 6,
+                "integrated": {
+                    "transferPercentage": 83.33,
+                    "transferCount": 5,
+                    "within3Days": 2,
+                    "within8Days": 2,
+                    "beyond8Days": 1,
+                },
+                "failed": {"transferCount": 1, "transferPercentage": 16.67},
+                "pending": {"transferCount": 0, "transferPercentage": 0.0},
+                "paperFallback": {"transferCount": 2, "transferPercentage": 33.33},
+                "year": 2019,
+                "month": 12,
+            }
+        ],
     }
 
 
@@ -51,6 +105,7 @@ def test_read_organisation_metadata():
         s3_data_manager=s3_manager,
         organisation_metadata_bucket=ods_bucket,
         gp2gp_spine_bucket=a_string(),
+        dashboard_data_bucket=a_string(),
     )
 
     s3_manager.read_json.return_value = _org_metadata_as_dict(organisation_metadata)
@@ -80,6 +135,7 @@ def test_read_spine_messages():
         s3_data_manager=s3_manager,
         organisation_metadata_bucket=a_string(),
         gp2gp_spine_bucket=spine_bucket,
+        dashboard_data_bucket=a_string(),
     )
 
     s3_manager.read_gzip_csv.side_effect = [
@@ -98,3 +154,30 @@ def test_read_spine_messages():
     assert actual_data == expected_data
 
     s3_manager.read_gzip_csv.assert_has_calls([call(expected_path), call(expected_overflow_path)])
+
+
+def test_write_national_metrics():
+    s3_manager = Mock()
+    reporting_window_datetime = a_datetime(year=2021, month=1)
+    reporting_window = MonthlyReportingWindow.prior_to(reporting_window_datetime)
+
+    dashboard_data_bucket = a_string()
+
+    metrics_io = PlatformMetricsIO(
+        reporting_window=reporting_window,
+        s3_data_manager=s3_manager,
+        organisation_metadata_bucket=a_string(),
+        gp2gp_spine_bucket=a_string(),
+        dashboard_data_bucket=dashboard_data_bucket,
+    )
+
+    national_metrics_presentation = generate_national_metrics_presentation(
+        reporting_window_datetime
+    )
+
+    metrics_io.write_national_metrics(national_metrics_presentation)
+
+    expected_national_metrics_dict = _national_metrics_as_dict(reporting_window_datetime)
+    expected_path = f"s3://{dashboard_data_bucket}/v2/2020/12/nationalMetrics.json"
+
+    s3_manager.write_json.assert_called_once_with(expected_path, expected_national_metrics_dict)
