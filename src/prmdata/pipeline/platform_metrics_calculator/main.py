@@ -76,10 +76,9 @@ def main():
         object_uri=f"s3://{s3_path}/organisationMetadata.json",
         data=_create_platform_json_object(organisation_metadata),
     )
-    s3_manager.write_json(
-        object_uri=f"s3://{s3_path}/nationalMetrics.json",
-        data=_create_platform_json_object(national_metrics_data),
-    )
+
+    metrics_io.write_national_metrics(national_metrics_data)
+
     write_table(
         table=transfer_table,
         where=f"{s3_path}/transfers.parquet",

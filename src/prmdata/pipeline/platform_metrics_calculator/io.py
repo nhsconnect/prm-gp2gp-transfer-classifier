@@ -90,11 +90,16 @@ class PlatformMetricsIO:
         yield from self._read_spine_gzip_csv(spine_messages_overflow_path)
 
     def write_national_metrics(self, national_metrics_presentation_data):
-        s3_path = (
-            f"{self._dashboard_data_bucket}/{self._DASHBOARD_DATA_VERSION}/"
-            f"{self._window.metric_year}/{self._window.metric_month}"
+        national_metrics_path = "/".join(
+            [
+                self._dashboard_data_bucket,
+                self._DASHBOARD_DATA_VERSION,
+                self._metric_month_path_fragment(),
+                self._NATIONAL_METRICS_FILE_NAME,
+            ]
         )
+
         self._s3_manager.write_json(
-            f"s3://{s3_path}/{self._NATIONAL_METRICS_FILE_NAME}",
+            f"s3://{national_metrics_path}",
             self._create_platform_json_object(national_metrics_presentation_data),
         )
