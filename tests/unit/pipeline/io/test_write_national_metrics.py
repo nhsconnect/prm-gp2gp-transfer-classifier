@@ -12,8 +12,12 @@ from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from tests.builders.common import a_datetime, a_string
 
+_OVERFLOW_MONTH = 1
+_OVERFLOW_YEAR = 2021
+_METRIC_MONTH = 12
+_METRIC_YEAR = 2020
 
-_NATIONAL_METRICS_GENERATED_ON_DATETIME = a_datetime(year=2021, month=1)
+_NATIONAL_METRICS_GENERATED_ON_DATETIME = a_datetime(year=_METRIC_YEAR, month=_METRIC_MONTH)
 _NATIONAL_METRICS_OBJECT = NationalMetricsPresentation(
     generated_on=_NATIONAL_METRICS_GENERATED_ON_DATETIME.isoformat(),
     metrics=[
@@ -59,7 +63,8 @@ _NATIONAL_METRICS_DICT = {
 
 def test_write_national_metrics():
     s3_manager = Mock()
-    reporting_window = MonthlyReportingWindow.prior_to(_NATIONAL_METRICS_GENERATED_ON_DATETIME)
+    date_anchor = a_datetime(year=_OVERFLOW_YEAR, month=_OVERFLOW_MONTH)
+    reporting_window = MonthlyReportingWindow.prior_to(date_anchor)
 
     dashboard_data_bucket = a_string()
 
@@ -74,6 +79,8 @@ def test_write_national_metrics():
     metrics_io.write_national_metrics(_NATIONAL_METRICS_OBJECT)
 
     expected_national_metrics_dict = _NATIONAL_METRICS_DICT
-    expected_path = f"s3://{dashboard_data_bucket}/v2/2020/12/nationalMetrics.json"
+    expected_path = (
+        f"s3://{dashboard_data_bucket}/v2/{_METRIC_YEAR}/{_METRIC_MONTH}/nationalMetrics.json"
+    )
 
     s3_manager.write_json.assert_called_once_with(expected_path, expected_national_metrics_dict)
