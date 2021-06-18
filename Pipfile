@@ -19,7 +19,6 @@ mypy = "~=0.9"
 types-python-dateutil = "*"
 types-freezegun = "*"
 moto = {version = "~=2.0.8", extras = ["server"]}
-pyfakefs = "~=3.7"
 pytest-datadir = "~=1.3"
 freezegun = "~=0.3"
 pytest-cov = "~=2.10"
