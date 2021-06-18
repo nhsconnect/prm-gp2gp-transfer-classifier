@@ -4,6 +4,8 @@ import json
 from datetime import datetime
 from urllib.parse import urlparse
 
+from mypy_boto3_s3 import S3ServiceResource
+
 
 def _serialize_datetime(obj):
     if isinstance(obj, datetime):
@@ -12,7 +14,7 @@ def _serialize_datetime(obj):
 
 
 class S3DataManager:
-    def __init__(self, client):
+    def __init__(self, client: S3ServiceResource):
         self._client = client
 
     def _object_from_uri(self, uri):
@@ -29,7 +31,7 @@ class S3DataManager:
 
     def write_json(self, object_uri, data):
         s3_object = self._object_from_uri(object_uri)
-        body = json.dumps(data, default=_serialize_datetime)
+        body = json.dumps(data, default=_serialize_datetime).encode("utf8")
         s3_object.put(Body=body, ContentType="application/json")
 
     def read_gzip_csv(self, object_uri):
