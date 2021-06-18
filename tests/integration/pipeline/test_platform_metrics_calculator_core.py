@@ -18,7 +18,7 @@ from prmdata.domain.data_platform.practice_metrics import (
     PracticeSummary,
     PracticeMetricsPresentation,
 )
-from prmdata.domain.ods_portal.models import PracticeDetails
+from prmdata.domain.ods_portal.models import PracticeDetails, OrganisationMetadata
 from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
@@ -159,13 +159,17 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         )
     ]
 
-    practice_list = [
-        PracticeDetails(
-            asids=[requesting_asid_with_transfer],
-            ods_code=requesting_ods_code,
-            name=requesting_practice_name,
-        )
-    ]
+    organisation_metadata = OrganisationMetadata(
+        generated_on=datetime(year=2020, month=1, day=15, hour=23, second=42),
+        practices=[
+            PracticeDetails(
+                asids=[requesting_asid_with_transfer],
+                ods_code=requesting_ods_code,
+                name=requesting_practice_name,
+            )
+        ],
+        ccgs=[],
+    )
 
     expected = PracticeMetricsPresentation(
         generated_on=datetime(year=2020, month=1, day=15, hour=23, second=42, tzinfo=UTC),
@@ -191,7 +195,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         ],
     )
 
-    actual = calculate_practice_metrics_data(transfers, practice_list, reporting_window)
+    actual = calculate_practice_metrics_data(transfers, organisation_metadata, reporting_window)
 
     assert actual == expected
 
