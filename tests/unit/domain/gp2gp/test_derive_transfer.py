@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Iterator
+from typing import List, Iterable
 
 import pytest
 
@@ -12,7 +12,7 @@ from prmdata.domain.gp2gp.transfer import (
 )
 
 
-def _assert_attributes(attr_name: str, actual: Iterator[Transfer], expected: List):
+def _assert_attributes(attr_name: str, actual: Iterable[Transfer], expected: List):
     assert [getattr(i, attr_name) for i in actual] == expected
 
 

@@ -1,9 +1,12 @@
 import datetime
+from typing import List
 
 import pytest
 
 from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
+from prmdata.domain.gp2gp.transfer import Transfer
+
 from tests.builders.gp2gp import (
     build_transfers,
     a_pending_transfer,
@@ -93,7 +96,7 @@ def test_returns_failed_transfer_count():
 
 
 def test_returns_pending_transfer_count_default_given_no_transfers():
-    transfers = []
+    transfers: List[Transfer] = []
 
     national_metrics = calculate_national_metrics(transfers)
 

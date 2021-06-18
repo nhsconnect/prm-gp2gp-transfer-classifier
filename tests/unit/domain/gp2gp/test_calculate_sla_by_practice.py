@@ -1,10 +1,11 @@
 from collections import Counter
 from datetime import timedelta
-from typing import Set, Iterator
+from typing import Set, Iterator, List
 
 import pytest
 
 from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
+from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.domain.gp2gp.practice_metrics import (
     PracticeMetrics,
@@ -56,7 +57,7 @@ def test_groups_by_ods_code_given_single_practice_and_no_transfers():
     lookup = PracticeLookup(
         [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     )
-    transfers = []
+    transfers: List[Transfer] = []
 
     actual = calculate_sla_by_practice(lookup, transfers)
 
@@ -107,7 +108,7 @@ def test_contains_practice_name():
     lookup = PracticeLookup(
         [PracticeDetails(asids=[a_string()], ods_code=a_string(), name=expected_name)]
     )
-    transfers = []
+    transfers: List[Transfer] = []
 
     actual_name = list(calculate_sla_by_practice(lookup, transfers))[0].name
 
@@ -118,7 +119,8 @@ def test_returns_practice_sla_metrics_placeholder_given_a_list_with_one_practice
     lookup = PracticeLookup(
         [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     )
-    transfers = []
+    transfers: List[Transfer] = []
+
     actual = calculate_sla_by_practice(lookup, transfers)
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=0, within_8_days=0, beyond_8_days=0)

@@ -1,3 +1,5 @@
+from typing import List
+
 from tests.builders.common import a_datetime
 from tests.builders.spine import build_parsed_conversation, build_message
 
@@ -67,7 +69,7 @@ def test_doesnt_extract_error_code_given_pending_request_completed_ack():
 
     actual = conversation.final_error_codes()
 
-    expected = []
+    expected: List[int] = []
 
     assert actual == expected
 
@@ -109,7 +111,7 @@ def test_intermediate_error_code_is_empty_list_if_no_errors():
 
     actual = conversation.intermediate_error_codes()
 
-    expected_intermediate_error_codes = []
+    expected_intermediate_error_codes: List[int] = []
 
     assert actual == expected_intermediate_error_codes
 

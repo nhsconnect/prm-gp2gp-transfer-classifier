@@ -1,12 +1,16 @@
+from typing import List
+
 from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
+from prmdata.domain.ods_portal.models import PracticeDetails
+
 from tests.builders.ods_portal import build_practice_details
 
 
 def test_all_practices_returns_nothing_given_no_practices():
-    practices = []
+    practices: List[PracticeDetails] = []
     practice_lookup = PracticeLookup(practices)
 
-    expected = []
+    expected: List[PracticeDetails] = []
 
     actual = list(practice_lookup.all_practices())
 
@@ -77,7 +81,7 @@ def test_has_asid_code_returns_true_given_multiple_practices():
 
 
 def test_ods_code_from_asid_returns_none_given_no_practices():
-    practices = []
+    practices: List[PracticeDetails] = []
     practice_lookup = PracticeLookup(practices)
 
     expected = None
@@ -122,10 +126,10 @@ def test_ods_code_from_asid_returns_matching_practice_given_multiple_practices()
 
 
 def test_all_ods_codes_returns_nothing_given_no_practices():
-    practices = []
+    practices: List[PracticeDetails] = []
     practice_lookup = PracticeLookup(practices)
 
-    expected = []
+    expected: List[PracticeDetails] = []
 
     actual = list(practice_lookup.all_ods_codes())
 

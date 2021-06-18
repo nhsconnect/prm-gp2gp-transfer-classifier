@@ -1,6 +1,10 @@
 from datetime import datetime
+from typing import List
 
-from prmdata.domain.spine.parsed_conversation import filter_conversations_by_request_started_time
+from prmdata.domain.spine.parsed_conversation import (
+    filter_conversations_by_request_started_time,
+    ParsedConversation,
+)
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from tests.builders.spine import build_parsed_conversation, build_message
 
@@ -35,7 +39,7 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_befor
         )
     ]
 
-    expected = []
+    expected: List[ParsedConversation] = []
 
     actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
@@ -53,7 +57,7 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_after
         )
     ]
 
-    expected = []
+    expected: List[ParsedConversation] = []
 
     actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 
@@ -118,7 +122,7 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_on_ra
         )
     ]
 
-    expected = []
+    expected: List[ParsedConversation] = []
 
     actual = filter_conversations_by_request_started_time(parsed_conversations, reporting_window)
 

@@ -110,7 +110,7 @@ def test_final_error_code_is_converted_to_column():
 def test_final_error_code_is_converted_to_column_when_missing():
     transfer = build_transfer(final_error_codes=[])
 
-    expected_error_code_column = {"final_error_codes": [[]]}
+    expected_error_code_column: dict = {"final_error_codes": [[]]}
 
     table = convert_transfers_to_table([transfer])
     actual_error_code_column = table.select(["final_error_codes"]).to_pydict()
@@ -132,7 +132,7 @@ def test_intermediate_error_codes_is_converted_to_column():
 def test_intermediate_error_codes_is_converted_to_column_when_empty():
     transfer = build_transfer(intermediate_error_codes=[])
 
-    expected_error_code_column = {"intermediate_error_codes": [[]]}
+    expected_error_code_column: dict = {"intermediate_error_codes": [[]]}
 
     table = convert_transfers_to_table([transfer])
     actual_error_code_column = table.select(["intermediate_error_codes"]).to_pydict()

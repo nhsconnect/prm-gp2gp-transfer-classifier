@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import List
 
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
@@ -120,6 +121,6 @@ def test_excludes_pending_transfers():
     transfers = [pending_transfer]
 
     actual = filter_for_successful_transfers(transfers)
-    expected = []
+    expected: List[Transfer] = []
 
     assert list(actual) == expected

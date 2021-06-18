@@ -3,7 +3,7 @@ from prmdata.domain.spine.message import Message
 from tests.builders.common import a_string, a_datetime
 
 
-def build_parsed_conversation(**kwargs):
+def build_parsed_conversation(**kwargs) -> ParsedConversation:
     return ParsedConversation(
         id=kwargs.get("id", a_string(36)),
         request_started=kwargs.get("request_started", build_message()),
@@ -14,7 +14,7 @@ def build_parsed_conversation(**kwargs):
     )
 
 
-def build_message(**kwargs):
+def build_message(**kwargs) -> Message:
     return Message(
         time=kwargs.get("time", a_datetime()),
         conversation_id=kwargs.get("conversation_id", a_string(36)),

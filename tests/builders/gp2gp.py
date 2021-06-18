@@ -5,7 +5,7 @@ from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
 from tests.builders.common import a_string, a_duration, an_integer, a_datetime
 
 
-def build_transfer(**kwargs):
+def build_transfer(**kwargs) -> Transfer:
     return Transfer(
         conversation_id=kwargs.get("conversation_id", a_string(36)),
         sla_duration=kwargs.get("sla_duration", a_duration()),
@@ -22,7 +22,7 @@ def build_transfer(**kwargs):
     )
 
 
-def build_practice_metrics(**kwargs):
+def build_practice_metrics(**kwargs) -> PracticeMetrics:
     return PracticeMetrics(
         ods_code=kwargs.get("ods_code", a_string(6)),
         name=kwargs.get("name", a_string()),

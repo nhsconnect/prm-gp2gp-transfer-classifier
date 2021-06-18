@@ -8,7 +8,7 @@ def an_asid_list():
     return [a_string() for _ in range(randrange(1, 3))]
 
 
-def build_practice_details(**kwargs):
+def build_practice_details(**kwargs) -> PracticeDetails:
     return PracticeDetails(
         ods_code=kwargs.get("ods_code", a_string()),
         name=kwargs.get("name", a_string()),
@@ -16,7 +16,7 @@ def build_practice_details(**kwargs):
     )
 
 
-def build_ccg_details(**kwargs):
+def build_ccg_details(**kwargs) -> CcgDetails:
     return CcgDetails(
         ods_code=kwargs.get("ods_code", a_string()),
         name=kwargs.get("name", a_string()),
