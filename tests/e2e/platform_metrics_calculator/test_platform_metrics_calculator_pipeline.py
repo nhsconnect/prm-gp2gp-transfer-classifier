@@ -153,8 +153,6 @@ def test_with_s3_output(datadir):
     expected_practice_metrics = _read_json(datadir / "expected_outputs" / "practiceMetrics.json")
     expected_national_metrics = _read_json(datadir / "expected_outputs" / "nationalMetrics.json")
 
-    s3_path = "v2/2019/12/"
-
     input_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Dec-2019.csv")
     input_transfer_data_bucket.upload_fileobj(
         input_csv_gz, "v2/messages/2019/12/2019-12_spine_messages.csv.gz"
@@ -170,16 +168,18 @@ def test_with_s3_output(datadir):
         organisation_metadata_file, "v2/2020/1/organisationMetadata.json"
     )
 
+    s3_output_path = "v3/2019/12/"
+
     try:
         main()
         actual_practice_metrics = _read_s3_json(
-            output_transfer_data_bucket, f"{s3_path}{expected_practice_metrics_output_key}"
+            output_transfer_data_bucket, f"{s3_output_path}{expected_practice_metrics_output_key}"
         )
         actual_national_metrics = _read_s3_json(
-            output_transfer_data_bucket, f"{s3_path}{expected_national_metrics_output_key}"
+            output_transfer_data_bucket, f"{s3_output_path}{expected_national_metrics_output_key}"
         )
         actual_transfers = _read_s3_parquet(
-            output_transfer_data_bucket, f"{s3_path}{expected_transfers_output_key}"
+            output_transfer_data_bucket, f"{s3_output_path}{expected_transfers_output_key}"
         )
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]

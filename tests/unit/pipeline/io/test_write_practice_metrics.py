@@ -88,7 +88,7 @@ def test_write_practice_metrics():
 
     expected_national_metrics_dict = _PRACTICE_METRICS_DICT
     expected_path = (
-        f"s3://{dashboard_data_bucket}/v2/{_METRIC_YEAR}/{_METRIC_MONTH}/practiceMetrics.json"
+        f"s3://{dashboard_data_bucket}/v3/{_METRIC_YEAR}/{_METRIC_MONTH}/practiceMetrics.json"
     )
 
     s3_manager.write_json.assert_called_once_with(expected_path, expected_national_metrics_dict)

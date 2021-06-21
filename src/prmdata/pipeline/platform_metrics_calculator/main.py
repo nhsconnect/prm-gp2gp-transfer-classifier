@@ -20,7 +20,7 @@ from pyarrow.fs import S3FileSystem
 
 logger = logging.getLogger(__name__)
 
-VERSION = "v2"
+VERSION = "v3"
 
 
 def _create_platform_json_object(platform_data):
