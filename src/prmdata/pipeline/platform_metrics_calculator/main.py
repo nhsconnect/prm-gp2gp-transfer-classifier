@@ -52,7 +52,7 @@ def main():
 
     transfers = list(parse_transfers_from_messages(spine_messages, reporting_window))
     practice_metrics_data = calculate_practice_metrics_data(
-        transfers, organisation_metadata, reporting_window
+        transfers, organisation_metadata.practices, reporting_window
     )
     national_metrics_data = calculate_national_metrics_data(
         transfers=transfers, reporting_window=reporting_window
