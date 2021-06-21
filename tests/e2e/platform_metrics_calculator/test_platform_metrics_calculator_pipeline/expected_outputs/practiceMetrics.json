@@ -55,5 +55,22 @@
         }
       ]
     }
+  ],
+  "ccgs": [
+    {
+      "odsCode": "10D",
+      "name": "Test CCG",
+      "practices": [
+        "A12345"
+      ]
+    },
+    {
+      "odsCode": "11D",
+      "name": "Another Test CCG",
+      "practices": [
+        "A12346",
+        "A12347"
+      ]
+    }
   ]
 }

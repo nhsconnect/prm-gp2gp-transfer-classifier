@@ -8,6 +8,7 @@ from dateutil import parser
 class CcgDetails:
     ods_code: str
     name: str
+    practices: List[str]
 
 
 @dataclass
@@ -33,5 +34,8 @@ class OrganisationMetadata:
                 )
                 for practice in data["practices"]
             ],
-            ccgs=[CcgDetails(ods_code=ccg["ods_code"], name=ccg["name"]) for ccg in data["ccgs"]],
+            ccgs=[
+                CcgDetails(ods_code=ccg["ods_code"], name=ccg["name"], practices=ccg["practices"])
+                for ccg in data["ccgs"]
+            ],
         )

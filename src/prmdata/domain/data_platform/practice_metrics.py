@@ -5,6 +5,7 @@ from typing import Iterable, List
 from dateutil.tz import tzutc
 
 from prmdata.domain.gp2gp.practice_metrics import PracticeMetrics
+from prmdata.domain.ods_portal.models import CcgDetails
 from prmdata.utils.calculate_percentage import calculate_percentage
 
 
@@ -39,6 +40,7 @@ class PracticeSummary:
 class PracticeMetricsPresentation:
     generated_on: datetime
     practices: List[PracticeSummary]
+    ccgs: List[CcgDetails]
 
 
 def construct_practice_summaries(
@@ -81,7 +83,8 @@ def construct_practice_summaries(
 
 def construct_practice_metrics_presentation(
     practice_summaries: List[PracticeSummary],
+    ccgs: List[CcgDetails],
 ) -> PracticeMetricsPresentation:
     return PracticeMetricsPresentation(
-        generated_on=datetime.now(tzutc()), practices=practice_summaries
+        generated_on=datetime.now(tzutc()), practices=practice_summaries, ccgs=ccgs
     )

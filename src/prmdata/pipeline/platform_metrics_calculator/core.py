@@ -10,7 +10,7 @@ from prmdata.domain.data_platform.practice_metrics import (
     construct_practice_metrics_presentation,
 )
 from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
-from prmdata.domain.ods_portal.models import PracticeDetails
+from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
@@ -50,16 +50,18 @@ def parse_transfers_from_messages(
 
 def calculate_practice_metrics_data(
     transfers: List[Transfer],
-    practice_list: List[PracticeDetails],
+    organisation_metadata: OrganisationMetadata,
     reporting_window: MonthlyReportingWindow,
 ) -> PracticeMetricsPresentation:
     completed_transfers = filter_for_successful_transfers(transfers)
-    practice_lookup = PracticeLookup(practice_list)
+    practice_lookup = PracticeLookup(organisation_metadata.practices)
     sla_metrics = calculate_sla_by_practice(practice_lookup, completed_transfers)
     practice_summaries = construct_practice_summaries(
         sla_metrics, year=reporting_window.metric_year, month=reporting_window.metric_month
     )
-    practice_metrics_presentation = construct_practice_metrics_presentation(practice_summaries)
+    practice_metrics_presentation = construct_practice_metrics_presentation(
+        practice_summaries, organisation_metadata.ccgs
+    )
     return practice_metrics_presentation
 
 

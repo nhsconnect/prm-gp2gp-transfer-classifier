@@ -26,11 +26,18 @@
   "ccgs": [
     {
       "ods_code": "10D",
-      "name": "Test CCG with GP practices"
+      "name": "Test CCG",
+      "practices": [
+        "A12345"
+      ]
     },
     {
       "ods_code": "11D",
-      "name": "Test CCG without GP practices"
+      "name": "Another Test CCG",
+      "practices": [
+        "A12346",
+        "A12347"
+      ]
     }
   ]
 }

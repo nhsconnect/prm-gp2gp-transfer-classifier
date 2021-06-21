@@ -147,14 +147,10 @@ def test_with_s3_output(datadir):
     organisation_metadata_bucket = _build_fake_s3_bucket(s3_organisation_metadata_bucket_name, s3)
 
     expected_practice_metrics_output_key = "practiceMetrics.json"
-    expected_organisation_metadata_output_key = "organisationMetadata.json"
     expected_national_metrics_output_key = "nationalMetrics.json"
     expected_transfers_output_key = "transfers.parquet"
 
     expected_practice_metrics = _read_json(datadir / "expected_outputs" / "practiceMetrics.json")
-    expected_organisation_metadata = _read_json(
-        datadir / "expected_outputs" / "organisationMetadata.json"
-    )
     expected_national_metrics = _read_json(datadir / "expected_outputs" / "nationalMetrics.json")
 
     s3_path = "v2/2019/12/"
@@ -179,9 +175,6 @@ def test_with_s3_output(datadir):
         actual_practice_metrics = _read_s3_json(
             output_transfer_data_bucket, f"{s3_path}{expected_practice_metrics_output_key}"
         )
-        actual_organisation_metadata = _read_s3_json(
-            output_transfer_data_bucket, f"{s3_path}{expected_organisation_metadata_output_key}"
-        )
         actual_national_metrics = _read_s3_json(
             output_transfer_data_bucket, f"{s3_path}{expected_national_metrics_output_key}"
         )
@@ -190,9 +183,7 @@ def test_with_s3_output(datadir):
         )
 
         assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
-        assert (
-            actual_organisation_metadata["practices"] == expected_organisation_metadata["practices"]
-        )
+        assert actual_practice_metrics["ccgs"] == expected_practice_metrics["ccgs"]
         assert actual_national_metrics["metrics"] == expected_national_metrics["metrics"]
 
         assert actual_transfers == EXPECTED_TRANSFERS

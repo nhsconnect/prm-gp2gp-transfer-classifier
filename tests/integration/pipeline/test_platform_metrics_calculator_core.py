@@ -18,7 +18,7 @@ from prmdata.domain.data_platform.practice_metrics import (
     PracticeSummary,
     PracticeMetricsPresentation,
 )
-from prmdata.domain.ods_portal.models import PracticeDetails
+from prmdata.domain.ods_portal.models import PracticeDetails, CcgDetails, OrganisationMetadata
 from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
@@ -141,6 +141,8 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
     requesting_supplier = "SystemOne"
     sending_supplier = "Unknown"
     conversation_id = "abcdefg_1234"
+    ccg_ods_code = "23B"
+    ccg_name = "Test CCG"
 
     transfers = [
         Transfer(
@@ -167,6 +169,14 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         )
     ]
 
+    ccg_list = [CcgDetails(name=ccg_name, ods_code=ccg_ods_code, practices=[requesting_ods_code])]
+
+    organisation_metadata = OrganisationMetadata(
+        generated_on=datetime(year=2020, month=1, day=15, hour=23, second=42, tzinfo=UTC),
+        practices=practice_list,
+        ccgs=ccg_list,
+    )
+
     expected = PracticeMetricsPresentation(
         generated_on=datetime(year=2020, month=1, day=15, hour=23, second=42, tzinfo=UTC),
         practices=[
@@ -189,9 +199,10 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
                 ],
             )
         ],
+        ccgs=ccg_list,
     )
 
-    actual = calculate_practice_metrics_data(transfers, practice_list, reporting_window)
+    actual = calculate_practice_metrics_data(transfers, organisation_metadata, reporting_window)
 
     assert actual == expected
 

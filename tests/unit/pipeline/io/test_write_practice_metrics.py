@@ -8,6 +8,7 @@ from prmdata.domain.data_platform.practice_metrics import (
     RequesterMetrics,
     IntegratedPracticeMetrics,
 )
+from prmdata.domain.ods_portal.models import CcgDetails
 from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from tests.builders.common import a_datetime, a_string
@@ -39,6 +40,7 @@ _PRACTICE_METRICS_OBJECT = PracticeMetricsPresentation(
             ],
         )
     ],
+    ccgs=[CcgDetails(name="A test CCG", ods_code="12A", practices=["A12345"])],
 )
 
 _PRACTICE_METRICS_DICT = {
@@ -63,6 +65,7 @@ _PRACTICE_METRICS_DICT = {
             ],
         },
     ],
+    "ccgs": [{"name": "A test CCG", "odsCode": "12A", "practices": ["A12345"]}],
 }
 
 

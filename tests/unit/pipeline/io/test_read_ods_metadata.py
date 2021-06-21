@@ -11,13 +11,13 @@ _OVERFLOW_YEAR = 2021
 
 _ORGANISATION_METADATA_OBJECT = OrganisationMetadata(
     generated_on=datetime(_OVERFLOW_YEAR, _OVERFLOW_MONTH, 1),
-    practices=[PracticeDetails("ABC", "A Practice", ["123"])],
-    ccgs=[CcgDetails("XYZ", "A CCG")],
+    practices=[PracticeDetails(ods_code="ABC", name="A Practice", asids=["123"])],
+    ccgs=[CcgDetails(ods_code="XYZ", name="A CCG", practices=["ABC"])],
 )
 _ORGANISATION_METADATA_DICT = {
     "generated_on": "2021-01-01T00:00:00",
     "practices": [{"ods_code": "ABC", "name": "A Practice", "asids": ["123"]}],
-    "ccgs": [{"ods_code": "XYZ", "name": "A CCG"}],
+    "ccgs": [{"ods_code": "XYZ", "name": "A CCG", "practices": ["ABC"]}],
 }
 
 
