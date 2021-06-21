@@ -19,7 +19,7 @@ from prmdata.domain.gp2gp.transfer import (
 )
 from prmdata.domain.gp2gp.practice_metrics import calculate_sla_by_practice
 from prmdata.domain.spine.message import Message
-from prmdata.domain.spine.parsed_conversation import (
+from prmdata.domain.spine.gp2gp_conversation import (
     parse_conversation,
     ConversationMissingStart,
     filter_conversations_by_request_started_time,
@@ -40,9 +40,9 @@ def parse_transfers_from_messages(
     spine_messages: Iterable[Message], reporting_window: MonthlyReportingWindow
 ) -> Iterator[Transfer]:
     conversations = group_into_conversations(spine_messages)
-    parsed_conversations = _parse_conversations(conversations)
+    gp2gp_conversations = _parse_conversations(conversations)
     conversations_started_in_range = filter_conversations_by_request_started_time(
-        parsed_conversations, reporting_window
+        gp2gp_conversations, reporting_window
     )
     transfers = derive_transfers(conversations_started_in_range)
     return transfers

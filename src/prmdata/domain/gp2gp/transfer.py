@@ -7,7 +7,7 @@ import pyarrow as pa
 import pyarrow as Table
 
 from prmdata.domain.spine.message import Message, ERROR_SUPPRESSED, DUPLICATE_ERROR
-from prmdata.domain.spine.parsed_conversation import ParsedConversation
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 
 
 class TransferStatus(Enum):
@@ -32,7 +32,7 @@ class Transfer(NamedTuple):
     date_completed: Optional[datetime]
 
 
-def _calculate_sla(conversation: ParsedConversation) -> Optional[timedelta]:
+def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
     final_acknowledgement_time = conversation.effective_final_acknowledgement_time()
     request_completed_time = conversation.effective_request_completed_time()
 
@@ -47,7 +47,7 @@ def _calculate_sla(conversation: ParsedConversation) -> Optional[timedelta]:
     return max(timedelta(0), sla_duration)
 
 
-def _assign_status(conversation: ParsedConversation) -> TransferStatus:
+def _assign_status(conversation: Gp2gpConversation) -> TransferStatus:
     if _is_integrated(conversation):
         return TransferStatus.INTEGRATED
     elif _has_final_ack_error(conversation):
@@ -58,7 +58,7 @@ def _assign_status(conversation: ParsedConversation) -> TransferStatus:
         return TransferStatus.PENDING
 
 
-def _is_integrated(conversation: ParsedConversation) -> bool:
+def _is_integrated(conversation: Gp2gpConversation) -> bool:
     final_ack_messages = conversation.request_completed_ack_messages
     return len(final_ack_messages) > 0 and any(
         _is_successful_ack(final_ack_message) for final_ack_message in final_ack_messages
@@ -69,7 +69,7 @@ def _is_successful_ack(message: Message) -> bool:
     return message.error_code is None or message.error_code == ERROR_SUPPRESSED
 
 
-def _has_final_ack_error(conversation: ParsedConversation) -> bool:
+def _has_final_ack_error(conversation: Gp2gpConversation) -> bool:
     final_ack_messages = conversation.request_completed_ack_messages
     return len(final_ack_messages) > 0 and any(
         not _is_successful_ack(final_ack_message)
@@ -78,7 +78,7 @@ def _has_final_ack_error(conversation: ParsedConversation) -> bool:
     )
 
 
-def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -> bool:
+def _has_intermediate_error_and_no_final_ack(conversation: Gp2gpConversation) -> bool:
     intermediate_errors = conversation.intermediate_error_codes()
     sender_error = conversation.sender_error()
     has_intermediate_error = len(intermediate_errors) > 0 or sender_error is not None
@@ -86,7 +86,7 @@ def _has_intermediate_error_and_no_final_ack(conversation: ParsedConversation) -
     return lacking_final_ack and has_intermediate_error
 
 
-def _derive_transfer(conversation: ParsedConversation) -> Transfer:
+def _derive_transfer(conversation: Gp2gpConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.id,
         sla_duration=_calculate_sla(conversation),
@@ -103,7 +103,7 @@ def _derive_transfer(conversation: ParsedConversation) -> Transfer:
     )
 
 
-def derive_transfers(conversations: Iterable[ParsedConversation]) -> Iterator[Transfer]:
+def derive_transfers(conversations: Iterable[Gp2gpConversation]) -> Iterator[Transfer]:
     return (_derive_transfer(conversation) for conversation in conversations)
 
 

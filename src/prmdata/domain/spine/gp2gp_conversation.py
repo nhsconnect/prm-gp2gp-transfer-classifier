@@ -7,7 +7,7 @@ from prmdata.domain.spine.message import Message
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 
-class ParsedConversation(NamedTuple):
+class Gp2gpConversation(NamedTuple):
     id: str
     request_started: Message
     request_started_ack: Optional[Message]
@@ -99,7 +99,7 @@ class ParsedConversation(NamedTuple):
         return final_ack.time
 
 
-def parse_conversation(conversation: Conversation) -> ParsedConversation:
+def parse_conversation(conversation: Conversation) -> Gp2gpConversation:
     parser = SpineConversationParser(conversation)
     return parser.parse()
 
@@ -161,7 +161,7 @@ class SpineConversationParser:
         while (next_message := self._get_next_or_none()) is not None:
             self._process_message(next_message)
 
-        return ParsedConversation(
+        return Gp2gpConversation(
             self._id,
             request_started=self._req_started,
             request_started_ack=self._request_started_ack,
@@ -172,8 +172,8 @@ class SpineConversationParser:
 
 
 def filter_conversations_by_request_started_time(
-    conversations: Iterable[ParsedConversation], reporting_window: MonthlyReportingWindow
-) -> Iterator[ParsedConversation]:
+    conversations: Iterable[Gp2gpConversation], reporting_window: MonthlyReportingWindow
+) -> Iterator[Gp2gpConversation]:
     return (
         conversation
         for conversation in conversations

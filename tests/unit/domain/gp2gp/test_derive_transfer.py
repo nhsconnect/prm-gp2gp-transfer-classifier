@@ -4,7 +4,7 @@ from typing import List, Iterable
 import pytest
 
 from prmdata.domain.spine.message import ERROR_SUPPRESSED, DUPLICATE_ERROR
-from tests.builders.spine import build_parsed_conversation, build_message
+from tests.builders.spine import build_gp2gp_conversation, build_message
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
@@ -17,7 +17,7 @@ def _assert_attributes(attr_name: str, actual: Iterable[Transfer], expected: Lis
 
 
 def test_extracts_conversation_id():
-    conversations = [build_parsed_conversation(id="1234")]
+    conversations = [build_gp2gp_conversation(id="1234")]
 
     actual = derive_transfers(conversations)
 
@@ -28,7 +28,7 @@ def test_extracts_conversation_id():
 
 def test_produces_sla_of_successful_conversation():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(
@@ -58,7 +58,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(
@@ -109,7 +109,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(
@@ -157,7 +157,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_
 
 def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(
@@ -190,7 +190,7 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_othe
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(
@@ -241,7 +241,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_no_error_a
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(
@@ -292,7 +292,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_suppressed
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(
@@ -340,7 +340,7 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_suppressed
 
 def test_produces_no_sla_given_pending_ehr_completed():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[],
             request_completed_ack_messages=[],
@@ -356,7 +356,7 @@ def test_produces_no_sla_given_pending_ehr_completed():
 
 def test_produces_no_sla_given_pending_request_completed_ack():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
             request_completed_ack_messages=[],
@@ -372,9 +372,9 @@ def test_produces_no_sla_given_pending_request_completed_ack():
 
 def test_extracts_conversation_ids_for_conversations():
     conversations = [
-        build_parsed_conversation(id="1234"),
-        build_parsed_conversation(id="3456"),
-        build_parsed_conversation(id="5678"),
+        build_gp2gp_conversation(id="1234"),
+        build_gp2gp_conversation(id="3456"),
+        build_gp2gp_conversation(id="5678"),
     ]
 
     actual = derive_transfers(conversations)
@@ -386,9 +386,7 @@ def test_extracts_conversation_ids_for_conversations():
 
 def test_has_pending_status_if_no_final_ack():
     conversations = [
-        build_parsed_conversation(
-            request_started=build_message(), request_completed_ack_messages=[]
-        )
+        build_gp2gp_conversation(request_started=build_message(), request_completed_ack_messages=[])
     ]
 
     actual = derive_transfers(conversations)
@@ -400,7 +398,7 @@ def test_has_pending_status_if_no_final_ack():
 
 def test_has_pending_status_if_no_request_completed_message():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[],
             request_completed_ack_messages=[],
@@ -416,7 +414,7 @@ def test_has_pending_status_if_no_request_completed_message():
 
 def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             intermediate_messages=[build_message(error_code=None)],
             request_completed_ack_messages=[],
@@ -432,7 +430,7 @@ def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
 
 def test_has_integrated_status_if_no_error_in_final_ack():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message(guid="abc")],
             request_completed_ack_messages=[build_message(error_code=None, message_ref="abc")],
@@ -448,7 +446,7 @@ def test_has_integrated_status_if_no_error_in_final_ack():
 
 def test_has_integrated_status_if_error_is_suppressed():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message(guid="abc")],
             request_completed_ack_messages=[
@@ -466,7 +464,7 @@ def test_has_integrated_status_if_error_is_suppressed():
 
 def test_has_failed_status_if_error_in_final_ack():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message(guid="abc")],
             request_completed_ack_messages=[build_message(error_code=30, message_ref="abc")],
@@ -482,7 +480,7 @@ def test_has_failed_status_if_error_in_final_ack():
 
 def test_has_pending_with_error_status_if_error_in_intermediate_message():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[build_message()],
             intermediate_messages=[build_message(error_code=30)],
@@ -499,7 +497,7 @@ def test_has_pending_with_error_status_if_error_in_intermediate_message():
 
 def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_started_ack=build_message(error_code=10),
             request_completed_messages=[build_message()],
@@ -517,7 +515,7 @@ def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
 
 def test_negative_sla_duration_clamped_to_zero():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(time=datetime(year=2021, month=1, day=5), guid="abc")
@@ -537,7 +535,7 @@ def test_negative_sla_duration_clamped_to_zero():
 
 def test_warns_about_conversation_with_negative_sla():
     conversations = [
-        build_parsed_conversation(
+        build_gp2gp_conversation(
             request_started=build_message(),
             request_completed_messages=[
                 build_message(time=datetime(year=2021, month=1, day=5), guid="abc")

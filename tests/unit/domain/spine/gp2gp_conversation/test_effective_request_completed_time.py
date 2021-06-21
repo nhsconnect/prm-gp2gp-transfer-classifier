@@ -1,10 +1,10 @@
 from tests.builders.common import a_datetime
-from tests.builders.spine import build_parsed_conversation, build_message
+from tests.builders.spine import build_gp2gp_conversation, build_message
 from prmdata.domain.spine.message import ERROR_SUPPRESSED
 
 
 def test_returns_none_when_request_has_been_made():
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=None,
         request_completed_messages=[],
@@ -19,7 +19,7 @@ def test_returns_none_when_request_has_been_made():
 
 
 def test_returns_none_when_request_has_been_acknowledged():
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[],
@@ -34,7 +34,7 @@ def test_returns_none_when_request_has_been_acknowledged():
 
 
 def test_returns_none_when_ehr_has_been_returned():
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[build_message()],
@@ -49,7 +49,7 @@ def test_returns_none_when_ehr_has_been_returned():
 
 
 def test_returns_none_given_duplicate_and_pending():
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[
@@ -72,7 +72,7 @@ def test_returns_correct_time_when_conversation_has_concluded_successfully():
 
     effective_request_completed_time = a_datetime()
 
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[
@@ -91,7 +91,7 @@ def test_returns_correct_time_when_conversation_has_concluded_successfully():
 def test_returns_correct_time_when_record_is_suppressed():
     effective_request_completed_time = a_datetime()
 
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[
@@ -112,7 +112,7 @@ def test_returns_correct_time_when_record_is_suppressed():
 def test_returns_correct_time_when_conversation_concluded_with_failure():
     effective_request_completed_time = a_datetime()
 
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[
@@ -131,7 +131,7 @@ def test_returns_correct_time_when_conversation_concluded_with_failure():
 def test_returns_correct_time_given_duplicate_and_success():
     effective_request_completed_time = a_datetime()
 
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[
@@ -154,7 +154,7 @@ def test_returns_correct_time_given_duplicate_and_success():
 def test_returns_correct_time_given_duplicate_and_failure():
     effective_request_completed_time = a_datetime()
 
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[
@@ -177,7 +177,7 @@ def test_returns_correct_time_given_duplicate_and_failure():
 def test_returns_correct_time_given_success_and_failure():
     effective_request_completed_time = a_datetime()
 
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[
@@ -203,7 +203,7 @@ def test_returns_correct_time_given_success_and_failure():
 def test_returns_correct_time_given_failure_and_success():
     effective_request_completed_time = a_datetime()
 
-    conversation = build_parsed_conversation(
+    conversation = build_gp2gp_conversation(
         request_started=build_message(),
         request_started_ack=build_message(),
         request_completed_messages=[

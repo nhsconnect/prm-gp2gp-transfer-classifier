@@ -1,10 +1,10 @@
-from prmdata.domain.spine.parsed_conversation import ParsedConversation
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from prmdata.domain.spine.message import Message
 from tests.builders.common import a_string, a_datetime
 
 
-def build_parsed_conversation(**kwargs) -> ParsedConversation:
-    return ParsedConversation(
+def build_gp2gp_conversation(**kwargs) -> Gp2gpConversation:
+    return Gp2gpConversation(
         id=kwargs.get("id", a_string(36)),
         request_started=kwargs.get("request_started", build_message()),
         request_started_ack=kwargs.get("request_started_ack", build_message()),

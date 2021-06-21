@@ -6,8 +6,8 @@ from prmdata.domain.spine.message import (
     EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
 )
-from prmdata.domain.spine.parsed_conversation import (
-    ParsedConversation,
+from prmdata.domain.spine.gp2gp_conversation import (
+    Gp2gpConversation,
     parse_conversation,
     ConversationMissingStart,
 )
@@ -34,7 +34,7 @@ def test_parses_a_complete_conversation():
 
     conversation = Conversation("abc-0", messages)
 
-    expected = ParsedConversation(
+    expected = Gp2gpConversation(
         id="abc-0",
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
@@ -70,7 +70,7 @@ def test_parses_incomplete_conversation():
 
     conversation = Conversation("abc-0", messages)
 
-    expected = ParsedConversation(
+    expected = Gp2gpConversation(
         id="abc-0",
         request_started=request_started_message,
         request_completed_messages=[request_completed_message],
@@ -105,7 +105,7 @@ def test_parses_conversation_with_large_messages():
 
     conversation = Conversation("abc-0", messages)
 
-    expected = ParsedConversation(
+    expected = Gp2gpConversation(
         id="abc-0",
         request_started=request_started_message,
         request_completed_messages=[request_completed_message],
@@ -133,7 +133,7 @@ def test_parses_conversation_without_request_completed():
 
     conversation = Conversation(guid, messages)
 
-    expected = ParsedConversation(
+    expected = Gp2gpConversation(
         id=guid,
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
@@ -175,7 +175,7 @@ def test_saves_all_request_completed_messages_and_all_final_acks():
 
     conversation = Conversation("cde", messages)
 
-    expected = ParsedConversation(
+    expected = Gp2gpConversation(
         id="cde",
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
