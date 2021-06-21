@@ -41,42 +41,47 @@ class PracticeMetricsPresentation:
     practices: List[PracticeSummary]
 
 
-def construct_practice_metrics(
+def construct_practice_summaries(
     sla_metrics: Iterable[PracticeMetrics], year: int, month: int
-) -> PracticeMetricsPresentation:
-    return PracticeMetricsPresentation(
-        generated_on=datetime.now(tzutc()),
-        practices=[
-            PracticeSummary(
-                ods_code=practice.ods_code,
-                name=practice.name,
-                metrics=[
-                    MonthlyMetrics(
-                        year=year,
-                        month=month,
-                        requester=RequesterMetrics(
-                            integrated=IntegratedPracticeMetrics(
-                                transfer_count=practice.integrated.transfer_count,
-                                within_3_days_percentage=calculate_percentage(
-                                    portion=practice.integrated.within_3_days,
-                                    total=practice.integrated.transfer_count,
-                                    num_digits=1,
-                                ),
-                                within_8_days_percentage=calculate_percentage(
-                                    portion=practice.integrated.within_8_days,
-                                    total=practice.integrated.transfer_count,
-                                    num_digits=1,
-                                ),
-                                beyond_8_days_percentage=calculate_percentage(
-                                    portion=practice.integrated.beyond_8_days,
-                                    total=practice.integrated.transfer_count,
-                                    num_digits=1,
-                                ),
+) -> List[PracticeSummary]:
+    return [
+        PracticeSummary(
+            ods_code=practice.ods_code,
+            name=practice.name,
+            metrics=[
+                MonthlyMetrics(
+                    year=year,
+                    month=month,
+                    requester=RequesterMetrics(
+                        integrated=IntegratedPracticeMetrics(
+                            transfer_count=practice.integrated.transfer_count,
+                            within_3_days_percentage=calculate_percentage(
+                                portion=practice.integrated.within_3_days,
+                                total=practice.integrated.transfer_count,
+                                num_digits=1,
+                            ),
+                            within_8_days_percentage=calculate_percentage(
+                                portion=practice.integrated.within_8_days,
+                                total=practice.integrated.transfer_count,
+                                num_digits=1,
+                            ),
+                            beyond_8_days_percentage=calculate_percentage(
+                                portion=practice.integrated.beyond_8_days,
+                                total=practice.integrated.transfer_count,
+                                num_digits=1,
                             ),
                         ),
-                    )
-                ],
-            )
-            for practice in sla_metrics
-        ],
+                    ),
+                )
+            ],
+        )
+        for practice in sla_metrics
+    ]
+
+
+def construct_practice_metrics_presentation(
+    practice_summaries: List[PracticeSummary],
+) -> PracticeMetricsPresentation:
+    return PracticeMetricsPresentation(
+        generated_on=datetime.now(tzutc()), practices=practice_summaries
     )

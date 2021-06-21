@@ -5,8 +5,9 @@ from prmdata.domain.data_platform.national_metrics import (
     construct_national_metrics,
 )
 from prmdata.domain.data_platform.practice_metrics import (
-    construct_practice_metrics,
+    construct_practice_summaries,
     PracticeMetricsPresentation,
+    construct_practice_metrics_presentation,
 )
 from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
 from prmdata.domain.ods_portal.models import PracticeDetails
@@ -55,10 +56,11 @@ def calculate_practice_metrics_data(
     completed_transfers = filter_for_successful_transfers(transfers)
     practice_lookup = PracticeLookup(practice_list)
     sla_metrics = calculate_sla_by_practice(practice_lookup, completed_transfers)
-    practice_metrics = construct_practice_metrics(
+    practice_summaries = construct_practice_summaries(
         sla_metrics, year=reporting_window.metric_year, month=reporting_window.metric_month
     )
-    return practice_metrics
+    practice_metrics_presentation = construct_practice_metrics_presentation(practice_summaries)
+    return practice_metrics_presentation
 
 
 def calculate_national_metrics_data(
