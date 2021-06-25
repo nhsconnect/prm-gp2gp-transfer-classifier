@@ -20,9 +20,9 @@ from prmdata.domain.gp2gp.transfer import (
 from prmdata.domain.gp2gp.practice_metrics import calculate_sla_by_practice
 from prmdata.domain.spine.message import Message
 from prmdata.domain.spine.gp2gp_conversation import (
-    parse_conversation,
     ConversationMissingStart,
     filter_conversations_by_request_started_time,
+    Gp2gpConversation,
 )
 from prmdata.domain.spine.conversation import group_into_conversations
 from prmdata.utils.reporting_window import MonthlyReportingWindow
@@ -31,7 +31,7 @@ from prmdata.utils.reporting_window import MonthlyReportingWindow
 def _parse_conversations(conversations):
     for conversation in conversations:
         try:
-            yield parse_conversation(conversation)
+            yield Gp2gpConversation.from_messages(conversation.messages)
         except ConversationMissingStart:
             pass
 

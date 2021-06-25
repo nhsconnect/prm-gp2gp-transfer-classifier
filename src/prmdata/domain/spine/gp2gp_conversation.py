@@ -2,7 +2,6 @@ from typing import NamedTuple, List, Optional, Iterable, Iterator
 from datetime import datetime
 
 from prmdata.domain.gp2gp.transfer import DUPLICATE_ERROR, ERROR_SUPPRESSED
-from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.message import Message
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
@@ -102,11 +101,6 @@ class Gp2gpConversation(NamedTuple):
     def from_messages(cls, messages):
         parser = SpineConversationParser(messages)
         return parser.parse()
-
-
-def parse_conversation(conversation: Conversation) -> Gp2gpConversation:
-    parser = SpineConversationParser(conversation.messages)
-    return parser.parse()
 
 
 class ConversationMissingStart(Exception):

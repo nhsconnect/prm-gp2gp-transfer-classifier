@@ -1,19 +1,18 @@
 import pytest
 
+from prmdata.domain.spine.gp2gp_conversation import (
+    Gp2gpConversation,
+    ConversationMissingStart,
+    SpineConversationParser,
+)
 from prmdata.domain.spine.message import (
     COMMON_POINT_TO_POINT,
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
 )
-from prmdata.domain.spine.gp2gp_conversation import (
-    Gp2gpConversation,
-    parse_conversation,
-    ConversationMissingStart,
-)
-from prmdata.domain.spine.conversation import Conversation
-from tests.builders.spine import build_message
 from tests.builders.common import a_string
+from tests.builders.spine import build_message
 
 
 def test_parses_a_complete_conversation():
@@ -34,8 +33,6 @@ def test_parses_a_complete_conversation():
         request_completed_ack_message,
     ]
 
-    conversation = Conversation("abc", messages)
-
     expected = Gp2gpConversation(
         id="abc",
         request_started=request_started_message,
@@ -44,7 +41,7 @@ def test_parses_a_complete_conversation():
         intermediate_messages=[],
         request_completed_ack_messages=[request_completed_ack_message],
     )
-    actual = parse_conversation(conversation)
+    actual = SpineConversationParser(messages).parse()
 
     assert actual == expected
 
@@ -53,10 +50,8 @@ def test_throws_conversation_missing_start_exception_when_conversation_start_omi
     request_completed_ack_message = build_message(interaction_id=APPLICATION_ACK)
     messages = [request_completed_ack_message]
 
-    conversation = Conversation("a-conversation-id", messages)
-
     with pytest.raises(ConversationMissingStart):
-        parse_conversation(conversation)
+        SpineConversationParser(messages).parse()
 
 
 def test_parses_incomplete_conversation():
@@ -72,8 +67,6 @@ def test_parses_incomplete_conversation():
         request_started_ack_message,
     ]
 
-    conversation = Conversation("abc", messages)
-
     expected = Gp2gpConversation(
         id="abc",
         request_started=request_started_message,
@@ -82,7 +75,7 @@ def test_parses_incomplete_conversation():
         intermediate_messages=[],
         request_completed_ack_messages=[],
     )
-    actual = parse_conversation(conversation)
+    actual = SpineConversationParser(messages).parse()
 
     assert actual == expected
 
@@ -109,8 +102,6 @@ def test_parses_conversation_with_large_messages():
         request_completed_ack_message,
     ]
 
-    conversation = Conversation("abc", messages)
-
     expected = Gp2gpConversation(
         id="abc",
         request_started=request_started_message,
@@ -122,7 +113,7 @@ def test_parses_conversation_with_large_messages():
         ],
         request_completed_ack_messages=[request_completed_ack_message],
     )
-    actual = parse_conversation(conversation)
+    actual = SpineConversationParser(messages).parse()
 
     assert actual == expected
 
@@ -139,8 +130,6 @@ def test_parses_conversation_without_request_completed():
         request_started_ack_message,
     ]
 
-    conversation = Conversation(guid, messages)
-
     expected = Gp2gpConversation(
         id=guid,
         request_started=request_started_message,
@@ -149,7 +138,7 @@ def test_parses_conversation_without_request_completed():
         intermediate_messages=[],
         request_completed_ack_messages=[],
     )
-    actual = parse_conversation(conversation)
+    actual = SpineConversationParser(messages).parse()
 
     assert actual == expected
 
@@ -183,8 +172,6 @@ def test_saves_all_request_completed_messages_and_all_final_acks():
         request_completed_ack_message_3,
     ]
 
-    conversation = Conversation("cde", messages)
-
     expected = Gp2gpConversation(
         id="cde",
         request_started=request_started_message,
@@ -201,6 +188,6 @@ def test_saves_all_request_completed_messages_and_all_final_acks():
             request_completed_ack_message_3,
         ],
     )
-    actual = parse_conversation(conversation)
+    actual = SpineConversationParser(messages).parse()
 
     assert actual == expected
