@@ -100,13 +100,12 @@ class Gp2gpConversation(NamedTuple):
 
     @classmethod
     def from_messages(cls, messages):
-        conversation_id = messages[0].conversation_id
-        parser = SpineConversationParser(Conversation(conversation_id, messages))
+        parser = SpineConversationParser(messages)
         return parser.parse()
 
 
 def parse_conversation(conversation: Conversation) -> Gp2gpConversation:
-    parser = SpineConversationParser(conversation)
+    parser = SpineConversationParser(conversation.messages)
     return parser.parse()
 
 
@@ -115,9 +114,8 @@ class ConversationMissingStart(Exception):
 
 
 class SpineConversationParser:
-    def __init__(self, conversation: Conversation):
-        self._id = conversation.id
-        self._messages = iter(conversation.messages)
+    def __init__(self, messages: Iterable[Message]):
+        self._messages = iter(messages)
         self._req_started: Optional[Message] = None
         self._req_completed_messages: List[Message] = []
         self._request_started_ack: Optional[Message] = None
@@ -153,22 +151,23 @@ class SpineConversationParser:
             for req_completed_message in self._req_completed_messages
         )
 
-    def _process_first_message(self):
+    def _process_first_message(self) -> str:
         first_message = self._get_next_or_none()
         if first_message.is_ehr_request_started():
             self._req_started = first_message
+            return first_message.conversation_id
         else:
             raise ConversationMissingStart()
 
     def parse(self):
 
-        self._process_first_message()
+        conversation_id = self._process_first_message()
 
         while (next_message := self._get_next_or_none()) is not None:
             self._process_message(next_message)
 
         return Gp2gpConversation(
-            self._id,
+            id=conversation_id,
             request_started=self._req_started,
             request_started_ack=self._request_started_ack,
             request_completed_messages=self._req_completed_messages,

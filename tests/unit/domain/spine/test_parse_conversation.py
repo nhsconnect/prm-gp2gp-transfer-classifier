@@ -17,7 +17,9 @@ from tests.builders.common import a_string
 
 
 def test_parses_a_complete_conversation():
-    request_started_message = build_message(guid="abc", interaction_id=EHR_REQUEST_STARTED)
+    request_started_message = build_message(
+        conversation_id="abc", guid="abc", interaction_id=EHR_REQUEST_STARTED
+    )
     request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc")
     request_completed_ack_message = build_message(
@@ -32,10 +34,10 @@ def test_parses_a_complete_conversation():
         request_completed_ack_message,
     ]
 
-    conversation = Conversation("abc-0", messages)
+    conversation = Conversation("abc", messages)
 
     expected = Gp2gpConversation(
-        id="abc-0",
+        id="abc",
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
         request_completed_messages=[request_completed_message],
@@ -58,7 +60,9 @@ def test_throws_conversation_missing_start_exception_when_conversation_start_omi
 
 
 def test_parses_incomplete_conversation():
-    request_started_message = build_message(guid="abc", interaction_id=EHR_REQUEST_STARTED)
+    request_started_message = build_message(
+        conversation_id="abc", guid="abc", interaction_id=EHR_REQUEST_STARTED
+    )
     request_completed_message = build_message(interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc")
 
@@ -68,10 +72,10 @@ def test_parses_incomplete_conversation():
         request_started_ack_message,
     ]
 
-    conversation = Conversation("abc-0", messages)
+    conversation = Conversation("abc", messages)
 
     expected = Gp2gpConversation(
-        id="abc-0",
+        id="abc",
         request_started=request_started_message,
         request_completed_messages=[request_completed_message],
         request_started_ack=request_started_ack_message,
@@ -84,7 +88,9 @@ def test_parses_incomplete_conversation():
 
 
 def test_parses_conversation_with_large_messages():
-    request_started_message = build_message(guid="abc", interaction_id=EHR_REQUEST_STARTED)
+    request_started_message = build_message(
+        conversation_id="abc", guid="abc", interaction_id=EHR_REQUEST_STARTED
+    )
     request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc")
     common_p2p_message = build_message(guid="abc-2", interaction_id=COMMON_POINT_TO_POINT)
@@ -103,10 +109,10 @@ def test_parses_conversation_with_large_messages():
         request_completed_ack_message,
     ]
 
-    conversation = Conversation("abc-0", messages)
+    conversation = Conversation("abc", messages)
 
     expected = Gp2gpConversation(
-        id="abc-0",
+        id="abc",
         request_started=request_started_message,
         request_completed_messages=[request_completed_message],
         request_started_ack=request_started_ack_message,
@@ -123,7 +129,9 @@ def test_parses_conversation_with_large_messages():
 
 def test_parses_conversation_without_request_completed():
     guid = a_string()
-    request_started_message = build_message(guid=guid, interaction_id=EHR_REQUEST_STARTED)
+    request_started_message = build_message(
+        conversation_id=guid, guid=guid, interaction_id=EHR_REQUEST_STARTED
+    )
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref=guid)
 
     messages = [
@@ -147,7 +155,9 @@ def test_parses_conversation_without_request_completed():
 
 
 def test_saves_all_request_completed_messages_and_all_final_acks():
-    request_started_message = build_message(guid="cde", interaction_id=EHR_REQUEST_STARTED)
+    request_started_message = build_message(
+        conversation_id="cde", guid="cde", interaction_id=EHR_REQUEST_STARTED
+    )
     request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="cde")
     request_completed_message_1 = build_message(guid="cde-1", interaction_id=EHR_REQUEST_COMPLETED)
     request_completed_message_2 = build_message(guid="cde-2", interaction_id=EHR_REQUEST_COMPLETED)
