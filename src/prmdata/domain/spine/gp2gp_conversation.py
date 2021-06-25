@@ -98,6 +98,12 @@ class Gp2gpConversation(NamedTuple):
             return None
         return final_ack.time
 
+    @classmethod
+    def from_messages(cls, messages):
+        conversation_id = messages[0].conversation_id
+        parser = SpineConversationParser(Conversation(conversation_id, messages))
+        return parser.parse()
+
 
 def parse_conversation(conversation: Conversation) -> Gp2gpConversation:
     parser = SpineConversationParser(conversation)
