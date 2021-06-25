@@ -140,22 +140,12 @@ def test_returns_correct_time_given_duplicate_and_failure():
 def test_returns_correct_time_given_success_and_failure():
     effective_final_acknowledgement_time = a_datetime()
 
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(
-                guid="bcd",
-            ),
-            build_message(guid="abc"),
-        ],
-        request_completed_ack_messages=[
-            build_message(
-                message_ref="bcd", error_code=None, time=effective_final_acknowledgement_time
-            ),
-            build_message(message_ref="abc", error_code=99),
-        ],
+    gp2gp_messages: List[Message] = test_cases.ehr_integrated_successfully_with_failure(
+        ehr_acknowledge_time=effective_final_acknowledgement_time,
+        duplicate_req_completed_ack_message_error_code=99,
     )
+
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     expected = effective_final_acknowledgement_time
 
