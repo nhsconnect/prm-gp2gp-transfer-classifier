@@ -1,15 +1,17 @@
+from typing import List
+
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from prmdata.domain.spine.message import Message
+from tests.builders import test_cases
 from tests.builders.common import a_datetime
-from tests.builders.spine import build_gp2gp_conversation, build_message
 
 
 def test_extracts_date_requested_from_request_started_message():
     date_requested = a_datetime()
 
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(time=date_requested),
-        request_completed_messages=[build_message()],
-        request_completed_ack_messages=[build_message()],
-    )
+    gp2gp_messages: List[Message] = test_cases.gp2gp_request_made(request_sent_date=date_requested)
+
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     actual = conversation.date_requested()
 

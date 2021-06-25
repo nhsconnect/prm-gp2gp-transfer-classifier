@@ -5,7 +5,7 @@ from tests.builders.common import a_datetime, a_string
 def gp2gp_request_made(**kwargs):
     return [
         Message(
-            time=a_datetime(),
+            time=kwargs.get("request_sent_date", a_datetime()),
             conversation_id=a_string(),
             guid=a_string(),
             interaction_id=EHR_REQUEST_STARTED,
