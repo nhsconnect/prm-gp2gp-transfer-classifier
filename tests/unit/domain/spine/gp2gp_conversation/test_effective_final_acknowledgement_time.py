@@ -44,9 +44,7 @@ def test_returns_none_when_ehr_has_been_returned():
 
 
 def test_returns_none_given_duplicate_and_pending():
-    gp2gp_messages: List[
-        Message
-    ] = test_cases.acknowledged_duplicate_ehr_and_waiting_for_integration()
+    gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
 
     expected = None
 

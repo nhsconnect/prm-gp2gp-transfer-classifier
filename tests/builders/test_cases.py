@@ -102,7 +102,7 @@ def core_ehr_sent():
     return [gp2gp_request, gp2gp_request_acknowledgement, core_ehr]
 
 
-def acknowledged_duplicate_ehr_and_waiting_for_integration():
+def acknowledged_duplicate_and_waiting_for_integration():
     conversation_id = a_string()
     requesting_asid = a_string()
     sending_asid = a_string()
