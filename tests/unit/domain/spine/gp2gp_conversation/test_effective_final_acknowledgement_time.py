@@ -32,12 +32,9 @@ def test_returns_none_when_request_has_been_acknowledged():
 
 
 def test_returns_none_when_ehr_has_been_returned():
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[build_message()],
-        request_completed_ack_messages=[],
-    )
+    gp2gp_messages: List[Message] = test_cases.gp2gp_core_ehr_sent()
+
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     expected = None
 
