@@ -8,7 +8,7 @@ from tests.builders.spine import build_gp2gp_conversation, build_message
 
 
 def test_returns_none_when_request_has_been_made():
-    gp2gp_messages: List[Message] = test_cases.gp2gp_request_made()
+    gp2gp_messages: List[Message] = test_cases.request_made()
 
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
@@ -20,7 +20,7 @@ def test_returns_none_when_request_has_been_made():
 
 
 def test_returns_none_when_request_has_been_acknowledged():
-    gp2gp_messages: List[Message] = test_cases.gp2gp_request_acknowledged_successfully()
+    gp2gp_messages: List[Message] = test_cases.request_acknowledged_successfully()
 
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
@@ -32,7 +32,7 @@ def test_returns_none_when_request_has_been_acknowledged():
 
 
 def test_returns_none_when_ehr_has_been_returned():
-    gp2gp_messages: List[Message] = test_cases.gp2gp_core_ehr_sent()
+    gp2gp_messages: List[Message] = test_cases.core_ehr_sent()
 
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
@@ -44,19 +44,13 @@ def test_returns_none_when_ehr_has_been_returned():
 
 
 def test_returns_none_given_duplicate_and_pending():
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(guid="abc"),
-            build_message(guid="bcd"),
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="abc", error_code=12),
-        ],
-    )
+    gp2gp_messages: List[
+        Message
+    ] = test_cases.acknowledged_duplicate_ehr_and_waiting_for_integration()
 
     expected = None
+
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     actual = conversation.effective_final_acknowledgement_time()
 
