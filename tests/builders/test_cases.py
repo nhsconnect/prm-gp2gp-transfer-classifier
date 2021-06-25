@@ -9,7 +9,7 @@ def gp2gp_request_made(**kwargs):
             conversation_id=a_string(),
             guid=a_string(),
             interaction_id=EHR_REQUEST_STARTED,
-            from_party_asid=a_string(),
+            from_party_asid=kwargs.get("requesting_asid", a_string()),
             to_party_asid=kwargs.get("sending_asid", a_string()),
             message_ref=None,
             error_code=None,
