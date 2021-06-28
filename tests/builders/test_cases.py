@@ -177,7 +177,7 @@ def suppressed_ehr(**kwargs):
 
 def concluded_with_failure(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
-    ehr_ack_error = (kwargs.get("req_completed_ack_message_error_code", an_integer(a=20, b=30)),)
+    ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     ehr_guid = a_string()
 
@@ -193,7 +193,7 @@ def concluded_with_failure(**kwargs):
     )
 
 
-def ehr_integrated_successfully_with_duplicate(**kwargs):
+def ehr_integrated_successfully_after_duplicate(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
     conversation_id = a_string()
     ehr_guid = a_string()
@@ -213,9 +213,9 @@ def ehr_integrated_successfully_with_duplicate(**kwargs):
     )
 
 
-def concluded_with_failure_and_duplicate(**kwargs):
+def integration_failed_after_duplicate(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
-    ehr_ack_error = (kwargs.get("req_completed_ack_message_error_code", an_integer(a=20, b=30)),)
+    ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     ehr_guid = a_string()
     duplicate_ehr_guid = a_string()
@@ -238,7 +238,7 @@ def concluded_with_failure_and_duplicate(**kwargs):
 
 def first_ehr_integrated_after_second_ehr_failed(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
-    ehr_ack_error = (an_integer(a=20, b=30),)
+    ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()
@@ -257,7 +257,7 @@ def first_ehr_integrated_after_second_ehr_failed(**kwargs):
 
 def first_ehr_integrated_before_second_ehr_failed(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
-    ehr_ack_error = (an_integer(a=20, b=30),)
+    ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()
@@ -276,7 +276,7 @@ def first_ehr_integrated_before_second_ehr_failed(**kwargs):
 
 def second_ehr_integrated_after_first_ehr_failed(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
-    ehr_ack_error = (an_integer(a=20, b=30),)
+    ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()
@@ -295,7 +295,7 @@ def second_ehr_integrated_after_first_ehr_failed(**kwargs):
 
 def second_ehr_integrated_before_first_ehr_failed(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
-    ehr_ack_error = (an_integer(a=20, b=30),)
+    ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()

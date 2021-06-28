@@ -91,7 +91,6 @@ def test_returns_correct_time_when_conversation_concluded_with_failure():
 
     gp2gp_messages: List[Message] = test_cases.concluded_with_failure(
         ehr_acknowledge_time=effective_final_acknowledgement_time,
-        req_completed_ack_message_error_code=99,
     )
 
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
@@ -106,7 +105,7 @@ def test_returns_correct_time_when_conversation_concluded_with_failure():
 def test_returns_correct_time_given_duplicate_and_success():
     effective_final_acknowledgement_time = a_datetime()
 
-    gp2gp_messages: List[Message] = test_cases.ehr_integrated_successfully_with_duplicate(
+    gp2gp_messages: List[Message] = test_cases.ehr_integrated_successfully_after_duplicate(
         ehr_acknowledge_time=effective_final_acknowledgement_time
     )
 
@@ -122,9 +121,8 @@ def test_returns_correct_time_given_duplicate_and_success():
 def test_returns_correct_time_given_duplicate_and_failure():
     effective_final_acknowledgement_time = a_datetime()
 
-    gp2gp_messages: List[Message] = test_cases.ehr_integrated_successfully_with_duplicate(
+    gp2gp_messages: List[Message] = test_cases.integration_failed_after_duplicate(
         ehr_acknowledge_time=effective_final_acknowledgement_time,
-        req_completed_ack_message_error_code=99,
     )
 
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
