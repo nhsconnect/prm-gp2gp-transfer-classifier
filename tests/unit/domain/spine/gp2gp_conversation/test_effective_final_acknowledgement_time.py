@@ -136,7 +136,7 @@ def test_returns_correct_time_given_duplicate_and_failure():
     assert actual == expected
 
 
-def test_returns_correct_time_given_success_and_failure():
+def test_returns_correct_time_given_first_ehr_integrated_before_second_ehr_failed():
     effective_final_acknowledgement_time = a_datetime()
 
     gp2gp_messages: List[Message] = test_cases.first_ehr_integrated_before_second_ehr_failed(
@@ -152,10 +152,42 @@ def test_returns_correct_time_given_success_and_failure():
     assert actual == expected
 
 
-def test_returns_correct_time_given_failure_and_success():
+def test_returns_correct_time_given_first_ehr_integrated_after_second_ehr_failed():
     effective_final_acknowledgement_time = a_datetime()
 
     gp2gp_messages: List[Message] = test_cases.first_ehr_integrated_after_second_ehr_failed(
+        ehr_acknowledge_time=effective_final_acknowledgement_time,
+    )
+
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    expected = effective_final_acknowledgement_time
+
+    actual = conversation.effective_final_acknowledgement_time()
+
+    assert actual == expected
+
+
+def test_returns_correct_time_given_second_ehr_integrated_after_first_ehr_failed():
+    effective_final_acknowledgement_time = a_datetime()
+
+    gp2gp_messages: List[Message] = test_cases.second_ehr_integrated_after_first_ehr_failed(
+        ehr_acknowledge_time=effective_final_acknowledgement_time,
+    )
+
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    expected = effective_final_acknowledgement_time
+
+    actual = conversation.effective_final_acknowledgement_time()
+
+    assert actual == expected
+
+
+def test_returns_correct_time_given_second_ehr_integrated_before_first_ehr_failed():
+    effective_final_acknowledgement_time = a_datetime()
+
+    gp2gp_messages: List[Message] = test_cases.second_ehr_integrated_before_first_ehr_failed(
         ehr_acknowledge_time=effective_final_acknowledgement_time,
     )
 
