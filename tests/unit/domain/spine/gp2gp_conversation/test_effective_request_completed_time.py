@@ -1,15 +1,14 @@
+from typing import List
+
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from tests.builders import test_cases
 from tests.builders.common import a_datetime
-from tests.builders.spine import build_gp2gp_conversation, build_message
-from prmdata.domain.spine.message import ERROR_SUPPRESSED
+from prmdata.domain.spine.message import Message
 
 
 def test_returns_none_when_request_has_been_made():
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=None,
-        request_completed_messages=[],
-        request_completed_ack_messages=[],
-    )
+    gp2gp_messages: List[Message] = test_cases.request_made()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     expected = None
 
@@ -19,12 +18,8 @@ def test_returns_none_when_request_has_been_made():
 
 
 def test_returns_none_when_request_has_been_acknowledged():
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[],
-        request_completed_ack_messages=[],
-    )
+    gp2gp_messages: List[Message] = test_cases.request_acknowledged_successfully()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     expected = None
 
@@ -34,12 +29,8 @@ def test_returns_none_when_request_has_been_acknowledged():
 
 
 def test_returns_none_when_ehr_has_been_returned():
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[build_message()],
-        request_completed_ack_messages=[],
-    )
+    gp2gp_messages: List[Message] = test_cases.core_ehr_sent()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     expected = None
 
@@ -49,17 +40,8 @@ def test_returns_none_when_ehr_has_been_returned():
 
 
 def test_returns_none_given_duplicate_and_pending():
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(guid="abc"),
-            build_message(guid="bcd"),
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="abc", error_code=12),
-        ],
-    )
+    gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     expected = None
 
@@ -69,19 +51,13 @@ def test_returns_none_given_duplicate_and_pending():
 
 
 def test_returns_correct_time_when_conversation_has_concluded_successfully():
-
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(time=effective_request_completed_time, guid="abc")
-        ],
-        request_completed_ack_messages=[build_message(message_ref="abc", error_code=None)],
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.ehr_integrated_successfully(
+        request_completed_time=request_completed_time
     )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
-    expected = effective_request_completed_time
+    expected = request_completed_time
 
     actual = conversation.effective_request_completed_time()
 
@@ -89,20 +65,13 @@ def test_returns_correct_time_when_conversation_has_concluded_successfully():
 
 
 def test_returns_correct_time_when_record_is_suppressed():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(time=effective_request_completed_time, guid="abc")
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="abc", error_code=ERROR_SUPPRESSED)
-        ],
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.suppressed_ehr(
+        request_completed_time=request_completed_time
     )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
-    expected = effective_request_completed_time
+    expected = request_completed_time
 
     actual = conversation.effective_request_completed_time()
 
@@ -110,18 +79,13 @@ def test_returns_correct_time_when_record_is_suppressed():
 
 
 def test_returns_correct_time_when_conversation_concluded_with_failure():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(time=effective_request_completed_time, guid="abc")
-        ],
-        request_completed_ack_messages=[build_message(message_ref="abc", error_code=99)],
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.concluded_with_failure(
+        request_completed_time=request_completed_time
     )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
-    expected = effective_request_completed_time
+    expected = request_completed_time
 
     actual = conversation.effective_request_completed_time()
 
@@ -129,22 +93,13 @@ def test_returns_correct_time_when_conversation_concluded_with_failure():
 
 
 def test_returns_correct_time_given_duplicate_and_success():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(guid="bcd"),
-            build_message(time=effective_request_completed_time, guid="abc"),
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="abc", error_code=None),
-            build_message(message_ref="bcd", error_code=12),
-        ],
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.ehr_integrated_after_duplicate(
+        request_completed_time=request_completed_time
     )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
-    expected = effective_request_completed_time
+    expected = request_completed_time
 
     actual = conversation.effective_request_completed_time()
 
@@ -152,74 +107,69 @@ def test_returns_correct_time_given_duplicate_and_success():
 
 
 def test_returns_correct_time_given_duplicate_and_failure():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(guid="bcd"),
-            build_message(time=effective_request_completed_time, guid="abc"),
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="bcd", error_code=12),
-            build_message(message_ref="abc", error_code=99),
-        ],
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.integration_failed_after_duplicate(
+        request_completed_time=request_completed_time
     )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
-    expected = effective_request_completed_time
+    expected = request_completed_time
 
     actual = conversation.effective_request_completed_time()
 
     assert actual == expected
 
 
-def test_returns_correct_time_given_success_and_failure():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(
-                guid="bcd",
-                time=effective_request_completed_time,
-            ),
-            build_message(guid="abc"),
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="bcd", error_code=None),
-            build_message(message_ref="abc", error_code=99),
-        ],
+def test_returns_correct_time_given_first_ehr_integrated_before_second_ehr_failed():
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.first_ehr_integrated_before_second_ehr_failed(
+        request_completed_time=request_completed_time
     )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
-    expected = effective_request_completed_time
+    expected = request_completed_time
 
     actual = conversation.effective_request_completed_time()
 
     assert actual == expected
 
 
-def test_returns_correct_time_given_failure_and_success():
-    effective_request_completed_time = a_datetime()
-
-    conversation = build_gp2gp_conversation(
-        request_started=build_message(),
-        request_started_ack=build_message(),
-        request_completed_messages=[
-            build_message(guid="bcd", time=effective_request_completed_time),
-            build_message(guid="abc"),
-        ],
-        request_completed_ack_messages=[
-            build_message(message_ref="abc", error_code=99),
-            build_message(
-                message_ref="bcd",
-                error_code=None,
-            ),
-        ],
+def test_returns_correct_time_given_first_ehr_integrated_after_second_ehr_failed():
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.first_ehr_integrated_after_second_ehr_failed(
+        request_completed_time=request_completed_time
     )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
-    expected = effective_request_completed_time
+    expected = request_completed_time
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == expected
+
+
+def test_returns_correct_time_given_second_ehr_integrated_after_first_ehr_failed():
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.second_ehr_integrated_after_first_ehr_failed(
+        request_completed_time=request_completed_time
+    )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    expected = request_completed_time
+
+    actual = conversation.effective_request_completed_time()
+
+    assert actual == expected
+
+
+def test_returns_correct_time_given_second_ehr_integrated_before_first_ehr_failed():
+    request_completed_time = a_datetime()
+    gp2gp_messages: List[Message] = test_cases.second_ehr_integrated_before_first_ehr_failed(
+        request_completed_time=request_completed_time
+    )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    expected = request_completed_time
 
     actual = conversation.effective_request_completed_time()
 

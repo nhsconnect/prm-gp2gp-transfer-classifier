@@ -4,7 +4,7 @@ from prmdata.domain.spine.message import (
     APPLICATION_ACK,
     EHR_REQUEST_COMPLETED,
 )
-from tests.builders.common import a_datetime, a_string, a_duration, an_integer
+from tests.builders.common import a_datetime, a_string, an_integer
 
 DUPLICATE_EHR_ERROR = 12
 SUPPRESSED_EHR_ERROR = 15
@@ -144,7 +144,8 @@ def acknowledged_duplicate_and_waiting_for_integration():
 
 
 def ehr_integrated_successfully(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     conversation_id = a_string()
     ehr_guid = a_string()
 
@@ -152,14 +153,15 @@ def ehr_integrated_successfully(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
         .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
         .build()
     )
 
 
 def suppressed_ehr(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     conversation_id = a_string()
     ehr_guid = a_string()
 
@@ -167,7 +169,7 @@ def suppressed_ehr(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
         .with_requester_acknowledgement(
             time=ehr_ack_time, message_ref=ehr_guid, error_code=SUPPRESSED_EHR_ERROR
         )
@@ -176,7 +178,8 @@ def suppressed_ehr(**kwargs):
 
 
 def concluded_with_failure(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     ehr_guid = a_string()
@@ -185,7 +188,7 @@ def concluded_with_failure(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
         .with_requester_acknowledgement(
             time=ehr_ack_time, message_ref=ehr_guid, error_code=ehr_ack_error
         )
@@ -193,8 +196,9 @@ def concluded_with_failure(**kwargs):
     )
 
 
-def ehr_integrated_successfully_after_duplicate(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+def ehr_integrated_after_duplicate(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     conversation_id = a_string()
     ehr_guid = a_string()
     duplicate_ehr_guid = a_string()
@@ -203,7 +207,7 @@ def ehr_integrated_successfully_after_duplicate(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
         .with_core_ehr(guid=duplicate_ehr_guid)
         .with_requester_acknowledgement(
             message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
@@ -214,7 +218,8 @@ def ehr_integrated_successfully_after_duplicate(**kwargs):
 
 
 def integration_failed_after_duplicate(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     ehr_guid = a_string()
@@ -224,7 +229,7 @@ def integration_failed_after_duplicate(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
         .with_core_ehr(guid=duplicate_ehr_guid)
         .with_requester_acknowledgement(
             message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
@@ -237,7 +242,8 @@ def integration_failed_after_duplicate(**kwargs):
 
 
 def first_ehr_integrated_after_second_ehr_failed(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
@@ -247,7 +253,7 @@ def first_ehr_integrated_after_second_ehr_failed(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=first_ehr_guid)
+        .with_core_ehr(guid=first_ehr_guid, time=req_complete_time)
         .with_core_ehr(guid=second_ehr_guid)
         .with_requester_acknowledgement(message_ref=second_ehr_guid, error_code=ehr_ack_error)
         .with_requester_acknowledgement(message_ref=first_ehr_guid, time=ehr_ack_time)
@@ -256,7 +262,8 @@ def first_ehr_integrated_after_second_ehr_failed(**kwargs):
 
 
 def first_ehr_integrated_before_second_ehr_failed(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
@@ -266,7 +273,7 @@ def first_ehr_integrated_before_second_ehr_failed(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=first_ehr_guid)
+        .with_core_ehr(guid=first_ehr_guid, time=req_complete_time)
         .with_core_ehr(guid=second_ehr_guid)
         .with_requester_acknowledgement(message_ref=first_ehr_guid, time=ehr_ack_time)
         .with_requester_acknowledgement(message_ref=second_ehr_guid, error_code=ehr_ack_error)
@@ -275,7 +282,8 @@ def first_ehr_integrated_before_second_ehr_failed(**kwargs):
 
 
 def second_ehr_integrated_after_first_ehr_failed(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
@@ -286,7 +294,7 @@ def second_ehr_integrated_after_first_ehr_failed(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr(guid=first_ehr_guid)
-        .with_core_ehr(guid=second_ehr_guid)
+        .with_core_ehr(guid=second_ehr_guid, time=req_complete_time)
         .with_requester_acknowledgement(message_ref=first_ehr_guid, error_code=ehr_ack_error)
         .with_requester_acknowledgement(message_ref=second_ehr_guid, time=ehr_ack_time)
         .build()
@@ -294,7 +302,8 @@ def second_ehr_integrated_after_first_ehr_failed(**kwargs):
 
 
 def second_ehr_integrated_before_first_ehr_failed(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_error = an_integer(a=20, b=30)
     conversation_id = a_string()
     first_ehr_guid = a_string()
@@ -305,7 +314,7 @@ def second_ehr_integrated_before_first_ehr_failed(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr(guid=first_ehr_guid)
-        .with_core_ehr(guid=second_ehr_guid)
+        .with_core_ehr(guid=second_ehr_guid, time=req_complete_time)
         .with_requester_acknowledgement(message_ref=second_ehr_guid, time=ehr_ack_time)
         .with_requester_acknowledgement(message_ref=first_ehr_guid, error_code=ehr_ack_error)
         .build()
