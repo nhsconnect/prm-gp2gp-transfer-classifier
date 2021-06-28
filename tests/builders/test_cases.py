@@ -10,608 +10,248 @@ DUPLICATE_EHR_ERROR = 12
 SUPPRESSED_EHR_ERROR = 15
 
 
-def request_made(**kwargs):
-    gp2gp_request = Message(
-        time=kwargs.get("request_sent_date", a_datetime()),
-        conversation_id=a_string(),
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=kwargs.get("requesting_asid", a_string()),
-        to_party_asid=kwargs.get("sending_asid", a_string()),
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
+class GP2GPTestCase:
+    def __init__(self, **kwargs):
+        self._messages = []
+        self._conversation_id = kwargs.get("conversation_id", a_string())
+        self._requesting_asid = kwargs.get("requesting_asid", a_string())
+        self._sending_asid = kwargs.get("sending_asid", a_string())
+        self._requesting_system = kwargs.get("requesting_system", a_string())
+        self._sending_system = kwargs.get("sending_system", a_string())
 
-    return [gp2gp_request]
+    def with_request(self, **kwargs):
+        self._messages.append(
+            Message(
+                time=kwargs.get("time", a_datetime()),
+                conversation_id=self._conversation_id,
+                guid=self._conversation_id,
+                interaction_id=EHR_REQUEST_STARTED,
+                from_party_asid=self._requesting_asid,
+                to_party_asid=self._sending_asid,
+                message_ref=None,
+                error_code=None,
+                from_system=self._requesting_system,
+                to_system=self._sending_system,
+            )
+        )
+        return self
+
+    def with_sender_acknowledgement(self, *, message_ref, **kwargs):
+        self._messages.append(
+            Message(
+                time=kwargs.get("time", a_datetime()),
+                conversation_id=self._conversation_id,
+                guid=a_string(),
+                interaction_id=APPLICATION_ACK,
+                from_party_asid=self._sending_asid,
+                to_party_asid=self._requesting_asid,
+                message_ref=message_ref,
+                error_code=kwargs.get("error_code", None),
+                from_system=self._sending_system,
+                to_system=self._requesting_system,
+            )
+        )
+        return self
+
+    def with_requester_acknowledgement(self, *, message_ref, **kwargs):
+        self._messages.append(
+            Message(
+                time=kwargs.get("time", a_datetime()),
+                conversation_id=self._conversation_id,
+                guid=a_string(),
+                interaction_id=APPLICATION_ACK,
+                from_party_asid=self._requesting_asid,
+                to_party_asid=self._sending_asid,
+                message_ref=message_ref,
+                error_code=kwargs.get("error_code", None),
+                from_system=self._requesting_system,
+                to_system=self._sending_system,
+            )
+        )
+        return self
+
+    def with_core_ehr(self, **kwargs):
+        self._messages.append(
+            Message(
+                time=kwargs.get("time", a_datetime()),
+                conversation_id=self._conversation_id,
+                guid=kwargs.get("guid", a_string()),
+                interaction_id=EHR_REQUEST_COMPLETED,
+                from_party_asid=self._sending_asid,
+                to_party_asid=self._requesting_asid,
+                message_ref=None,
+                error_code=None,
+                from_system=self._sending_system,
+                to_system=self._requesting_system,
+            )
+        )
+        return self
+
+    def build(self):
+        return self._messages
+
+
+def request_made(**kwargs):
+    request_time = kwargs.get("request_sent_date", a_datetime())
+    requester_asid = kwargs.get("requesting_asid", a_string())
+    sender_asid = kwargs.get("sending_asid", a_string())
+
+    return (
+        GP2GPTestCase(requesting_asid=requester_asid, sending_asid=sender_asid)
+        .with_request(time=request_time)
+        .build()
+    )
 
 
 def request_acknowledged_successfully():
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
-
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    return [gp2gp_request, gp2gp_request_acknowledgement]
 
 
 def core_ehr_sent():
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr()
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    return [gp2gp_request, gp2gp_request_acknowledgement, core_ehr]
 
 
 def acknowledged_duplicate_and_waiting_for_integration():
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
+    ehr_guid = a_string()
+    duplicate_ehr_guid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=duplicate_ehr_guid)
+        .with_requester_acknowledgement(
+            message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
+        )
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    duplicate_core_ehr = Message(
-        time=core_ehr.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    duplicate_core_ehr_acknowledgement = Message(
-        time=duplicate_core_ehr.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=duplicate_core_ehr.guid,
-        error_code=DUPLICATE_EHR_ERROR,
-        from_system=None,
-        to_system=None,
-    )
-    return [
-        gp2gp_request,
-        gp2gp_request_acknowledgement,
-        core_ehr,
-        duplicate_core_ehr,
-        duplicate_core_ehr_acknowledgement,
-    ]
 
 
 def ehr_integrated_successfully(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
+    ehr_guid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-
-    core_ehr_acknowledgement = Message(
-        time=kwargs.get("ehr_acknowledge_time", core_ehr.time + a_duration()),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=core_ehr.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-
-    return [gp2gp_request, gp2gp_request_acknowledgement, core_ehr, core_ehr_acknowledgement]
 
 
 def suppressed_ehr(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
+    ehr_guid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_requester_acknowledgement(
+            time=ehr_ack_time, message_ref=ehr_guid, error_code=SUPPRESSED_EHR_ERROR
+        )
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-
-    core_ehr_acknowledgement = Message(
-        time=kwargs.get("ehr_acknowledge_time", core_ehr.time + a_duration()),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=core_ehr.guid,
-        error_code=SUPPRESSED_EHR_ERROR,
-        from_system=None,
-        to_system=None,
-    )
-
-    return [gp2gp_request, gp2gp_request_acknowledgement, core_ehr, core_ehr_acknowledgement]
 
 
 def concluded_with_failure(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_error = (kwargs.get("req_completed_ack_message_error_code", an_integer(a=20, b=30)),)
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
+    ehr_guid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_requester_acknowledgement(
+            time=ehr_ack_time, message_ref=ehr_guid, error_code=ehr_ack_error
+        )
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr_acknowledgement = Message(
-        time=kwargs.get("ehr_acknowledge_time", core_ehr.time + a_duration()),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=core_ehr.guid,
-        error_code=kwargs.get("req_completed_ack_message_error_code", an_integer(a=20, b=30)),
-        from_system=None,
-        to_system=None,
-    )
-
-    return [gp2gp_request, gp2gp_request_acknowledgement, core_ehr, core_ehr_acknowledgement]
 
 
 def ehr_integrated_successfully_with_duplicate(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
+    ehr_guid = a_string()
+    duplicate_ehr_guid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=duplicate_ehr_guid)
+        .with_requester_acknowledgement(
+            message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
+        )
+        .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    duplicate_core_ehr = Message(
-        time=core_ehr.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    duplicate_core_ehr_acknowledgement = Message(
-        time=duplicate_core_ehr.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=duplicate_core_ehr.guid,
-        error_code=DUPLICATE_EHR_ERROR,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr_acknowledgement = Message(
-        time=kwargs.get(
-            "ehr_acknowledge_time", duplicate_core_ehr_acknowledgement.time + a_duration()
-        ),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=core_ehr.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    return [
-        gp2gp_request,
-        gp2gp_request_acknowledgement,
-        core_ehr,
-        duplicate_core_ehr,
-        duplicate_core_ehr_acknowledgement,
-        core_ehr_acknowledgement,
-    ]
 
 
 def concluded_with_failure_and_duplicate(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_error = (kwargs.get("req_completed_ack_message_error_code", an_integer(a=20, b=30)),)
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
+    ehr_guid = a_string()
+    duplicate_ehr_guid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=duplicate_ehr_guid)
+        .with_requester_acknowledgement(
+            message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
+        )
+        .with_requester_acknowledgement(
+            time=ehr_ack_time, message_ref=ehr_guid, error_code=ehr_ack_error
+        )
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    duplicate_core_ehr = Message(
-        time=core_ehr.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    duplicate_core_ehr_acknowledgement = Message(
-        time=duplicate_core_ehr.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=duplicate_core_ehr.guid,
-        error_code=DUPLICATE_EHR_ERROR,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr_acknowledgement = Message(
-        time=kwargs.get(
-            "ehr_acknowledge_time", duplicate_core_ehr_acknowledgement.time + a_duration()
-        ),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=core_ehr.guid,
-        error_code=kwargs.get("req_completed_ack_message_error_code", an_integer(a=20, b=30)),
-        from_system=None,
-        to_system=None,
-    )
-    return [
-        gp2gp_request,
-        gp2gp_request_acknowledgement,
-        core_ehr,
-        duplicate_core_ehr,
-        duplicate_core_ehr_acknowledgement,
-        core_ehr_acknowledgement,
-    ]
 
 
 def ehr_integrated_successfully_with_failure(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_duration())
+    ehr_ack_error = (
+        kwargs.get("duplicate_req_completed_ack_message_error_code", an_integer(a=20, b=30)),
+    )
     conversation_id = a_string()
-    requesting_asid = a_string()
-    sending_asid = a_string()
+    ehr_guid = a_string()
+    duplicate_ehr_guid = a_string()
 
-    gp2gp_request = Message(
-        time=a_datetime(),
-        conversation_id=conversation_id,
-        guid=conversation_id,
-        interaction_id=EHR_REQUEST_STARTED,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=duplicate_ehr_guid)
+        .with_requester_acknowledgement(message_ref=duplicate_ehr_guid, error_code=ehr_ack_error)
+        .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
+        .build()
     )
-    gp2gp_request_acknowledgement = Message(
-        time=gp2gp_request.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=gp2gp_request.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr = Message(
-        time=gp2gp_request_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    duplicate_core_ehr = Message(
-        time=core_ehr.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=EHR_REQUEST_COMPLETED,
-        from_party_asid=sending_asid,
-        to_party_asid=requesting_asid,
-        message_ref=None,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    core_ehr_acknowledgement = Message(
-        time=kwargs.get("ehr_acknowledge_time", duplicate_core_ehr.time + a_duration()),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=core_ehr.guid,
-        error_code=None,
-        from_system=None,
-        to_system=None,
-    )
-    failed_core_ehr_acknowledgement = Message(
-        time=core_ehr_acknowledgement.time + a_duration(),
-        conversation_id=conversation_id,
-        guid=a_string(),
-        interaction_id=APPLICATION_ACK,
-        from_party_asid=requesting_asid,
-        to_party_asid=sending_asid,
-        message_ref=duplicate_core_ehr.guid,
-        error_code=kwargs.get(
-            "duplicate_req_completed_ack_message_error_code", an_integer(a=20, b=30)
-        ),
-        from_system=None,
-        to_system=None,
-    )
-    return [
-        gp2gp_request,
-        gp2gp_request_acknowledgement,
-        core_ehr,
-        duplicate_core_ehr,
-        core_ehr_acknowledgement,
-        failed_core_ehr_acknowledgement,
-    ]
