@@ -128,11 +128,14 @@ class GP2GPTestCase:
 
 def request_made(**kwargs):
     request_time = kwargs.get("request_sent_date", a_datetime())
-    requester_asid = kwargs.get("requesting_asid", a_string())
-    sender_asid = kwargs.get("sending_asid", a_string())
 
     return (
-        GP2GPTestCase(requesting_asid=requester_asid, sending_asid=sender_asid)
+        GP2GPTestCase(
+            requesting_asid=kwargs.get("requesting_asid", a_string()),
+            sending_asid=kwargs.get("sending_asid", a_string()),
+            requesting_system=kwargs.get("requesting_system", a_string()),
+            sending_system=kwargs.get("sending_system", a_string()),
+        )
         .with_request(time=request_time)
         .build()
     )

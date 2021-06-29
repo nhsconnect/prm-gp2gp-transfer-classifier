@@ -1,21 +1,26 @@
-from tests.builders.spine import build_gp2gp_conversation, build_message
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from tests.builders import test_cases
 
 
 def test_extracts_requesting_supplier():
-    conversation = build_gp2gp_conversation(request_started=build_message(from_system="EMIS"))
+    conversation = Gp2gpConversation.from_messages(
+        messages=test_cases.request_made(requesting_system="A System")
+    )
 
     actual = conversation.requesting_supplier()
 
-    expected = "EMIS"
+    expected = "A System"
 
     assert actual == expected
 
 
 def test_extracts_sending_supplier():
-    conversation = build_gp2gp_conversation(request_started=build_message(to_system="Vision"))
+    conversation = Gp2gpConversation.from_messages(
+        messages=test_cases.request_made(sending_system="Another System")
+    )
 
     actual = conversation.sending_supplier()
 
-    expected = "Vision"
+    expected = "Another System"
 
     assert actual == expected
