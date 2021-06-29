@@ -90,6 +90,35 @@ def test_negative_sla_duration_clamped_to_zero():
     _assert_attributes("sla_duration", actual, [expected_sla])
 
 
+def test_produces_no_sla_given_no_request_completed_time():
+    conversations = [
+        build_mock_gp2gp_conversation(
+            request_completed_time=None,
+            final_acknowledgement_time=None,
+        )
+    ]
+    actual = derive_transfers(conversations)
+
+    expected_sla_durations = [None]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+
+
+def test_produces_no_sla_given_no_final_acknowledgement_time():
+    conversations = [
+        build_mock_gp2gp_conversation(
+            request_completed_time=datetime(year=2021, month=1, day=5),
+            final_acknowledgement_time=None,
+        )
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_sla_durations = [None]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+
+
 def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_without_error():
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
@@ -373,38 +402,6 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_suppressed
     _assert_attributes("sla_duration", actual, expected_sla_durations)
     _assert_attributes("status", actual, expected_statuses)
     _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
-
-
-def test_produces_no_sla_given_pending_ehr_completed():
-    conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[],
-            request_completed_ack_messages=[],
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_sla_durations = [None]
-
-    _assert_attributes("sla_duration", actual, expected_sla_durations)
-
-
-def test_produces_no_sla_given_pending_request_completed_ack():
-    conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[build_message()],
-            request_completed_ack_messages=[],
-        )
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_sla_durations = [None]
-
-    _assert_attributes("sla_duration", actual, expected_sla_durations)
 
 
 def test_has_pending_status_if_no_final_ack():
