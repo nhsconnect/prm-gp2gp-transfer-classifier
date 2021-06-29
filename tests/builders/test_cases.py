@@ -3,6 +3,7 @@ from prmdata.domain.spine.message import (
     EHR_REQUEST_STARTED,
     APPLICATION_ACK,
     EHR_REQUEST_COMPLETED,
+    COMMON_POINT_TO_POINT,
 )
 from tests.builders.common import a_datetime, a_string, an_integer
 
@@ -89,6 +90,40 @@ class GP2GPTestCase:
 
     def build(self):
         return self._messages
+
+    def with_large_fragment_continue(self, **kwargs):
+        self._messages.append(
+            Message(
+                time=kwargs.get("time", a_datetime()),
+                conversation_id=self._conversation_id,
+                guid=a_string(),
+                interaction_id=COMMON_POINT_TO_POINT,
+                from_party_asid=self._requesting_asid,
+                to_party_asid=self._sending_asid,
+                message_ref=None,
+                error_code=None,
+                from_system=self._requesting_system,
+                to_system=self._sending_system,
+            )
+        )
+        return self
+
+    def with_large_fragment(self, **kwargs):
+        self._messages.append(
+            Message(
+                time=kwargs.get("time", a_datetime()),
+                conversation_id=self._conversation_id,
+                guid=kwargs.get("guid", a_string()),
+                interaction_id=COMMON_POINT_TO_POINT,
+                from_party_asid=self._sending_asid,
+                to_party_asid=self._requesting_asid,
+                message_ref=None,
+                error_code=None,
+                from_system=self._sending_system,
+                to_system=self._requesting_system,
+            )
+        )
+        return self
 
 
 def request_made(**kwargs):
@@ -325,7 +360,7 @@ def _some_error_codes():
     return [an_integer(20, 30) for _ in range(an_integer(2, 4))]
 
 
-def multiple_failures(**kwargs):
+def multiple_integration_failures(**kwargs):
     error_codes = kwargs.get("error_codes", _some_error_codes())
 
     ehr_guids = [a_string() for _ in range(len(error_codes))]
@@ -341,6 +376,71 @@ def multiple_failures(**kwargs):
         test_case = test_case.with_core_ehr(guid=guid)
 
     for error_code, guid in zip(error_codes, ehr_guids):
+        test_case = test_case.with_requester_acknowledgement(
+            message_ref=guid, error_code=error_code
+        )
+
+    return test_case.build()
+
+
+def large_message_fragment_failure(**kwargs):
+    conversation_id = a_string()
+    fragment_guid = a_string()
+    fragment_error = kwargs.get("error_code", an_integer(a=20, b=30))
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr()
+        .with_large_fragment_continue()
+        .with_large_fragment(guid=fragment_guid)
+        .with_requester_acknowledgement(message_ref=fragment_guid, error_code=fragment_error)
+        .build()
+    )
+
+
+def successful_integration_with_large_messages(**kwargs):
+    conversation_id = a_string()
+    ehr_guid = a_string()
+    fragment1_guid = a_string()
+    fragment2_guid = a_string()
+    fragment3_guid = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_large_fragment_continue()
+        .with_large_fragment(guid=fragment1_guid)
+        .with_large_fragment(guid=fragment2_guid)
+        .with_requester_acknowledgement(message_ref=fragment1_guid)
+        .with_requester_acknowledgement(message_ref=fragment2_guid)
+        .with_large_fragment(guid=fragment3_guid)
+        .with_requester_acknowledgement(message_ref=fragment3_guid)
+        .with_requester_acknowledgement(message_ref=ehr_guid)
+        .build()
+    )
+
+
+def multiple_large_fragment_failures(**kwargs):
+    error_codes = kwargs.get("error_codes", _some_error_codes())
+    conversation_id = a_string()
+    fragment_guids = [a_string() for _ in range(len(error_codes))]
+
+    test_case = (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr()
+        .with_large_fragment_continue()
+    )
+
+    for guid in fragment_guids:
+        test_case = test_case.with_large_fragment(guid=guid)
+
+    for error_code, guid in zip(error_codes, fragment_guids):
         test_case = test_case.with_requester_acknowledgement(
             message_ref=guid, error_code=error_code
         )

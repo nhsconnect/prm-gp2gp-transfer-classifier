@@ -81,7 +81,7 @@ def test_extracts_correct_code_given_success_and_failure():
 
 def test_correct_code_given_multiple_failures():
     conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.multiple_failures(error_codes=[42, 99, 56])
+        messages=test_cases.multiple_integration_failures(error_codes=[42, 99, 56])
     )
 
     expected = [42, 99, 56]
