@@ -4,7 +4,11 @@ from typing import List, Iterable
 import pytest
 
 from prmdata.domain.spine.message import ERROR_SUPPRESSED, DUPLICATE_ERROR
-from tests.builders.spine import build_gp2gp_conversation, build_message
+from tests.builders.spine import (
+    build_gp2gp_conversation,
+    build_message,
+    build_mock_gp2gp_conversation,
+)
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
@@ -17,11 +21,25 @@ def _assert_attributes(attr_name: str, actual: Iterable[Transfer], expected: Lis
 
 
 def test_extracts_conversation_id():
-    conversations = [build_gp2gp_conversation(id="1234")]
+    conversations = [build_mock_gp2gp_conversation(conversation_id="1234")]
 
     actual = derive_transfers(conversations)
 
     expected_conversation_ids = ["1234"]
+
+    _assert_attributes("conversation_id", actual, expected_conversation_ids)
+
+
+def test_extracts_conversation_ids_for_conversations():
+    conversations = [
+        build_mock_gp2gp_conversation(conversation_id="1234"),
+        build_mock_gp2gp_conversation(conversation_id="3456"),
+        build_mock_gp2gp_conversation(conversation_id="5678"),
+    ]
+
+    actual = derive_transfers(conversations)
+
+    expected_conversation_ids = ["1234", "3456", "5678"]
 
     _assert_attributes("conversation_id", actual, expected_conversation_ids)
 
@@ -368,20 +386,6 @@ def test_produces_no_sla_given_pending_request_completed_ack():
     expected_sla_durations = [None]
 
     _assert_attributes("sla_duration", actual, expected_sla_durations)
-
-
-def test_extracts_conversation_ids_for_conversations():
-    conversations = [
-        build_gp2gp_conversation(id="1234"),
-        build_gp2gp_conversation(id="3456"),
-        build_gp2gp_conversation(id="5678"),
-    ]
-
-    actual = derive_transfers(conversations)
-
-    expected_conversation_ids = ["1234", "3456", "5678"]
-
-    _assert_attributes("conversation_id", actual, expected_conversation_ids)
 
 
 def test_has_pending_status_if_no_final_ack():

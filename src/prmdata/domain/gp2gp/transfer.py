@@ -88,7 +88,7 @@ def _has_intermediate_error_and_no_final_ack(conversation: Gp2gpConversation) ->
 
 def _derive_transfer(conversation: Gp2gpConversation) -> Transfer:
     return Transfer(
-        conversation_id=conversation.id,
+        conversation_id=conversation.conversation_id(),
         sla_duration=_calculate_sla(conversation),
         requesting_practice_asid=conversation.requesting_practice_asid(),
         sending_practice_asid=conversation.sending_practice_asid(),

@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from prmdata.domain.spine.message import Message
 from tests.builders.common import a_string, a_datetime
@@ -12,6 +14,19 @@ def build_gp2gp_conversation(**kwargs) -> Gp2gpConversation:
         intermediate_messages=kwargs.get("intermediate_messages", []),
         request_completed_ack_messages=kwargs.get("request_completed_ack_messages", []),
     )
+
+
+def build_mock_gp2gp_conversation(**kwargs):
+    conversation_id = kwargs.get("conversation_id", a_string())
+    conversation = Mock()
+    conversation.conversation_id.return_value = conversation_id
+    conversation.effective_final_acknowledgement_time.return_value = a_datetime()
+    conversation.effective_request_completed_time.return_value = a_datetime()
+    conversation.intermediate_error_codes.return_value = []
+
+    # Remove this once derive transfers no longer accesses messages directly
+    conversation.request_completed_ack_messages = []
+    return conversation
 
 
 def build_message(**kwargs) -> Message:
