@@ -148,6 +148,17 @@ def request_acknowledged_successfully():
     )
 
 
+def request_acknowledged_with_error(**kwargs):
+    conversation_id = a_string()
+    request_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id, error_code=request_ack_error)
+        .build()
+    )
+
+
 def core_ehr_sent():
     conversation_id = a_string()
 

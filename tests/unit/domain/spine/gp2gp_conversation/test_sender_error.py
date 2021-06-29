@@ -1,8 +1,11 @@
-from tests.builders.spine import build_gp2gp_conversation, build_message
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from tests.builders import test_cases
 
 
 def test_extracts_sender_error_code_when_no_sender_error():
-    conversation = build_gp2gp_conversation(request_started_ack=build_message(error_code=None))
+    conversation = Gp2gpConversation.from_messages(
+        messages=test_cases.request_acknowledged_successfully()
+    )
 
     actual = conversation.sender_error()
 
@@ -12,7 +15,9 @@ def test_extracts_sender_error_code_when_no_sender_error():
 
 
 def test_extracts_sender_error_code_when_sender_error():
-    conversation = build_gp2gp_conversation(request_started_ack=build_message(error_code=10))
+    conversation = Gp2gpConversation.from_messages(
+        messages=test_cases.request_acknowledged_with_error(error_code=10)
+    )
 
     actual = conversation.sender_error()
 
