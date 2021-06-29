@@ -14,6 +14,9 @@ class Gp2gpConversation(NamedTuple):
     intermediate_messages: List[Message]
     request_completed_ack_messages: List[Message]
 
+    def conversation_id(self):
+        return self.request_started.conversation_id
+
     def sending_practice_asid(self) -> str:
         return self.request_started.to_party_asid
 

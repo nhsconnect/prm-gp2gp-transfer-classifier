@@ -131,6 +131,7 @@ def request_made(**kwargs):
 
     return (
         GP2GPTestCase(
+            conversation_id=kwargs.get("conversation_id", a_string()),
             requesting_asid=kwargs.get("requesting_asid", a_string()),
             sending_asid=kwargs.get("sending_asid", a_string()),
             requesting_system=kwargs.get("requesting_system", a_string()),
