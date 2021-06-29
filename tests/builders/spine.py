@@ -18,10 +18,13 @@ def build_gp2gp_conversation(**kwargs) -> Gp2gpConversation:
 
 def build_mock_gp2gp_conversation(**kwargs):
     conversation_id = kwargs.get("conversation_id", a_string())
+    final_ack_time = kwargs.get("final_acknowledgement_time", a_datetime())
+    req_completed_time = kwargs.get("request_completed_time", a_datetime())
+
     conversation = Mock()
     conversation.conversation_id.return_value = conversation_id
-    conversation.effective_final_acknowledgement_time.return_value = a_datetime()
-    conversation.effective_request_completed_time.return_value = a_datetime()
+    conversation.effective_final_acknowledgement_time.return_value = final_ack_time
+    conversation.effective_request_completed_time.return_value = req_completed_time
     conversation.intermediate_error_codes.return_value = []
 
     # Remove this once derive transfers no longer accesses messages directly

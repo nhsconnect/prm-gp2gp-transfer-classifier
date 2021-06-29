@@ -46,21 +46,13 @@ def test_extracts_conversation_ids_for_conversations():
 
 def test_produces_sla_of_successful_conversation():
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-                    guid="abc",
-                )
-            ],
-            request_completed_ack_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
-                    message_ref="abc",
-                    error_code=None,
-                )
-            ],
+        build_mock_gp2gp_conversation(
+            request_completed_time=datetime(
+                year=2020, month=6, day=1, hour=12, minute=42, second=0
+            ),
+            final_acknowledgement_time=datetime(
+                year=2020, month=6, day=1, hour=13, minute=52, second=0
+            ),
         )
     ]
 
