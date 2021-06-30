@@ -15,7 +15,7 @@ from tests.builders import test_cases
         test_cases.core_ehr_sent,
     ],
 )
-def test_doesnt_extract_error_code_given_transfer_in_progress(test_case):
+def test_doesnt_extract_error_codes_given_transfer_in_progress(test_case):
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
@@ -34,7 +34,7 @@ def test_doesnt_extract_error_code_given_transfer_in_progress(test_case):
         (test_cases.ehr_integrated_after_duplicate, [12, None]),
     ],
 )
-def test_extracts_correct_code_given_successful_transfer(test_case, expected_codes):
+def test_extracts_correct_codes_given_successful_transfer(test_case, expected_codes):
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
@@ -43,7 +43,7 @@ def test_extracts_correct_code_given_successful_transfer(test_case, expected_cod
     assert actual == expected_codes
 
 
-def test_extracts_correct_code_given_transfer_concluded_with_failure():
+def test_extracts_correct_codes_given_transfer_concluded_with_failure():
     conversation = Gp2gpConversation.from_messages(
         messages=test_cases.concluded_with_failure(error_code=42)
     )
@@ -55,7 +55,7 @@ def test_extracts_correct_code_given_transfer_concluded_with_failure():
     assert actual == expected
 
 
-def test_extracts_correct_code_given_duplicate_and_failure():
+def test_extracts_correct_codes_given_duplicate_and_failure():
     conversation = Gp2gpConversation.from_messages(
         messages=test_cases.integration_failed_after_duplicate(error_code=42)
     )
@@ -67,7 +67,7 @@ def test_extracts_correct_code_given_duplicate_and_failure():
     assert actual == expected
 
 
-def test_extracts_correct_code_given_success_and_failure():
+def test_extracts_corrects_codes_given_success_and_failure():
     conversation = Gp2gpConversation.from_messages(
         messages=test_cases.second_ehr_integrated_before_first_ehr_failed(error_code=42)
     )
@@ -79,7 +79,7 @@ def test_extracts_correct_code_given_success_and_failure():
     assert actual == expected
 
 
-def test_correct_code_given_multiple_failures():
+def test_extracts_correct_codes_given_multiple_failures():
     conversation = Gp2gpConversation.from_messages(
         messages=test_cases.multiple_integration_failures(error_codes=[42, 99, 56])
     )

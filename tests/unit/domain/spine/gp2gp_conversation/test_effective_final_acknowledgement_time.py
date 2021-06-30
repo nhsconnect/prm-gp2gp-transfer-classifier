@@ -40,6 +40,11 @@ def test_returns_none_when_transfer_in_progress(test_case):
         test_cases.first_ehr_integrated_after_second_ehr_failed,
         test_cases.second_ehr_integrated_after_first_ehr_failed,
         test_cases.second_ehr_integrated_before_first_ehr_failed,
+        test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs,
+        test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs,
+        test_cases.integration_failed_with_conflicting_acks_and_duplicate_ehrs,
+        test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack,
+        test_cases.ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack,
     ],
 )
 def test_returns_correct_time_when_conversation_has_concluded(test_case):

@@ -461,3 +461,92 @@ def multiple_large_fragment_failures(**kwargs):
         )
 
     return test_case.build()
+
+
+def concluded_with_conflicting_acks_and_duplicate_ehrs(**kwargs):
+    conversation_id = a_string()
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    ehr_ack_code = kwargs.get("ehr_ack_code", None)
+
+    ehr_guid_1 = a_string()
+    ehr_guid_2 = a_string()
+    ehr_guid_3 = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid_1)
+        .with_core_ehr(guid=ehr_guid_2, time=req_complete_time)
+        .with_core_ehr(guid=ehr_guid_3)
+        .with_requester_acknowledgement(message_ref=ehr_guid_2, error_code=DUPLICATE_EHR_ERROR)
+        .with_requester_acknowledgement(
+            message_ref=ehr_guid_2, error_code=ehr_ack_code, time=ehr_ack_time
+        )
+        .with_requester_acknowledgement(message_ref=ehr_guid_1, error_code=DUPLICATE_EHR_ERROR)
+        .build()
+    )
+
+
+def ehr_integrated_with_conflicting_acks_and_duplicate_ehrs(**kwargs):
+    return concluded_with_conflicting_acks_and_duplicate_ehrs(ehr_ack_code=None, **kwargs)
+
+
+def ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs(**kwargs):
+    return concluded_with_conflicting_acks_and_duplicate_ehrs(
+        ehr_ack_code=SUPPRESSED_EHR_ERROR, **kwargs
+    )
+
+
+def integration_failed_with_conflicting_acks_and_duplicate_ehrs(**kwargs):
+    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    return concluded_with_conflicting_acks_and_duplicate_ehrs(ehr_ack_code=ehr_ack_error, **kwargs)
+
+
+def concluded_with_conflicting_acks(**kwargs):
+    conversation_id = a_string()
+    default_codes_and_times = [(None, a_datetime()), (DUPLICATE_EHR_ERROR, a_datetime())]
+    codes_and_times = kwargs.get("codes_and_times", default_codes_and_times)
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    ehr_guid = a_string()
+
+    test_case = (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
+    )
+
+    for code, ack_time in codes_and_times:
+        test_case = test_case.with_requester_acknowledgement(
+            message_ref=ehr_guid,
+            error_code=code,
+            time=ack_time,
+        )
+
+    return test_case.build()
+
+
+def ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    return concluded_with_conflicting_acks(
+        **kwargs,
+        codes_and_times=[
+            (11, a_datetime()),
+            (DUPLICATE_EHR_ERROR, a_datetime()),
+            (None, ehr_ack_time),
+        ],
+    )
+
+
+def ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack(**kwargs):
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    return concluded_with_conflicting_acks(
+        **kwargs,
+        codes_and_times=[
+            (11, a_datetime()),
+            (DUPLICATE_EHR_ERROR, a_datetime()),
+            (SUPPRESSED_EHR_ERROR, ehr_ack_time),
+        ],
+    )
