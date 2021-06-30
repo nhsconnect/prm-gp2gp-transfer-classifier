@@ -3,7 +3,9 @@ from typing import List, Iterable
 
 import pytest
 
-from prmdata.domain.spine.message import ERROR_SUPPRESSED, DUPLICATE_ERROR
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from prmdata.domain.spine.message import ERROR_SUPPRESSED
+from tests.builders import test_cases
 from tests.builders.spine import (
     build_gp2gp_conversation,
     build_message,
@@ -119,125 +121,10 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
     _assert_attributes("sla_duration", actual, expected_sla_durations)
 
 
-def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_without_error():
-    successful_acknowledgement_datetime = datetime(
-        year=2020, month=6, day=1, hour=13, minute=52, second=0
-    )
-    conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
-                    guid="ddd",
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-                    guid="aaa",
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
-                    guid="xxx",
-                ),
-            ],
-            request_completed_ack_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
-                    message_ref="aaa",
-                    error_code=DUPLICATE_ERROR,
-                ),
-                build_message(
-                    time=successful_acknowledgement_datetime,
-                    message_ref="aaa",
-                    error_code=None,
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=1),
-                    message_ref="ddd",
-                    error_code=DUPLICATE_ERROR,
-                ),
-            ],
-        )
-    ]
-
-    actual = list(derive_transfers(conversations))
-
-    expected_sla_durations = [timedelta(hours=1, minutes=10)]
-    expected_statuses = [TransferStatus.INTEGRATED]
-
-    _assert_attributes("sla_duration", actual, expected_sla_durations)
-    _assert_attributes("status", actual, expected_statuses)
-    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
-
-
-def test_produces_sla_and_integrated_status_given_acks_with_duplicate_error_and_suppressed_error():
-    successful_acknowledgement_datetime = datetime(
-        year=2020, month=6, day=1, hour=13, minute=52, second=0
-    )
-    conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
-                    guid="ddd",
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-                    guid="aaa",
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
-                    guid="xxx",
-                ),
-            ],
-            request_completed_ack_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
-                    message_ref="aaa",
-                    error_code=DUPLICATE_ERROR,
-                ),
-                build_message(
-                    time=successful_acknowledgement_datetime,
-                    message_ref="aaa",
-                    error_code=ERROR_SUPPRESSED,
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=1),
-                    message_ref="ddd",
-                    error_code=DUPLICATE_ERROR,
-                ),
-            ],
-        )
-    ]
-
-    actual = list(derive_transfers(conversations))
-
-    expected_sla_durations = [timedelta(hours=1, minutes=10)]
-    expected_statuses = [TransferStatus.INTEGRATED]
-
-    _assert_attributes("sla_duration", actual, expected_sla_durations)
-    _assert_attributes("status", actual, expected_statuses)
-    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
-
-
 def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error():
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
-                    guid="ddd",
-                )
-            ],
-            request_completed_ack_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=4, minute=43, second=0),
-                    message_ref="ddd",
-                    error_code=DUPLICATE_ERROR,
-                )
-            ],
+        Gp2gpConversation.from_messages(
+            messages=test_cases.acknowledged_duplicate_and_waiting_for_integration()
         )
     ]
 
@@ -251,44 +138,69 @@ def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error
     _assert_attributes("date_completed", actual, [None])
 
 
-def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_other_error():
+def test_produces_sla_and_status_given_integration_with_conflicting_acks_and_duplicate_ehrs():
+    successful_acknowledgement_datetime = datetime(
+        year=2020, month=6, day=1, hour=13, minute=52, second=0
+    )
+
+    conversations = [
+        Gp2gpConversation.from_messages(
+            messages=test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs(
+                request_completed_time=datetime(
+                    year=2020, month=6, day=1, hour=12, minute=42, second=0
+                ),
+                ehr_acknowledge_time=successful_acknowledgement_datetime,
+            )
+        )
+    ]
+
+    actual = list(derive_transfers(conversations))
+
+    expected_sla_durations = [timedelta(hours=1, minutes=10)]
+    expected_statuses = [TransferStatus.INTEGRATED]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+    _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
+
+
+def test_produces_sla_and_status_given_suppression_with_conflicting_acks_and_duplicate_ehrs():
+    successful_acknowledgement_datetime = datetime(
+        year=2020, month=6, day=1, hour=13, minute=52, second=0
+    )
+    conversations = [
+        Gp2gpConversation.from_messages(
+            messages=test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs(
+                request_completed_time=datetime(
+                    year=2020, month=6, day=1, hour=12, minute=42, second=0
+                ),
+                ehr_acknowledge_time=successful_acknowledgement_datetime,
+            )
+        )
+    ]
+
+    actual = list(derive_transfers(conversations))
+
+    expected_sla_durations = [timedelta(hours=1, minutes=10)]
+    expected_statuses = [TransferStatus.INTEGRATED]
+
+    _assert_attributes("sla_duration", actual, expected_sla_durations)
+    _assert_attributes("status", actual, expected_statuses)
+    _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
+
+
+def test_produces_sla_and_status_given_failure_with_conflicting_acks_and_duplicate_ehrs():
     failed_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
-                    guid="ddd",
+        Gp2gpConversation.from_messages(
+            messages=test_cases.integration_failed_with_conflicting_acks_and_duplicate_ehrs(
+                request_completed_time=datetime(
+                    year=2020, month=6, day=1, hour=12, minute=42, second=0
                 ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-                    guid="aaa",
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
-                    guid="xxx",
-                ),
-            ],
-            request_completed_ack_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
-                    message_ref="xxx",
-                    error_code=DUPLICATE_ERROR,
-                ),
-                build_message(
-                    time=failed_acknowledgement_datetime,
-                    message_ref="aaa",
-                    error_code=99,
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=1),
-                    message_ref="ddd",
-                    error_code=DUPLICATE_ERROR,
-                ),
-            ],
+                ehr_acknowledge_time=failed_acknowledgement_datetime,
+            )
         )
     ]
 
@@ -302,44 +214,19 @@ def test_produces_sla_and_failed_status_given_acks_with_duplicate_error_and_othe
     _assert_attributes("date_completed", actual, [failed_acknowledgement_datetime])
 
 
-def test_produces_sla_and_integrated_status_given_acks_with_duplicate_no_error_and_other_error():
+def test_produces_sla_and_status_given_integration_with_conflicting_duplicate_and_error_acks():
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
+
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
-                    guid="ddd",
+        Gp2gpConversation.from_messages(
+            messages=test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack(
+                request_completed_time=datetime(
+                    year=2020, month=6, day=1, hour=12, minute=42, second=0
                 ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-                    guid="aaa",
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
-                    guid="xxx",
-                ),
-            ],
-            request_completed_ack_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
-                    message_ref="aaa",
-                    error_code=DUPLICATE_ERROR,
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
-                    message_ref="aaa",
-                    error_code=11,
-                ),
-                build_message(
-                    time=successful_acknowledgement_datetime,
-                    message_ref="aaa",
-                    error_code=None,
-                ),
-            ],
+                ehr_acknowledge_time=successful_acknowledgement_datetime,
+            )
         )
     ]
 
@@ -353,44 +240,19 @@ def test_produces_sla_and_integrated_status_given_acks_with_duplicate_no_error_a
     _assert_attributes("date_completed", actual, [successful_acknowledgement_datetime])
 
 
-def test_produces_sla_and_integrated_status_given_acks_with_duplicate_suppressed_and_other_errors():
+def test_produces_sla_and_status_given_suppression_with_conflicting_duplicate_and_error_acks():
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
+
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=4, minute=42, second=0),
-                    guid="ddd",
+        Gp2gpConversation.from_messages(
+            messages=test_cases.ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack(
+                request_completed_time=datetime(
+                    year=2020, month=6, day=1, hour=12, minute=42, second=0
                 ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-                    guid="aaa",
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=16, minute=42, second=0),
-                    guid="xxx",
-                ),
-            ],
-            request_completed_ack_messages=[
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=13, second=0),
-                    message_ref="aaa",
-                    error_code=DUPLICATE_ERROR,
-                ),
-                build_message(
-                    time=datetime(year=2020, month=6, day=1, hour=13, minute=52, second=0),
-                    message_ref="aaa",
-                    error_code=11,
-                ),
-                build_message(
-                    time=successful_acknowledgement_datetime,
-                    message_ref="aaa",
-                    error_code=ERROR_SUPPRESSED,
-                ),
-            ],
+                ehr_acknowledge_time=successful_acknowledgement_datetime,
+            )
         )
     ]
 
