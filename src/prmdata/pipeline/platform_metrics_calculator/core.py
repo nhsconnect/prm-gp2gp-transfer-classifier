@@ -14,7 +14,7 @@ from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
-    derive_transfers,
+    derive_transfer,
     filter_for_successful_transfers,
 )
 from prmdata.domain.gp2gp.practice_metrics import calculate_sla_by_practice
@@ -41,10 +41,13 @@ def parse_transfers_from_messages(
 ) -> Iterator[Transfer]:
     conversations = group_into_conversations(spine_messages)
     gp2gp_conversations = _parse_conversations(conversations)
-    conversations_started_in_range = filter_conversations_by_request_started_time(
+    conversations_started_in_reporting_window = filter_conversations_by_request_started_time(
         gp2gp_conversations, reporting_window
     )
-    transfers = derive_transfers(conversations_started_in_range)
+    transfers = (
+        derive_transfer(conversation)
+        for conversation in (conversations_started_in_reporting_window)
+    )
     return transfers
 
 

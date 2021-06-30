@@ -86,7 +86,7 @@ def _has_intermediate_error_and_no_final_ack(conversation: Gp2gpConversation) ->
     return lacking_final_ack and has_intermediate_error
 
 
-def _derive_transfer(conversation: Gp2gpConversation) -> Transfer:
+def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.conversation_id(),
         sla_duration=_calculate_sla(conversation),
@@ -101,10 +101,6 @@ def _derive_transfer(conversation: Gp2gpConversation) -> Transfer:
         date_requested=conversation.date_requested(),
         date_completed=conversation.effective_final_acknowledgement_time(),
     )
-
-
-def derive_transfers(conversations: Iterable[Gp2gpConversation]) -> Iterator[Transfer]:
-    return (_derive_transfer(conversation) for conversation in conversations)
 
 
 def filter_for_successful_transfers(transfers: List[Transfer]) -> Iterator[Transfer]:
