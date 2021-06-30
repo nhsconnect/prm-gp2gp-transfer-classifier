@@ -4,11 +4,8 @@ from typing import List, Iterable
 import pytest
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
-from prmdata.domain.spine.message import ERROR_SUPPRESSED
 from tests.builders import test_cases
 from tests.builders.spine import (
-    build_gp2gp_conversation,
-    build_message,
     build_mock_gp2gp_conversation,
 )
 from prmdata.domain.gp2gp.transfer import (
@@ -267,9 +264,7 @@ def test_produces_sla_and_status_given_suppression_with_conflicting_duplicate_an
 
 
 def test_has_pending_status_if_no_final_ack():
-    conversations = [
-        build_gp2gp_conversation(request_started=build_message(), request_completed_ack_messages=[])
-    ]
+    conversations = [Gp2gpConversation.from_messages(messages=test_cases.core_ehr_sent())]
 
     actual = derive_transfers(conversations)
 
@@ -279,13 +274,7 @@ def test_has_pending_status_if_no_final_ack():
 
 
 def test_has_pending_status_if_no_request_completed_message():
-    conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[],
-            request_completed_ack_messages=[],
-        )
-    ]
+    conversations = [Gp2gpConversation.from_messages(messages=test_cases.request_made())]
 
     actual = derive_transfers(conversations)
 
@@ -296,10 +285,8 @@ def test_has_pending_status_if_no_request_completed_message():
 
 def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            intermediate_messages=[build_message(error_code=None)],
-            request_completed_ack_messages=[],
+        Gp2gpConversation.from_messages(
+            messages=test_cases.pending_integration_with_large_message_fragments()
         )
     ]
 
@@ -312,11 +299,7 @@ def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
 
 def test_has_integrated_status_if_no_error_in_final_ack():
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[build_message(guid="abc")],
-            request_completed_ack_messages=[build_message(error_code=None, message_ref="abc")],
-        )
+        Gp2gpConversation.from_messages(messages=test_cases.ehr_integrated_successfully())
     ]
 
     actual = derive_transfers(conversations)
@@ -327,15 +310,7 @@ def test_has_integrated_status_if_no_error_in_final_ack():
 
 
 def test_has_integrated_status_if_error_is_suppressed():
-    conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[build_message(guid="abc")],
-            request_completed_ack_messages=[
-                build_message(error_code=ERROR_SUPPRESSED, message_ref="abc")
-            ],
-        )
-    ]
+    conversations = [Gp2gpConversation.from_messages(messages=test_cases.ehr_suppressed())]
 
     actual = derive_transfers(conversations)
 
@@ -345,13 +320,7 @@ def test_has_integrated_status_if_error_is_suppressed():
 
 
 def test_has_failed_status_if_error_in_final_ack():
-    conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[build_message(guid="abc")],
-            request_completed_ack_messages=[build_message(error_code=30, message_ref="abc")],
-        )
-    ]
+    conversations = [Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())]
 
     actual = derive_transfers(conversations)
 
@@ -362,12 +331,7 @@ def test_has_failed_status_if_error_in_final_ack():
 
 def test_has_pending_with_error_status_if_error_in_intermediate_message():
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_completed_messages=[build_message()],
-            intermediate_messages=[build_message(error_code=30)],
-            request_completed_ack_messages=[],
-        )
+        Gp2gpConversation.from_messages(messages=test_cases.large_message_fragment_failure())
     ]
 
     actual = derive_transfers(conversations)
@@ -379,13 +343,7 @@ def test_has_pending_with_error_status_if_error_in_intermediate_message():
 
 def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
     conversations = [
-        build_gp2gp_conversation(
-            request_started=build_message(),
-            request_started_ack=build_message(error_code=10),
-            request_completed_messages=[build_message()],
-            intermediate_messages=[],
-            request_completed_ack_messages=[],
-        )
+        Gp2gpConversation.from_messages(messages=test_cases.request_acknowledged_with_error())
     ]
 
     actual = derive_transfers(conversations)

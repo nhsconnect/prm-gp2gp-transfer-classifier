@@ -209,7 +209,7 @@ def ehr_integrated_successfully(**kwargs):
     )
 
 
-def suppressed_ehr(**kwargs):
+def ehr_suppressed(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
     conversation_id = a_string()
@@ -227,7 +227,7 @@ def suppressed_ehr(**kwargs):
     )
 
 
-def concluded_with_failure(**kwargs):
+def ehr_integration_failed(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
@@ -435,6 +435,29 @@ def successful_integration_with_large_messages(**kwargs):
         .with_large_fragment(guid=fragment3_guid)
         .with_requester_acknowledgement(message_ref=fragment3_guid)
         .with_requester_acknowledgement(message_ref=ehr_guid)
+        .build()
+    )
+
+
+def pending_integration_with_large_message_fragments(**kwargs):
+    conversation_id = a_string()
+    ehr_guid = a_string()
+    fragment1_guid = a_string()
+    fragment2_guid = a_string()
+    fragment3_guid = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_large_fragment_continue()
+        .with_large_fragment(guid=fragment1_guid)
+        .with_large_fragment(guid=fragment2_guid)
+        .with_requester_acknowledgement(message_ref=fragment1_guid)
+        .with_requester_acknowledgement(message_ref=fragment2_guid)
+        .with_large_fragment(guid=fragment3_guid)
+        .with_requester_acknowledgement(message_ref=fragment3_guid)
         .build()
     )
 

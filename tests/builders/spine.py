@@ -1,19 +1,7 @@
 from unittest.mock import Mock
 
-from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from prmdata.domain.spine.message import Message
 from tests.builders.common import a_string, a_datetime
-
-
-def build_gp2gp_conversation(**kwargs) -> Gp2gpConversation:
-    return Gp2gpConversation(
-        id=kwargs.get("id", a_string(36)),
-        request_started=kwargs.get("request_started", build_message()),
-        request_started_ack=kwargs.get("request_started_ack", build_message()),
-        request_completed_messages=kwargs.get("request_completed_messages", [build_message()]),
-        intermediate_messages=kwargs.get("intermediate_messages", []),
-        request_completed_ack_messages=kwargs.get("request_completed_ack_messages", []),
-    )
 
 
 def build_mock_gp2gp_conversation(**kwargs):

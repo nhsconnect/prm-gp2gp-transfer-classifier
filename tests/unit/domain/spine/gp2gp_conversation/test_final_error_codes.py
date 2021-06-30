@@ -30,7 +30,7 @@ def test_doesnt_extract_error_codes_given_transfer_in_progress(test_case):
     ["test_case", "expected_codes"],
     [
         (test_cases.ehr_integrated_successfully, [None]),
-        (test_cases.suppressed_ehr, [15]),
+        (test_cases.ehr_suppressed, [15]),
         (test_cases.ehr_integrated_after_duplicate, [12, None]),
     ],
 )
@@ -45,7 +45,7 @@ def test_extracts_correct_codes_given_successful_transfer(test_case, expected_co
 
 def test_extracts_correct_codes_given_transfer_concluded_with_failure():
     conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.concluded_with_failure(error_code=42)
+        messages=test_cases.ehr_integration_failed(error_code=42)
     )
 
     expected = [42]
