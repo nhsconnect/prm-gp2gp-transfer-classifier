@@ -47,12 +47,39 @@ class Gp2gpConversation(NamedTuple):
     def date_requested(self) -> datetime:
         return self.request_started.time
 
+    def is_integrated(self):
+        final_ack = self._find_effective_request_completed_ack_message()
+        has_final_ack = final_ack is not None
+        return has_final_ack and _integrated_or_suppressed(final_ack)
+
+    def effective_request_completed_time(self) -> Optional[datetime]:
+        effective_request_completed_ack_message = (
+            self._find_effective_request_completed_ack_message()
+        )
+
+        if effective_request_completed_ack_message is None:
+            return None
+
+        effective_request_completed_message = self._find_request_completed_by_guid(
+            guid=effective_request_completed_ack_message.message_ref
+        )
+        if effective_request_completed_message:
+            return effective_request_completed_message.time
+
+        return None
+
+    def effective_final_acknowledgement_time(self):
+        final_ack = self._find_effective_request_completed_ack_message()
+        if final_ack is None:
+            return None
+        return final_ack.time
+
     def _find_successful_request_completed_ack_message(self) -> Optional[Message]:
         return next(
             (
                 message
                 for message in self.request_completed_ack_messages
-                if message.error_code is None or message.error_code == ERROR_SUPPRESSED
+                if _integrated_or_suppressed(message)
             ),
             None,
         )
@@ -78,32 +105,17 @@ class Gp2gpConversation(NamedTuple):
             (message for message in self.request_completed_messages if message.guid == guid), None
         )
 
-    def effective_request_completed_time(self) -> Optional[datetime]:
-        effective_request_completed_ack_message = (
-            self._find_effective_request_completed_ack_message()
-        )
-
-        if effective_request_completed_ack_message is None:
-            return None
-
-        effective_request_completed_message = self._find_request_completed_by_guid(
-            guid=effective_request_completed_ack_message.message_ref
-        )
-        if effective_request_completed_message:
-            return effective_request_completed_message.time
-
-        return None
-
-    def effective_final_acknowledgement_time(self):
-        final_ack = self._find_effective_request_completed_ack_message()
-        if final_ack is None:
-            return None
-        return final_ack.time
-
     @classmethod
     def from_messages(cls, messages):
         parser = SpineConversationParser(messages)
         return parser.parse()
+
+
+def _integrated_or_suppressed(request_completed_ack):
+    return (
+        request_completed_ack.error_code is None
+        or request_completed_ack.error_code == ERROR_SUPPRESSED
+    )
 
 
 class ConversationMissingStart(Exception):

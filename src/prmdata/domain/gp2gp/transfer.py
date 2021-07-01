@@ -48,7 +48,7 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
 
 
 def _assign_status(conversation: Gp2gpConversation) -> TransferStatus:
-    if _is_integrated(conversation):
+    if conversation.is_integrated():
         return TransferStatus.INTEGRATED
     elif _has_final_ack_error(conversation):
         return TransferStatus.FAILED
@@ -56,13 +56,6 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferStatus:
         return TransferStatus.PENDING_WITH_ERROR
     else:
         return TransferStatus.PENDING
-
-
-def _is_integrated(conversation: Gp2gpConversation) -> bool:
-    final_ack_messages = conversation.request_completed_ack_messages
-    return len(final_ack_messages) > 0 and any(
-        _is_successful_ack(final_ack_message) for final_ack_message in final_ack_messages
-    )
 
 
 def _is_successful_ack(message: Message) -> bool:
