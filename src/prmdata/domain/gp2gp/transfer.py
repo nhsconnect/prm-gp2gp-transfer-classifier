@@ -6,7 +6,6 @@ from enum import Enum
 import pyarrow as pa
 import pyarrow as Table
 
-from prmdata.domain.spine.message import Message, ERROR_SUPPRESSED, DUPLICATE_ERROR
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 
 
@@ -50,25 +49,12 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
 def _assign_status(conversation: Gp2gpConversation) -> TransferStatus:
     if conversation.is_integrated():
         return TransferStatus.INTEGRATED
-    elif _has_final_ack_error(conversation):
+    elif conversation.has_concluded_with_failure():
         return TransferStatus.FAILED
     elif _has_intermediate_error_and_no_final_ack(conversation):
         return TransferStatus.PENDING_WITH_ERROR
     else:
         return TransferStatus.PENDING
-
-
-def _is_successful_ack(message: Message) -> bool:
-    return message.error_code is None or message.error_code == ERROR_SUPPRESSED
-
-
-def _has_final_ack_error(conversation: Gp2gpConversation) -> bool:
-    final_ack_messages = conversation.request_completed_ack_messages
-    return len(final_ack_messages) > 0 and any(
-        not _is_successful_ack(final_ack_message)
-        and final_ack_message.error_code != DUPLICATE_ERROR
-        for final_ack_message in final_ack_messages
-    )
 
 
 def _has_intermediate_error_and_no_final_ack(conversation: Gp2gpConversation) -> bool:

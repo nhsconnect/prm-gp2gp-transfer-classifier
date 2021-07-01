@@ -1,8 +1,7 @@
 from typing import NamedTuple, List, Optional, Iterable, Iterator
 from datetime import datetime
 
-from prmdata.domain.gp2gp.transfer import DUPLICATE_ERROR, ERROR_SUPPRESSED
-from prmdata.domain.spine.message import Message
+from prmdata.domain.spine.message import Message, DUPLICATE_ERROR, ERROR_SUPPRESSED
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 
@@ -51,6 +50,11 @@ class Gp2gpConversation(NamedTuple):
         final_ack = self._find_effective_request_completed_ack_message()
         has_final_ack = final_ack is not None
         return has_final_ack and _integrated_or_suppressed(final_ack)
+
+    def has_concluded_with_failure(self):
+        final_ack = self._find_effective_request_completed_ack_message()
+        has_final_ack = final_ack is not None
+        return has_final_ack and not _integrated_or_suppressed(final_ack)
 
     def effective_request_completed_time(self) -> Optional[datetime]:
         effective_request_completed_ack_message = (
