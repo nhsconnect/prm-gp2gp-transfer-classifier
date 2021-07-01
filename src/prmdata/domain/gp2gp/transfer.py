@@ -51,18 +51,10 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferStatus:
         return TransferStatus.INTEGRATED
     elif conversation.has_concluded_with_failure():
         return TransferStatus.FAILED
-    elif _has_intermediate_error_and_no_final_ack(conversation):
+    elif conversation.is_pending_with_error():
         return TransferStatus.PENDING_WITH_ERROR
     else:
         return TransferStatus.PENDING
-
-
-def _has_intermediate_error_and_no_final_ack(conversation: Gp2gpConversation) -> bool:
-    intermediate_errors = conversation.intermediate_error_codes()
-    sender_error = conversation.sender_error()
-    has_intermediate_error = len(intermediate_errors) > 0 or sender_error is not None
-    lacking_final_ack = len(conversation.request_completed_ack_messages) == 0
-    return lacking_final_ack and has_intermediate_error
 
 
 def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
