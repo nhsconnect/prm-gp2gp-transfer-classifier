@@ -4,12 +4,14 @@ import pytest
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
+from tests.builders.common import a_datetime
 from tests.builders.spine import (
     build_mock_gp2gp_conversation,
 )
 from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
     derive_transfer,
+    TransferFailureReason,
 )
 
 
@@ -98,7 +100,7 @@ def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error
     expected_date_completed = None
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == expected_date_completed
 
 
@@ -119,10 +121,10 @@ def test_produces_sla_and_status_given_integration_with_conflicting_acks_and_dup
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
-    expected_status = TransferStatus.INTEGRATED
+    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
 
 
@@ -142,10 +144,10 @@ def test_produces_sla_and_status_given_suppression_with_conflicting_acks_and_dup
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
-    expected_status = TransferStatus.INTEGRATED
+    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
 
 
@@ -168,7 +170,7 @@ def test_produces_sla_and_status_given_failure_with_conflicting_acks_and_duplica
     expected_status = TransferStatus.FAILED
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == failed_acknowledgement_datetime
 
 
@@ -189,10 +191,10 @@ def test_produces_sla_and_status_given_integration_with_conflicting_duplicate_an
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
-    expected_status = TransferStatus.INTEGRATED
+    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
 
 
@@ -213,10 +215,10 @@ def test_produces_sla_and_status_given_suppression_with_conflicting_duplicate_an
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
-    expected_status = TransferStatus.INTEGRATED
+    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
 
 
@@ -227,7 +229,7 @@ def test_has_pending_status_if_no_final_ack():
 
     expected_status = TransferStatus.PENDING
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
 
 
 def test_has_pending_status_if_no_request_completed_message():
@@ -237,7 +239,7 @@ def test_has_pending_status_if_no_request_completed_message():
 
     expected_status = TransferStatus.PENDING
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
 
 
 def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
@@ -249,7 +251,7 @@ def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
 
     expected_status = TransferStatus.PENDING
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
 
 
 def test_has_integrated_status_if_no_error_in_final_ack():
@@ -259,9 +261,9 @@ def test_has_integrated_status_if_no_error_in_final_ack():
 
     actual = derive_transfer(conversation)
 
-    expected_status = TransferStatus.INTEGRATED
+    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
 
 
 def test_has_integrated_status_if_error_is_suppressed():
@@ -269,9 +271,9 @@ def test_has_integrated_status_if_error_is_suppressed():
 
     actual = derive_transfer(conversation)
 
-    expected_status = TransferStatus.INTEGRATED
+    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
 
 
 def test_has_failed_status_if_error_in_final_ack():
@@ -281,7 +283,7 @@ def test_has_failed_status_if_error_in_final_ack():
 
     expected_status = TransferStatus.FAILED
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
 
 
 def test_has_pending_with_error_status_if_error_in_intermediate_message():
@@ -293,7 +295,7 @@ def test_has_pending_with_error_status_if_error_in_intermediate_message():
 
     expected_status = TransferStatus.PENDING_WITH_ERROR
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
 
 
 def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
@@ -305,4 +307,40 @@ def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
 
     expected_status = TransferStatus.PENDING_WITH_ERROR
 
-    assert actual.status == expected_status
+    assert actual.transfer_outcome.status == expected_status
+
+
+def test_has_integrated_on_time_status_if_ehr_integrated_successfully_within_8_days():
+    request_completed_time = a_datetime(year=2021, month=5, day=1)
+    ehr_acknowledge_time = a_datetime(year=2021, month=5, day=5)
+
+    conversation = Gp2gpConversation.from_messages(
+        messages=test_cases.ehr_integrated_successfully(
+            ehr_acknowledge_time=ehr_acknowledge_time, request_completed_time=request_completed_time
+        )
+    )
+
+    actual = derive_transfer(conversation)
+
+    expected_status = TransferStatus.INTEGRATED_ON_TIME
+
+    assert actual.transfer_outcome.status == expected_status
+
+
+def test_has_process_failure_status_with_integrated_late_reason_if_ehr_integrated_successfully_beyond_8_days():
+    request_completed_time = a_datetime(year=2021, month=5, day=1)
+    ehr_acknowledge_time = a_datetime(year=2021, month=5, day=10)
+
+    conversation = Gp2gpConversation.from_messages(
+        messages=test_cases.ehr_integrated_successfully(
+            ehr_acknowledge_time=ehr_acknowledge_time, request_completed_time=request_completed_time
+        )
+    )
+
+    actual = derive_transfer(conversation)
+
+    expected_status = TransferStatus.PROCESS_FAILURE
+    expected_reason = TransferFailureReason.INTEGRATED_LATE
+
+    assert actual.transfer_outcome.status == expected_status
+    assert actual.transfer_outcome.reason == expected_reason

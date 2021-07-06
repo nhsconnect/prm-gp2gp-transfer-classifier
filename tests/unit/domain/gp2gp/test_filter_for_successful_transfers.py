@@ -5,6 +5,8 @@ from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
     filter_for_successful_transfers,
+    TransferOutcome,
+    TransferFailureReason,
 )
 from tests.builders.gp2gp import build_transfer
 from tests.builders.common import a_datetime
@@ -14,6 +16,9 @@ date_completed = a_datetime()
 
 
 def test_includes_successful_transfer():
+    integrated_transfer_outcome = TransferOutcome(
+        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+    )
     successful_transfer = build_transfer(
         conversation_id="123",
         sla_duration=timedelta(hours=1),
@@ -22,7 +27,7 @@ def test_includes_successful_transfer():
         requesting_supplier="EMIS",
         sending_supplier="SystemOne",
         final_error_codes=[],
-        status=TransferStatus.INTEGRATED,
+        transfer_outcome=integrated_transfer_outcome,
         date_requested=date_requested,
         date_completed=date_completed,
     )
@@ -42,7 +47,7 @@ def test_includes_successful_transfer():
             sender_error_code=None,
             final_error_codes=[],
             intermediate_error_codes=[],
-            status=TransferStatus.INTEGRATED,
+            transfer_outcome=integrated_transfer_outcome,
             date_requested=date_requested,
             date_completed=date_completed,
         )
@@ -52,6 +57,9 @@ def test_includes_successful_transfer():
 
 
 def test_includes_suppressed_transfers():
+    integrated_transfer_outcome = TransferOutcome(
+        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+    )
     suppressed_transfer = build_transfer(
         conversation_id="456",
         sla_duration=timedelta(hours=2),
@@ -60,7 +68,7 @@ def test_includes_suppressed_transfers():
         requesting_supplier="Vision",
         sending_supplier="SystemOne",
         final_error_codes=[15],
-        status=TransferStatus.INTEGRATED,
+        transfer_outcome=integrated_transfer_outcome,
         date_requested=date_requested,
         date_completed=date_completed,
     )
@@ -80,7 +88,7 @@ def test_includes_suppressed_transfers():
             sender_error_code=None,
             final_error_codes=[15],
             intermediate_error_codes=[],
-            status=TransferStatus.INTEGRATED,
+            transfer_outcome=integrated_transfer_outcome,
             date_requested=date_requested,
             date_completed=date_completed,
         )
@@ -90,9 +98,15 @@ def test_includes_suppressed_transfers():
 
 
 def test_excludes_failed_transfers():
-    integrated_transfer_1 = build_transfer(status=TransferStatus.INTEGRATED)
-    integrated_transfer_2 = build_transfer(status=TransferStatus.INTEGRATED)
-    failed_transfer = build_transfer(status=TransferStatus.FAILED)
+    integrated_transfer_outcome = TransferOutcome(
+        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+    )
+    failed_transfer_outcome = TransferOutcome(
+        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+    )
+    integrated_transfer_1 = build_transfer(transfer_outcome=integrated_transfer_outcome)
+    integrated_transfer_2 = build_transfer(transfer_outcome=integrated_transfer_outcome)
+    failed_transfer = build_transfer(transfer_outcome=failed_transfer_outcome)
     transfers = [integrated_transfer_1, integrated_transfer_2, failed_transfer]
 
     actual = filter_for_successful_transfers(transfers)
@@ -103,9 +117,17 @@ def test_excludes_failed_transfers():
 
 
 def test_excludes_transfers_missing_sla_duration():
-    integrated_transfer_1 = build_transfer(status=TransferStatus.INTEGRATED)
-    integrated_transfer_2 = build_transfer(status=TransferStatus.INTEGRATED, sla_duration=None)
-    failed_transfer = build_transfer(status=TransferStatus.FAILED)
+    integrated_transfer_outcome = TransferOutcome(
+        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+    )
+    failed_transfer_outcome = TransferOutcome(
+        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+    )
+    integrated_transfer_1 = build_transfer(transfer_outcome=integrated_transfer_outcome)
+    integrated_transfer_2 = build_transfer(
+        transfer_outcome=integrated_transfer_outcome, sla_duration=None
+    )
+    failed_transfer = build_transfer(transfer_outcome=failed_transfer_outcome)
     transfers = [integrated_transfer_1, integrated_transfer_2, failed_transfer]
 
     actual = filter_for_successful_transfers(transfers)
@@ -116,7 +138,7 @@ def test_excludes_transfers_missing_sla_duration():
 
 
 def test_excludes_pending_transfers():
-    pending_transfer = build_transfer(status=TransferStatus.PENDING)
+    pending_transfer = build_transfer()
 
     transfers = [pending_transfer]
 

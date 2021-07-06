@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Iterable, List, Set
 from prmdata.domain.gp2gp.sla import SlaCounter
-from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
+from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus, TransferFailureReason
 
 
 @dataclass
@@ -46,11 +46,21 @@ def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
 def _count_transfers_with_statuses(
     transfers: Iterable[Transfer], statuses: Set[TransferStatus]
 ) -> int:
-    return len([t for t in transfers if t.status in statuses])
+    return len([t for t in transfers if t.transfer_outcome.status in statuses])
 
 
 def _filter_for_integrated_transfers(transfers: Iterable[Transfer]) -> List[Transfer]:
-    return [t for t in transfers if t.status == TransferStatus.INTEGRATED]
+    return [
+        t
+        for t in transfers
+        if (
+            (t.transfer_outcome.status == TransferStatus.INTEGRATED_ON_TIME)
+            | (
+                (t.transfer_outcome.status == TransferStatus.PROCESS_FAILURE)
+                & (t.transfer_outcome.reason == TransferFailureReason.INTEGRATED_LATE)
+            )
+        )
+    ]
 
 
 def _calculate_sla_band_counts(integrated_transfers: List[Transfer]):

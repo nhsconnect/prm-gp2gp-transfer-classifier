@@ -2,7 +2,12 @@ from datetime import timedelta, datetime
 
 import pyarrow as pa
 
-from prmdata.domain.gp2gp.transfer import TransferStatus, convert_transfers_to_table
+from prmdata.domain.gp2gp.transfer import (
+    TransferStatus,
+    convert_transfers_to_table,
+    TransferFailureReason,
+    TransferOutcome,
+)
 from tests.builders.gp2gp import build_transfer
 
 
@@ -141,9 +146,12 @@ def test_intermediate_error_codes_is_converted_to_column_when_empty():
 
 
 def test_status_is_converted_to_column():
-    transfer = build_transfer(status=TransferStatus.INTEGRATED)
+    integrated_transfer_outcome = TransferOutcome(
+        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+    )
+    transfer = build_transfer(transfer_outcome=integrated_transfer_outcome)
 
-    expected_status_column = {"status": ["INTEGRATED"]}
+    expected_status_column = {"status": ["INTEGRATED_ON_TIME"]}
 
     table = convert_transfers_to_table([transfer])
     actual_status_column = table.select(["status"]).to_pydict()
@@ -217,6 +225,7 @@ def test_table_has_correct_schema():
             ("final_error_codes", pa.list_(pa.int64())),
             ("intermediate_error_codes", pa.list_(pa.int64())),
             ("status", pa.string()),
+            ("failure_reason", pa.string()),
             ("date_requested", pa.timestamp("us")),
             ("date_completed", pa.timestamp("us")),
         ]

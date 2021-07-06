@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from prmdata.domain.spine.message import (
     Message,
     EHR_REQUEST_STARTED,
@@ -194,8 +196,8 @@ def acknowledged_duplicate_and_waiting_for_integration():
 
 
 def ehr_integrated_successfully(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time + timedelta(days=1))
     conversation_id = a_string()
     ehr_guid = a_string()
 
@@ -210,8 +212,8 @@ def ehr_integrated_successfully(**kwargs):
 
 
 def ehr_suppressed(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time + timedelta(days=1))
     conversation_id = a_string()
     ehr_guid = a_string()
 

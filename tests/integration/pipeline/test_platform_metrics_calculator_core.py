@@ -26,7 +26,12 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
 )
 from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 
-from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
+from prmdata.domain.gp2gp.transfer import (
+    Transfer,
+    TransferStatus,
+    TransferFailureReason,
+    TransferOutcome,
+)
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 from tests.builders.spine import build_message
@@ -113,7 +118,9 @@ def test_parses_transfer_correctly_given_valid_message_list():
             sending_practice_asid=sending_asid_with_transfer,
             requesting_supplier=requesting_supplier,
             sending_supplier=sending_supplier,
-            status=TransferStatus.INTEGRATED,
+            transfer_outcome=TransferOutcome(
+                reason=TransferFailureReason.DEFAULT, status=TransferStatus.INTEGRATED_ON_TIME
+            ),
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
             sender_error_code=None,
@@ -152,7 +159,9 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
             sending_practice_asid=sending_asid_with_transfer,
             requesting_supplier=requesting_supplier,
             sending_supplier=sending_supplier,
-            status=TransferStatus.INTEGRATED,
+            transfer_outcome=TransferOutcome(
+                reason=TransferFailureReason.DEFAULT, status=TransferStatus.INTEGRATED_ON_TIME
+            ),
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
             sender_error_code=None,
@@ -213,16 +222,47 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     sla_duration_within_8_days = timedelta(seconds=EIGHT_DAYS_IN_SECONDS)
     sla_duration_beyond_8_days = timedelta(seconds=EIGHT_DAYS_IN_SECONDS + 1)
 
+    integrated_late_transfer_outcome = TransferOutcome(
+        status=TransferStatus.PROCESS_FAILURE, reason=TransferFailureReason.INTEGRATED_LATE
+    )
+    integrated_on_time_transfer_outcome = TransferOutcome(
+        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+    )
+    pending_with_error_transfer_outcome = TransferOutcome(
+        status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
+    )
+    failed_transfer_outcome = TransferOutcome(
+        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+    )
+
     transfers = [
-        build_transfer(status=TransferStatus.PENDING),
-        build_transfer(status=TransferStatus.PENDING_WITH_ERROR),
-        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_3_days),
-        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_8_days),
-        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_within_8_days),
-        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
-        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
-        build_transfer(status=TransferStatus.INTEGRATED, sla_duration=sla_duration_beyond_8_days),
-        build_transfer(status=TransferStatus.FAILED),
+        build_transfer(),
+        build_transfer(transfer_outcome=pending_with_error_transfer_outcome),
+        build_transfer(
+            transfer_outcome=integrated_on_time_transfer_outcome,
+            sla_duration=sla_duration_within_3_days,
+        ),
+        build_transfer(
+            transfer_outcome=integrated_on_time_transfer_outcome,
+            sla_duration=sla_duration_within_8_days,
+        ),
+        build_transfer(
+            transfer_outcome=integrated_on_time_transfer_outcome,
+            sla_duration=sla_duration_within_8_days,
+        ),
+        build_transfer(
+            transfer_outcome=integrated_late_transfer_outcome,
+            sla_duration=sla_duration_beyond_8_days,
+        ),
+        build_transfer(
+            transfer_outcome=integrated_late_transfer_outcome,
+            sla_duration=sla_duration_beyond_8_days,
+        ),
+        build_transfer(
+            transfer_outcome=integrated_late_transfer_outcome,
+            sla_duration=sla_duration_beyond_8_days,
+        ),
+        build_transfer(transfer_outcome=failed_transfer_outcome),
     ]
 
     reporting_window = MonthlyReportingWindow(

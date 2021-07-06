@@ -1,7 +1,12 @@
 from typing import List
 
 from prmdata.domain.gp2gp.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
-from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus
+from prmdata.domain.gp2gp.transfer import (
+    Transfer,
+    TransferStatus,
+    TransferOutcome,
+    TransferFailureReason,
+)
 from tests.builders.common import a_string, a_duration, an_integer, a_datetime
 
 
@@ -16,7 +21,10 @@ def build_transfer(**kwargs) -> Transfer:
         sender_error_code=kwargs.get("sender_error_code", None),
         final_error_codes=kwargs.get("final_error_codes", []),
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),
-        status=kwargs.get("status", TransferStatus.PENDING),
+        transfer_outcome=kwargs.get(
+            "transfer_outcome",
+            TransferOutcome(status=TransferStatus.PENDING, reason=TransferFailureReason.DEFAULT),
+        ),
         date_requested=kwargs.get("date_requested", a_datetime()),
         date_completed=kwargs.get("date_completed", None),
     )
@@ -36,21 +44,31 @@ def build_practice_metrics(**kwargs) -> PracticeMetrics:
 
 
 def an_integrated_transfer(**kwargs):
+    integrated_transfer_outcome = TransferOutcome(
+        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+    )
     return build_transfer(
-        status=TransferStatus.INTEGRATED, sla_duration=kwargs.get("sla_duration", a_duration())
+        transfer_outcome=integrated_transfer_outcome,
+        sla_duration=kwargs.get("sla_duration", a_duration()),
     )
 
 
 def a_pending_transfer():
-    return build_transfer(status=TransferStatus.PENDING)
+    return build_transfer()
 
 
 def a_pending_with_error_transfer():
-    return build_transfer(status=TransferStatus.PENDING_WITH_ERROR)
+    pending_with_error_transfer_outcome = TransferOutcome(
+        status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
+    )
+    return build_transfer(transfer_outcome=pending_with_error_transfer_outcome)
 
 
 def a_failed_transfer():
-    return build_transfer(status=TransferStatus.FAILED)
+    failed_transfer_outcome = TransferOutcome(
+        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+    )
+    return build_transfer(transfer_outcome=failed_transfer_outcome)
 
 
 def build_transfers(**kwargs) -> List[Transfer]:

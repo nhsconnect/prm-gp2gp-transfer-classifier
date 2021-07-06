@@ -63,7 +63,15 @@ EXPECTED_TRANSFERS = {
     ],
     "sending_supplier": ["", "EMIS", "Vision", "Unknown", "", "Vision"],
     "sla_duration": [398306, 830306, 139106, 52706, 311906, 3],
-    "status": ["INTEGRATED", "INTEGRATED", "INTEGRATED", "FAILED", "INTEGRATED", "INTEGRATED"],
+    "status": [
+        "INTEGRATED_ON_TIME",
+        "PROCESS_FAILURE",
+        "INTEGRATED_ON_TIME",
+        "FAILED",
+        "INTEGRATED_ON_TIME",
+        "INTEGRATED_ON_TIME",
+    ],
+    "failure_reason": ["", "Integrated Late", "", "", "", ""],
 }
 
 
