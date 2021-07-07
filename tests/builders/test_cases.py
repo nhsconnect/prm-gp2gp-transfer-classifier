@@ -211,6 +211,22 @@ def ehr_integrated_successfully(**kwargs):
     )
 
 
+def ehr_integrated_late(**kwargs):
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time + timedelta(days=9))
+    conversation_id = a_string()
+    ehr_guid = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
+        .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
+        .build()
+    )
+
+
 def ehr_suppressed(**kwargs):
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time + timedelta(days=1))
@@ -490,8 +506,8 @@ def multiple_large_fragment_failures(**kwargs):
 
 def concluded_with_conflicting_acks_and_duplicate_ehrs(**kwargs):
     conversation_id = a_string()
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time + timedelta(hours=4))
     ehr_ack_code = kwargs.get("ehr_ack_code", None)
 
     ehr_guid_1 = a_string()
@@ -519,6 +535,7 @@ def ehr_integrated_with_conflicting_acks_and_duplicate_ehrs(**kwargs):
 
 
 def ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs(**kwargs):
+
     return concluded_with_conflicting_acks_and_duplicate_ehrs(
         ehr_ack_code=SUPPRESSED_EHR_ERROR, **kwargs
     )
@@ -554,7 +571,9 @@ def concluded_with_conflicting_acks(**kwargs):
 
 
 def ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    request_completed_time = kwargs.setdefault("request_completed_time", a_datetime())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", request_completed_time + timedelta(hours=4))
+
     return concluded_with_conflicting_acks(
         **kwargs,
         codes_and_times=[
@@ -566,7 +585,9 @@ def ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack(**kwargs
 
 
 def ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack(**kwargs):
-    ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
+    request_completed_time = kwargs.setdefault("request_completed_time", a_datetime())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", request_completed_time + timedelta(hours=4))
+
     return concluded_with_conflicting_acks(
         **kwargs,
         codes_and_times=[

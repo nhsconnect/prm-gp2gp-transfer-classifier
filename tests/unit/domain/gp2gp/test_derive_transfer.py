@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
+from typing import List
 
 import pytest
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from prmdata.domain.spine.message import Message
 from tests.builders import test_cases
-from tests.builders.common import a_datetime
 from tests.builders.spine import (
     build_mock_gp2gp_conversation,
 )
@@ -23,6 +24,88 @@ def test_extracts_conversation_id():
     expected_conversation_id = "1234"
 
     assert actual.conversation_id == expected_conversation_id
+
+
+@pytest.mark.parametrize(
+    "test_case, expected_status, expected_reason",
+    [
+        (
+            test_cases.ehr_integrated_successfully,
+            TransferStatus.INTEGRATED_ON_TIME,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.ehr_integrated_late,
+            TransferStatus.PROCESS_FAILURE,
+            TransferFailureReason.INTEGRATED_LATE,
+        ),
+        (
+            test_cases.ehr_integration_failed,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.FINAL_ERROR,
+        ),
+        (
+            test_cases.acknowledged_duplicate_and_waiting_for_integration,
+            TransferStatus.PENDING,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs,
+            TransferStatus.INTEGRATED_ON_TIME,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs,
+            TransferStatus.INTEGRATED_ON_TIME,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.integration_failed_with_conflicting_acks_and_duplicate_ehrs,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.FINAL_ERROR,
+        ),
+        (
+            test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack,
+            TransferStatus.INTEGRATED_ON_TIME,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack,
+            TransferStatus.INTEGRATED_ON_TIME,
+            TransferFailureReason.DEFAULT,
+        ),
+        (test_cases.core_ehr_sent, TransferStatus.PENDING, TransferFailureReason.DEFAULT),
+        (test_cases.request_made, TransferStatus.PENDING, TransferFailureReason.DEFAULT),
+        (
+            test_cases.pending_integration_with_large_message_fragments,
+            TransferStatus.PENDING,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.ehr_suppressed,
+            TransferStatus.INTEGRATED_ON_TIME,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.large_message_fragment_failure,
+            TransferStatus.PENDING_WITH_ERROR,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
+            test_cases.request_acknowledged_with_error,
+            TransferStatus.PENDING_WITH_ERROR,
+            TransferFailureReason.DEFAULT,
+        ),
+    ],
+)
+def test_returns_correct_transfer_outcome(test_case, expected_status, expected_reason):
+    gp2gp_messages: List[Message] = test_case()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    actual = derive_transfer(conversation)
+
+    assert actual.transfer_outcome.status == expected_status
+    assert actual.transfer_outcome.reason == expected_reason
 
 
 def test_produces_sla_of_successful_conversation():
@@ -88,7 +171,7 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
     assert actual.sla_duration == expected_sla_duration
 
 
-def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error():
+def test_produces_no_sla_given_acks_with_only_duplicate_error():
     conversation = Gp2gpConversation.from_messages(
         messages=test_cases.acknowledged_duplicate_and_waiting_for_integration()
     )
@@ -96,15 +179,13 @@ def test_produces_no_sla_and_pending_status_given_acks_with_only_duplicate_error
     actual = derive_transfer(conversation)
 
     expected_sla_duration = None
-    expected_status = TransferStatus.PENDING
     expected_date_completed = None
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == expected_date_completed
 
 
-def test_produces_sla_and_status_given_integration_with_conflicting_acks_and_duplicate_ehrs():
+def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs():
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
@@ -121,14 +202,12 @@ def test_produces_sla_and_status_given_integration_with_conflicting_acks_and_dup
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
-    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
 
 
-def test_produces_sla_and_status_given_suppression_with_conflicting_acks_and_duplicate_ehrs():
+def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs():
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
@@ -144,14 +223,12 @@ def test_produces_sla_and_status_given_suppression_with_conflicting_acks_and_dup
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
-    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
 
 
-def test_produces_sla_and_status_given_failure_with_conflicting_acks_and_duplicate_ehrs():
+def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
     failed_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
@@ -167,14 +244,12 @@ def test_produces_sla_and_status_given_failure_with_conflicting_acks_and_duplica
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
-    expected_status = TransferStatus.TECHNICAL_FAILURE
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == failed_acknowledgement_datetime
 
 
-def test_produces_sla_and_status_given_integration_with_conflicting_duplicate_and_error_acks():
+def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_acks():
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
@@ -191,14 +266,12 @@ def test_produces_sla_and_status_given_integration_with_conflicting_duplicate_an
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
-    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
 
 
-def test_produces_sla_and_status_given_suppression_with_conflicting_duplicate_and_error_acks():
+def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_acks():
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
@@ -215,122 +288,6 @@ def test_produces_sla_and_status_given_suppression_with_conflicting_duplicate_an
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
-    expected_status = TransferStatus.INTEGRATED_ON_TIME
 
     assert actual.sla_duration == expected_sla_duration
-    assert actual.transfer_outcome.status == expected_status
     assert actual.date_completed == successful_acknowledgement_datetime
-
-
-def test_has_pending_status_if_no_final_ack():
-    conversation = Gp2gpConversation.from_messages(messages=test_cases.core_ehr_sent())
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.PENDING
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_pending_status_if_no_request_completed_message():
-    conversation = Gp2gpConversation.from_messages(messages=test_cases.request_made())
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.PENDING
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.pending_integration_with_large_message_fragments()
-    )
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.PENDING
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_integrated_status_if_error_is_suppressed():
-    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_suppressed())
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.INTEGRATED_ON_TIME
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_pending_with_error_status_if_error_in_intermediate_message():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.large_message_fragment_failure()
-    )
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.PENDING_WITH_ERROR
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_pending_with_error_status_if_error_in_request_acknowledgement():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.request_acknowledged_with_error()
-    )
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.PENDING_WITH_ERROR
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_integrated_on_time_status_if_ehr_integrated_successfully_within_8_days():
-    request_completed_time = a_datetime(year=2021, month=5, day=1)
-    ehr_acknowledge_time = a_datetime(year=2021, month=5, day=5)
-
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.ehr_integrated_successfully(
-            ehr_acknowledge_time=ehr_acknowledge_time, request_completed_time=request_completed_time
-        )
-    )
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.INTEGRATED_ON_TIME
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_process_failure_with_integrated_late_reason_if_ehr_integrated_beyond_8_days():
-    request_completed_time = a_datetime(year=2021, month=5, day=1)
-    ehr_acknowledge_time = a_datetime(year=2021, month=5, day=10)
-
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.ehr_integrated_successfully(
-            ehr_acknowledge_time=ehr_acknowledge_time, request_completed_time=request_completed_time
-        )
-    )
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.PROCESS_FAILURE
-    expected_reason = TransferFailureReason.INTEGRATED_LATE
-
-    assert actual.transfer_outcome.status == expected_status
-    assert actual.transfer_outcome.reason == expected_reason
-
-
-def test_has_technical_failure_final_error_if_error_in_final_ack():
-    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.TECHNICAL_FAILURE
-    expected_reason = TransferFailureReason.FINAL_ERROR
-
-    assert actual.transfer_outcome.status == expected_status
-    assert actual.transfer_outcome.reason == expected_reason
