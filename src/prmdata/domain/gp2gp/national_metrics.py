@@ -33,13 +33,19 @@ def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
         pending_transfer_count=_count_transfers_with_statuses(
             transfers, {TransferStatus.PENDING, TransferStatus.PENDING_WITH_ERROR}
         ),
-        failed_transfer_count=_count_transfers_with_statuses(transfers, {TransferStatus.FAILED}),
+        failed_transfer_count=_count_failed_transfers(transfers),
         integrated=IntegratedMetrics(
             transfer_count=len(integrated_transfers),
             within_3_days=sla_band_counts.within_3_days(),
             within_8_days=sla_band_counts.within_8_days(),
             beyond_8_days=sla_band_counts.beyond_8_days(),
         ),
+    )
+
+
+def _count_failed_transfers(transfers: Iterable[Transfer]) -> int:
+    return len(
+        [t for t in transfers if t.transfer_outcome.reason == TransferFailureReason.FINAL_ERROR]
     )
 
 

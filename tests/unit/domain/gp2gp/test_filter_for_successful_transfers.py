@@ -102,7 +102,7 @@ def test_excludes_failed_transfers():
         status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
     )
     failed_transfer_outcome = TransferOutcome(
-        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+        status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
     )
     integrated_transfer_1 = build_transfer(transfer_outcome=integrated_transfer_outcome)
     integrated_transfer_2 = build_transfer(transfer_outcome=integrated_transfer_outcome)
@@ -121,7 +121,7 @@ def test_excludes_transfers_missing_sla_duration():
         status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
     )
     failed_transfer_outcome = TransferOutcome(
-        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+        status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
     )
     integrated_transfer_1 = build_transfer(transfer_outcome=integrated_transfer_outcome)
     integrated_transfer_2 = build_transfer(

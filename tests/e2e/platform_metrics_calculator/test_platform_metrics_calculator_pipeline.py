@@ -67,11 +67,11 @@ EXPECTED_TRANSFERS = {
         "INTEGRATED_ON_TIME",
         "PROCESS_FAILURE",
         "INTEGRATED_ON_TIME",
-        "FAILED",
+        "TECHNICAL_FAILURE",
         "INTEGRATED_ON_TIME",
         "INTEGRATED_ON_TIME",
     ],
-    "failure_reason": ["", "Integrated Late", "", "", "", ""],
+    "failure_reason": ["", "Integrated Late", "", "Final Error", "", ""],
 }
 
 

@@ -66,7 +66,7 @@ def a_pending_with_error_transfer():
 
 def a_failed_transfer():
     failed_transfer_outcome = TransferOutcome(
-        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+        status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
     )
     return build_transfer(transfer_outcome=failed_transfer_outcome)
 

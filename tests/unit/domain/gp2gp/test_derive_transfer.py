@@ -167,7 +167,7 @@ def test_produces_sla_and_status_given_failure_with_conflicting_acks_and_duplica
     actual = derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
-    expected_status = TransferStatus.FAILED
+    expected_status = TransferStatus.TECHNICAL_FAILURE
 
     assert actual.sla_duration == expected_sla_duration
     assert actual.transfer_outcome.status == expected_status
@@ -254,34 +254,12 @@ def test_has_pending_status_if_no_final_ack_and_no_intermediate_error():
     assert actual.transfer_outcome.status == expected_status
 
 
-def test_has_integrated_status_if_no_error_in_final_ack():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.ehr_integrated_successfully()
-    )
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.INTEGRATED_ON_TIME
-
-    assert actual.transfer_outcome.status == expected_status
-
-
 def test_has_integrated_status_if_error_is_suppressed():
     conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_suppressed())
 
     actual = derive_transfer(conversation)
 
     expected_status = TransferStatus.INTEGRATED_ON_TIME
-
-    assert actual.transfer_outcome.status == expected_status
-
-
-def test_has_failed_status_if_error_in_final_ack():
-    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())
-
-    actual = derive_transfer(conversation)
-
-    expected_status = TransferStatus.FAILED
 
     assert actual.transfer_outcome.status == expected_status
 
@@ -341,6 +319,18 @@ def test_has_process_failure_with_integrated_late_reason_if_ehr_integrated_beyon
 
     expected_status = TransferStatus.PROCESS_FAILURE
     expected_reason = TransferFailureReason.INTEGRATED_LATE
+
+    assert actual.transfer_outcome.status == expected_status
+    assert actual.transfer_outcome.reason == expected_reason
+
+
+def test_has_technical_failure_final_error_if_error_in_final_ack():
+    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())
+
+    actual = derive_transfer(conversation)
+
+    expected_status = TransferStatus.TECHNICAL_FAILURE
+    expected_reason = TransferFailureReason.FINAL_ERROR
 
     assert actual.transfer_outcome.status == expected_status
     assert actual.transfer_outcome.reason == expected_reason

@@ -232,7 +232,7 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
         status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
     )
     failed_transfer_outcome = TransferOutcome(
-        status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT
+        status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
     )
 
     transfers = [

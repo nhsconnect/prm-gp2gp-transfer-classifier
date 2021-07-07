@@ -12,7 +12,7 @@ from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 
 class TransferStatus(Enum):
     INTEGRATED_ON_TIME = "INTEGRATED_ON_TIME"
-    FAILED = "FAILED"
+    TECHNICAL_FAILURE = "TECHNICAL_FAILURE"
     PENDING = "PENDING"
     PENDING_WITH_ERROR = "PENDING_WITH_ERROR"
     PROCESS_FAILURE = "PROCESS_FAILURE"
@@ -20,6 +20,7 @@ class TransferStatus(Enum):
 
 class TransferFailureReason(Enum):
     INTEGRATED_LATE = "Integrated Late"
+    FINAL_ERROR = "Final Error"
     DEFAULT = ""
 
 
@@ -63,7 +64,9 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.is_integrated():
         return _integrated_within_sla(conversation)
     elif conversation.has_concluded_with_failure():
-        return TransferOutcome(status=TransferStatus.FAILED, reason=TransferFailureReason.DEFAULT)
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
+        )
     elif conversation.is_pending_with_error():
         return TransferOutcome(
             status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
