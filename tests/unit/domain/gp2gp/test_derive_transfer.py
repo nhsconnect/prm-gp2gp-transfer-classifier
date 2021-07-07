@@ -327,7 +327,7 @@ def test_has_integrated_on_time_status_if_ehr_integrated_successfully_within_8_d
     assert actual.transfer_outcome.status == expected_status
 
 
-def test_has_process_failure_status_with_integrated_late_reason_if_ehr_integrated_successfully_beyond_8_days():
+def test_has_process_failure_with_integrated_late_reason_if_ehr_integrated_beyond_8_days():
     request_completed_time = a_datetime(year=2021, month=5, day=1)
     ehr_acknowledge_time = a_datetime(year=2021, month=5, day=10)
 
