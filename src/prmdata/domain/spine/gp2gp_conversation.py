@@ -6,6 +6,7 @@ from prmdata.domain.spine.message import (
     DUPLICATE_ERROR,
     ERROR_SUPPRESSED,
     FATAL_SENDER_ERROR_CODES,
+    COMMON_POINT_TO_POINT,
 )
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
@@ -85,6 +86,11 @@ class Gp2gpConversation(NamedTuple):
             is_missing_request_acknowledged is False and len(self.request_completed_messages) == 0
         )
 
+    def is_missing_copc(self) -> bool:
+        copc_continue = self._find_copc_continue()
+        copc = self._find_copc()
+        return copc_continue is not None and len(copc) == 0
+
     def contains_copc_error(self) -> bool:
         final_ack = self._find_effective_request_completed_ack_message()
         missing_final_ack = final_ack is None
@@ -149,6 +155,27 @@ class Gp2gpConversation(NamedTuple):
         return next(
             (message for message in self.request_completed_messages if message.guid == guid), None
         )
+
+    def _find_copc_continue(self) -> Optional[Message]:
+        requesting_practice_asid = self.requesting_practice_asid()
+        return next(
+            (
+                message
+                for message in self.intermediate_messages
+                if message.interaction_id == COMMON_POINT_TO_POINT
+                and message.from_party_asid == requesting_practice_asid
+            ),
+            None,
+        )
+
+    def _find_copc(self) -> List[Message]:
+        sending_practice_asid = self.sending_practice_asid()
+        return [
+            message
+            for message in self.intermediate_messages
+            if message.interaction_id == COMMON_POINT_TO_POINT
+            and message.from_party_asid == sending_practice_asid
+        ]
 
     @classmethod
     def from_messages(cls, messages):

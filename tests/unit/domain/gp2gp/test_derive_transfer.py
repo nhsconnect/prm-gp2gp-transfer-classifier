@@ -95,6 +95,11 @@ def test_extracts_conversation_id():
             TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         ),
         (
+            test_cases.large_message_continue_sent,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.COPC_NOT_SENT,
+        ),
+        (
             test_cases.ehr_suppressed,
             TransferStatus.INTEGRATED_ON_TIME,
             TransferFailureReason.DEFAULT,

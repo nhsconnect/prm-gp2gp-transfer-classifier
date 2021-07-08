@@ -416,6 +416,19 @@ def multiple_integration_failures(**kwargs):
     return test_case.build()
 
 
+def large_message_continue_sent(**kwargs):
+    conversation_id = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr()
+        .with_large_fragment_continue()
+        .build()
+    )
+
+
 def large_message_fragment_failure(**kwargs):
     conversation_id = a_string()
     fragment_guid = a_string()

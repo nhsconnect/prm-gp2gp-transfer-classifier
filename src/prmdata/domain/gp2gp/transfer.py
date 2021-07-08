@@ -26,6 +26,7 @@ class TransferFailureReason(Enum):
     REQUEST_NOT_ACKNOWLEDGED = "Request not Acknowledged"
     CORE_EHR_NOT_SENT = "Core Extract not Sent"
     FATAL_SENDER_ERROR = "Contains Fatal Sender Error"
+    COPC_NOT_SENT = "COPC(s) not sent"
     DEFAULT = ""
 
 
@@ -95,6 +96,11 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
             reason=TransferFailureReason.CORE_EHR_NOT_SENT,
+        )
+    elif conversation.is_missing_copc():
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.COPC_NOT_SENT,
         )
     elif conversation.is_missing_final_ack():
         return TransferOutcome(
