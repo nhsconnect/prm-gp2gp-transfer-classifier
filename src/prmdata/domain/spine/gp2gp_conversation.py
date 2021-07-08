@@ -64,15 +64,21 @@ class Gp2gpConversation(NamedTuple):
         has_intermediate_error = has_intermediate_errors or has_sender_error
         return missing_final_ack and has_intermediate_error
 
-    def is_missing_final_ack(self):
+    def is_missing_final_ack(self) -> bool:
         final_ack = self._find_effective_request_completed_ack_message()
         return final_ack is None
 
-    def is_missing_request_acknowledged(self):
+    def is_missing_request_acknowledged(self) -> bool:
         missing_request_acknowledged = (
             self.request_started is not None and self.request_started_ack is None
         )
         return missing_request_acknowledged
+
+    def is_missing_core_ehr(self) -> bool:
+        is_missing_request_acknowledged = self.is_missing_request_acknowledged()
+        return (
+            is_missing_request_acknowledged is False and len(self.request_completed_messages) == 0
+        )
 
     def effective_request_completed_time(self) -> Optional[datetime]:
         effective_request_completed_ack_message = (

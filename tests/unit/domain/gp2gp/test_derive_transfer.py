@@ -85,6 +85,11 @@ def test_extracts_conversation_id():
             TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
         ),
         (
+            test_cases.request_acknowledged_successfully,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.CORE_EHR_NOT_SENT,
+        ),
+        (
             test_cases.pending_integration_with_large_message_fragments,
             TransferStatus.PROCESS_FAILURE,
             TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,

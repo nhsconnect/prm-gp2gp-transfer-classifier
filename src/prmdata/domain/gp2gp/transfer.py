@@ -23,6 +23,7 @@ class TransferFailureReason(Enum):
     FINAL_ERROR = "Final Error"
     TRANSFERRED_NOT_INTEGRATED = "Transferred, not integrated"
     REQUEST_NOT_ACKNOWLEDGED = "Request not Acknowledged"
+    CORE_EHR_NOT_SENT = "Core Extract not Sent"
     DEFAULT = ""
 
 
@@ -78,6 +79,11 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
             reason=TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
+        )
+    elif conversation.is_missing_core_ehr():
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.CORE_EHR_NOT_SENT,
         )
     elif conversation.is_missing_final_ack():
         return TransferOutcome(
