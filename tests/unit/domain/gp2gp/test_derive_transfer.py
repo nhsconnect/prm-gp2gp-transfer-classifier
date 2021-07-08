@@ -45,9 +45,14 @@ def test_extracts_conversation_id():
             TransferFailureReason.FINAL_ERROR,
         ),
         (
+            test_cases.core_ehr_sent,
+            TransferStatus.PROCESS_FAILURE,
+            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        ),
+        (
             test_cases.acknowledged_duplicate_and_waiting_for_integration,
-            TransferStatus.PENDING,
-            TransferFailureReason.DEFAULT,
+            TransferStatus.PROCESS_FAILURE,
+            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         ),
         (
             test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs,
@@ -74,12 +79,15 @@ def test_extracts_conversation_id():
             TransferStatus.INTEGRATED_ON_TIME,
             TransferFailureReason.DEFAULT,
         ),
-        (test_cases.core_ehr_sent, TransferStatus.PENDING, TransferFailureReason.DEFAULT),
-        (test_cases.request_made, TransferStatus.PENDING, TransferFailureReason.DEFAULT),
+        (
+            test_cases.request_made,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
+        ),
         (
             test_cases.pending_integration_with_large_message_fragments,
-            TransferStatus.PENDING,
-            TransferFailureReason.DEFAULT,
+            TransferStatus.PROCESS_FAILURE,
+            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         ),
         (
             test_cases.ehr_suppressed,

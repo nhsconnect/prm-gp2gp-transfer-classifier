@@ -21,6 +21,8 @@ class TransferStatus(Enum):
 class TransferFailureReason(Enum):
     INTEGRATED_LATE = "Integrated Late"
     FINAL_ERROR = "Final Error"
+    TRANSFERRED_NOT_INTEGRATED = "Transferred, not integrated"
+    REQUEST_NOT_ACKNOWLEDGED = "Request not Acknowledged"
     DEFAULT = ""
 
 
@@ -60,6 +62,7 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
     return max(timedelta(0), sla_duration)
 
 
+# flake8: noqa: C901
 def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.is_integrated():
         return _integrated_within_sla(conversation)
@@ -70,6 +73,16 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
     elif conversation.is_pending_with_error():
         return TransferOutcome(
             status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
+        )
+    elif conversation.is_missing_request_acknowledged():
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
+        )
+    elif conversation.is_missing_final_ack():
+        return TransferOutcome(
+            status=TransferStatus.PROCESS_FAILURE,
+            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         )
     else:
         return TransferOutcome(status=TransferStatus.PENDING, reason=TransferFailureReason.DEFAULT)
