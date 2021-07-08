@@ -1,7 +1,12 @@
 from typing import NamedTuple, List, Optional, Iterable, Iterator
 from datetime import datetime
 
-from prmdata.domain.spine.message import Message, DUPLICATE_ERROR, ERROR_SUPPRESSED
+from prmdata.domain.spine.message import (
+    Message,
+    DUPLICATE_ERROR,
+    ERROR_SUPPRESSED,
+    FATAL_SENDER_ERROR_CODES,
+)
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 
@@ -79,6 +84,12 @@ class Gp2gpConversation(NamedTuple):
         return (
             is_missing_request_acknowledged is False and len(self.request_completed_messages) == 0
         )
+
+    def contains_fatal_sender_error_code(self) -> bool:
+        final_ack = self._find_effective_request_completed_ack_message()
+        missing_final_ack = final_ack is None
+        has_fatal_sender_error = self.sender_error() in FATAL_SENDER_ERROR_CODES
+        return missing_final_ack and has_fatal_sender_error
 
     def effective_request_completed_time(self) -> Optional[datetime]:
         effective_request_completed_ack_message = (

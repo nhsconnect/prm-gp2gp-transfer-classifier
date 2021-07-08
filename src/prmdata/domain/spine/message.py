@@ -10,6 +10,7 @@ COMMON_POINT_TO_POINT = "urn:nhs:names:services:gp2gp/COPC_IN000001UK01"
 
 ERROR_SUPPRESSED = 15
 DUPLICATE_ERROR = 12
+FATAL_SENDER_ERROR_CODES = [6, 7, 10, 14, 23, 24, 99, 30]
 
 
 class Message(NamedTuple):

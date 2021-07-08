@@ -24,6 +24,7 @@ class TransferFailureReason(Enum):
     TRANSFERRED_NOT_INTEGRATED = "Transferred, not integrated"
     REQUEST_NOT_ACKNOWLEDGED = "Request not Acknowledged"
     CORE_EHR_NOT_SENT = "Core Extract not Sent"
+    FATAL_SENDER_ERROR = "Contains Fatal Sender Error"
     DEFAULT = ""
 
 
@@ -70,6 +71,10 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
     elif conversation.has_concluded_with_failure():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
+        )
+    elif conversation.contains_fatal_sender_error_code():
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FATAL_SENDER_ERROR
         )
     elif conversation.is_pending_with_error():
         return TransferOutcome(

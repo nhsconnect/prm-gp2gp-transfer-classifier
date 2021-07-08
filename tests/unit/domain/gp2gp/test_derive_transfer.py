@@ -4,7 +4,7 @@ from typing import List
 import pytest
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
-from prmdata.domain.spine.message import Message
+from prmdata.domain.spine.message import Message, FATAL_SENDER_ERROR_CODES
 from tests.builders import test_cases
 from tests.builders.spine import (
     build_mock_gp2gp_conversation,
@@ -116,6 +116,24 @@ def test_returns_correct_transfer_outcome(test_case, expected_status, expected_r
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     actual = derive_transfer(conversation)
+
+    assert actual.transfer_outcome.status == expected_status
+    assert actual.transfer_outcome.reason == expected_reason
+
+
+@pytest.mark.parametrize("fatal_sender_error_code", FATAL_SENDER_ERROR_CODES)
+def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
+    fatal_sender_error_code,
+):
+    gp2gp_messages: List[Message] = test_cases.request_acknowledged_with_error(
+        error_code=fatal_sender_error_code
+    )
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    actual = derive_transfer(conversation)
+
+    expected_status = TransferStatus.TECHNICAL_FAILURE
+    expected_reason = TransferFailureReason.FATAL_SENDER_ERROR
 
     assert actual.transfer_outcome.status == expected_status
     assert actual.transfer_outcome.reason == expected_reason
