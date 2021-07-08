@@ -85,6 +85,12 @@ class Gp2gpConversation(NamedTuple):
             is_missing_request_acknowledged is False and len(self.request_completed_messages) == 0
         )
 
+    def contains_copc_error(self) -> bool:
+        final_ack = self._find_effective_request_completed_ack_message()
+        missing_final_ack = final_ack is None
+        intermediate_error_codes = self.intermediate_error_codes()
+        return missing_final_ack and len(intermediate_error_codes) > 0
+
     def contains_fatal_sender_error_code(self) -> bool:
         final_ack = self._find_effective_request_completed_ack_message()
         missing_final_ack = final_ack is None

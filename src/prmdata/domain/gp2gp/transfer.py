@@ -16,6 +16,7 @@ class TransferStatus(Enum):
     PENDING = "PENDING"
     PENDING_WITH_ERROR = "PENDING_WITH_ERROR"
     PROCESS_FAILURE = "PROCESS_FAILURE"
+    TRANSFERRED_NOT_INTEGRATED_WITH_ERROR = "TRANSFERRED_NOT_INTEGRATED_WITH_ERROR"
 
 
 class TransferFailureReason(Enum):
@@ -75,6 +76,11 @@ def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
     elif conversation.contains_fatal_sender_error_code():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FATAL_SENDER_ERROR
+        )
+    elif conversation.contains_copc_error():
+        return TransferOutcome(
+            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+            reason=TransferFailureReason.DEFAULT,
         )
     elif conversation.is_pending_with_error():
         return TransferOutcome(

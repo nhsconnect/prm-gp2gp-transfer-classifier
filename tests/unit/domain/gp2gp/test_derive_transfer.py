@@ -101,7 +101,7 @@ def test_extracts_conversation_id():
         ),
         (
             test_cases.large_message_fragment_failure,
-            TransferStatus.PENDING_WITH_ERROR,
+            TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
             TransferFailureReason.DEFAULT,
         ),
         (
