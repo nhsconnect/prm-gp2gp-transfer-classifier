@@ -67,6 +67,29 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
     return max(timedelta(0), sla_duration)
 
 
+def _copc_transfer_outcome(conversation):
+    if conversation.contains_copc_error():
+        return TransferOutcome(
+            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+            reason=TransferFailureReason.DEFAULT,
+        )
+    elif conversation.is_missing_copc_ack():
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
+        )
+    elif conversation.is_missing_copc():
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.COPC_NOT_SENT,
+        )
+    else:
+        return TransferOutcome(
+            status=TransferStatus.PROCESS_FAILURE,
+            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        )
+
+
 # flake8: noqa: C901
 def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.is_integrated():
@@ -75,14 +98,11 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
         )
+    elif conversation.contains_copc_messages():
+        return _copc_transfer_outcome(conversation)
     elif conversation.contains_fatal_sender_error_code():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FATAL_SENDER_ERROR
-        )
-    elif conversation.contains_copc_error():
-        return TransferOutcome(
-            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
-            reason=TransferFailureReason.DEFAULT,
         )
     elif conversation.is_missing_request_acknowledged():
         return TransferOutcome(
@@ -99,16 +119,7 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
             status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
             reason=TransferFailureReason.DEFAULT,
         )
-    elif conversation.is_missing_copc():
-        return TransferOutcome(
-            status=TransferStatus.TECHNICAL_FAILURE,
-            reason=TransferFailureReason.COPC_NOT_SENT,
-        )
-    elif conversation.is_missing_copc_ack():
-        return TransferOutcome(
-            status=TransferStatus.TECHNICAL_FAILURE,
-            reason=TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
-        )
+
     elif conversation.is_missing_final_ack():
         return TransferOutcome(
             status=TransferStatus.PROCESS_FAILURE,

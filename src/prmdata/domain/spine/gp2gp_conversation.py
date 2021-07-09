@@ -208,6 +208,11 @@ class Gp2gpConversation(NamedTuple):
         parser = SpineConversationParser(messages)
         return parser.parse()
 
+    def contains_copc_messages(self) -> bool:
+        contains_copcs = len(self._find_copc()) > 0
+        contains_copc_continue = self._find_copc_continue() is not None
+        return contains_copcs or contains_copc_continue
+
 
 def _integrated_or_suppressed(request_completed_ack) -> bool:
     return (
