@@ -67,21 +67,34 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
     return max(timedelta(0), sla_duration)
 
 
-def _copc_transfer_outcome(conversation):
+def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.contains_copc_error():
         return TransferOutcome(
             status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
             reason=TransferFailureReason.DEFAULT,
+        )
+    elif conversation.is_missing_copc():
+        return TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.COPC_NOT_SENT,
         )
     elif conversation.is_missing_copc_ack():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
             reason=TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         )
-    elif conversation.is_missing_copc():
+    else:
         return TransferOutcome(
-            status=TransferStatus.TECHNICAL_FAILURE,
-            reason=TransferFailureReason.COPC_NOT_SENT,
+            status=TransferStatus.PROCESS_FAILURE,
+            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        )
+
+
+def _core_ehr_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
+    if conversation.contains_core_ehr_with_sender_error():
+        return TransferOutcome(
+            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+            reason=TransferFailureReason.DEFAULT,
         )
     else:
         return TransferOutcome(
@@ -109,22 +122,15 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
             status=TransferStatus.TECHNICAL_FAILURE,
             reason=TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
         )
+    elif not conversation.is_missing_core_ehr():
+        return _core_ehr_transfer_outcome(conversation)
+
     elif conversation.is_missing_core_ehr():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
             reason=TransferFailureReason.CORE_EHR_NOT_SENT,
         )
-    elif conversation.contains_core_ehr_with_sender_error():
-        return TransferOutcome(
-            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
-            reason=TransferFailureReason.DEFAULT,
-        )
 
-    elif conversation.is_missing_final_ack():
-        return TransferOutcome(
-            status=TransferStatus.PROCESS_FAILURE,
-            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
-        )
     elif conversation.is_pending_with_error():
         return TransferOutcome(
             status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
