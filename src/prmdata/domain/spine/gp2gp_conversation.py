@@ -20,7 +20,7 @@ class Gp2gpConversation(NamedTuple):
     intermediate_messages: List[Message]
     request_completed_ack_messages: List[Message]
 
-    def conversation_id(self):
+    def conversation_id(self) -> str:
         return self.request_started.conversation_id
 
     def sending_practice_asid(self) -> str:
@@ -53,17 +53,17 @@ class Gp2gpConversation(NamedTuple):
     def date_requested(self) -> datetime:
         return self.request_started.time
 
-    def is_integrated(self):
+    def is_integrated(self) -> bool:
         final_ack = self._find_effective_request_completed_ack_message()
         has_final_ack = final_ack is not None
         return has_final_ack and _integrated_or_suppressed(final_ack)
 
-    def has_concluded_with_failure(self):
+    def has_concluded_with_failure(self) -> bool:
         final_ack = self._find_effective_request_completed_ack_message()
         has_final_ack = final_ack is not None
         return has_final_ack and not _integrated_or_suppressed(final_ack)
 
-    def is_pending_with_error(self):
+    def is_pending_with_error(self) -> bool:
         final_ack = self._find_effective_request_completed_ack_message()
         missing_final_ack = final_ack is None
         has_intermediate_errors = len(self.intermediate_error_codes()) > 0
@@ -128,7 +128,7 @@ class Gp2gpConversation(NamedTuple):
 
         return None
 
-    def effective_final_acknowledgement_time(self):
+    def effective_final_acknowledgement_time(self) -> Optional[datetime]:
         final_ack = self._find_effective_request_completed_ack_message()
         if final_ack is None:
             return None
@@ -201,7 +201,7 @@ class Gp2gpConversation(NamedTuple):
         return parser.parse()
 
 
-def _integrated_or_suppressed(request_completed_ack):
+def _integrated_or_suppressed(request_completed_ack) -> bool:
     return (
         request_completed_ack.error_code is None
         or request_completed_ack.error_code == ERROR_SUPPRESSED
@@ -221,14 +221,14 @@ class SpineConversationParser:
         self._intermediate_messages: List[Message] = []
         self._request_completed_ack_messages: List[Message] = []
 
-    def _get_next_or_none(self):
+    def _get_next_or_none(self) -> Message:
         next_message = next(self._messages, None)
         return next_message
 
-    def _has_seen_req_completed(self):
+    def _has_seen_req_completed(self) -> bool:
         return len(self._req_completed_messages) > 0
 
-    def _has_seen_req_started(self):
+    def _has_seen_req_started(self) -> bool:
         return self._req_started is not None
 
     def _process_message(self, message):
@@ -244,7 +244,7 @@ class SpineConversationParser:
         else:
             self._intermediate_messages.append(message)
 
-    def _is_acknowledging_any_request_completed_message(self, message):
+    def _is_acknowledging_any_request_completed_message(self, message) -> bool:
         return any(
             message.is_acknowledgement_of(req_completed_message)
             for req_completed_message in self._req_completed_messages
@@ -258,7 +258,7 @@ class SpineConversationParser:
         else:
             raise ConversationMissingStart()
 
-    def parse(self):
+    def parse(self) -> Gp2gpConversation:
 
         conversation_id = self._process_first_message()
 
