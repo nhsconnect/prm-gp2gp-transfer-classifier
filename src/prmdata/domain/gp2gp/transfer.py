@@ -68,7 +68,7 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
 
 
 # flake8: noqa: C901
-def _assign_status(conversation: Gp2gpConversation) -> TransferOutcome:
+def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.is_integrated():
         return _integrated_within_sla(conversation)
     elif conversation.has_concluded_with_failure():
@@ -140,7 +140,7 @@ def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
         sender_error_code=conversation.sender_error(),
         final_error_codes=conversation.final_error_codes(),
         intermediate_error_codes=conversation.intermediate_error_codes(),
-        transfer_outcome=_assign_status(conversation),
+        transfer_outcome=_assign_transfer_outcome(conversation),
         date_requested=conversation.date_requested(),
         date_completed=conversation.effective_final_acknowledgement_time(),
     )
