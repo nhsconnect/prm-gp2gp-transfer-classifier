@@ -113,6 +113,13 @@ class Gp2gpConversation(NamedTuple):
         has_fatal_sender_error = self.sender_error() in FATAL_SENDER_ERROR_CODES
         return missing_final_ack and has_fatal_sender_error
 
+    def contains_core_ehr_with_sender_error(self) -> bool:
+        final_ack = self._find_effective_request_completed_ack_message()
+        missing_final_ack = final_ack is None
+        is_missing_core_ehr = self.is_missing_core_ehr()
+        has_sender_error = self.sender_error() is not None
+        return missing_final_ack and has_sender_error and not is_missing_core_ehr
+
     def effective_request_completed_time(self) -> Optional[datetime]:
         effective_request_completed_ack_message = (
             self._find_effective_request_completed_ack_message()

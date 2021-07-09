@@ -94,6 +94,11 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
             status=TransferStatus.TECHNICAL_FAILURE,
             reason=TransferFailureReason.CORE_EHR_NOT_SENT,
         )
+    elif conversation.contains_core_ehr_with_sender_error():
+        return TransferOutcome(
+            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+            reason=TransferFailureReason.DEFAULT,
+        )
     elif conversation.is_missing_copc():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,

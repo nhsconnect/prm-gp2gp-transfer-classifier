@@ -50,6 +50,11 @@ def test_extracts_conversation_id():
             TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         ),
         (
+            test_cases.core_ehr_sent_with_sender_error,
+            TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+            TransferFailureReason.DEFAULT,
+        ),
+        (
             test_cases.acknowledged_duplicate_and_waiting_for_integration,
             TransferStatus.PROCESS_FAILURE,
             TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
