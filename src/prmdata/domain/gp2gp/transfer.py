@@ -84,10 +84,6 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
             status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
             reason=TransferFailureReason.DEFAULT,
         )
-    elif conversation.is_pending_with_error():
-        return TransferOutcome(
-            status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
-        )
     elif conversation.is_missing_request_acknowledged():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
@@ -112,6 +108,10 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
         return TransferOutcome(
             status=TransferStatus.PROCESS_FAILURE,
             reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        )
+    elif conversation.is_pending_with_error():
+        return TransferOutcome(
+            status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
         )
     else:
         return TransferOutcome(status=TransferStatus.PENDING, reason=TransferFailureReason.DEFAULT)

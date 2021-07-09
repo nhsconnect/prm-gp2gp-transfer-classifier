@@ -116,8 +116,13 @@ def test_extracts_conversation_id():
         ),
         (
             test_cases.request_acknowledged_with_error,
-            TransferStatus.PENDING_WITH_ERROR,
-            TransferFailureReason.DEFAULT,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.CORE_EHR_NOT_SENT,
+        ),
+        (
+            test_cases.large_message_fragment_failure_and_missing_large_fragment_ack,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         ),
     ],
 )

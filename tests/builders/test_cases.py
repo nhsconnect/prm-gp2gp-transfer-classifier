@@ -446,6 +446,24 @@ def large_message_fragment_failure(**kwargs):
     )
 
 
+def large_message_fragment_failure_and_missing_large_fragment_ack(**kwargs):
+    conversation_id = a_string()
+    fragment_guid = a_string()
+    fragment_error = kwargs.get("error_code", an_integer(a=20, b=30))
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr()
+        .with_large_fragment_continue()
+        .with_large_fragment(guid=fragment_guid)
+        .with_requester_acknowledgement(message_ref=fragment_guid, error_code=fragment_error)
+        .with_large_fragment()
+        .build()
+    )
+
+
 def successful_integration_with_large_messages(**kwargs):
     conversation_id = a_string()
     ehr_guid = a_string()
