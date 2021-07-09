@@ -27,118 +27,117 @@ def test_extracts_conversation_id():
 
 
 @pytest.mark.parametrize(
-    "test_case, expected_status, expected_reason",
+    "test_case, expected_reason",
     [
         (
-            test_cases.ehr_integrated_successfully,
-            TransferStatus.INTEGRATED_ON_TIME,
-            TransferFailureReason.DEFAULT,
-        ),
-        (
-            test_cases.ehr_integrated_late,
-            TransferStatus.PROCESS_FAILURE,
-            TransferFailureReason.INTEGRATED_LATE,
-        ),
-        (
             test_cases.ehr_integration_failed,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.FINAL_ERROR,
-        ),
-        (
-            test_cases.core_ehr_sent,
-            TransferStatus.PROCESS_FAILURE,
-            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
-        ),
-        (
-            test_cases.core_ehr_sent_with_sender_error,
-            TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
-            TransferFailureReason.DEFAULT,
-        ),
-        (
-            test_cases.acknowledged_duplicate_and_waiting_for_integration,
-            TransferStatus.PROCESS_FAILURE,
-            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
-        ),
-        (
-            test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs,
-            TransferStatus.INTEGRATED_ON_TIME,
-            TransferFailureReason.DEFAULT,
-        ),
-        (
-            test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs,
-            TransferStatus.INTEGRATED_ON_TIME,
-            TransferFailureReason.DEFAULT,
         ),
         (
             test_cases.integration_failed_with_conflicting_acks_and_duplicate_ehrs,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.FINAL_ERROR,
         ),
         (
-            test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack,
-            TransferStatus.INTEGRATED_ON_TIME,
-            TransferFailureReason.DEFAULT,
-        ),
-        (
-            test_cases.ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack,
-            TransferStatus.INTEGRATED_ON_TIME,
-            TransferFailureReason.DEFAULT,
-        ),
-        (
             test_cases.request_made,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
         ),
         (
             test_cases.request_acknowledged_successfully,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.CORE_EHR_NOT_SENT,
         ),
         (
-            test_cases.pending_integration_with_acked_large_message_fragments,
-            TransferStatus.PROCESS_FAILURE,
-            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
-        ),
-        (
             test_cases.large_message_continue_sent,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.COPC_NOT_SENT,
         ),
         (
             test_cases.pending_integration_with_large_message_fragments,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         ),
         (
-            test_cases.ehr_suppressed,
-            TransferStatus.INTEGRATED_ON_TIME,
-            TransferFailureReason.DEFAULT,
-        ),
-        (
-            test_cases.large_message_fragment_failure,
-            TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
-            TransferFailureReason.DEFAULT,
-        ),
-        (
             test_cases.request_acknowledged_with_error,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.CORE_EHR_NOT_SENT,
         ),
         (
             test_cases.large_message_fragment_failure_and_missing_large_fragment_ack,
-            TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         ),
     ],
 )
-def test_returns_correct_transfer_outcome(test_case, expected_status, expected_reason):
+def test_returns_transfer_status_technical_failure_with_reason(test_case, expected_reason):
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation.from_messages(gp2gp_messages)
 
     actual = derive_transfer(conversation)
 
-    assert actual.transfer_outcome.status == expected_status
+    assert actual.transfer_outcome.status == TransferStatus.TECHNICAL_FAILURE
     assert actual.transfer_outcome.reason == expected_reason
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        test_cases.ehr_integrated_successfully,
+        test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs,
+        test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs,
+        test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack,
+        test_cases.ehr_suppressed,
+        test_cases.ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack,
+    ],
+)
+def test_returns_transfer_status_integrated_on_time(test_case):
+    gp2gp_messages: List[Message] = test_case()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    actual = derive_transfer(conversation)
+
+    assert actual.transfer_outcome.status == TransferStatus.INTEGRATED_ON_TIME
+    assert actual.transfer_outcome.reason == TransferFailureReason.DEFAULT
+
+
+@pytest.mark.parametrize(
+    "test_case, expected_reason",
+    [
+        (
+            test_cases.ehr_integrated_late,
+            TransferFailureReason.INTEGRATED_LATE,
+        ),
+        (
+            test_cases.core_ehr_sent,
+            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        ),
+        (
+            test_cases.acknowledged_duplicate_and_waiting_for_integration,
+            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        ),
+        (
+            test_cases.pending_integration_with_acked_large_message_fragments,
+            TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        ),
+    ],
+)
+def test_returns_transfer_status_process_failure_with_reason(test_case, expected_reason):
+    gp2gp_messages: List[Message] = test_case()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    actual = derive_transfer(conversation)
+    assert actual.transfer_outcome.status == TransferStatus.PROCESS_FAILURE
+    assert actual.transfer_outcome.reason == expected_reason
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        test_cases.core_ehr_sent_with_sender_error,
+        test_cases.large_message_fragment_failure,
+    ],
+)
+def test_returns_transferred_not_integrated_with_error_status(test_case):
+    gp2gp_messages: List[Message] = test_case()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    actual = derive_transfer(conversation)
+
+    assert actual.transfer_outcome.status == TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
+    assert actual.transfer_outcome.reason == TransferFailureReason.DEFAULT
 
 
 @pytest.mark.parametrize("fatal_sender_error_code", FATAL_SENDER_ERROR_CODES)
