@@ -473,6 +473,23 @@ def successful_integration_with_large_messages(**kwargs):
 def pending_integration_with_large_message_fragments(**kwargs):
     conversation_id = a_string()
     ehr_guid = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_large_fragment_continue()
+        .with_large_fragment()
+        .with_large_fragment()
+        .with_large_fragment()
+        .build()
+    )
+
+
+def pending_integration_with_acked_large_message_fragments(**kwargs):
+    conversation_id = a_string()
+    ehr_guid = a_string()
     fragment1_guid = a_string()
     fragment2_guid = a_string()
     fragment3_guid = a_string()

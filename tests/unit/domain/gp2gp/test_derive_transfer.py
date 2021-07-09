@@ -90,7 +90,7 @@ def test_extracts_conversation_id():
             TransferFailureReason.CORE_EHR_NOT_SENT,
         ),
         (
-            test_cases.pending_integration_with_large_message_fragments,
+            test_cases.pending_integration_with_acked_large_message_fragments,
             TransferStatus.PROCESS_FAILURE,
             TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         ),
@@ -98,6 +98,11 @@ def test_extracts_conversation_id():
             test_cases.large_message_continue_sent,
             TransferStatus.TECHNICAL_FAILURE,
             TransferFailureReason.COPC_NOT_SENT,
+        ),
+        (
+            test_cases.pending_integration_with_large_message_fragments,
+            TransferStatus.TECHNICAL_FAILURE,
+            TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         ),
         (
             test_cases.ehr_suppressed,

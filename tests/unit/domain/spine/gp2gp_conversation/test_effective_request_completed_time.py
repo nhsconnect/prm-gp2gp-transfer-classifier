@@ -15,7 +15,7 @@ from prmdata.domain.spine.message import Message
         test_cases.request_acknowledged_successfully,
         test_cases.core_ehr_sent,
         test_cases.acknowledged_duplicate_and_waiting_for_integration,
-        test_cases.pending_integration_with_large_message_fragments,
+        test_cases.pending_integration_with_acked_large_message_fragments,
     ],
 )
 def test_returns_none_when_transfer_in_progress(test_case):
