@@ -6,11 +6,11 @@ from prmdata.domain.spine.gp2gp_conversation import (
     SpineConversationParser,
 )
 from prmdata.domain.spine.message import (
-    COMMON_POINT_TO_POINT,
     EHR_REQUEST_STARTED,
     EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
 )
+from tests.builders import test_cases
 from tests.builders.common import a_string
 from tests.builders.spine import build_message
 
@@ -38,7 +38,9 @@ def test_parses_a_complete_conversation():
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
         request_completed_messages=[request_completed_message],
-        intermediate_messages=[],
+        copc_continue=None,
+        copc_messages=[],
+        copc_ack_messages=[],
         request_completed_ack_messages=[request_completed_ack_message],
     )
     actual = SpineConversationParser(messages).parse()
@@ -72,7 +74,9 @@ def test_parses_incomplete_conversation():
         request_started=request_started_message,
         request_completed_messages=[request_completed_message],
         request_started_ack=request_started_ack_message,
-        intermediate_messages=[],
+        copc_continue=None,
+        copc_messages=[],
+        copc_ack_messages=[],
         request_completed_ack_messages=[],
     )
     actual = SpineConversationParser(messages).parse()
@@ -81,39 +85,36 @@ def test_parses_incomplete_conversation():
 
 
 def test_parses_conversation_with_large_messages():
-    request_started_message = build_message(
-        conversation_id="abc", guid="abc", interaction_id=EHR_REQUEST_STARTED
-    )
-    request_completed_message = build_message(guid="abc-1", interaction_id=EHR_REQUEST_COMPLETED)
-    request_started_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc")
-    common_p2p_message = build_message(guid="abc-2", interaction_id=COMMON_POINT_TO_POINT)
-    common_p2p_ack_message = build_message(interaction_id=APPLICATION_ACK, message_ref="abc-2")
-    request_completed_ack_message = build_message(
-        interaction_id=APPLICATION_ACK,
-        message_ref="abc-1",
-    )
+    gp2gp_messages = test_cases.successful_integration_with_large_messages()
 
-    messages = [
+    (
         request_started_message,
-        request_completed_message,
         request_started_ack_message,
-        common_p2p_message,
-        common_p2p_ack_message,
+        request_completed_message,
+        *intermediate_messages,
         request_completed_ack_message,
-    ]
+    ) = gp2gp_messages
+    (
+        copc_continue,
+        copc_1,
+        copc_2,
+        copc_1_ack,
+        copc_2_ack,
+        copc_3,
+        copc_3_ack,
+    ) = intermediate_messages
 
     expected = Gp2gpConversation(
-        id="abc",
+        id=request_started_message.conversation_id,
         request_started=request_started_message,
-        request_completed_messages=[request_completed_message],
         request_started_ack=request_started_ack_message,
-        intermediate_messages=[
-            common_p2p_message,
-            common_p2p_ack_message,
-        ],
+        request_completed_messages=[request_completed_message],
+        copc_continue=copc_continue,
+        copc_messages=[copc_1, copc_2, copc_3],
+        copc_ack_messages=[copc_1_ack, copc_2_ack, copc_3_ack],
         request_completed_ack_messages=[request_completed_ack_message],
     )
-    actual = SpineConversationParser(messages).parse()
+    actual = SpineConversationParser(gp2gp_messages).parse()
 
     assert actual == expected
 
@@ -135,7 +136,9 @@ def test_parses_conversation_without_request_completed():
         request_started=request_started_message,
         request_started_ack=request_started_ack_message,
         request_completed_messages=[],
-        intermediate_messages=[],
+        copc_continue=None,
+        copc_messages=[],
+        copc_ack_messages=[],
         request_completed_ack_messages=[],
     )
     actual = SpineConversationParser(messages).parse()
@@ -181,7 +184,9 @@ def test_saves_all_request_completed_messages_and_all_final_acks():
             request_completed_message_2,
             request_completed_message_3,
         ],
-        intermediate_messages=[],
+        copc_continue=None,
+        copc_messages=[],
+        copc_ack_messages=[],
         request_completed_ack_messages=[
             request_completed_ack_message_1,
             request_completed_ack_message_2,

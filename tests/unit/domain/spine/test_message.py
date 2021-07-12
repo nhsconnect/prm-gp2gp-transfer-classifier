@@ -78,3 +78,23 @@ def test_is_acknowledgement_of_returns_true_when_given_message_with_matching_ref
     actual = message.is_acknowledgement_of(other_message)
 
     assert actual == expected
+
+
+def test_is_copc_returns_true_when_interaction_is_copc():
+    message = build_message(interaction_id=COMMON_POINT_TO_POINT)
+
+    expected = True
+
+    actual = message.is_copc()
+
+    assert actual == expected
+
+
+def test_is_copc_returns_false_when_interaction_is__not_copc():
+    message = build_message(interaction_id=APPLICATION_ACK)
+
+    expected = False
+
+    actual = message.is_copc()
+
+    assert actual == expected

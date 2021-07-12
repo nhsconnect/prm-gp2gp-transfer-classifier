@@ -6,8 +6,6 @@ from prmdata.domain.spine.message import (
     DUPLICATE_ERROR,
     ERROR_SUPPRESSED,
     FATAL_SENDER_ERROR_CODES,
-    COMMON_POINT_TO_POINT,
-    APPLICATION_ACK,
 )
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
@@ -17,7 +15,9 @@ class Gp2gpConversation(NamedTuple):
     request_started: Message
     request_started_ack: Optional[Message]
     request_completed_messages: List[Message]
-    intermediate_messages: List[Message]
+    copc_continue: Optional[Message]
+    copc_messages: List[Message]
+    copc_ack_messages: List[Message]
     request_completed_ack_messages: List[Message]
 
     def conversation_id(self) -> str:
@@ -46,7 +46,7 @@ class Gp2gpConversation(NamedTuple):
     def intermediate_error_codes(self) -> List[int]:
         return [
             message.error_code
-            for message in self.intermediate_messages
+            for message in self.copc_ack_messages
             if message.error_code is not None
         ]
 
@@ -88,15 +88,11 @@ class Gp2gpConversation(NamedTuple):
         )
 
     def is_missing_copc(self) -> bool:
-        copc_continue = self._find_copc_continue()
-        copc = self._find_copc()
-        return copc_continue is not None and len(copc) == 0
+        return self.copc_continue is not None and len(self.copc_messages) == 0
 
     def is_missing_copc_ack(self) -> bool:
-        copcs = self._find_copc()
-        copc_ids = [copc.guid for copc in copcs]
-        copc_acks = self._find_copc_ack()
-        copc_ack_ids = [copc_ack.message_ref for copc_ack in copc_acks]
+        copc_ids = [copc.guid for copc in self.copc_messages]
+        copc_ack_ids = [copc_ack.message_ref for copc_ack in self.copc_ack_messages]
         missing_copc_ack_ids = set(copc_ids) - set(copc_ack_ids)
         return len(missing_copc_ack_ids) > 0
 
@@ -173,45 +169,14 @@ class Gp2gpConversation(NamedTuple):
             (message for message in self.request_completed_messages if message.guid == guid), None
         )
 
-    def _find_copc_continue(self) -> Optional[Message]:
-        requesting_practice_asid = self.requesting_practice_asid()
-        return next(
-            (
-                message
-                for message in self.intermediate_messages
-                if message.interaction_id == COMMON_POINT_TO_POINT
-                and message.from_party_asid == requesting_practice_asid
-            ),
-            None,
-        )
-
-    def _find_copc(self) -> List[Message]:
-        sending_practice_asid = self.sending_practice_asid()
-        return [
-            message
-            for message in self.intermediate_messages
-            if message.interaction_id == COMMON_POINT_TO_POINT
-            and message.from_party_asid == sending_practice_asid
-        ]
-
-    def _find_copc_ack(self) -> List[Message]:
-        requesting_practice_asid = self.requesting_practice_asid()
-        return [
-            message
-            for message in self.intermediate_messages
-            if message.interaction_id == APPLICATION_ACK
-            and message.from_party_asid == requesting_practice_asid
-        ]
-
     @classmethod
     def from_messages(cls, messages):
         parser = SpineConversationParser(messages)
         return parser.parse()
 
     def contains_copc_messages(self) -> bool:
-        contains_copcs = len(self._find_copc()) > 0
-        contains_copc_continue = self._find_copc_continue() is not None
-        return contains_copcs or contains_copc_continue
+        contains_copcs_messages = len(self.copc_messages) > 0
+        return contains_copcs_messages or self.copc_continue is not None
 
 
 def _integrated_or_suppressed(request_completed_ack) -> bool:
@@ -231,7 +196,9 @@ class SpineConversationParser:
         self._req_started: Optional[Message] = None
         self._req_completed_messages: List[Message] = []
         self._request_started_ack: Optional[Message] = None
-        self._intermediate_messages: List[Message] = []
+        self._copc_continue: Optional[Message] = None
+        self._copc_messages: List[Message] = []
+        self._copc_ack_messages: List[Message] = []
         self._request_completed_ack_messages: List[Message] = []
 
     def _get_next_or_none(self) -> Message:
@@ -254,14 +221,29 @@ class SpineConversationParser:
             self._request_completed_ack_messages.append(message)
         elif self._has_seen_req_started() and message.is_acknowledgement_of(self._req_started):
             self._request_started_ack = message
+        elif message.is_copc():
+            self._process_copc(message)
         else:
-            self._intermediate_messages.append(message)
+            self._copc_ack_messages.append(message)
 
-    def _is_acknowledging_any_request_completed_message(self, message) -> bool:
+    def _process_copc(self, message: Message):
+        if self._is_copc_continue(message):
+            self._copc_continue = message
+        else:
+            self._copc_messages.append(message)
+
+    def _is_acknowledging_any_request_completed_message(self, message: Message) -> bool:
         return any(
             message.is_acknowledgement_of(req_completed_message)
             for req_completed_message in self._req_completed_messages
         )
+
+    def _is_copc_continue(self, message: Message) -> bool:
+        if self._req_started:
+            requesting_practice_asid = self._req_started.from_party_asid
+            return message.from_party_asid == requesting_practice_asid
+        else:
+            return False
 
     def _process_first_message(self) -> str:
         first_message = self._get_next_or_none()
@@ -283,7 +265,9 @@ class SpineConversationParser:
             request_started=self._req_started,
             request_started_ack=self._request_started_ack,
             request_completed_messages=self._req_completed_messages,
-            intermediate_messages=self._intermediate_messages,
+            copc_continue=self._copc_continue,
+            copc_messages=self._copc_messages,
+            copc_ack_messages=self._copc_ack_messages,
             request_completed_ack_messages=self._request_completed_ack_messages,
         )
 
