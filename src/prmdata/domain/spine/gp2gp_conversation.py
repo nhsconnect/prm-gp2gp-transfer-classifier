@@ -1,5 +1,6 @@
 from typing import NamedTuple, List, Optional, Iterable, Iterator
 from datetime import datetime
+from warnings import warn
 
 from prmdata.domain.spine.message import (
     Message,
@@ -228,7 +229,13 @@ class SpineConversationParser:
 
     def _process_copc(self, message: Message):
         if self._is_copc_continue(message):
-            self._copc_continue = message
+            if self._copc_continue is not None:
+                warn(
+                    f"Duplicate COPC Continue found in conversation: {message.conversation_id}",
+                    RuntimeWarning,
+                )
+            else:
+                self._copc_continue = message
         else:
             self._copc_messages.append(message)
 

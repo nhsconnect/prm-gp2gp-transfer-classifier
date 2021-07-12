@@ -13,6 +13,7 @@ from prmdata.domain.spine.message import (
 from tests.builders import test_cases
 from tests.builders.common import a_string
 from tests.builders.spine import build_message
+from tests.builders.test_cases import GP2GPTestCase
 
 
 def test_parses_a_complete_conversation():
@@ -115,6 +116,48 @@ def test_parses_conversation_with_large_messages():
         request_completed_ack_messages=[request_completed_ack_message],
     )
     actual = SpineConversationParser(gp2gp_messages).parse()
+
+    assert actual == expected
+
+
+def test_throws_duplicate_copc_continue_exception_when_duplicate_found():
+    conversation_id = a_string()
+
+    gp2gp_messages = (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr()
+        .with_large_fragment_continue()
+        .with_large_fragment_continue()
+        .build()
+    )
+
+    (
+        request_started_message,
+        request_started_ack_message,
+        request_completed_message,
+        copc_continue,
+        copc_continue_duplicated,
+    ) = gp2gp_messages
+
+    expected = Gp2gpConversation(
+        id=request_started_message.conversation_id,
+        request_started=request_started_message,
+        request_started_ack=request_started_ack_message,
+        request_completed_messages=[request_completed_message],
+        copc_continue=copc_continue,
+        copc_messages=[],
+        copc_ack_messages=[],
+        request_completed_ack_messages=[],
+    )
+
+    with pytest.warns(RuntimeWarning) as warning:
+        actual = SpineConversationParser(gp2gp_messages).parse()
+        assert (
+            str(warning[0].message)
+            == f"Duplicate COPC Continue found in conversation: {conversation_id}"
+        )
 
     assert actual == expected
 
