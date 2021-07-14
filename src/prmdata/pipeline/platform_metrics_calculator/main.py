@@ -1,4 +1,3 @@
-from dataclasses import asdict
 import logging
 
 import boto3
@@ -7,7 +6,6 @@ from os import environ
 from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
-from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.pipeline.platform_metrics_calculator.core import (
     calculate_practice_metrics_data,
     parse_transfers_from_messages,
@@ -21,11 +19,6 @@ from pyarrow.fs import S3FileSystem
 logger = logging.getLogger(__name__)
 
 VERSION = "v3"
-
-
-def _create_platform_json_object(platform_data):
-    content_dict = asdict(platform_data)
-    return camelize_dict(content_dict)
 
 
 def main():
