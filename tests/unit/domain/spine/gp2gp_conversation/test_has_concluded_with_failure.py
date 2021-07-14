@@ -9,9 +9,12 @@ from tests.builders import test_cases
     [
         test_cases.request_made,
         test_cases.request_acknowledged_successfully,
+        test_cases.large_message_continue_sent,
         test_cases.core_ehr_sent,
+        test_cases.core_ehr_sent_with_sender_error,
         test_cases.acknowledged_duplicate_and_waiting_for_integration,
         test_cases.pending_integration_with_acked_large_message_fragments,
+        test_cases.large_message_fragment_failure_and_missing_large_fragment_ack,
     ],
 )
 def test_returns_false_given_pending_transfer(test_case):
@@ -28,6 +31,7 @@ def test_returns_false_given_pending_transfer(test_case):
     "test_case",
     [
         test_cases.ehr_integrated_successfully,
+        test_cases.ehr_integrated_late,
         test_cases.ehr_suppressed,
         test_cases.ehr_integrated_after_duplicate,
         test_cases.first_ehr_integrated_after_second_ehr_failed,

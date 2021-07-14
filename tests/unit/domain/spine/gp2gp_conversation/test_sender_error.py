@@ -1,3 +1,5 @@
+import pytest
+
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
 
@@ -14,10 +16,15 @@ def test_extracts_sender_error_code_when_no_sender_error():
     assert actual == expected
 
 
-def test_extracts_sender_error_code_when_sender_error():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.request_acknowledged_with_error(error_code=10)
-    )
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        test_cases.request_acknowledged_with_error,
+        test_cases.core_ehr_sent_with_sender_error,
+    ],
+)
+def test_extracts_sender_error_code_when_sender_error(test_case):
+    conversation = Gp2gpConversation.from_messages(messages=test_case(error_code=10))
 
     actual = conversation.sender_error()
 

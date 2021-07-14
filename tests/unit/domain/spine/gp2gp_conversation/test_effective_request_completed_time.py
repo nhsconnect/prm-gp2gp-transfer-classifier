@@ -14,6 +14,7 @@ from prmdata.domain.spine.message import Message
         test_cases.request_made,
         test_cases.request_acknowledged_successfully,
         test_cases.core_ehr_sent,
+        test_cases.large_message_continue_sent,
         test_cases.acknowledged_duplicate_and_waiting_for_integration,
         test_cases.pending_integration_with_acked_large_message_fragments,
     ],

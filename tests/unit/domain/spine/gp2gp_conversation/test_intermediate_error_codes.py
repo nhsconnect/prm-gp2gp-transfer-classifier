@@ -1,5 +1,7 @@
 from typing import List
 
+import pytest
+
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
 
@@ -28,6 +30,17 @@ def test_intermediate_error_code_is_empty_list_if_no_errors():
     assert actual == expected_intermediate_error_codes
 
 
+def test_extracts_error_codes_when_some_messages_unacknowledged():
+    conversation = Gp2gpConversation.from_messages(
+        test_cases.large_message_fragment_failure_and_missing_large_fragment_ack(error_code=10),
+    )
+    actual = conversation.intermediate_error_codes()
+
+    expected_intermediate_error_codes = [10]
+
+    assert actual == expected_intermediate_error_codes
+
+
 def test_extracts_multiple_intermediate_message_error_codes():
     conversation = Gp2gpConversation.from_messages(
         messages=test_cases.multiple_large_fragment_failures(error_codes=[11, None, 10])
@@ -36,5 +49,48 @@ def test_extracts_multiple_intermediate_message_error_codes():
     actual = conversation.intermediate_error_codes()
 
     expected_intermediate_error_codes = [11, 10]
+
+    assert actual == expected_intermediate_error_codes
+
+
+def test_ignores_sender_error_codes():
+    conversation = Gp2gpConversation.from_messages(
+        messages=test_cases.request_acknowledged_with_error()
+    )
+
+    actual = conversation.intermediate_error_codes()
+
+    expected_intermediate_error_codes: List[int] = []
+
+    assert actual == expected_intermediate_error_codes
+
+
+def test_ignores_ehr_acknowledgement_error_codes():
+    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())
+
+    actual = conversation.intermediate_error_codes()
+
+    expected_intermediate_error_codes: List[int] = []
+
+    assert actual == expected_intermediate_error_codes
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        test_cases.request_made,
+        test_cases.request_acknowledged_successfully,
+        test_cases.core_ehr_sent,
+        test_cases.large_message_continue_sent,
+        test_cases.acknowledged_duplicate_and_waiting_for_integration,
+        test_cases.pending_integration_with_acked_large_message_fragments,
+    ],
+)
+def test_returns_nothing_when_transfer_in_progress_and_no_errors(test_case):
+    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())
+
+    actual = conversation.intermediate_error_codes()
+
+    expected_intermediate_error_codes: List[int] = []
 
     assert actual == expected_intermediate_error_codes

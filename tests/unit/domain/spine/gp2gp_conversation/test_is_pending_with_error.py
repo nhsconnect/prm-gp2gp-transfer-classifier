@@ -10,6 +10,7 @@ from tests.builders import test_cases
         test_cases.request_made,
         test_cases.request_acknowledged_successfully,
         test_cases.core_ehr_sent,
+        test_cases.large_message_continue_sent,
         test_cases.acknowledged_duplicate_and_waiting_for_integration,
         test_cases.pending_integration_with_acked_large_message_fragments,
     ],
@@ -48,6 +49,7 @@ def test_returns_false_given_transfer_failed(test_case):
     [
         test_cases.ehr_integrated_successfully,
         test_cases.ehr_suppressed,
+        test_cases.ehr_integrated_late,
         test_cases.ehr_integrated_after_duplicate,
         test_cases.first_ehr_integrated_after_second_ehr_failed,
         test_cases.first_ehr_integrated_before_second_ehr_failed,
@@ -74,8 +76,10 @@ def test_returns_false_given_transfer_succeeded(test_case):
     "test_case",
     [
         test_cases.request_acknowledged_with_error,
+        test_cases.core_ehr_sent_with_sender_error,
         test_cases.large_message_fragment_failure,
         test_cases.multiple_large_fragment_failures,
+        test_cases.large_message_fragment_failure_and_missing_large_fragment_ack,
     ],
 )
 def test_returns_true_given_transfer_pending_with_error(test_case):
