@@ -16,64 +16,6 @@ import pyarrow.parquet as pq
 
 logger = logging.getLogger(__name__)
 
-EXPECTED_TRANSFERS = {
-    "conversation_id": [
-        "integrated-within-8-days--A12345",
-        "integrated-beyond-8-days--A12345",
-        "completed-within-3-days-in-jan--A12345",
-        "failed--A12345",
-        "integrated-within-8-days--A12347",
-        "completed-within-3-days--A12347",
-    ],
-    "date_completed": [
-        datetime(2019, 12, 6, 8, 41, 48, 337000),
-        datetime(2019, 12, 15, 8, 41, 48, 337000),
-        datetime(2020, 1, 1, 8, 41, 48, 337000),
-        datetime(2019, 12, 20, 8, 41, 48, 337000),
-        datetime(2019, 12, 7, 8, 41, 48, 337000),
-        datetime(2019, 12, 31, 18, 3, 24, 982000),
-    ],
-    "date_requested": [
-        datetime(2019, 12, 1, 18, 2, 29, 985000),
-        datetime(2019, 12, 5, 18, 2, 29, 985000),
-        datetime(2019, 12, 30, 18, 2, 29, 985000),
-        datetime(2019, 12, 19, 18, 2, 29, 985000),
-        datetime(2019, 12, 3, 18, 2, 29, 985000),
-        datetime(2019, 12, 31, 18, 2, 29, 985000),
-    ],
-    "final_error_codes": [[None], [None], [None], [30], [None], [None]],
-    "intermediate_error_codes": [[], [], [], [], [], []],
-    "requesting_practice_asid": [
-        "123456789123",
-        "123456789123",
-        "123456789123",
-        "123456789123",
-        "987654321240",
-        "987654321240",
-    ],
-    "requesting_supplier": ["", "SystmOne", "SystmOne", "Vision", "", "SystmOne"],
-    "sender_error_code": [None, None, None, None, None, None],
-    "sending_practice_asid": [
-        "003456789123",
-        "003456789123",
-        "003456789123",
-        "003456789123",
-        "003456789123",
-        "003456789123",
-    ],
-    "sending_supplier": ["", "EMIS", "Vision", "Unknown", "", "Vision"],
-    "sla_duration": [398306, 830306, 139106, 52706, 311906, 3],
-    "status": [
-        "INTEGRATED_ON_TIME",
-        "PROCESS_FAILURE",
-        "INTEGRATED_ON_TIME",
-        "TECHNICAL_FAILURE",
-        "INTEGRATED_ON_TIME",
-        "INTEGRATED_ON_TIME",
-    ],
-    "failure_reason": ["", "Integrated Late", "", "Final Error", "", ""],
-}
-
 
 class ThreadedServer:
     def __init__(self, server):
@@ -90,6 +32,17 @@ class ThreadedServer:
 
 def _read_json(path):
     return json.loads(path.read_text())
+
+
+def _parse_dates(items):
+    return [datetime.fromisoformat(item) for item in items]
+
+
+def _read_parquet_columns_json(path):
+    return {
+        column_name: _parse_dates(values) if column_name.startswith("date_") else values
+        for column_name, values in _read_json(path).items()
+    }
 
 
 def _read_s3_json(bucket, key):
@@ -117,7 +70,7 @@ def _build_fake_s3_bucket(bucket_name: str, s3):
     return s3_fake_bucket
 
 
-def test_with_s3_output(datadir):
+def test_end_to_end_with_fake_f3(datadir):
     fake_s3_host = "127.0.0.1"
     fake_s3_port = 8887
     fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"
@@ -160,6 +113,9 @@ def test_with_s3_output(datadir):
 
     expected_practice_metrics = _read_json(datadir / "expected_outputs" / "practiceMetrics.json")
     expected_national_metrics = _read_json(datadir / "expected_outputs" / "nationalMetrics.json")
+    expected_transfers = _read_parquet_columns_json(
+        datadir / "expected_outputs" / "transfersParquetColumns.json"
+    )
 
     input_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Dec-2019.csv")
     input_transfer_data_bucket.upload_fileobj(
@@ -194,7 +150,7 @@ def test_with_s3_output(datadir):
         assert actual_practice_metrics["ccgs"] == expected_practice_metrics["ccgs"]
         assert actual_national_metrics["metrics"] == expected_national_metrics["metrics"]
 
-        assert actual_transfers == EXPECTED_TRANSFERS
+        assert actual_transfers == expected_transfers
     finally:
         output_transfer_data_bucket.objects.all().delete()
         output_transfer_data_bucket.delete()

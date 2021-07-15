@@ -1,0 +1,58 @@
+{
+    "conversation_id": [
+        "integrated-within-8-days--A12345",
+        "integrated-beyond-8-days--A12345",
+        "completed-within-3-days-in-jan--A12345",
+        "failed--A12345",
+        "integrated-within-8-days--A12347",
+        "completed-within-3-days--A12347"
+    ],
+    "date_completed": [
+        "2019-12-06T08:41:48.337000",
+        "2019-12-15T08:41:48.337000",
+        "2020-01-01T08:41:48.337000",
+        "2019-12-20T08:41:48.337000",
+        "2019-12-07T08:41:48.337000",
+        "2019-12-31T18:03:24.982000"
+    ],
+    "date_requested": [
+        "2019-12-01T18:02:29.985000",
+        "2019-12-05T18:02:29.985000",
+        "2019-12-30T18:02:29.985000",
+        "2019-12-19T18:02:29.985000",
+        "2019-12-03T18:02:29.985000",
+        "2019-12-31T18:02:29.985000"
+    ],
+    "final_error_codes": [[null], [null], [null], [30], [null], [null]],
+    "intermediate_error_codes": [[], [], [], [], [], []],
+    "requesting_practice_asid": [
+        "123456789123",
+        "123456789123",
+        "123456789123",
+        "123456789123",
+        "987654321240",
+        "987654321240"
+    ],
+    "requesting_supplier": ["", "SystmOne", "SystmOne", "Vision", "", "SystmOne"],
+    "sender_error_code": [null, null, null, null, null, null],
+    "sending_practice_asid": [
+        "003456789123",
+        "003456789123",
+        "003456789123",
+        "003456789123",
+        "003456789123",
+        "003456789123"
+    ],
+    "sending_supplier": ["", "EMIS", "Vision", "Unknown", "", "Vision"],
+    "sla_duration": [398306, 830306, 139106, 52706, 311906, 3],
+    "status": [
+        "INTEGRATED_ON_TIME",
+        "PROCESS_FAILURE",
+        "INTEGRATED_ON_TIME",
+        "TECHNICAL_FAILURE",
+        "INTEGRATED_ON_TIME",
+        "INTEGRATED_ON_TIME"
+    ],
+    "failure_reason": ["", "Integrated Late", "", "Final Error", "", ""]
+}
+
