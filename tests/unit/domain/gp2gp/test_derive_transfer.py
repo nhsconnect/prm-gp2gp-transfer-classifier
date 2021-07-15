@@ -123,21 +123,41 @@ def test_returns_transfer_status_process_failure_with_reason(test_case, expected
     assert actual.transfer_outcome.reason == expected_reason
 
 
-@pytest.mark.parametrize(
-    "test_case",
-    [
-        test_cases.core_ehr_sent_with_sender_error,
-        test_cases.large_message_fragment_failure,
-    ],
-)
-def test_returns_transferred_not_integrated_with_error_status(test_case):
-    gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_and_sender_error():
+    conversation = build_mock_gp2gp_conversation()
+
+    conversation.is_integrated.return_value = False
+    conversation.has_concluded_with_failure.return_value = False
+    conversation.contains_copc_messages.return_value = False
+    conversation.contains_fatal_sender_error_code.return_value = False
+    conversation.is_missing_request_acknowledged.return_value = False
+    conversation.is_missing_core_ehr.return_value = False
+    conversation.contains_core_ehr_with_sender_error.return_value = True
 
     actual = derive_transfer(conversation)
 
-    assert actual.transfer_outcome.status == TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
-    assert actual.transfer_outcome.reason == TransferFailureReason.DEFAULT
+    expected_status = TransferStatus.UNCLASSIFIED_FAILURE
+    expected_reason = TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
+
+    assert actual.transfer_outcome.status == expected_status
+    assert actual.transfer_outcome.reason == expected_reason
+
+
+def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_error():
+    conversation = build_mock_gp2gp_conversation()
+
+    conversation.is_integrated.return_value = False
+    conversation.has_concluded_with_failure.return_value = False
+    conversation.contains_copc_messages.return_value = True
+    conversation.contains_copc_error.return_value = True
+
+    actual = derive_transfer(conversation)
+
+    expected_status = TransferStatus.UNCLASSIFIED_FAILURE
+    expected_reason = TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
+
+    assert actual.transfer_outcome.status == expected_status
+    assert actual.transfer_outcome.reason == expected_reason
 
 
 @pytest.mark.parametrize("fatal_sender_error_code", FATAL_SENDER_ERROR_CODES)

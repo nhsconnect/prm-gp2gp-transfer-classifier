@@ -13,10 +13,12 @@ from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 class TransferStatus(Enum):
     INTEGRATED_ON_TIME = "INTEGRATED_ON_TIME"
     TECHNICAL_FAILURE = "TECHNICAL_FAILURE"
+    PROCESS_FAILURE = "PROCESS_FAILURE"
+    UNCLASSIFIED_FAILURE = "UNCLASSIFIED_FAILURE"
+
+    # Remove once PRMT-1956 is complete
     PENDING = "PENDING"
     PENDING_WITH_ERROR = "PENDING_WITH_ERROR"
-    PROCESS_FAILURE = "PROCESS_FAILURE"
-    TRANSFERRED_NOT_INTEGRATED_WITH_ERROR = "TRANSFERRED_NOT_INTEGRATED_WITH_ERROR"
 
 
 class TransferFailureReason(Enum):
@@ -28,6 +30,7 @@ class TransferFailureReason(Enum):
     FATAL_SENDER_ERROR = "Contains Fatal Sender Error"
     COPC_NOT_SENT = "COPC(s) not sent"
     COPC_NOT_ACKNOWLEDGED = "COPC(s) not Acknowledged"
+    TRANSFERRED_NOT_INTEGRATED_WITH_ERROR = "TRANSFERRED_NOT_INTEGRATED_WITH_ERROR"
     DEFAULT = ""
 
 
@@ -70,8 +73,8 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
 def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.contains_copc_error():
         return TransferOutcome(
-            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
-            reason=TransferFailureReason.DEFAULT,
+            status=TransferStatus.UNCLASSIFIED_FAILURE,
+            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
         )
     elif conversation.is_missing_copc():
         return TransferOutcome(
@@ -93,8 +96,8 @@ def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
 def _core_ehr_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.contains_core_ehr_with_sender_error():
         return TransferOutcome(
-            status=TransferStatus.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
-            reason=TransferFailureReason.DEFAULT,
+            status=TransferStatus.UNCLASSIFIED_FAILURE,
+            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
         )
     else:
         return TransferOutcome(
