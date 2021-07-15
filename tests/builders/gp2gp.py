@@ -1,6 +1,8 @@
+from datetime import timedelta
 from typing import List
 
 from prmdata.domain.gp2gp.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
+from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
@@ -44,17 +46,47 @@ def build_practice_metrics(**kwargs) -> PracticeMetrics:
 
 
 def an_integrated_transfer(**kwargs):
-    integrated_transfer_outcome = TransferOutcome(
-        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
-    )
     return build_transfer(
-        transfer_outcome=integrated_transfer_outcome,
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+        ),
         sla_duration=kwargs.get("sla_duration", a_duration()),
     )
 
 
+def a_transfer_integrated_within_3_days():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+        ),
+        sla_duration=timedelta(seconds=THREE_DAYS_IN_SECONDS),
+    )
+
+
+def a_transfer_integrated_between_3_and_8_days():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+        ),
+        sla_duration=timedelta(seconds=THREE_DAYS_IN_SECONDS + 1),
+    )
+
+
+def a_transfer_integrated_beyond_8_days():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.PROCESS_FAILURE, reason=TransferFailureReason.INTEGRATED_LATE
+        ),
+        sla_duration=timedelta(seconds=EIGHT_DAYS_IN_SECONDS + 1),
+    )
+
+
 def a_pending_transfer():
-    return build_transfer()
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.PENDING, reason=TransferFailureReason.DEFAULT
+        )
+    )
 
 
 def a_pending_with_error_transfer():
@@ -65,10 +97,84 @@ def a_pending_with_error_transfer():
 
 
 def a_failed_transfer():
-    failed_transfer_outcome = TransferOutcome(
-        status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
+        )
     )
-    return build_transfer(transfer_outcome=failed_transfer_outcome)
+
+
+def a_transfer_that_was_never_integrated():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.PROCESS_FAILURE,
+            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+        )
+    )
+
+
+def a_transfer_where_the_request_was_never_acknowledged():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
+        )
+    )
+
+
+def a_transfer_where_no_core_ehr_was_sent():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.CORE_EHR_NOT_SENT,
+        )
+    )
+
+
+def a_transfer_where_no_large_message_continue_was_sent():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            # TODO: This should be a separate failure reason
+            reason=TransferFailureReason.COPC_NOT_SENT,
+        )
+    )
+
+
+def a_transfer_where_large_messages_were_required_but_not_sent():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.COPC_NOT_SENT,
+        )
+    )
+
+
+def a_transfer_where_large_messages_remained_unacknowledged():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
+        )
+    )
+
+
+def a_transfer_where_the_sender_reported_an_unrecoverable_error():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.TECHNICAL_FAILURE,
+            reason=TransferFailureReason.FATAL_SENDER_ERROR,
+        )
+    )
+
+
+def a_transfer_where_a_large_message_triggered_an_error():
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.UNCLASSIFIED_FAILURE,
+            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+        )
+    )
 
 
 def build_transfers(**kwargs) -> List[Transfer]:

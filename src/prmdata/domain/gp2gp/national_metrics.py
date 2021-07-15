@@ -1,7 +1,46 @@
 from dataclasses import dataclass
 from typing import Iterable, List, Set
 from prmdata.domain.gp2gp.sla import SlaCounter
-from prmdata.domain.gp2gp.transfer import Transfer, TransferStatus, TransferFailureReason
+from prmdata.domain.gp2gp.transfer import (
+    Transfer,
+    TransferStatus,
+    TransferFailureReason,
+)
+
+_PENDING_TRANSFER_REASONS = {
+    (
+        TransferStatus.PROCESS_FAILURE,
+        TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+    ),
+    (
+        TransferStatus.TECHNICAL_FAILURE,
+        TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
+    ),
+    (
+        TransferStatus.TECHNICAL_FAILURE,
+        TransferFailureReason.CORE_EHR_NOT_SENT,
+    ),
+    (
+        TransferStatus.TECHNICAL_FAILURE,
+        TransferFailureReason.COPC_NOT_SENT,
+    ),
+    (
+        TransferStatus.TECHNICAL_FAILURE,
+        TransferFailureReason.COPC_NOT_SENT,
+    ),
+    (
+        TransferStatus.TECHNICAL_FAILURE,
+        TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
+    ),
+    (
+        TransferStatus.TECHNICAL_FAILURE,
+        TransferFailureReason.FATAL_SENDER_ERROR,
+    ),
+    (
+        TransferStatus.UNCLASSIFIED_FAILURE,
+        TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+    ),
+}
 
 
 @dataclass
@@ -30,9 +69,7 @@ def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
 
     return NationalMetrics(
         initiated_transfer_count=len(transfers),
-        pending_transfer_count=_count_transfers_with_statuses(
-            transfers, {TransferStatus.PENDING, TransferStatus.PENDING_WITH_ERROR}
-        ),
+        pending_transfer_count=_count_pending_transfers(transfers),
         failed_transfer_count=_count_failed_transfers(transfers),
         integrated=IntegratedMetrics(
             transfer_count=len(integrated_transfers),
@@ -53,6 +90,15 @@ def _count_transfers_with_statuses(
     transfers: Iterable[Transfer], statuses: Set[TransferStatus]
 ) -> int:
     return len([t for t in transfers if t.transfer_outcome.status in statuses])
+
+
+def _count_pending_transfers(transfers: Iterable[Transfer]):
+    count = 0
+    for transfer in transfers:
+        outcome = transfer.transfer_outcome
+        if (outcome.status, outcome.reason) in _PENDING_TRANSFER_REASONS:
+            count += 1
+    return count
 
 
 def _filter_for_integrated_transfers(transfers: Iterable[Transfer]) -> List[Transfer]:

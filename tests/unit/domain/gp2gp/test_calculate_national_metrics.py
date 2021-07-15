@@ -9,10 +9,16 @@ from prmdata.domain.gp2gp.transfer import Transfer
 
 from tests.builders.gp2gp import (
     build_transfers,
-    a_pending_transfer,
-    a_pending_with_error_transfer,
     an_integrated_transfer,
     a_failed_transfer,
+    a_transfer_that_was_never_integrated,
+    a_transfer_where_the_request_was_never_acknowledged,
+    a_transfer_where_no_core_ehr_was_sent,
+    a_transfer_where_no_large_message_continue_was_sent,
+    a_transfer_where_large_messages_were_required_but_not_sent,
+    a_transfer_where_large_messages_remained_unacknowledged,
+    a_transfer_where_the_sender_reported_an_unrecoverable_error,
+    a_transfer_where_a_large_message_triggered_an_error,
 )
 from tests.builders.common import an_integer
 
@@ -106,30 +112,33 @@ def test_returns_pending_transfer_count_default_given_no_transfers():
 
 
 def test_returns_pending_transfer_count_given_only_pending_transfers():
-    transfers = [a_pending_transfer(), a_pending_transfer()]
+    transfers = [
+        a_transfer_that_was_never_integrated(),
+        a_transfer_where_the_request_was_never_acknowledged(),
+        a_transfer_where_no_core_ehr_was_sent(),
+        a_transfer_where_no_large_message_continue_was_sent(),
+        a_transfer_where_large_messages_were_required_but_not_sent(),
+        a_transfer_where_large_messages_remained_unacknowledged(),
+        a_transfer_where_the_sender_reported_an_unrecoverable_error(),
+        a_transfer_where_a_large_message_triggered_an_error(),
+    ]
 
     national_metrics = calculate_national_metrics(transfers)
 
-    expected_pending_transfer_count = 2
+    expected_pending_transfer_count = 8
 
     assert national_metrics.pending_transfer_count == expected_pending_transfer_count
 
 
 def test_returns_pending_transfer_count_given_a_mixture_of_transfers():
-    transfers = [a_pending_transfer(), a_failed_transfer(), an_integrated_transfer()]
+    transfers = [
+        a_transfer_that_was_never_integrated(),
+        a_failed_transfer(),
+        an_integrated_transfer(),
+    ]
 
     national_metrics = calculate_national_metrics(transfers)
 
     expected_pending_transfer_count = 1
-
-    assert national_metrics.pending_transfer_count == expected_pending_transfer_count
-
-
-def test_returns_pending_transfer_count_given_pending_and_pending_with_error_transfers():
-    transfers = [a_pending_transfer(), a_pending_with_error_transfer()]
-
-    national_metrics = calculate_national_metrics(transfers)
-
-    expected_pending_transfer_count = 2
 
     assert national_metrics.pending_transfer_count == expected_pending_transfer_count

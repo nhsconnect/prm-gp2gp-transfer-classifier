@@ -4,9 +4,9 @@
     {
       "year": 2019,
       "month": 12,
-      "transferCount": 6,
+      "transferCount": 7,
       "integrated": {
-        "transferPercentage": 83.33,
+        "transferPercentage": 71.43,
         "transferCount": 5,
         "within3Days": 2,
         "within8Days": 2,
@@ -14,15 +14,15 @@
       },
       "failed": {
         "transferCount": 1,
-        "transferPercentage": 16.67
+        "transferPercentage": 14.29
       },
       "pending": {
-        "transferCount": 0,
-        "transferPercentage": 0.0
+        "transferCount": 1,
+        "transferPercentage": 14.29
       },
       "paperFallback": {
-        "transferCount": 2,
-        "transferPercentage": 33.33
+        "transferCount": 3,
+        "transferPercentage": 42.86
       }
     }
   ]

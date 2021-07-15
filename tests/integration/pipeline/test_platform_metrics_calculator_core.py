@@ -24,7 +24,6 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
-from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
@@ -35,7 +34,20 @@ from prmdata.domain.gp2gp.transfer import (
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 from tests.builders.spine import build_message
-from tests.builders.gp2gp import build_transfer
+from tests.builders.gp2gp import (
+    a_transfer_integrated_beyond_8_days,
+    a_transfer_integrated_within_3_days,
+    a_transfer_integrated_between_3_and_8_days,
+    a_failed_transfer,
+    a_transfer_that_was_never_integrated,
+    a_transfer_where_the_request_was_never_acknowledged,
+    a_transfer_where_no_core_ehr_was_sent,
+    a_transfer_where_no_large_message_continue_was_sent,
+    a_transfer_where_large_messages_were_required_but_not_sent,
+    a_transfer_where_large_messages_remained_unacknowledged,
+    a_transfer_where_the_sender_reported_an_unrecoverable_error,
+    a_transfer_where_a_large_message_triggered_an_error,
+)
 
 
 def _build_successful_conversation(**kwargs):
@@ -218,51 +230,23 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
 @freeze_time(datetime(year=2020, month=1, day=17, hour=21, second=32), tz_offset=0)
 def test_calculates_correct_national_metrics_given_series_of_messages():
-    sla_duration_within_3_days = timedelta(seconds=THREE_DAYS_IN_SECONDS)
-    sla_duration_within_8_days = timedelta(seconds=EIGHT_DAYS_IN_SECONDS)
-    sla_duration_beyond_8_days = timedelta(seconds=EIGHT_DAYS_IN_SECONDS + 1)
-
-    integrated_late_transfer_outcome = TransferOutcome(
-        status=TransferStatus.PROCESS_FAILURE, reason=TransferFailureReason.INTEGRATED_LATE
-    )
-    integrated_on_time_transfer_outcome = TransferOutcome(
-        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
-    )
-    pending_with_error_transfer_outcome = TransferOutcome(
-        status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
-    )
-    failed_transfer_outcome = TransferOutcome(
-        status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
-    )
 
     transfers = [
-        build_transfer(),
-        build_transfer(transfer_outcome=pending_with_error_transfer_outcome),
-        build_transfer(
-            transfer_outcome=integrated_on_time_transfer_outcome,
-            sla_duration=sla_duration_within_3_days,
-        ),
-        build_transfer(
-            transfer_outcome=integrated_on_time_transfer_outcome,
-            sla_duration=sla_duration_within_8_days,
-        ),
-        build_transfer(
-            transfer_outcome=integrated_on_time_transfer_outcome,
-            sla_duration=sla_duration_within_8_days,
-        ),
-        build_transfer(
-            transfer_outcome=integrated_late_transfer_outcome,
-            sla_duration=sla_duration_beyond_8_days,
-        ),
-        build_transfer(
-            transfer_outcome=integrated_late_transfer_outcome,
-            sla_duration=sla_duration_beyond_8_days,
-        ),
-        build_transfer(
-            transfer_outcome=integrated_late_transfer_outcome,
-            sla_duration=sla_duration_beyond_8_days,
-        ),
-        build_transfer(transfer_outcome=failed_transfer_outcome),
+        a_transfer_that_was_never_integrated(),
+        a_transfer_where_the_request_was_never_acknowledged(),
+        a_transfer_where_no_core_ehr_was_sent(),
+        a_transfer_where_no_large_message_continue_was_sent(),
+        a_transfer_where_large_messages_were_required_but_not_sent(),
+        a_transfer_where_large_messages_remained_unacknowledged(),
+        a_transfer_where_the_sender_reported_an_unrecoverable_error(),
+        a_transfer_where_a_large_message_triggered_an_error(),
+        a_transfer_integrated_within_3_days(),
+        a_transfer_integrated_between_3_and_8_days(),
+        a_transfer_integrated_between_3_and_8_days(),
+        a_transfer_integrated_beyond_8_days(),
+        a_transfer_integrated_beyond_8_days(),
+        a_transfer_integrated_beyond_8_days(),
+        a_failed_transfer(),
     ]
 
     reporting_window = MonthlyReportingWindow(
@@ -272,17 +256,17 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
     current_datetime = datetime.now(tzutc())
 
     expected_national_metrics = MonthlyNationalMetrics(
-        transfer_count=9,
+        transfer_count=15,
         integrated=IntegratedMetrics(
-            transfer_percentage=66.67,
+            transfer_percentage=40.0,
             transfer_count=6,
             within_3_days=1,
             within_8_days=2,
             beyond_8_days=3,
         ),
-        failed=FailedMetrics(transfer_count=1, transfer_percentage=11.11),
-        pending=PendingMetrics(transfer_count=2, transfer_percentage=22.22),
-        paper_fallback=PaperFallbackMetrics(transfer_count=6, transfer_percentage=66.67),
+        failed=FailedMetrics(transfer_count=1, transfer_percentage=6.67),
+        pending=PendingMetrics(transfer_count=8, transfer_percentage=53.33),
+        paper_fallback=PaperFallbackMetrics(transfer_count=12, transfer_percentage=80.0),
         year=2019,
         month=12,
     )

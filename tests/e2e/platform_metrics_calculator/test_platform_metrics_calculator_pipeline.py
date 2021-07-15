@@ -35,7 +35,7 @@ def _read_json(path):
 
 
 def _parse_dates(items):
-    return [datetime.fromisoformat(item) for item in items]
+    return [None if item is None else datetime.fromisoformat(item) for item in items]
 
 
 def _read_parquet_columns_json(path):
