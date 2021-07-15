@@ -61,9 +61,9 @@ def _filter_for_integrated_transfers(transfers: Iterable[Transfer]) -> List[Tran
         for t in transfers
         if (
             (t.transfer_outcome.status == TransferStatus.INTEGRATED_ON_TIME)
-            | (
+            or (
                 (t.transfer_outcome.status == TransferStatus.PROCESS_FAILURE)
-                & (t.transfer_outcome.reason == TransferFailureReason.INTEGRATED_LATE)
+                and (t.transfer_outcome.reason == TransferFailureReason.INTEGRATED_LATE)
             )
         )
     ]
