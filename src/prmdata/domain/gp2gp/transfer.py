@@ -53,7 +53,7 @@ class Transfer(NamedTuple):
     sender_error_code: Optional[int]
     final_error_codes: List[Optional[int]]
     intermediate_error_codes: List[int]
-    transfer_outcome: TransferOutcome
+    outcome: TransferOutcome
     date_requested: datetime
     date_completed: Optional[datetime]
 
@@ -165,7 +165,7 @@ def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
         sender_error_code=conversation.sender_error(),
         final_error_codes=conversation.final_error_codes(),
         intermediate_error_codes=conversation.intermediate_error_codes(),
-        transfer_outcome=_assign_transfer_outcome(conversation),
+        outcome=_assign_transfer_outcome(conversation),
         date_requested=conversation.date_requested(),
         date_completed=conversation.effective_final_acknowledgement_time(),
     )
@@ -176,12 +176,12 @@ def filter_for_successful_transfers(transfers: List[Transfer]) -> Iterator[Trans
         transfer
         for transfer in transfers
         if (
-            transfer.transfer_outcome.status == TransferStatus.INTEGRATED_ON_TIME
+            transfer.outcome.status == TransferStatus.INTEGRATED_ON_TIME
             and transfer.sla_duration is not None
         )
         or (
-            transfer.transfer_outcome.status == TransferStatus.PROCESS_FAILURE
-            and transfer.transfer_outcome.failure_reason == TransferFailureReason.INTEGRATED_LATE
+            transfer.outcome.status == TransferStatus.PROCESS_FAILURE
+            and transfer.outcome.failure_reason == TransferFailureReason.INTEGRATED_LATE
         )
     )
 
@@ -205,8 +205,8 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "sender_error_code": [t.sender_error_code for t in transfers],
             "final_error_codes": [t.final_error_codes for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
-            "status": [t.transfer_outcome.status_string for t in transfers],
-            "failure_reason": [t.transfer_outcome.failure_reason_string for t in transfers],
+            "status": [t.outcome.status_string for t in transfers],
+            "failure_reason": [t.outcome.failure_reason_string for t in transfers],
             "date_requested": [t.date_requested for t in transfers],
             "date_completed": [t.date_completed for t in transfers],
         },
