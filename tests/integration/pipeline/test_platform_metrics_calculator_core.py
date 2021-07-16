@@ -105,8 +105,8 @@ def test_parses_transfer_correctly_given_valid_message_list():
 
     requesting_asid_with_transfer = "343434343434"
     sending_asid_with_transfer = "111134343434"
-    requesting_supplier = "EMIS"
-    sending_supplier = "Vision"
+    requesting_supplier = "SupplierA"
+    sending_supplier = "SupplierB"
     conversation_id = "abcdefg_1234"
 
     spine_messages = _build_successful_conversation(

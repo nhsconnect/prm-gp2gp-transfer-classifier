@@ -18,7 +18,7 @@ def test_returns_correct_messages_given_two_items():
             message_ref="NotProvided",
             jdi_event="NONE",
             raw="",
-            from_system="EMIS",
+            from_system="SupplierA",
             to_system="Unknown",
         ),
         build_spine_item(
@@ -31,8 +31,8 @@ def test_returns_correct_messages_given_two_items():
             message_ref="convo_xyz",
             jdi_event="23",
             raw="",
-            from_system="Vision",
-            to_system="TPP",
+            from_system="SupplierB",
+            to_system="SupplierC",
         ),
     ]
 
@@ -46,7 +46,7 @@ def test_returns_correct_messages_given_two_items():
             to_party_asid="121212121212",
             message_ref=None,
             error_code=None,
-            from_system="EMIS",
+            from_system="SupplierA",
             to_system="Unknown",
         ),
         Message(
@@ -58,8 +58,8 @@ def test_returns_correct_messages_given_two_items():
             to_party_asid="343434343434",
             message_ref="convo_xyz",
             error_code=23,
-            from_system="Vision",
-            to_system="TPP",
+            from_system="SupplierB",
+            to_system="SupplierC",
         ),
     ]
 
