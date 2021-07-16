@@ -59,6 +59,6 @@
         "INTEGRATED_ON_TIME",
         "INTEGRATED_ON_TIME"
     ],
-    "failure_reason": ["", "Integrated Late", "", "Final Error", "Transferred, not integrated", "", ""]
+    "failure_reason": [null, "Integrated Late", null, "Final Error", "Transferred, not integrated", null, null]
 }
 

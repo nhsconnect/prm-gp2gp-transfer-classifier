@@ -28,7 +28,6 @@ from prmdata.pipeline.platform_metrics_calculator.core import (
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
-    TransferFailureReason,
     TransferOutcome,
 )
 from prmdata.utils.reporting_window import MonthlyReportingWindow
@@ -131,7 +130,7 @@ def test_parses_transfer_correctly_given_valid_message_list():
             requesting_supplier=requesting_supplier,
             sending_supplier=sending_supplier,
             transfer_outcome=TransferOutcome(
-                reason=TransferFailureReason.DEFAULT, status=TransferStatus.INTEGRATED_ON_TIME
+                failure_reason=None, status=TransferStatus.INTEGRATED_ON_TIME
             ),
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
@@ -172,7 +171,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
             requesting_supplier=requesting_supplier,
             sending_supplier=sending_supplier,
             transfer_outcome=TransferOutcome(
-                reason=TransferFailureReason.DEFAULT, status=TransferStatus.INTEGRATED_ON_TIME
+                failure_reason=None, status=TransferStatus.INTEGRATED_ON_TIME
             ),
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),

@@ -5,7 +5,6 @@ from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
     filter_for_successful_transfers,
     TransferOutcome,
-    TransferFailureReason,
 )
 from tests.builders.gp2gp import (
     build_transfer,
@@ -68,7 +67,7 @@ def test_excludes_transfers_missing_sla_duration():
     integrated_transfer_1 = an_integrated_transfer()
     integrated_transfer_2 = build_transfer(
         transfer_outcome=TransferOutcome(
-            status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+            status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None
         ),
         sla_duration=None,
     )

@@ -82,7 +82,11 @@ def calculate_national_metrics(transfers: List[Transfer]) -> NationalMetrics:
 
 def _count_failed_transfers(transfers: Iterable[Transfer]) -> int:
     return len(
-        [t for t in transfers if t.transfer_outcome.reason == TransferFailureReason.FINAL_ERROR]
+        [
+            t
+            for t in transfers
+            if t.transfer_outcome.failure_reason == TransferFailureReason.FINAL_ERROR
+        ]
     )
 
 
@@ -96,7 +100,7 @@ def _count_pending_transfers(transfers: Iterable[Transfer]):
     count = 0
     for transfer in transfers:
         outcome = transfer.transfer_outcome
-        if (outcome.status, outcome.reason) in _PENDING_TRANSFER_REASONS:
+        if (outcome.status, outcome.failure_reason) in _PENDING_TRANSFER_REASONS:
             count += 1
     return count
 
@@ -109,7 +113,7 @@ def _filter_for_integrated_transfers(transfers: Iterable[Transfer]) -> List[Tran
             (t.transfer_outcome.status == TransferStatus.INTEGRATED_ON_TIME)
             or (
                 (t.transfer_outcome.status == TransferStatus.PROCESS_FAILURE)
-                and (t.transfer_outcome.reason == TransferFailureReason.INTEGRATED_LATE)
+                and (t.transfer_outcome.failure_reason == TransferFailureReason.INTEGRATED_LATE)
             )
         )
     ]

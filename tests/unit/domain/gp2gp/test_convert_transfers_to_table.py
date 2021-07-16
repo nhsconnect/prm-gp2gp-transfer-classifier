@@ -5,7 +5,6 @@ import pyarrow as pa
 from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
     convert_transfers_to_table,
-    TransferFailureReason,
     TransferOutcome,
 )
 from tests.builders.gp2gp import build_transfer
@@ -147,7 +146,7 @@ def test_intermediate_error_codes_is_converted_to_column_when_empty():
 
 def test_status_is_converted_to_column():
     integrated_transfer_outcome = TransferOutcome(
-        status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+        status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None
     )
     transfer = build_transfer(transfer_outcome=integrated_transfer_outcome)
 

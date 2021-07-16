@@ -27,13 +27,20 @@ class TransferFailureReason(Enum):
     COPC_NOT_SENT = "COPC(s) not sent"
     COPC_NOT_ACKNOWLEDGED = "COPC(s) not Acknowledged"
     TRANSFERRED_NOT_INTEGRATED_WITH_ERROR = "TRANSFERRED_NOT_INTEGRATED_WITH_ERROR"
-    DEFAULT = ""
 
 
 @dataclass
 class TransferOutcome:
     status: TransferStatus
-    reason: TransferFailureReason
+    failure_reason: Optional[TransferFailureReason]
+
+    @property
+    def status_string(self):
+        return self.status.value
+
+    @property
+    def failure_reason_string(self):
+        return None if self.failure_reason is None else self.failure_reason.value
 
 
 class Transfer(NamedTuple):
@@ -70,22 +77,22 @@ def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.contains_copc_error():
         return TransferOutcome(
             status=TransferStatus.UNCLASSIFIED_FAILURE,
-            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+            failure_reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
         )
     elif conversation.is_missing_copc():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
-            reason=TransferFailureReason.COPC_NOT_SENT,
+            failure_reason=TransferFailureReason.COPC_NOT_SENT,
         )
     elif conversation.is_missing_copc_ack():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
-            reason=TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
+            failure_reason=TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         )
     else:
         return TransferOutcome(
             status=TransferStatus.PROCESS_FAILURE,
-            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+            failure_reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         )
 
 
@@ -93,12 +100,12 @@ def _core_ehr_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutco
     if conversation.contains_core_ehr_with_sender_error():
         return TransferOutcome(
             status=TransferStatus.UNCLASSIFIED_FAILURE,
-            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
+            failure_reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
         )
     else:
         return TransferOutcome(
             status=TransferStatus.PROCESS_FAILURE,
-            reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
+            failure_reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         )
 
 
@@ -108,30 +115,32 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
         return _integrated_within_sla(conversation)
     elif conversation.has_concluded_with_failure():
         return TransferOutcome(
-            status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
+            status=TransferStatus.TECHNICAL_FAILURE,
+            failure_reason=TransferFailureReason.FINAL_ERROR,
         )
     elif conversation.contains_copc_messages():
         return _copc_transfer_outcome(conversation)
     elif conversation.contains_fatal_sender_error_code():
         return TransferOutcome(
-            status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FATAL_SENDER_ERROR
+            status=TransferStatus.TECHNICAL_FAILURE,
+            failure_reason=TransferFailureReason.FATAL_SENDER_ERROR,
         )
     elif conversation.is_missing_request_acknowledged():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
-            reason=TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
+            failure_reason=TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED,
         )
     elif not conversation.is_missing_core_ehr():
         return _core_ehr_transfer_outcome(conversation)
     elif conversation.is_missing_core_ehr():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
-            reason=TransferFailureReason.CORE_EHR_NOT_SENT,
+            failure_reason=TransferFailureReason.CORE_EHR_NOT_SENT,
         )
     else:
         return TransferOutcome(
             status=TransferStatus.UNCLASSIFIED_FAILURE,
-            reason=TransferFailureReason.DEFAULT,
+            failure_reason=None,
         )
 
 
@@ -139,11 +148,9 @@ def _integrated_within_sla(conversation: Gp2gpConversation) -> TransferOutcome:
     sla_duration = _calculate_sla(conversation)
     if sla_duration is not None:
         if sla_duration < timedelta(days=8):
-            return TransferOutcome(
-                status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
-            )
+            return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
     return TransferOutcome(
-        status=TransferStatus.PROCESS_FAILURE, reason=TransferFailureReason.INTEGRATED_LATE
+        status=TransferStatus.PROCESS_FAILURE, failure_reason=TransferFailureReason.INTEGRATED_LATE
     )
 
 
@@ -174,7 +181,7 @@ def filter_for_successful_transfers(transfers: List[Transfer]) -> Iterator[Trans
         )
         or (
             transfer.transfer_outcome.status == TransferStatus.PROCESS_FAILURE
-            and transfer.transfer_outcome.reason == TransferFailureReason.INTEGRATED_LATE
+            and transfer.transfer_outcome.failure_reason == TransferFailureReason.INTEGRATED_LATE
         )
     )
 
@@ -198,8 +205,8 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "sender_error_code": [t.sender_error_code for t in transfers],
             "final_error_codes": [t.final_error_codes for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
-            "status": [t.transfer_outcome.status.value for t in transfers],
-            "failure_reason": [t.transfer_outcome.reason.value for t in transfers],
+            "status": [t.transfer_outcome.status_string for t in transfers],
+            "failure_reason": [t.transfer_outcome.failure_reason_string for t in transfers],
             "date_requested": [t.date_requested for t in transfers],
             "date_completed": [t.date_completed for t in transfers],
         },
