@@ -126,7 +126,6 @@ def a_transfer_where_no_large_message_continue_was_sent():
     return build_transfer(
         outcome=TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
-            # TODO: This should be a separate failure reason
             failure_reason=TransferFailureReason.COPC_NOT_SENT,
         )
     )
