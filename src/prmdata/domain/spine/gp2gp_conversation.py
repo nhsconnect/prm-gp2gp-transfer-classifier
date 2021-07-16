@@ -64,14 +64,6 @@ class Gp2gpConversation(NamedTuple):
         has_final_ack = final_ack is not None
         return has_final_ack and not _integrated_or_suppressed(final_ack)
 
-    def is_pending_with_error(self) -> bool:
-        final_ack = self._find_effective_request_completed_ack_message()
-        missing_final_ack = final_ack is None
-        has_intermediate_errors = len(self.intermediate_error_codes()) > 0
-        has_sender_error = self.sender_error() is not None
-        has_intermediate_error = has_intermediate_errors or has_sender_error
-        return missing_final_ack and has_intermediate_error
-
     def is_missing_final_ack(self) -> bool:
         final_ack = self._find_effective_request_completed_ack_message()
         return final_ack is None

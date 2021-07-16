@@ -1,5 +1,4 @@
 from datetime import timedelta
-from typing import List
 
 from prmdata.domain.gp2gp.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
 from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
@@ -25,7 +24,9 @@ def build_transfer(**kwargs) -> Transfer:
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),
         transfer_outcome=kwargs.get(
             "transfer_outcome",
-            TransferOutcome(status=TransferStatus.PENDING, reason=TransferFailureReason.DEFAULT),
+            TransferOutcome(
+                status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
+            ),
         ),
         date_requested=kwargs.get("date_requested", a_datetime()),
         date_completed=kwargs.get("date_completed", None),
@@ -50,7 +51,18 @@ def an_integrated_transfer(**kwargs):
         transfer_outcome=TransferOutcome(
             status=TransferStatus.INTEGRATED_ON_TIME, reason=TransferFailureReason.DEFAULT
         ),
-        sla_duration=kwargs.get("sla_duration", a_duration()),
+        sla_duration=kwargs.get("sla_duration", a_duration(max_length=604800)),
+    )
+
+
+def a_supressed_transfer(**kwargs):
+    return build_transfer(
+        transfer_outcome=TransferOutcome(
+            status=TransferStatus.INTEGRATED_ON_TIME,
+            reason=TransferFailureReason.DEFAULT,
+        ),
+        final_error_codes=[15],
+        sla_duration=kwargs.get("sla_duration", a_duration(max_length=604800)),
     )
 
 
@@ -81,22 +93,7 @@ def a_transfer_integrated_beyond_8_days():
     )
 
 
-def a_pending_transfer():
-    return build_transfer(
-        transfer_outcome=TransferOutcome(
-            status=TransferStatus.PENDING, reason=TransferFailureReason.DEFAULT
-        )
-    )
-
-
-def a_pending_with_error_transfer():
-    pending_with_error_transfer_outcome = TransferOutcome(
-        status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
-    )
-    return build_transfer(transfer_outcome=pending_with_error_transfer_outcome)
-
-
-def a_failed_transfer():
+def a_transfer_with_a_final_error():
     return build_transfer(
         transfer_outcome=TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE, reason=TransferFailureReason.FINAL_ERROR
@@ -175,20 +172,3 @@ def a_transfer_where_a_large_message_triggered_an_error():
             reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,
         )
     )
-
-
-def build_transfers(**kwargs) -> List[Transfer]:
-    transfer_count = kwargs.get("transfer_count", an_integer(2, 7))
-    integrated_transfer_count = kwargs.get("integrated_transfer_count", 0)
-    failed_transfer_count = kwargs.get("failed_transfer_count", 0)
-    sla_duration = kwargs.get("sla_duration", a_duration())
-    transfers: List[Transfer] = []
-    transfers.extend((build_transfer() for _ in range(transfer_count)))
-    transfers.extend(
-        (
-            an_integrated_transfer(sla_duration=sla_duration)
-            for _ in range(integrated_transfer_count)
-        )
-    )
-    transfers.extend((a_failed_transfer() for _ in range(failed_transfer_count)))
-    return transfers

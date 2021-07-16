@@ -23,5 +23,5 @@ def a_datetime(**kwargs):
     )
 
 
-def a_duration():
-    return timedelta(seconds=an_integer(10, 604800))
+def a_duration(max_length=1000000):
+    return timedelta(seconds=an_integer(10, max_length))

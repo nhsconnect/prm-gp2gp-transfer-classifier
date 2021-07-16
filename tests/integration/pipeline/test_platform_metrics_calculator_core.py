@@ -38,7 +38,7 @@ from tests.builders.gp2gp import (
     a_transfer_integrated_beyond_8_days,
     a_transfer_integrated_within_3_days,
     a_transfer_integrated_between_3_and_8_days,
-    a_failed_transfer,
+    a_transfer_with_a_final_error,
     a_transfer_that_was_never_integrated,
     a_transfer_where_the_request_was_never_acknowledged,
     a_transfer_where_no_core_ehr_was_sent,
@@ -246,7 +246,7 @@ def test_calculates_correct_national_metrics_given_series_of_messages():
         a_transfer_integrated_beyond_8_days(),
         a_transfer_integrated_beyond_8_days(),
         a_transfer_integrated_beyond_8_days(),
-        a_failed_transfer(),
+        a_transfer_with_a_final_error(),
     ]
 
     reporting_window = MonthlyReportingWindow(

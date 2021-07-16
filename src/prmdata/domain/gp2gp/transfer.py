@@ -16,10 +16,6 @@ class TransferStatus(Enum):
     PROCESS_FAILURE = "PROCESS_FAILURE"
     UNCLASSIFIED_FAILURE = "UNCLASSIFIED_FAILURE"
 
-    # Remove once PRMT-1956 is complete
-    PENDING = "PENDING"
-    PENDING_WITH_ERROR = "PENDING_WITH_ERROR"
-
 
 class TransferFailureReason(Enum):
     INTEGRATED_LATE = "Integrated Late"
@@ -127,19 +123,16 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
         )
     elif not conversation.is_missing_core_ehr():
         return _core_ehr_transfer_outcome(conversation)
-
     elif conversation.is_missing_core_ehr():
         return TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
             reason=TransferFailureReason.CORE_EHR_NOT_SENT,
         )
-
-    elif conversation.is_pending_with_error():
-        return TransferOutcome(
-            status=TransferStatus.PENDING_WITH_ERROR, reason=TransferFailureReason.DEFAULT
-        )
     else:
-        return TransferOutcome(status=TransferStatus.PENDING, reason=TransferFailureReason.DEFAULT)
+        return TransferOutcome(
+            status=TransferStatus.UNCLASSIFIED_FAILURE,
+            reason=TransferFailureReason.DEFAULT,
+        )
 
 
 def _integrated_within_sla(conversation: Gp2gpConversation) -> TransferOutcome:
