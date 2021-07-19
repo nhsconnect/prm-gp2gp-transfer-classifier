@@ -23,3 +23,21 @@ def test_returns_false_given_acknowledged_duplicate_ehr_and_no_copcs():
     actual = conversation.contains_unacknowledged_duplicate_ehr_and_copcs()
 
     assert actual is False
+
+
+def test_returns_true_given_only_duplicate_ehrs_present():
+    gp2gp_messages: List[Message] = test_cases.only_acknowledged_duplicates()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    actual = conversation.contains_only_duplicate_ehr()
+
+    assert actual
+
+
+def test_returns_false_given_an_unacknowledged_ehr_present():
+    gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+
+    actual = conversation.contains_only_duplicate_ehr()
+
+    assert actual is False

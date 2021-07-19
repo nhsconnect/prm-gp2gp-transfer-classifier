@@ -182,9 +182,24 @@ class Gp2gpConversation(NamedTuple):
         return contains_copcs_messages or self.copc_continue is not None
 
     def contains_unacknowledged_duplicate_ehr_and_copcs(self) -> bool:
-        contains_duplicate = self._find_duplicate_request_completed_ack_message()
+        duplicate_count = self._count_duplicate_errors()
         contains_copcs = self.contains_copc_messages()
-        return contains_duplicate is not None and contains_copcs
+        unacknowledged_duplicate = duplicate_count > 0 and duplicate_count < len(
+            self.request_completed_messages
+        )
+        return unacknowledged_duplicate and contains_copcs
+
+    def contains_only_duplicate_ehr(self) -> bool:
+        duplicate_count = self._count_duplicate_errors()
+        return duplicate_count is len(self.request_completed_messages)
+
+    def _count_duplicate_errors(self) -> int:
+        final_error_codes = self.final_error_codes()
+        duplicate_count = 0
+        for error_code in final_error_codes:
+            if error_code is DUPLICATE_ERROR:
+                duplicate_count += 1
+        return duplicate_count
 
 
 def _integrated_or_suppressed(request_completed_ack) -> bool:

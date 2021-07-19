@@ -208,6 +208,25 @@ def acknowledged_duplicate_and_waiting_for_integration():
     )
 
 
+def only_acknowledged_duplicates():
+    conversation_id = a_string()
+    ehr_guid = a_string()
+    duplicate_ehr_guid = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=duplicate_ehr_guid)
+        .with_requester_acknowledgement(
+            message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
+        )
+        .with_requester_acknowledgement(message_ref=ehr_guid, error_code=DUPLICATE_EHR_ERROR)
+        .build()
+    )
+
+
 def unacknowledged_duplicate_with_copcs_and_waiting_for_integration():
     conversation_id = a_string()
     ehr_guid = a_string()
