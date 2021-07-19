@@ -151,6 +151,16 @@ class Gp2gpConversation(NamedTuple):
             None,
         )
 
+    def _find_duplicate_request_completed_ack_message(self) -> Optional[Message]:
+        return next(
+            (
+                message
+                for message in self.request_completed_ack_messages
+                if message.error_code is not None and message.error_code is DUPLICATE_ERROR
+            ),
+            None,
+        )
+
     def _find_effective_request_completed_ack_message(self) -> Optional[Message]:
         return (
             self._find_successful_request_completed_ack_message()
@@ -170,6 +180,11 @@ class Gp2gpConversation(NamedTuple):
     def contains_copc_messages(self) -> bool:
         contains_copcs_messages = len(self.copc_messages) > 0
         return contains_copcs_messages or self.copc_continue is not None
+
+    def contains_unacknowledged_duplicate_ehr_and_copcs(self) -> bool:
+        contains_duplicate = self._find_duplicate_request_completed_ack_message()
+        contains_copcs = self.contains_copc_messages()
+        return contains_duplicate is not None and contains_copcs
 
 
 def _integrated_or_suppressed(request_completed_ack) -> bool:

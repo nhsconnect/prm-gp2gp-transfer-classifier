@@ -27,6 +27,7 @@ class TransferFailureReason(Enum):
     COPC_NOT_SENT = "COPC(s) not sent"
     COPC_NOT_ACKNOWLEDGED = "COPC(s) not Acknowledged"
     TRANSFERRED_NOT_INTEGRATED_WITH_ERROR = "TRANSFERRED_NOT_INTEGRATED_WITH_ERROR"
+    AMBIGUOUS_COPCS = "Ambiguous COPC messages"
 
 
 @dataclass
@@ -74,7 +75,12 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
 
 
 def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
-    if conversation.contains_copc_error():
+    if conversation.contains_unacknowledged_duplicate_ehr_and_copcs():
+        return TransferOutcome(
+            status=TransferStatus.UNCLASSIFIED_FAILURE,
+            failure_reason=TransferFailureReason.AMBIGUOUS_COPCS,
+        )
+    elif conversation.contains_copc_error():
         return TransferOutcome(
             status=TransferStatus.UNCLASSIFIED_FAILURE,
             failure_reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,

@@ -143,12 +143,37 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_an
     assert actual.outcome.failure_reason == expected_reason
 
 
+def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_messages():
+    conversation = build_mock_gp2gp_conversation()
+
+    conversation.is_integrated.return_value = False
+    conversation.has_concluded_with_failure.return_value = False
+    conversation.contains_unacknowledged_duplicate_ehr_and_copcs.return_value = True
+
+    actual = derive_transfer(conversation)
+
+    expected_status = TransferStatus.UNCLASSIFIED_FAILURE
+    expected_reason = TransferFailureReason.AMBIGUOUS_COPCS
+
+    assert actual.outcome.status == expected_status
+    assert actual.outcome.failure_reason == expected_reason
+
+
+def test_returns_process_failure_given_one_unacknowledged_ehr_with_duplicate_and_no_copc_messages():
+    gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
+    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    actual = derive_transfer(conversation)
+    assert actual.outcome.status == TransferStatus.PROCESS_FAILURE
+    assert actual.outcome.failure_reason == TransferFailureReason.TRANSFERRED_NOT_INTEGRATED
+
+
 def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_error():
     conversation = build_mock_gp2gp_conversation()
 
     conversation.is_integrated.return_value = False
     conversation.has_concluded_with_failure.return_value = False
     conversation.contains_copc_messages.return_value = True
+    conversation.contains_unacknowledged_duplicate_ehr_and_copcs.return_value = False
     conversation.contains_copc_error.return_value = True
 
     actual = derive_transfer(conversation)
