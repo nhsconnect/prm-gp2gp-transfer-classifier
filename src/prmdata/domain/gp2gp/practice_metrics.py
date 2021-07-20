@@ -39,7 +39,7 @@ def calculate_sla_by_practice(
 
     unexpected_asids = set()
     for transfer in transfers:
-        asid = transfer.requesting_practice_asid
+        asid = transfer.requesting_practice.asid
 
         if practice_lookup.has_asid_code(asid):
             ods_code = practice_lookup.ods_code_from_asid(asid)

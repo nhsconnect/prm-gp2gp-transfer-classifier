@@ -6,6 +6,7 @@ from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
     convert_transfers_to_table,
     TransferOutcome,
+    Practice,
 )
 from tests.builders.gp2gp import build_transfer
 
@@ -57,7 +58,9 @@ def test_sla_duration_is_converted_to_column_when_missing():
 
 
 def test_requesting_practice_asid_is_converted_to_column():
-    transfer = build_transfer(requesting_practice_asid="003212345678")
+    transfer = build_transfer(
+        requesting_practice=Practice(asid="003212345678", supplier="supplier")
+    )
 
     expected_asid_column = {"requesting_practice_asid": ["003212345678"]}
 
@@ -68,7 +71,7 @@ def test_requesting_practice_asid_is_converted_to_column():
 
 
 def test_sending_practice_asid_is_converted_to_column():
-    transfer = build_transfer(sending_practice_asid="001112345678")
+    transfer = build_transfer(sending_practice=Practice(asid="001112345678", supplier="supplier"))
 
     expected_asid_column = {"sending_practice_asid": ["001112345678"]}
 

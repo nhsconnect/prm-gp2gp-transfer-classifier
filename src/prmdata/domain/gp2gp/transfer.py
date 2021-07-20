@@ -44,13 +44,17 @@ class TransferOutcome:
         return None if self.failure_reason is None else self.failure_reason.value
 
 
+@dataclass
+class Practice:
+    asid: str
+    supplier: str
+
+
 class Transfer(NamedTuple):
     conversation_id: str
     sla_duration: Optional[timedelta]
-    requesting_practice_asid: str
-    sending_practice_asid: str
-    requesting_supplier: str
-    sending_supplier: str
+    requesting_practice: Practice
+    sending_practice: Practice
     sender_error_code: Optional[int]
     final_error_codes: List[Optional[int]]
     intermediate_error_codes: List[int]
@@ -167,10 +171,13 @@ def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
     return Transfer(
         conversation_id=conversation.conversation_id(),
         sla_duration=_calculate_sla(conversation),
-        requesting_practice_asid=conversation.requesting_practice_asid(),
-        sending_practice_asid=conversation.sending_practice_asid(),
-        requesting_supplier=conversation.requesting_supplier(),
-        sending_supplier=conversation.sending_supplier(),
+        requesting_practice=Practice(
+            asid=conversation.requesting_practice_asid(),
+            supplier=conversation.requesting_supplier(),
+        ),
+        sending_practice=Practice(
+            asid=conversation.sending_practice_asid(), supplier=conversation.sending_supplier()
+        ),
         sender_error_code=conversation.sender_error(),
         final_error_codes=conversation.final_error_codes(),
         intermediate_error_codes=conversation.intermediate_error_codes(),
@@ -207,10 +214,10 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
         {
             "conversation_id": [t.conversation_id for t in transfers],
             "sla_duration": [_convert_to_seconds(t.sla_duration) for t in transfers],
-            "requesting_practice_asid": [t.requesting_practice_asid for t in transfers],
-            "sending_practice_asid": [t.sending_practice_asid for t in transfers],
-            "requesting_supplier": [t.requesting_supplier for t in transfers],
-            "sending_supplier": [t.sending_supplier for t in transfers],
+            "requesting_practice_asid": [t.requesting_practice.asid for t in transfers],
+            "sending_practice_asid": [t.sending_practice.asid for t in transfers],
+            "requesting_supplier": [t.requesting_practice.supplier for t in transfers],
+            "sending_supplier": [t.sending_practice.supplier for t in transfers],
             "sender_error_code": [t.sender_error_code for t in transfers],
             "final_error_codes": [t.final_error_codes for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],

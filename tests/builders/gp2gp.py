@@ -7,6 +7,7 @@ from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
     TransferOutcome,
     TransferFailureReason,
+    Practice,
 )
 from tests.builders.common import a_string, a_duration, an_integer, a_datetime
 
@@ -15,10 +16,12 @@ def build_transfer(**kwargs) -> Transfer:
     return Transfer(
         conversation_id=kwargs.get("conversation_id", a_string(36)),
         sla_duration=kwargs.get("sla_duration", a_duration()),
-        requesting_practice_asid=kwargs.get("requesting_practice_asid", a_string(12)),
-        sending_practice_asid=kwargs.get("sending_practice_asid", a_string(12)),
-        requesting_supplier=kwargs.get("requesting_supplier", a_string(12)),
-        sending_supplier=kwargs.get("sending_supplier", a_string(12)),
+        requesting_practice=kwargs.get(
+            "requesting_practice", Practice(asid=a_string(12), supplier=a_string(12))
+        ),
+        sending_practice=kwargs.get(
+            "sending_practice", Practice(asid=a_string(12), supplier=a_string(12))
+        ),
         sender_error_code=kwargs.get("sender_error_code", None),
         final_error_codes=kwargs.get("final_error_codes", []),
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),

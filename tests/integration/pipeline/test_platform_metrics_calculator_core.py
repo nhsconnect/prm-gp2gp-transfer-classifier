@@ -29,6 +29,7 @@ from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
     TransferOutcome,
+    Practice,
 )
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
@@ -102,19 +103,16 @@ def test_parses_transfer_correctly_given_valid_message_list():
         metric_month_start=datetime(2019, 12, 1, tzinfo=UTC),
         overflow_month_start=datetime(2020, 1, 1, tzinfo=UTC),
     )
-
-    requesting_asid_with_transfer = "343434343434"
-    sending_asid_with_transfer = "111134343434"
-    requesting_supplier = "SupplierA"
-    sending_supplier = "SupplierB"
     conversation_id = "abcdefg_1234"
+    requesting_practice = Practice(asid="343434343434", supplier="SupplierA")
+    sending_practice = Practice(asid="111134343434", supplier="SupplierB")
 
     spine_messages = _build_successful_conversation(
         conversation_id=conversation_id,
-        requesting_asid=requesting_asid_with_transfer,
-        sending_asid=sending_asid_with_transfer,
-        requesting_supplier=requesting_supplier,
-        sending_supplier=sending_supplier,
+        requesting_asid=requesting_practice.asid,
+        sending_asid=sending_practice.asid,
+        requesting_supplier=requesting_practice.supplier,
+        sending_supplier=sending_practice.supplier,
         ehr_request_started_on=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
         ehr_request_completed_on=datetime(2019, 12, 30, 18, 3, 21, tzinfo=UTC),
         ehr_request_started_acknowledged_on=datetime(2019, 12, 30, 18, 3, 23, tzinfo=UTC),
@@ -125,10 +123,8 @@ def test_parses_transfer_correctly_given_valid_message_list():
         Transfer(
             conversation_id=conversation_id,
             sla_duration=timedelta(days=1, seconds=52707),
-            requesting_practice_asid=requesting_asid_with_transfer,
-            sending_practice_asid=sending_asid_with_transfer,
-            requesting_supplier=requesting_supplier,
-            sending_supplier=sending_supplier,
+            requesting_practice=requesting_practice,
+            sending_practice=sending_practice,
             outcome=TransferOutcome(failure_reason=None, status=TransferStatus.INTEGRATED_ON_TIME),
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
@@ -152,10 +148,8 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
     requesting_practice_name = "Test GP"
     requesting_ods_code = "A12345"
-    requesting_asid_with_transfer = "343434343434"
-    sending_asid_with_transfer = "111134343434"
-    requesting_supplier = "SystemOne"
-    sending_supplier = "Unknown"
+    requesting_practice = Practice(asid="343434343434", supplier="SystemOne")
+    sending_practice = Practice(asid="111134343434", supplier="Unknown")
     conversation_id = "abcdefg_1234"
     ccg_ods_code = "23B"
     ccg_name = "Test CCG"
@@ -164,10 +158,8 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
         Transfer(
             conversation_id=conversation_id,
             sla_duration=timedelta(days=1, seconds=52707),
-            requesting_practice_asid=requesting_asid_with_transfer,
-            sending_practice_asid=sending_asid_with_transfer,
-            requesting_supplier=requesting_supplier,
-            sending_supplier=sending_supplier,
+            requesting_practice=requesting_practice,
+            sending_practice=sending_practice,
             outcome=TransferOutcome(failure_reason=None, status=TransferStatus.INTEGRATED_ON_TIME),
             date_requested=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
             date_completed=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
@@ -179,7 +171,7 @@ def test_calculates_correct_metrics_given_a_successful_transfer():
 
     practice_list = [
         PracticeDetails(
-            asids=[requesting_asid_with_transfer],
+            asids=[requesting_practice.asid],
             ods_code=requesting_ods_code,
             name=requesting_practice_name,
         )

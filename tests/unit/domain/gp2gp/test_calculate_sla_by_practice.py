@@ -5,7 +5,7 @@ from typing import Set, Iterator, List
 import pytest
 
 from prmdata.domain.gp2gp.practice_lookup import PracticeLookup
-from prmdata.domain.gp2gp.transfer import Transfer
+from prmdata.domain.gp2gp.transfer import Transfer, Practice
 from prmdata.domain.ods_portal.models import PracticeDetails
 from prmdata.domain.gp2gp.practice_metrics import (
     PracticeMetrics,
@@ -131,8 +131,10 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_3_da
         [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     )
     transfer = build_transfer(
-        requesting_practice_asid="121212121212", sla_duration=timedelta(hours=1, minutes=10)
+        requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
+        sla_duration=timedelta(hours=1, minutes=10),
     )
+
     actual = calculate_sla_by_practice(lookup, [transfer])
 
     _assert_first_summary_has_sla_counts(actual, within_3_days=1, within_8_days=0, beyond_8_days=0)
@@ -143,7 +145,8 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_within_8_da
         [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     )
     transfer = build_transfer(
-        requesting_practice_asid="121212121212", sla_duration=timedelta(days=7, hours=1, minutes=10)
+        requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
+        sla_duration=timedelta(days=7, hours=1, minutes=10),
     )
     actual = calculate_sla_by_practice(lookup, [transfer])
 
@@ -155,7 +158,8 @@ def test_calculate_sla_by_practice_calculates_sla_given_one_transfer_beyond_8_da
         [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     )
     transfer = build_transfer(
-        requesting_practice_asid="121212121212", sla_duration=timedelta(days=8, hours=1, minutes=10)
+        requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
+        sla_duration=timedelta(days=8, hours=1, minutes=10),
     )
     actual = calculate_sla_by_practice(lookup, [transfer])
 
@@ -171,23 +175,23 @@ def test_calculate_sla_by_practice_calculates_sla_given_transfers_for_2_practice
     )
     transfers = [
         build_transfer(
-            requesting_practice_asid="121212121212",
+            requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
             sla_duration=timedelta(days=8, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_asid="343434343434",
+            requesting_practice=Practice(asid="343434343434", supplier=a_string(12)),
             sla_duration=timedelta(days=4, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_asid="121212121212",
+            requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
             sla_duration=timedelta(days=0, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_asid="343434343434",
+            requesting_practice=Practice(asid="343434343434", supplier=a_string(12)),
             sla_duration=timedelta(days=8, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_asid="343434343434",
+            requesting_practice=Practice(asid="343434343434", supplier=a_string(12)),
             sla_duration=timedelta(days=5, hours=1, minutes=10),
         ),
     ]
@@ -224,7 +228,7 @@ def test_counts_second_asid_for_practice_with_two_asids():
         ]
     )
     transfer = build_transfer(
-        requesting_practice_asid="343434343434",
+        requesting_practice=Practice(asid="343434343434", supplier=a_string(12)),
         sla_duration=timedelta(hours=1, minutes=10),
     )
     actual = calculate_sla_by_practice(lookup, [transfer])
@@ -242,11 +246,11 @@ def test_counts_both_asids_for_practice_with_two_asids():
     )
     transfers = [
         build_transfer(
-            requesting_practice_asid="343434343434",
+            requesting_practice=Practice(asid="343434343434", supplier=a_string(12)),
             sla_duration=timedelta(hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_asid="121212121212",
+            requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
             sla_duration=timedelta(days=5, hours=1, minutes=10),
         ),
     ]
@@ -261,15 +265,15 @@ def test_returns_sum_of_all_integrated_transfers():
     )
     transfers = [
         build_transfer(
-            requesting_practice_asid="121212121212",
+            requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
             sla_duration=timedelta(days=0, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_asid="121212121212",
+            requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
             sla_duration=timedelta(days=7, hours=1, minutes=10),
         ),
         build_transfer(
-            requesting_practice_asid="121212121212",
+            requesting_practice=Practice(asid="121212121212", supplier=a_string(12)),
             sla_duration=timedelta(days=10, hours=1, minutes=10),
         ),
     ]
