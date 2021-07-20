@@ -69,7 +69,10 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
     sla_duration = final_acknowledgement_time - request_completed_time
 
     if sla_duration.total_seconds() < 0:
-        warn(f"Negative SLA duration for conversation: {conversation.id}", RuntimeWarning)
+        warn(
+            f"Negative SLA duration for conversation: {conversation.conversation_id()}",
+            RuntimeWarning,
+        )
 
     return max(timedelta(0), sla_duration)
 
@@ -80,7 +83,7 @@ def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
             status=TransferStatus.UNCLASSIFIED_FAILURE,
             failure_reason=TransferFailureReason.AMBIGUOUS_COPCS,
         )
-    elif conversation.contains_copc_error():
+    elif conversation.contains_copc_error() and not conversation.is_missing_copc_ack():
         return TransferOutcome(
             status=TransferStatus.UNCLASSIFIED_FAILURE,
             failure_reason=TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR,

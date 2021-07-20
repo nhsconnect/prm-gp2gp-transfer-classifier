@@ -11,7 +11,7 @@ def test_extracts_date_requested_from_request_started_message():
 
     gp2gp_messages: List[Message] = test_cases.request_made(request_sent_date=date_requested)
 
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     actual = conversation.date_requested()
 

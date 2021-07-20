@@ -1,4 +1,4 @@
-from typing import NamedTuple, List, Optional, Iterable, Iterator
+from typing import NamedTuple, List, Optional, Iterable, Iterator, Tuple
 from datetime import datetime
 from warnings import warn
 
@@ -11,195 +11,161 @@ from prmdata.domain.spine.message import (
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 
-class Gp2gpConversation(NamedTuple):
-    id: str
-    request_started: Message
-    request_started_ack: Optional[Message]
-    request_completed_messages: List[Message]
-    copc_continue: Optional[Message]
-    copc_messages: List[Message]
-    copc_ack_messages: List[Message]
-    request_completed_ack_messages: List[Message]
+class AcknowledgedMessage(NamedTuple):
+    message: Message
+    acknowledgements: List[Message]
+
+    def has_acknowledgements(self) -> bool:
+        return len(self.acknowledgements) > 0
+
+    def from_asid(self) -> str:
+        return self.message.from_party_asid
+
+    def to_asid(self) -> str:
+        return self.message.to_party_asid
+
+    def is_sent_by(self, asid):
+        return self.message.from_party_asid == asid
+
+    def is_ehr_request_completed(self):
+        return self.message.is_ehr_request_completed()
+
+    def is_copc(self):
+        return self.message.is_copc()
+
+
+class Gp2gpConversation:
+    def __init__(self, messages: List[Message]):
+
+        first_message = messages[0]
+        if not first_message.is_ehr_request_started():
+            raise ConversationMissingStart()
+
+        acked_messages = _pair_messages_with_acks(messages)
+        message_bundle = _group_message_by_type(acked_messages)
+
+        self._request_started = message_bundle.request_started
+        self._request_completed = message_bundle.request_completed
+        self._large_message_continue = message_bundle.large_messaging_continue
+        self._large_fragments = message_bundle.large_fragments
+
+        self._effective_ehr = None
+        self._effective_ehr_ack = None
+
+        effective_request_completed = _find_effective_request_completed(self._request_completed)
+        if effective_request_completed is not None:
+            (self._effective_ehr, self._effective_ehr_ack) = effective_request_completed
 
     def conversation_id(self) -> str:
-        return self.request_started.conversation_id
+        return self._request_started.message.conversation_id
 
     def sending_practice_asid(self) -> str:
-        return self.request_started.to_party_asid
+        return self._request_started.to_asid()
 
     def requesting_practice_asid(self) -> str:
-        return self.request_started.from_party_asid
+        return self._request_started.from_asid()
 
     def requesting_supplier(self) -> str:
-        return self.request_started.from_system
+        return self._request_started.message.from_system
 
     def sending_supplier(self) -> str:
-        return self.request_started.to_system
+        return self._request_started.message.to_system
 
     def final_error_codes(self) -> List[Optional[int]]:
-        return [message.error_code for message in self.request_completed_ack_messages]
+        return [
+            ack.error_code
+            for message in self._request_completed
+            for ack in message.acknowledgements
+        ]
 
     def sender_error(self) -> Optional[int]:
-        if self.request_started_ack:
-            return self.request_started_ack.error_code
-        return None
+        return next((ack.error_code for ack in self._request_started.acknowledgements), None)
 
     def intermediate_error_codes(self) -> List[int]:
         return [
-            message.error_code
-            for message in self.copc_ack_messages
-            if message.error_code is not None
+            ack.error_code
+            for message in self._large_fragments
+            for ack in message.acknowledgements
+            if ack.error_code is not None
         ]
 
     def date_requested(self) -> datetime:
-        return self.request_started.time
+        return self._request_started.message.time
 
     def is_integrated(self) -> bool:
-        final_ack = self._find_effective_request_completed_ack_message()
-        has_final_ack = final_ack is not None
-        return has_final_ack and _integrated_or_suppressed(final_ack)
+        return self._effective_ehr_ack is not None and _integrated_or_suppressed(
+            self._effective_ehr_ack
+        )
 
     def has_concluded_with_failure(self) -> bool:
-        final_ack = self._find_effective_request_completed_ack_message()
-        has_final_ack = final_ack is not None
-        return has_final_ack and not _integrated_or_suppressed(final_ack)
+        return self._effective_ehr_ack is not None and not _integrated_or_suppressed(
+            self._effective_ehr_ack
+        )
 
     def is_missing_final_ack(self) -> bool:
-        final_ack = self._find_effective_request_completed_ack_message()
-        return final_ack is None
+        return self._effective_ehr_ack is None
 
     def is_missing_request_acknowledged(self) -> bool:
-        missing_request_acknowledged = (
-            self.request_started is not None and self.request_started_ack is None
-        )
-        return missing_request_acknowledged
+        return not self._request_started.has_acknowledgements()
 
     def is_missing_core_ehr(self) -> bool:
-        is_missing_request_acknowledged = self.is_missing_request_acknowledged()
-        return (
-            is_missing_request_acknowledged is False and len(self.request_completed_messages) == 0
-        )
+        return len(self._request_completed) == 0
 
     def is_missing_copc(self) -> bool:
-        return self.copc_continue is not None and len(self.copc_messages) == 0
+        return len(self._large_message_continue) > 0 and len(self._large_fragments) == 0
 
     def is_missing_copc_ack(self) -> bool:
-        copc_ids = [copc.guid for copc in self.copc_messages]
-        copc_ack_ids = [copc_ack.message_ref for copc_ack in self.copc_ack_messages]
-        missing_copc_ack_ids = set(copc_ids) - set(copc_ack_ids)
-        return len(missing_copc_ack_ids) > 0
+        return any(not message.has_acknowledgements() for message in self._large_fragments)
 
     def contains_copc_error(self) -> bool:
-        final_ack = self._find_effective_request_completed_ack_message()
-        is_missing_copc_ack = self.is_missing_copc_ack()
-        missing_final_ack = final_ack is None
-        intermediate_error_codes = self.intermediate_error_codes()
-        return missing_final_ack and len(intermediate_error_codes) > 0 and not is_missing_copc_ack
+        return any(
+            ack.error_code is not None
+            for message in self._large_fragments
+            for ack in message.acknowledgements
+        )
 
     def contains_fatal_sender_error_code(self) -> bool:
-        final_ack = self._find_effective_request_completed_ack_message()
-        missing_final_ack = final_ack is None
-        has_fatal_sender_error = self.sender_error() in FATAL_SENDER_ERROR_CODES
-        return missing_final_ack and has_fatal_sender_error
+        return any(
+            ack.error_code in FATAL_SENDER_ERROR_CODES
+            for ack in self._request_started.acknowledgements
+        )
 
     def contains_core_ehr_with_sender_error(self) -> bool:
-        final_ack = self._find_effective_request_completed_ack_message()
-        missing_final_ack = final_ack is None
-        is_missing_core_ehr = self.is_missing_core_ehr()
-        has_sender_error = self.sender_error() is not None
-        return missing_final_ack and has_sender_error and not is_missing_core_ehr
+        contains_any_sender_error = any(
+            ack.error_code is not None for ack in self._request_started.acknowledgements
+        )
+        return not self.is_missing_core_ehr() and contains_any_sender_error
 
     def effective_request_completed_time(self) -> Optional[datetime]:
-        effective_request_completed_ack_message = (
-            self._find_effective_request_completed_ack_message()
-        )
-
-        if effective_request_completed_ack_message is None:
-            return None
-
-        effective_request_completed_message = self._find_request_completed_by_guid(
-            guid=effective_request_completed_ack_message.message_ref
-        )
-        if effective_request_completed_message:
-            return effective_request_completed_message.time
-
-        return None
+        return self._effective_ehr.time if self._effective_ehr else None
 
     def effective_final_acknowledgement_time(self) -> Optional[datetime]:
-        final_ack = self._find_effective_request_completed_ack_message()
-        if final_ack is None:
-            return None
-        return final_ack.time
-
-    def _find_successful_request_completed_ack_message(self) -> Optional[Message]:
-        return next(
-            (
-                message
-                for message in self.request_completed_ack_messages
-                if _integrated_or_suppressed(message)
-            ),
-            None,
-        )
-
-    def _find_failed_request_completed_ack_message(self) -> Optional[Message]:
-        return next(
-            (
-                message
-                for message in self.request_completed_ack_messages
-                if message.error_code is not None and message.error_code != DUPLICATE_ERROR
-            ),
-            None,
-        )
-
-    def _find_duplicate_request_completed_ack_message(self) -> Optional[Message]:
-        return next(
-            (
-                message
-                for message in self.request_completed_ack_messages
-                if message.error_code is not None and message.error_code is DUPLICATE_ERROR
-            ),
-            None,
-        )
-
-    def _find_effective_request_completed_ack_message(self) -> Optional[Message]:
-        return (
-            self._find_successful_request_completed_ack_message()
-            or self._find_failed_request_completed_ack_message()
-        )
-
-    def _find_request_completed_by_guid(self, guid: str) -> Optional[Message]:
-        return next(
-            (message for message in self.request_completed_messages if message.guid == guid), None
-        )
-
-    @classmethod
-    def from_messages(cls, messages):
-        parser = SpineConversationParser(messages)
-        return parser.parse()
+        return self._effective_ehr_ack.time if self._effective_ehr_ack else None
 
     def contains_copc_messages(self) -> bool:
-        contains_copcs_messages = len(self.copc_messages) > 0
-        return contains_copcs_messages or self.copc_continue is not None
+        return len(self._large_message_continue) > 0 or len(self._large_fragments) > 0
 
     def contains_unacknowledged_duplicate_ehr_and_copcs(self) -> bool:
-        duplicate_count = self._count_duplicate_errors()
+        has_duplicates = self._count_duplicate_errors() > 0
         contains_copcs = self.contains_copc_messages()
-        unacknowledged_duplicate = duplicate_count > 0 and duplicate_count < len(
-            self.request_completed_messages
-        )
-        return unacknowledged_duplicate and contains_copcs
+
+        return has_duplicates and contains_copcs and not self._all_ehr_acknowledged()
 
     def contains_only_duplicate_ehr(self) -> bool:
-        duplicate_count = self._count_duplicate_errors()
-        return duplicate_count is len(self.request_completed_messages)
+        return self._all_ehr_acknowledged() and self._all_ehr_acks_are_duplicates()
 
-    def _count_duplicate_errors(self) -> int:
-        final_error_codes = self.final_error_codes()
-        duplicate_count = 0
-        for error_code in final_error_codes:
-            if error_code is DUPLICATE_ERROR:
-                duplicate_count += 1
-        return duplicate_count
+    def _all_ehr_acknowledged(self):
+        return all(message.has_acknowledgements() for message in self._request_completed)
+
+    def _all_ehr_acks_are_duplicates(self):
+        return all(
+            ack.error_code == DUPLICATE_ERROR
+            for message in self._request_completed
+            for ack in message.acknowledgements
+        )
+
+    def _count_duplicate_errors(self):
+        return self.final_error_codes().count(DUPLICATE_ERROR)
 
 
 def _integrated_or_suppressed(request_completed_ack) -> bool:
@@ -213,92 +179,83 @@ class ConversationMissingStart(Exception):
     pass
 
 
-class SpineConversationParser:
-    def __init__(self, messages: Iterable[Message]):
-        self._messages = iter(messages)
-        self._req_started: Optional[Message] = None
-        self._req_completed_messages: List[Message] = []
-        self._request_started_ack: Optional[Message] = None
-        self._copc_continue: Optional[Message] = None
-        self._copc_messages: List[Message] = []
-        self._copc_ack_messages: List[Message] = []
-        self._request_completed_ack_messages: List[Message] = []
+class Gp2gpMessagesByType(NamedTuple):
+    request_started: AcknowledgedMessage
+    large_messaging_continue: List[Message]
+    large_fragments: List[AcknowledgedMessage]
+    request_completed: List[AcknowledgedMessage]
 
-    def _get_next_or_none(self) -> Message:
-        next_message = next(self._messages, None)
-        return next_message
 
-    def _has_seen_req_completed(self) -> bool:
-        return len(self._req_completed_messages) > 0
+def _find_acked_ehr_completed_where_ack(request_completed_messages, predicate):
+    return next(
+        (
+            (request_completed.message, ack)
+            for request_completed in request_completed_messages
+            for ack in request_completed.acknowledgements
+            if predicate(ack)
+        ),
+        None,
+    )
 
-    def _has_seen_req_started(self) -> bool:
-        return self._req_started is not None
 
-    def _process_message(self, message):
-        if message.is_ehr_request_completed():
-            self._req_completed_messages.append(message)
-        elif (
-            self._has_seen_req_completed()
-            and self._is_acknowledging_any_request_completed_message(message)
-        ):
-            self._request_completed_ack_messages.append(message)
-        elif self._has_seen_req_started() and message.is_acknowledgement_of(self._req_started):
-            self._request_started_ack = message
-        elif message.is_copc():
-            self._process_copc(message)
+def _find_effective_request_completed(
+    request_completed_messages,
+) -> Optional[Tuple[Message, Message]]:
+    successfully_acked_ehr = _find_acked_ehr_completed_where_ack(
+        request_completed_messages, _integrated_or_suppressed
+    )
+
+    if successfully_acked_ehr is not None:
+        return successfully_acked_ehr
+
+    unsuccessfully_acked_ehr = _find_acked_ehr_completed_where_ack(
+        request_completed_messages, lambda ack: ack.error_code != DUPLICATE_ERROR
+    )
+
+    if unsuccessfully_acked_ehr is not None:
+        return unsuccessfully_acked_ehr
+
+    return None
+
+
+def _group_message_by_type(messages: Iterable[AcknowledgedMessage]) -> Gp2gpMessagesByType:
+    request_completed_messages = []
+    large_messaging_continue_messages = []
+    large_fragment_messages = []
+
+    request_started, *remaining_messages = messages
+
+    requesting_asid = request_started.from_asid()
+    sending_asid = request_started.to_asid()
+
+    for acked_message in remaining_messages:
+        if acked_message.is_ehr_request_completed():
+            request_completed_messages.append(acked_message)
+        elif acked_message.is_copc() and acked_message.is_sent_by(requesting_asid):
+            large_messaging_continue_messages.append(acked_message.message)
+        elif acked_message.message.is_copc() and acked_message.is_sent_by(sending_asid):
+            large_fragment_messages.append(acked_message)
         else:
-            self._copc_ack_messages.append(message)
+            warn(f"Couldn't determine purpose of message: {acked_message.message.guid}")
 
-    def _process_copc(self, message: Message):
-        if self._is_copc_continue(message):
-            if self._copc_continue is not None:
-                warn(
-                    f"Duplicate COPC Continue found in conversation: {message.conversation_id}",
-                    RuntimeWarning,
-                )
-            else:
-                self._copc_continue = message
+    return Gp2gpMessagesByType(
+        request_started=request_started,
+        request_completed=request_completed_messages,
+        large_messaging_continue=large_messaging_continue_messages,
+        large_fragments=large_fragment_messages,
+    )
+
+
+def _pair_messages_with_acks(messages: Iterable[Message]) -> List[AcknowledgedMessage]:
+    acked_messages: dict[str, AcknowledgedMessage] = {}
+
+    for message in messages:
+        if message.is_acknowledgement():
+            acked_messages[message.message_ref].acknowledgements.append(message)
         else:
-            self._copc_messages.append(message)
+            acked_messages[message.guid] = AcknowledgedMessage(message, [])
 
-    def _is_acknowledging_any_request_completed_message(self, message: Message) -> bool:
-        return any(
-            message.is_acknowledgement_of(req_completed_message)
-            for req_completed_message in self._req_completed_messages
-        )
-
-    def _is_copc_continue(self, message: Message) -> bool:
-        if self._req_started:
-            requesting_practice_asid = self._req_started.from_party_asid
-            return message.from_party_asid == requesting_practice_asid
-        else:
-            return False
-
-    def _process_first_message(self) -> str:
-        first_message = self._get_next_or_none()
-        if first_message.is_ehr_request_started():
-            self._req_started = first_message
-            return first_message.conversation_id
-        else:
-            raise ConversationMissingStart()
-
-    def parse(self) -> Gp2gpConversation:
-
-        conversation_id = self._process_first_message()
-
-        while (next_message := self._get_next_or_none()) is not None:
-            self._process_message(next_message)
-
-        return Gp2gpConversation(
-            id=conversation_id,
-            request_started=self._req_started,
-            request_started_ack=self._request_started_ack,
-            request_completed_messages=self._req_completed_messages,
-            copc_continue=self._copc_continue,
-            copc_messages=self._copc_messages,
-            copc_ack_messages=self._copc_ack_messages,
-            request_completed_ack_messages=self._request_completed_ack_messages,
-        )
+    return list(acked_messages.values())
 
 
 def filter_conversations_by_request_started_time(
@@ -307,5 +264,5 @@ def filter_conversations_by_request_started_time(
     return (
         conversation
         for conversation in conversations
-        if reporting_window.contains(conversation.request_started.time)
+        if reporting_window.contains(conversation.date_requested())
     )

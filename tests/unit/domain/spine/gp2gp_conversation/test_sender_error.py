@@ -5,9 +5,7 @@ from tests.builders import test_cases
 
 
 def test_extracts_sender_error_code_when_no_sender_error():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.request_acknowledged_successfully()
-    )
+    conversation = Gp2gpConversation(messages=test_cases.request_acknowledged_successfully())
 
     actual = conversation.sender_error()
 
@@ -24,7 +22,7 @@ def test_extracts_sender_error_code_when_no_sender_error():
     ],
 )
 def test_extracts_sender_error_code_when_sender_error(test_case):
-    conversation = Gp2gpConversation.from_messages(messages=test_case(error_code=10))
+    conversation = Gp2gpConversation(messages=test_case(error_code=10))
 
     actual = conversation.sender_error()
 

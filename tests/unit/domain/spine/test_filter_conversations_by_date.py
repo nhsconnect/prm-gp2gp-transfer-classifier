@@ -16,7 +16,7 @@ def test_filter_conversations_by_request_started_time_keeps_conversation_within_
     )
 
     gp2gp_conversations = [
-        Gp2gpConversation.from_messages(
+        Gp2gpConversation(
             test_cases.request_made(request_sent_date=datetime(year=2020, month=6, day=6))
         )
     ]
@@ -35,7 +35,7 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_befor
     )
 
     gp2gp_conversations = [
-        Gp2gpConversation.from_messages(
+        Gp2gpConversation(
             test_cases.request_made(request_sent_date=datetime(year=2020, month=5, day=28))
         )
     ]
@@ -54,7 +54,7 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_after
     )
 
     gp2gp_conversations = [
-        Gp2gpConversation.from_messages(
+        Gp2gpConversation(
             test_cases.request_made(request_sent_date=datetime(year=2020, month=7, day=28))
         )
     ]
@@ -72,13 +72,13 @@ def test_filter_conversations_by_request_started_time_rejects_conversations_outs
         overflow_month_start=datetime(year=2020, month=7, day=1),
     )
 
-    conversation_within_range = Gp2gpConversation.from_messages(
+    conversation_within_range = Gp2gpConversation(
         test_cases.request_made(request_sent_date=datetime(year=2020, month=6, day=15))
     )
-    conversation_before_range = Gp2gpConversation.from_messages(
+    conversation_before_range = Gp2gpConversation(
         test_cases.request_made(request_sent_date=datetime(year=2020, month=5, day=28))
     )
-    conversation_after_range = Gp2gpConversation.from_messages(
+    conversation_after_range = Gp2gpConversation(
         test_cases.request_made(request_sent_date=datetime(year=2020, month=7, day=28))
     )
 
@@ -102,7 +102,7 @@ def test_filter_conversations_by_request_started_time_accepts_conversation_on_ra
     )
 
     gp2gp_conversations = [
-        Gp2gpConversation.from_messages(
+        Gp2gpConversation(
             test_cases.request_made(request_sent_date=datetime(year=2020, month=6, day=1))
         )
     ]
@@ -121,7 +121,7 @@ def test_filter_conversations_by_request_started_time_rejects_conversation_on_ra
     )
 
     gp2gp_conversations = [
-        Gp2gpConversation.from_messages(
+        Gp2gpConversation(
             test_cases.request_made(request_sent_date=datetime(year=2020, month=7, day=1))
         )
     ]

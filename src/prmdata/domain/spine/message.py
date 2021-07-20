@@ -34,6 +34,9 @@ class Message(NamedTuple):
     def is_acknowledgement_of(self, other_message):
         return self.interaction_id == APPLICATION_ACK and self.message_ref == other_message.guid
 
+    def is_acknowledgement(self):
+        return self.interaction_id == APPLICATION_ACK
+
     def is_copc(self):
         return self.interaction_id == COMMON_POINT_TO_POINT
 

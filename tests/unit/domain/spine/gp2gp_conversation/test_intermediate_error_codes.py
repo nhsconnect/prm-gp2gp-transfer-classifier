@@ -7,7 +7,7 @@ from tests.builders import test_cases
 
 
 def test_extracts_an_intermediate_message_error_code():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.large_message_fragment_failure(error_code=20)
     )
 
@@ -19,7 +19,7 @@ def test_extracts_an_intermediate_message_error_code():
 
 
 def test_intermediate_error_code_is_empty_list_if_no_errors():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.successful_integration_with_large_messages()
     )
 
@@ -31,7 +31,7 @@ def test_intermediate_error_code_is_empty_list_if_no_errors():
 
 
 def test_extracts_error_codes_when_some_messages_unacknowledged():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         test_cases.large_message_fragment_failure_and_missing_large_fragment_ack(error_code=10),
     )
     actual = conversation.intermediate_error_codes()
@@ -42,7 +42,7 @@ def test_extracts_error_codes_when_some_messages_unacknowledged():
 
 
 def test_extracts_multiple_intermediate_message_error_codes():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.multiple_large_fragment_failures(error_codes=[11, None, 10])
     )
 
@@ -54,9 +54,7 @@ def test_extracts_multiple_intermediate_message_error_codes():
 
 
 def test_ignores_sender_error_codes():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.request_acknowledged_with_error()
-    )
+    conversation = Gp2gpConversation(messages=test_cases.request_acknowledged_with_error())
 
     actual = conversation.intermediate_error_codes()
 
@@ -66,7 +64,7 @@ def test_ignores_sender_error_codes():
 
 
 def test_ignores_ehr_acknowledgement_error_codes():
-    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())
+    conversation = Gp2gpConversation(messages=test_cases.ehr_integration_failed())
 
     actual = conversation.intermediate_error_codes()
 
@@ -87,7 +85,7 @@ def test_ignores_ehr_acknowledgement_error_codes():
     ],
 )
 def test_returns_nothing_when_transfer_in_progress_and_no_errors(test_case):
-    conversation = Gp2gpConversation.from_messages(messages=test_cases.ehr_integration_failed())
+    conversation = Gp2gpConversation(messages=test_cases.ehr_integration_failed())
 
     actual = conversation.intermediate_error_codes()
 

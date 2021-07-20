@@ -3,9 +3,7 @@ from tests.builders import test_cases
 
 
 def test_extracts_conversation_id():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.request_made(conversation_id="1234")
-    )
+    conversation = Gp2gpConversation(messages=test_cases.request_made(conversation_id="1234"))
 
     expected = "1234"
 

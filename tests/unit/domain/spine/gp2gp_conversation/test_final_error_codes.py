@@ -20,7 +20,7 @@ from tests.builders import test_cases
 )
 def test_doesnt_extract_error_codes_given_transfer_in_progress(test_case):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     actual = conversation.final_error_codes()
 
@@ -38,7 +38,7 @@ def test_doesnt_extract_error_codes_given_transfer_in_progress(test_case):
 )
 def test_doesnt_extract_large_message_error_codes(test_case):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     actual = conversation.final_error_codes()
 
@@ -56,7 +56,7 @@ def test_doesnt_extract_large_message_error_codes(test_case):
 )
 def test_doesnt_extract_sender_error_codes(test_case):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     expected: List[int] = []
 
@@ -67,7 +67,7 @@ def test_doesnt_extract_sender_error_codes(test_case):
 
 def test_extracts_correct_code_given_waiting_for_integration_with_duplicate():
     gp2gp_messages = test_cases.acknowledged_duplicate_and_waiting_for_integration()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     expected = [12]
 
@@ -81,12 +81,12 @@ def test_extracts_correct_code_given_waiting_for_integration_with_duplicate():
     [
         (test_cases.ehr_integrated_successfully, [None]),
         (test_cases.ehr_suppressed, [15]),
-        (test_cases.ehr_integrated_after_duplicate, [12, None]),
+        (test_cases.ehr_integrated_after_duplicate, [None, 12]),
     ],
 )
 def test_extracts_correct_codes_given_successful_transfer(test_case, expected_codes):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     actual = conversation.final_error_codes()
 
@@ -94,9 +94,7 @@ def test_extracts_correct_codes_given_successful_transfer(test_case, expected_co
 
 
 def test_extracts_correct_codes_given_transfer_concluded_with_failure():
-    conversation = Gp2gpConversation.from_messages(
-        messages=test_cases.ehr_integration_failed(error_code=42)
-    )
+    conversation = Gp2gpConversation(messages=test_cases.ehr_integration_failed(error_code=42))
 
     expected = [42]
 
@@ -106,11 +104,11 @@ def test_extracts_correct_codes_given_transfer_concluded_with_failure():
 
 
 def test_extracts_correct_codes_given_duplicate_and_failure():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.integration_failed_after_duplicate(error_code=42)
     )
 
-    expected = [12, 42]
+    expected = [42, 12]
 
     actual = conversation.final_error_codes()
 
@@ -118,11 +116,11 @@ def test_extracts_correct_codes_given_duplicate_and_failure():
 
 
 def test_extracts_corrects_codes_given_success_and_failure():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.second_ehr_integrated_before_first_ehr_failed(error_code=42)
     )
 
-    expected = [None, 42]
+    expected = [42, None]
 
     actual = conversation.final_error_codes()
 
@@ -130,7 +128,7 @@ def test_extracts_corrects_codes_given_success_and_failure():
 
 
 def test_extracts_correct_codes_given_multiple_failures():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.multiple_integration_failures(error_codes=[42, 99, 56])
     )
 

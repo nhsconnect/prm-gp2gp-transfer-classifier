@@ -21,7 +21,7 @@ from tests.builders.common import a_datetime
 )
 def test_returns_none_when_transfer_in_progress(test_case):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     expected = None
 
@@ -55,7 +55,7 @@ def test_returns_correct_time_when_conversation_has_concluded(test_case):
     gp2gp_messages: List[Message] = test_case(
         ehr_acknowledge_time=acknowledgement_time,
     )
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     expected = acknowledgement_time
 

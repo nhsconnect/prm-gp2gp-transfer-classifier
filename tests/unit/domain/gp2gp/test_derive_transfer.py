@@ -65,7 +65,7 @@ def test_extracts_conversation_id():
 )
 def test_returns_transfer_status_technical_failure_with_reason(test_case, expected_reason):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     actual = derive_transfer(conversation)
 
@@ -86,7 +86,7 @@ def test_returns_transfer_status_technical_failure_with_reason(test_case, expect
 )
 def test_returns_transfer_status_integrated_on_time(test_case):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     actual = derive_transfer(conversation)
 
@@ -117,7 +117,7 @@ def test_returns_transfer_status_integrated_on_time(test_case):
 )
 def test_returns_transfer_status_process_failure_with_reason(test_case, expected_reason):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
     actual = derive_transfer(conversation)
     assert actual.outcome.status == TransferStatus.PROCESS_FAILURE
     assert actual.outcome.failure_reason == expected_reason
@@ -161,7 +161,7 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_m
 
 def test_returns_process_failure_given_one_unacknowledged_ehr_with_duplicate_and_no_copc_messages():
     gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
     actual = derive_transfer(conversation)
     assert actual.outcome.status == TransferStatus.PROCESS_FAILURE
     assert actual.outcome.failure_reason == TransferFailureReason.TRANSFERRED_NOT_INTEGRATED
@@ -175,6 +175,7 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_e
     conversation.contains_copc_messages.return_value = True
     conversation.contains_unacknowledged_duplicate_ehr_and_copcs.return_value = False
     conversation.contains_copc_error.return_value = True
+    conversation.is_missing_copc_ack.return_value = False
 
     actual = derive_transfer(conversation)
 
@@ -192,7 +193,7 @@ def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
     gp2gp_messages: List[Message] = test_cases.request_acknowledged_with_error(
         error_code=fatal_sender_error_code
     )
-    conversation = Gp2gpConversation.from_messages(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages)
 
     actual = derive_transfer(conversation)
 
@@ -267,7 +268,7 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
 
 
 def test_produces_no_sla_given_acks_with_only_duplicate_error():
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.acknowledged_duplicate_and_waiting_for_integration()
     )
 
@@ -285,7 +286,7 @@ def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
 
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs(
             request_completed_time=datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
@@ -306,7 +307,7 @@ def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs
     successful_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs(
             request_completed_time=datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
@@ -327,7 +328,7 @@ def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
     failed_acknowledgement_datetime = datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.integration_failed_with_conflicting_acks_and_duplicate_ehrs(
             request_completed_time=datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
@@ -349,7 +350,7 @@ def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_ack
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
 
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack(
             request_completed_time=datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
@@ -371,7 +372,7 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
 
-    conversation = Gp2gpConversation.from_messages(
+    conversation = Gp2gpConversation(
         messages=test_cases.ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack(
             request_completed_time=datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0

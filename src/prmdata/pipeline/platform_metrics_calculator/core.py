@@ -31,7 +31,7 @@ from prmdata.utils.reporting_window import MonthlyReportingWindow
 def _parse_conversations(conversations):
     for conversation in conversations:
         try:
-            yield Gp2gpConversation.from_messages(conversation.messages)
+            yield Gp2gpConversation(conversation.messages)
         except ConversationMissingStart:
             pass
 

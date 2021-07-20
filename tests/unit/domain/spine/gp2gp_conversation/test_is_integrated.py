@@ -17,7 +17,7 @@ from tests.builders import test_cases
     ],
 )
 def test_returns_false_when_transfer_is_still_in_progress(test_case):
-    conversation = Gp2gpConversation.from_messages(messages=test_case())
+    conversation = Gp2gpConversation(messages=test_case())
 
     expected = False
 
@@ -39,7 +39,7 @@ def test_returns_false_when_transfer_is_still_in_progress(test_case):
     ],
 )
 def test_returns_false_when_transfer_concluded_with_failure(test_case):
-    conversation = Gp2gpConversation.from_messages(messages=test_case())
+    conversation = Gp2gpConversation(messages=test_case())
 
     expected = False
 
@@ -67,7 +67,7 @@ def test_returns_false_when_transfer_concluded_with_failure(test_case):
     ],
 )
 def test_returns_true_when_transfer_was_integrated(test_case):
-    conversation = Gp2gpConversation.from_messages(messages=test_case())
+    conversation = Gp2gpConversation(messages=test_case())
 
     expected = True
 
