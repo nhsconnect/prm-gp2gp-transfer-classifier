@@ -46,7 +46,9 @@ def test_groups_by_ods_code_given_single_practice_and_single_transfer():
     lookup = PracticeLookup(
         [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     )
-    transfers = [build_transfer(requesting_practice_asid="121212121212")]
+    transfers = [
+        build_transfer(requesting_practice=Practice(asid="121212121212", supplier=a_string(12)))
+    ]
 
     actual = calculate_sla_by_practice(lookup, transfers)
 
@@ -66,7 +68,9 @@ def test_groups_by_ods_code_given_single_practice_and_no_transfers():
 
 def test_warns_about_transfer_with_unexpected_asid():
     lookup = PracticeLookup([])
-    transfers = [build_transfer(requesting_practice_asid="121212121212")]
+    transfers = [
+        build_transfer(requesting_practice=Practice(asid="121212121212", supplier=a_string(12)))
+    ]
 
     with pytest.warns(RuntimeWarning):
         calculate_sla_by_practice(lookup, transfers)
@@ -80,8 +84,8 @@ def test_groups_by_asid_given_two_practices_and_two_transfers_from_different_pra
         ]
     )
     transfers = [
-        build_transfer(requesting_practice_asid="121212121212"),
-        build_transfer(requesting_practice_asid="343434343434"),
+        build_transfer(requesting_practice=Practice(asid="121212121212", supplier=a_string(12))),
+        build_transfer(requesting_practice=Practice(asid="343434343434", supplier=a_string(12))),
     ]
 
     actual = calculate_sla_by_practice(lookup, transfers)
@@ -94,8 +98,8 @@ def test_groups_by_asid_given_single_practice_and_transfers_from_the_same_practi
         [PracticeDetails(asids=["121212121212"], ods_code="A12345", name=a_string())]
     )
     transfers = [
-        build_transfer(requesting_practice_asid="121212121212"),
-        build_transfer(requesting_practice_asid="121212121212"),
+        build_transfer(requesting_practice=Practice(asid="121212121212", supplier=a_string(12))),
+        build_transfer(requesting_practice=Practice(asid="121212121212", supplier=a_string(12))),
     ]
 
     actual = calculate_sla_by_practice(lookup, transfers)
