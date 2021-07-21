@@ -18,7 +18,7 @@ from pyarrow.fs import S3FileSystem
 
 logger = logging.getLogger(__name__)
 
-VERSION = "v3"
+_PARQUET_VERSION = "v4"
 
 
 def main():
@@ -54,7 +54,10 @@ def main():
     bucket_name = config.output_transfer_data_bucket
 
     s3_path = (
-        f"{bucket_name}/{VERSION}/{reporting_window.metric_year}/{reporting_window.metric_month}"
+        f"{bucket_name}/"
+        f"{_PARQUET_VERSION}/"
+        f"{reporting_window.metric_year}/"
+        f"{reporting_window.metric_month}"
     )
 
     metrics_io.write_practice_metrics(practice_metrics_data)

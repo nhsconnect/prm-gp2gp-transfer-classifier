@@ -132,7 +132,7 @@ def test_end_to_end_with_fake_f3(datadir):
         organisation_metadata_file, "v2/2020/1/organisationMetadata.json"
     )
 
-    s3_output_path = "v3/2019/12/"
+    s3_output_path = "v4/2019/12/"
 
     try:
         main()

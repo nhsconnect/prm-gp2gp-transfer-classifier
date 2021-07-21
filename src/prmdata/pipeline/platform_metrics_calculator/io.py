@@ -17,7 +17,7 @@ class PlatformMetricsIO:
     _SPINE_MESSAGES_VERSION = "v2"
     _SPINE_MESSAGES_PREFIX = "messages"
     _SPINE_MESSAGES_OVERFLOW_PREFIX = "messages-overflow"
-    _DASHBOARD_DATA_VERSION = "v3"
+    _DASHBOARD_DATA_VERSION = "v4"
     _NATIONAL_METRICS_FILE_NAME = "nationalMetrics.json"
     _PRACTICE_METRICS_FILE_NAME = "practiceMetrics.json"
 
