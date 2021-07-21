@@ -320,6 +320,20 @@ def ehr_integration_failed(**kwargs):
     )
 
 
+def ehr_missing_message_for_an_acknowledgement():
+    conversation_id = a_string()
+    message_ref_acknowledgement_to_non_existent_message = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(
+            message_ref=message_ref_acknowledgement_to_non_existent_message
+        )
+        .build()
+    )
+
+
 def ehr_integrated_after_duplicate(**kwargs):
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())

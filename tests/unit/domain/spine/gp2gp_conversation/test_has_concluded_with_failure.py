@@ -1,7 +1,9 @@
 import pytest
+import warnings
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
+from tests.builders.test_cases import ehr_missing_message_for_an_acknowledgement
 
 
 @pytest.mark.parametrize(
@@ -90,3 +92,15 @@ def test_returns_true_given_failed_transfer(test_case):
     actual = conversation.has_concluded_with_failure()
 
     assert actual == expected
+
+
+def test_warning_when_missing_message_for_an_acknowledgement():
+    with warnings.catch_warnings(record=True) as logged_warning:
+        warnings.simplefilter("always")
+
+        Gp2gpConversation(messages=ehr_missing_message_for_an_acknowledgement())
+
+        assert len(logged_warning) == 1
+        assert "Couldn't pair acknowledgement with message for ref:" in str(
+            logged_warning[-1].message
+        )

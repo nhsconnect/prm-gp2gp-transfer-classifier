@@ -251,9 +251,12 @@ def _pair_messages_with_acks(messages: Iterable[Message]) -> List[AcknowledgedMe
 
     for message in messages:
         if message.is_acknowledgement():
-            acked_messages[message.message_ref].acknowledgements.append(message)
+            try:
+                acked_messages[message.message_ref].acknowledgements.append(message)
+            except KeyError:
+                warn(f"Couldn't pair acknowledgement with message for ref: {message.message_ref}")
         else:
-            acked_messages[message.guid] = AcknowledgedMessage(message, [])
+            acked_messages[message.guid] = AcknowledgedMessage(message=message, acknowledgements=[])
 
     return list(acked_messages.values())
 
