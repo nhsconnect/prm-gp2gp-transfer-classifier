@@ -123,7 +123,7 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
 
 def _integrated_within_sla(conversation: Gp2gpConversation) -> TransferOutcome:
     sla_duration = _calculate_sla(conversation)
-    if sla_duration is not None and sla_duration < timedelta(days=8):
+    if sla_duration is not None and sla_duration <= timedelta(days=8):
         return _integrated_on_time()
     return _process_failure(TransferFailureReason.INTEGRATED_LATE)
 
