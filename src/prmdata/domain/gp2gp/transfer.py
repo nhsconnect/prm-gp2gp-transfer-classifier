@@ -207,7 +207,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
     )
 
 
-def _integrated_on_time():
+def _integrated_on_time() -> TransferOutcome:
     return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
 
 

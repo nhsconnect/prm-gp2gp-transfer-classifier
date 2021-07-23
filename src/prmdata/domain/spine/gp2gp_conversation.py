@@ -24,13 +24,13 @@ class AcknowledgedMessage(NamedTuple):
     def to_asid(self) -> str:
         return self.message.to_party_asid
 
-    def is_sent_by(self, asid):
+    def is_sent_by(self, asid: str) -> bool:
         return self.message.from_party_asid == asid
 
-    def is_ehr_request_completed(self):
+    def is_ehr_request_completed(self) -> bool:
         return self.message.is_ehr_request_completed()
 
-    def is_copc(self):
+    def is_copc(self) -> bool:
         return self.message.is_copc()
 
 
@@ -154,21 +154,21 @@ class Gp2gpConversation:
     def contains_only_duplicate_ehr(self) -> bool:
         return self._all_ehr_acknowledged() and self._all_ehr_acks_are_duplicates()
 
-    def _all_ehr_acknowledged(self):
+    def _all_ehr_acknowledged(self) -> bool:
         return all(message.has_acknowledgements() for message in self._request_completed)
 
-    def _all_ehr_acks_are_duplicates(self):
+    def _all_ehr_acks_are_duplicates(self) -> bool:
         return all(
             ack.error_code == DUPLICATE_ERROR
             for message in self._request_completed
             for ack in message.acknowledgements
         )
 
-    def _count_duplicate_errors(self):
+    def _count_duplicate_errors(self) -> int:
         return self.final_error_codes().count(DUPLICATE_ERROR)
 
 
-def _integrated_or_suppressed(request_completed_ack) -> bool:
+def _integrated_or_suppressed(request_completed_ack: Message) -> bool:
     return (
         request_completed_ack.error_code is None
         or request_completed_ack.error_code == ERROR_SUPPRESSED
@@ -186,7 +186,9 @@ class Gp2gpMessagesByType(NamedTuple):
     request_completed: List[AcknowledgedMessage]
 
 
-def _find_acked_ehr_completed_where_ack(request_completed_messages, predicate):
+def _find_acked_ehr_completed_where_ack(
+    request_completed_messages: List[AcknowledgedMessage], predicate
+):
     return next(
         (
             (request_completed.message, ack)
@@ -199,7 +201,7 @@ def _find_acked_ehr_completed_where_ack(request_completed_messages, predicate):
 
 
 def _find_effective_request_completed(
-    request_completed_messages,
+    request_completed_messages: List[AcknowledgedMessage],
 ) -> Optional[Tuple[Message, Message]]:
     successfully_acked_ehr = _find_acked_ehr_completed_where_ack(
         request_completed_messages, _integrated_or_suppressed
