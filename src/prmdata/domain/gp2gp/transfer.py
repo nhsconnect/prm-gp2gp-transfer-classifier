@@ -94,13 +94,6 @@ def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
         return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
 
 
-def _core_ehr_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
-    if conversation.contains_core_ehr_with_sender_error():
-        return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
-    else:
-        return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
-
-
 # flake8: noqa: C901
 def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
     if conversation.is_integrated():
@@ -113,12 +106,12 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
         return _technical_failure(TransferFailureReason.FATAL_SENDER_ERROR)
     elif conversation.is_missing_request_acknowledged():
         return _technical_failure(TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED)
-    elif not conversation.is_missing_core_ehr():
-        return _core_ehr_transfer_outcome(conversation)
     elif conversation.is_missing_core_ehr():
         return _technical_failure(TransferFailureReason.CORE_EHR_NOT_SENT)
+    elif conversation.contains_core_ehr_with_sender_error():
+        return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
     else:
-        return _unclassified_failure()
+        return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
 
 
 def _integrated_within_sla(conversation: Gp2gpConversation) -> TransferOutcome:
