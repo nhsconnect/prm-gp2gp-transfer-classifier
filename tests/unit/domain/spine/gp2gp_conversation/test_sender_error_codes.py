@@ -33,7 +33,7 @@ def test_extracts_sender_error_codes_when_sender_error(test_case):
 
 def test_extracts_sender_error_codes_when_multiple_sender_errors():
     conversation = Gp2gpConversation(
-        messages=test_cases.multiple_sender_failures(error_codes=[42, 43])
+        messages=test_cases.multiple_sender_acknowledgements(error_codes=[42, 43])
     )
 
     actual = conversation.sender_error_codes()

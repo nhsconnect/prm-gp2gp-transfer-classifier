@@ -715,8 +715,8 @@ def ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack(**kwargs
     )
 
 
-def multiple_sender_failures(**kwargs):
-    error_codes = kwargs.get("error_codes", _some_error_codes())
+def multiple_sender_acknowledgements(**kwargs):
+    error_codes = kwargs.get("error_codes", [None] * an_integer(2, 4))
 
     conversation_id = a_string()
 

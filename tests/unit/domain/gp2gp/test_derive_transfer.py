@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import List
+from random import choice
 
 import pytest
 
@@ -192,6 +193,23 @@ def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
 ):
     gp2gp_messages: List[Message] = test_cases.request_acknowledged_with_error(
         error_code=fatal_sender_error_code
+    )
+    conversation = Gp2gpConversation(gp2gp_messages)
+
+    actual = derive_transfer(conversation)
+
+    expected_status = TransferStatus.TECHNICAL_FAILURE
+    expected_reason = TransferFailureReason.FATAL_SENDER_ERROR
+
+    assert actual.outcome.status == expected_status
+    assert actual.outcome.failure_reason == expected_reason
+
+
+def test_returns_correct_transfer_outcome_given_multiple_conflicting_sender_acks():
+    a_fatal_sender_error = choice(FATAL_SENDER_ERROR_CODES)
+
+    gp2gp_messages: List[Message] = test_cases.multiple_sender_acknowledgements(
+        error_codes=[None, a_fatal_sender_error]
     )
     conversation = Gp2gpConversation(gp2gp_messages)
 
