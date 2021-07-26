@@ -12,8 +12,9 @@ class Conversation(NamedTuple):
 
 def _ignore_messages_sent_after(cutoff):
     def filter_messages_outside_cutoff(messages):
-        first_message = messages[0]
-        return [message for message in messages if message.time - first_message.time <= cutoff]
+        first_message_in_conversation = messages[0]
+        start_of_conversation = first_message_in_conversation.time
+        return [message for message in messages if message.time - start_of_conversation <= cutoff]
 
     return filter_messages_outside_cutoff
 
