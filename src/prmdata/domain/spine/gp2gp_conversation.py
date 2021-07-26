@@ -78,8 +78,8 @@ class Gp2gpConversation:
             for ack in message.acknowledgements
         ]
 
-    def sender_error(self) -> Optional[int]:
-        return next((ack.error_code for ack in self._request_started.acknowledgements), None)
+    def sender_error_codes(self) -> List[int]:
+        return [ack.error_code for ack in self._request_started.acknowledgements]
 
     def intermediate_error_codes(self) -> List[int]:
         return [

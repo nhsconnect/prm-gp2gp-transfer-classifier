@@ -55,7 +55,7 @@ class Transfer(NamedTuple):
     sla_duration: Optional[timedelta]
     requesting_practice: Practice
     sending_practice: Practice
-    sender_error_code: Optional[int]
+    sender_error_codes: List[Optional[int]]
     final_error_codes: List[Optional[int]]
     intermediate_error_codes: List[int]
     outcome: TransferOutcome
@@ -132,7 +132,7 @@ def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
         sending_practice=Practice(
             asid=conversation.sending_practice_asid(), supplier=conversation.sending_supplier()
         ),
-        sender_error_code=conversation.sender_error(),
+        sender_error_codes=conversation.sender_error_codes(),
         final_error_codes=conversation.final_error_codes(),
         intermediate_error_codes=conversation.intermediate_error_codes(),
         outcome=_assign_transfer_outcome(conversation),
@@ -172,7 +172,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
             "sending_practice_asid": [t.sending_practice.asid for t in transfers],
             "requesting_supplier": [t.requesting_practice.supplier for t in transfers],
             "sending_supplier": [t.sending_practice.supplier for t in transfers],
-            "sender_error_code": [t.sender_error_code for t in transfers],
+            "sender_error_codes": [t.sender_error_codes for t in transfers],
             "final_error_codes": [t.final_error_codes for t in transfers],
             "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
             "status": [t.outcome.status_string for t in transfers],
@@ -188,7 +188,7 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
                 ("sending_practice_asid", pa.string()),
                 ("requesting_supplier", pa.string()),
                 ("sending_supplier", pa.string()),
-                ("sender_error_code", pa.int64()),
+                ("sender_error_codes", pa.list_(pa.int64())),
                 ("final_error_codes", pa.list_(pa.int64())),
                 ("intermediate_error_codes", pa.list_(pa.int64())),
                 ("status", pa.string()),

@@ -22,7 +22,7 @@ def build_transfer(**kwargs) -> Transfer:
         sending_practice=kwargs.get(
             "sending_practice", Practice(asid=a_string(12), supplier=a_string(12))
         ),
-        sender_error_code=kwargs.get("sender_error_code", None),
+        sender_error_codes=kwargs.get("sender_error_codes", []),
         final_error_codes=kwargs.get("final_error_codes", []),
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),
         outcome=kwargs.get(

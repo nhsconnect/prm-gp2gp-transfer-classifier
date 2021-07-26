@@ -81,29 +81,29 @@ def test_sending_practice_asid_is_converted_to_column():
     assert actual_asid_column == expected_asid_column
 
 
-def test_sender_error_code_is_converted_to_column():
-    transfer = build_transfer(sender_error_code=10)
+def test_sender_error_codes_are_converted_to_column():
+    transfer = build_transfer(sender_error_codes=[10])
 
-    expected_error_code_column = {"sender_error_code": [10]}
+    expected_error_code_column = {"sender_error_codes": [[10]]}
 
     table = convert_transfers_to_table([transfer])
-    actual_error_code_column = table.select(["sender_error_code"]).to_pydict()
+    actual_error_code_column = table.select(["sender_error_codes"]).to_pydict()
 
     assert actual_error_code_column == expected_error_code_column
 
 
-def test_sender_error_code_is_converted_to_column_when_missing():
-    transfer = build_transfer(sender_error_code=None)
+def test_sender_error_codes_are_converted_to_column_when_missing():
+    transfer = build_transfer(sender_error_codes=[None])
 
-    expected_error_code_column = {"sender_error_code": [None]}
+    expected_error_code_column = {"sender_error_codes": [[None]]}
 
     table = convert_transfers_to_table([transfer])
-    actual_error_code_column = table.select(["sender_error_code"]).to_pydict()
+    actual_error_code_column = table.select(["sender_error_codes"]).to_pydict()
 
     assert actual_error_code_column == expected_error_code_column
 
 
-def test_final_error_code_is_converted_to_column():
+def test_final_error_codes_are_converted_to_column():
     transfer = build_transfer(final_error_codes=[5])
 
     expected_error_code_column = {"final_error_codes": [[5]]}
@@ -114,7 +114,7 @@ def test_final_error_code_is_converted_to_column():
     assert actual_error_code_column == expected_error_code_column
 
 
-def test_final_error_code_is_converted_to_column_when_missing():
+def test_final_error_codes_are_converted_to_column_when_missing():
     transfer = build_transfer(final_error_codes=[])
 
     expected_error_code_column: dict = {"final_error_codes": [[]]}
@@ -125,7 +125,7 @@ def test_final_error_code_is_converted_to_column_when_missing():
     assert actual_error_code_column == expected_error_code_column
 
 
-def test_intermediate_error_codes_is_converted_to_column():
+def test_intermediate_error_codes_are_converted_to_column():
     transfer = build_transfer(intermediate_error_codes=[6])
 
     expected_error_code_column = {"intermediate_error_codes": [[6]]}
@@ -136,7 +136,7 @@ def test_intermediate_error_codes_is_converted_to_column():
     assert actual_error_code_column == expected_error_code_column
 
 
-def test_intermediate_error_codes_is_converted_to_column_when_empty():
+def test_intermediate_error_codes_are_converted_to_column_when_empty():
     transfer = build_transfer(intermediate_error_codes=[])
 
     expected_error_code_column: dict = {"intermediate_error_codes": [[]]}
@@ -223,7 +223,7 @@ def test_table_has_correct_schema():
             ("sending_practice_asid", pa.string()),
             ("requesting_supplier", pa.string()),
             ("sending_supplier", pa.string()),
-            ("sender_error_code", pa.int64()),
+            ("sender_error_codes", pa.list_(pa.int64())),
             ("final_error_codes", pa.list_(pa.int64())),
             ("intermediate_error_codes", pa.list_(pa.int64())),
             ("status", pa.string()),

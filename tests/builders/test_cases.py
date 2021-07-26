@@ -90,9 +90,6 @@ class GP2GPTestCase:
         )
         return self
 
-    def build(self):
-        return self._messages
-
     def with_large_fragment_continue(self, **kwargs):
         self._messages.append(
             Message(
@@ -126,6 +123,9 @@ class GP2GPTestCase:
             )
         )
         return self
+
+    def build(self):
+        return self._messages
 
 
 def request_made(**kwargs):
@@ -713,3 +713,18 @@ def ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack(**kwargs
             (SUPPRESSED_EHR_ERROR, ehr_ack_time),
         ],
     )
+
+
+def multiple_sender_failures(**kwargs):
+    error_codes = kwargs.get("error_codes", _some_error_codes())
+
+    conversation_id = a_string()
+
+    test_case = GP2GPTestCase(conversation_id=conversation_id).with_request()
+
+    for code in error_codes:
+        test_case = test_case.with_sender_acknowledgement(
+            message_ref=conversation_id, error_code=code
+        )
+
+    return test_case.build()

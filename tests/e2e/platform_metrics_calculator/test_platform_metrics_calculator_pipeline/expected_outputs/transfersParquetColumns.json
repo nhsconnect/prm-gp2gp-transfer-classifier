@@ -6,7 +6,8 @@
         "failed--A12345",
         "awaiting-integration--A12345",
         "integrated-within-8-days--A12347",
-        "completed-within-3-days--A12347"
+        "completed-within-3-days--A12347",
+        "multiple-sender-errors--A12347"
     ],
     "date_completed": [
         "2019-12-06T08:41:48.337000",
@@ -15,7 +16,8 @@
         "2019-12-20T08:41:48.337000",
         null,
         "2019-12-07T08:41:48.337000",
-        "2019-12-31T18:03:24.982000"
+        "2019-12-31T18:03:24.982000",
+        null
     ],
     "date_requested": [
         "2019-12-01T18:02:29.985000",
@@ -24,10 +26,11 @@
         "2019-12-19T18:02:29.985000",
         "2019-12-20T18:02:29.985000",
         "2019-12-03T18:02:29.985000",
-        "2019-12-31T18:02:29.985000"
+        "2019-12-31T18:02:29.985000",
+        "2019-12-31T19:02:29.985000"
     ],
-    "final_error_codes": [[null], [null], [null], [30], [] ,[null], [null]],
-    "intermediate_error_codes": [[], [], [], [], [], [], []],
+    "final_error_codes": [[null], [null], [null], [30], [] ,[null], [null], []],
+    "intermediate_error_codes": [[], [], [], [], [], [], [], []],
     "requesting_practice_asid": [
         "123456789123",
         "123456789123",
@@ -35,11 +38,13 @@
         "123456789123",
         "123456789123",
         "987654321240",
+        "987654321240",
         "987654321240"
     ],
-    "requesting_supplier": ["", "SupplierC", "SupplierC", "SupplierB", "SupplierA", "", "SupplierC"],
-    "sender_error_code": [null, null, null, null, null, null, null],
+    "requesting_supplier": ["", "SupplierC", "SupplierC", "SupplierB", "SupplierA", "", "SupplierC", "SupplierC"],
+    "sender_error_codes": [[null], [null], [null], [null], [null], [null], [null], [23, 99]],
     "sending_practice_asid": [
+        "003456789123",
         "003456789123",
         "003456789123",
         "003456789123",
@@ -48,8 +53,8 @@
         "003456789123",
         "003456789123"
     ],
-    "sending_supplier": ["", "SupplierA", "SupplierB", "Unknown", "SupplierB", "", "SupplierB"],
-    "sla_duration": [398306, 830306, 139106, 52706, null, 311906, 3],
+    "sending_supplier": ["", "SupplierA", "SupplierB", "Unknown", "SupplierB", "", "SupplierB", "SupplierB"],
+    "sla_duration": [398306, 830306, 139106, 52706, null, 311906, 3, null],
     "status": [
         "INTEGRATED_ON_TIME",
         "PROCESS_FAILURE",
@@ -57,8 +62,9 @@
         "TECHNICAL_FAILURE",
         "PROCESS_FAILURE",
         "INTEGRATED_ON_TIME",
-        "INTEGRATED_ON_TIME"
+        "INTEGRATED_ON_TIME",
+        "TECHNICAL_FAILURE"
     ],
-    "failure_reason": [null, "Integrated Late", null, "Final Error", "Transferred, not integrated", null, null]
+    "failure_reason": [null, "Integrated Late", null, "Final Error", "Transferred, not integrated", null, null, "Contains Fatal Sender Error"]
 }
 
