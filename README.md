@@ -1,10 +1,16 @@
 # prm-gp2gp-data-pipeline
 
-This repo contains the data pipeline responsible for deriving GP2GP metrics from data sources such as NMS.
+This repo contains the data pipeline responsible for deriving GP2GP metrics.
+These metrics are calculated by inferring the outcome of each GP2GP transfer using the logs produced by SPINE.
 
 ## Running
 
-### Extracting Spine data from NMS
+The data pipeline can be installed via `python setup.py install`, or packaged into a docker container via `docker build`.
+Alternatively, you can download one of the docker containers already published to ECR.
+
+The main code entrypoint is via `python -m prmdata.pipeline.platform_metrics_calculator.main`.
+
+### Extracting Spine data from Splunk
 
 Run the following query for the desired time range and save the results as a csv.
 
@@ -12,6 +18,29 @@ Run the following query for the desired time range and save the results as a csv
 index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053d"
 | table _time, conversationID, GUID, interactionID, messageSender, messageRecipient, messageRef, jdiEvent, toSystem, fromSystem
 ```
+
+### Configuration
+
+Configuration is achieved via the following environment variables:
+
+
+| Environment variable         | Description                                          | 
+| ---------------------------- | ---------------------------------------------------- |
+| OUTPUT_TRANSFER_DATA_BUCKET  | Bucket to write classified transfers and metrics     |
+| INPUT_TRANSFER_DATA_BUCKET   | Bucket to read raw spine logs from                   |
+| ORGANISATION_METADATA_BUCKET | Bucket to read organisational metadata from.         |
+| DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                  |
+| S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to. |
+
+#### Notes on configuration
+
+The organisational metadata is produced by the [ods-downloader](https://github.com/nhsconnect/prm-gp2gp-ods-downloader#readme).
+This metadata is a list of names, ODS codes, and ASIDs of all general practices.
+It also provides the list of practices belonging to each CCG.
+
+Instead of directly passing target year and month, a date anchor is passed in specifying "now".
+Metrics are produced for the last full month prior to this.
+This design works around a lack of flexibility in how AWS step functions schedules recurring jobs.
 
 ## Developing
 
@@ -76,14 +105,7 @@ This will run the validation commands in the same container used by the GoCD pip
 
 - If this fails when running outside of Dojo, see [troubleshooting section](### Troubleshooting)
 
-### ODS Data
 
-If you need ODS codes and names of all active GP practices
-[please check this out.](https://github.com/nhsconnect/prm-gp2gp-ods-downloader#readme)
-
-### Data Platform Pipeline
-
-This pipeline will derive GP2GP metrics and metadata for practices produced by the ODS Portal Pipeline. It does this by performing a number of transformations on GP2GP messages provided by NMS.
 
 ### Troubleshooting
 
