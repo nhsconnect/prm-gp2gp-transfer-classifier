@@ -7,9 +7,7 @@ from tests.builders import test_cases
 
 
 def test_extracts_an_intermediate_message_error_code():
-    conversation = Gp2gpConversation(
-        messages=test_cases.large_message_fragment_failure(error_code=20)
-    )
+    conversation = Gp2gpConversation(messages=test_cases.copc_fragment_failure(error_code=20))
 
     actual = conversation.intermediate_error_codes()
 
@@ -20,7 +18,7 @@ def test_extracts_an_intermediate_message_error_code():
 
 def test_intermediate_error_code_is_empty_list_if_no_errors():
     conversation = Gp2gpConversation(
-        messages=test_cases.successful_integration_with_large_messages()
+        messages=test_cases.successful_integration_with_copc_fragments()
     )
 
     actual = conversation.intermediate_error_codes()
@@ -32,7 +30,7 @@ def test_intermediate_error_code_is_empty_list_if_no_errors():
 
 def test_extracts_error_codes_when_some_messages_unacknowledged():
     conversation = Gp2gpConversation(
-        test_cases.large_message_fragment_failure_and_missing_large_fragment_ack(error_code=10),
+        test_cases.copc_fragment_failure_and_missing_copc_fragment_ack(error_code=10),
     )
     actual = conversation.intermediate_error_codes()
 
@@ -43,7 +41,7 @@ def test_extracts_error_codes_when_some_messages_unacknowledged():
 
 def test_extracts_multiple_intermediate_message_error_codes():
     conversation = Gp2gpConversation(
-        messages=test_cases.multiple_large_fragment_failures(error_codes=[11, None, 10])
+        messages=test_cases.copc_fragment_failures(error_codes=[11, None, 10])
     )
 
     actual = conversation.intermediate_error_codes()
@@ -79,9 +77,9 @@ def test_ignores_ehr_acknowledgement_error_codes():
         test_cases.request_made,
         test_cases.request_acknowledged_successfully,
         test_cases.core_ehr_sent,
-        test_cases.large_message_continue_sent,
+        test_cases.copc_continue_sent,
         test_cases.acknowledged_duplicate_and_waiting_for_integration,
-        test_cases.pending_integration_with_acked_large_message_fragments,
+        test_cases.pending_integration_with_acked_copc_fragments,
     ],
 )
 def test_returns_nothing_when_transfer_in_progress_and_no_errors(test_case):

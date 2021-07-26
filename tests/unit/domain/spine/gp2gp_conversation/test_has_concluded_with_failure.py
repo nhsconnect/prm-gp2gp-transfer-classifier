@@ -11,12 +11,12 @@ from tests.builders.test_cases import ehr_missing_message_for_an_acknowledgement
     [
         test_cases.request_made,
         test_cases.request_acknowledged_successfully,
-        test_cases.large_message_continue_sent,
+        test_cases.copc_continue_sent,
         test_cases.core_ehr_sent,
         test_cases.core_ehr_sent_with_sender_error,
         test_cases.acknowledged_duplicate_and_waiting_for_integration,
-        test_cases.pending_integration_with_acked_large_message_fragments,
-        test_cases.large_message_fragment_failure_and_missing_large_fragment_ack,
+        test_cases.pending_integration_with_acked_copc_fragments,
+        test_cases.copc_fragment_failure_and_missing_copc_fragment_ack,
     ],
 )
 def test_returns_false_given_pending_transfer(test_case):
@@ -40,7 +40,7 @@ def test_returns_false_given_pending_transfer(test_case):
         test_cases.first_ehr_integrated_before_second_ehr_failed,
         test_cases.second_ehr_integrated_after_first_ehr_failed,
         test_cases.second_ehr_integrated_before_first_ehr_failed,
-        test_cases.successful_integration_with_large_messages,
+        test_cases.successful_integration_with_copc_fragments,
         test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs,
         test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs,
         test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack,
@@ -61,8 +61,8 @@ def test_returns_false_given_successful_transfer(test_case):
     "test_case",
     [
         test_cases.request_acknowledged_with_error,
-        test_cases.large_message_fragment_failure,
-        test_cases.multiple_large_fragment_failures,
+        test_cases.copc_fragment_failure,
+        test_cases.copc_fragment_failures,
     ],
 )
 def test_returns_false_given_intermediate_error(test_case):

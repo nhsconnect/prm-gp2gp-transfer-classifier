@@ -90,7 +90,7 @@ class GP2GPTestCase:
         )
         return self
 
-    def with_large_fragment_continue(self, **kwargs):
+    def with_copc_fragment_continue(self, **kwargs):
         self._messages.append(
             Message(
                 time=kwargs.get("time", a_datetime()),
@@ -107,7 +107,7 @@ class GP2GPTestCase:
         )
         return self
 
-    def with_large_fragment(self, **kwargs):
+    def with_copc_fragment(self, **kwargs):
         self._messages.append(
             Message(
                 time=kwargs.get("time", a_datetime()),
@@ -240,9 +240,9 @@ def unacknowledged_duplicate_with_copcs_and_waiting_for_integration():
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr(guid=ehr_guid)
         .with_core_ehr(guid=duplicate_ehr_guid)
-        .with_large_fragment_continue()
-        .with_large_fragment(guid=fragment1_guid)
-        .with_large_fragment(guid=fragment2_guid)
+        .with_copc_fragment_continue()
+        .with_copc_fragment(guid=fragment1_guid)
+        .with_copc_fragment(guid=fragment2_guid)
         .with_requester_acknowledgement(message_ref=fragment1_guid)
         .with_requester_acknowledgement(
             message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
@@ -486,7 +486,7 @@ def multiple_integration_failures(**kwargs):
     return test_case.build()
 
 
-def large_message_continue_sent(**kwargs):
+def copc_continue_sent(**kwargs):
     conversation_id = a_string()
 
     return (
@@ -494,29 +494,12 @@ def large_message_continue_sent(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr()
-        .with_large_fragment_continue()
+        .with_copc_fragment_continue()
         .build()
     )
 
 
-def large_message_fragment_failure(**kwargs):
-    conversation_id = a_string()
-    fragment_guid = a_string()
-    fragment_error = kwargs.get("error_code", an_integer(a=20, b=30))
-
-    return (
-        GP2GPTestCase(conversation_id=conversation_id)
-        .with_request()
-        .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr()
-        .with_large_fragment_continue()
-        .with_large_fragment(guid=fragment_guid)
-        .with_requester_acknowledgement(message_ref=fragment_guid, error_code=fragment_error)
-        .build()
-    )
-
-
-def large_message_fragment_failure_and_missing_large_fragment_ack(**kwargs):
+def copc_fragment_failure(**kwargs):
     conversation_id = a_string()
     fragment_guid = a_string()
     fragment_error = kwargs.get("error_code", an_integer(a=20, b=30))
@@ -526,15 +509,32 @@ def large_message_fragment_failure_and_missing_large_fragment_ack(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr()
-        .with_large_fragment_continue()
-        .with_large_fragment(guid=fragment_guid)
+        .with_copc_fragment_continue()
+        .with_copc_fragment(guid=fragment_guid)
         .with_requester_acknowledgement(message_ref=fragment_guid, error_code=fragment_error)
-        .with_large_fragment()
         .build()
     )
 
 
-def successful_integration_with_large_messages(**kwargs):
+def copc_fragment_failure_and_missing_copc_fragment_ack(**kwargs):
+    conversation_id = a_string()
+    fragment_guid = a_string()
+    fragment_error = kwargs.get("error_code", an_integer(a=20, b=30))
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_core_ehr()
+        .with_copc_fragment_continue()
+        .with_copc_fragment(guid=fragment_guid)
+        .with_requester_acknowledgement(message_ref=fragment_guid, error_code=fragment_error)
+        .with_copc_fragment()
+        .build()
+    )
+
+
+def successful_integration_with_copc_fragments(**kwargs):
     conversation_id = a_string()
     ehr_guid = a_string()
     fragment1_guid = a_string()
@@ -546,19 +546,19 @@ def successful_integration_with_large_messages(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr(guid=ehr_guid)
-        .with_large_fragment_continue()
-        .with_large_fragment(guid=fragment1_guid)
-        .with_large_fragment(guid=fragment2_guid)
+        .with_copc_fragment_continue()
+        .with_copc_fragment(guid=fragment1_guid)
+        .with_copc_fragment(guid=fragment2_guid)
         .with_requester_acknowledgement(message_ref=fragment1_guid)
         .with_requester_acknowledgement(message_ref=fragment2_guid)
-        .with_large_fragment(guid=fragment3_guid)
+        .with_copc_fragment(guid=fragment3_guid)
         .with_requester_acknowledgement(message_ref=fragment3_guid)
         .with_requester_acknowledgement(message_ref=ehr_guid)
         .build()
     )
 
 
-def pending_integration_with_large_message_fragments(**kwargs):
+def pending_integration_with_copc_fragments(**kwargs):
     conversation_id = a_string()
     ehr_guid = a_string()
 
@@ -567,15 +567,15 @@ def pending_integration_with_large_message_fragments(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr(guid=ehr_guid)
-        .with_large_fragment_continue()
-        .with_large_fragment()
-        .with_large_fragment()
-        .with_large_fragment()
+        .with_copc_fragment_continue()
+        .with_copc_fragment()
+        .with_copc_fragment()
+        .with_copc_fragment()
         .build()
     )
 
 
-def pending_integration_with_acked_large_message_fragments(**kwargs):
+def pending_integration_with_acked_copc_fragments(**kwargs):
     conversation_id = a_string()
     ehr_guid = a_string()
     fragment1_guid = a_string()
@@ -587,18 +587,18 @@ def pending_integration_with_acked_large_message_fragments(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr(guid=ehr_guid)
-        .with_large_fragment_continue()
-        .with_large_fragment(guid=fragment1_guid)
-        .with_large_fragment(guid=fragment2_guid)
+        .with_copc_fragment_continue()
+        .with_copc_fragment(guid=fragment1_guid)
+        .with_copc_fragment(guid=fragment2_guid)
         .with_requester_acknowledgement(message_ref=fragment1_guid)
         .with_requester_acknowledgement(message_ref=fragment2_guid)
-        .with_large_fragment(guid=fragment3_guid)
+        .with_copc_fragment(guid=fragment3_guid)
         .with_requester_acknowledgement(message_ref=fragment3_guid)
         .build()
     )
 
 
-def multiple_large_fragment_failures(**kwargs):
+def copc_fragment_failures(**kwargs):
     error_codes = kwargs.get("error_codes", _some_error_codes())
     conversation_id = a_string()
     fragment_guids = [a_string() for _ in range(len(error_codes))]
@@ -608,11 +608,11 @@ def multiple_large_fragment_failures(**kwargs):
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr()
-        .with_large_fragment_continue()
+        .with_copc_fragment_continue()
     )
 
     for guid in fragment_guids:
-        test_case = test_case.with_large_fragment(guid=guid)
+        test_case = test_case.with_copc_fragment(guid=guid)
 
     for error_code, guid in zip(error_codes, fragment_guids):
         test_case = test_case.with_requester_acknowledgement(

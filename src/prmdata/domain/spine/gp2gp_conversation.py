@@ -46,8 +46,8 @@ class Gp2gpConversation:
 
         self._request_started = message_bundle.request_started
         self._request_completed = message_bundle.request_completed
-        self._large_message_continue = message_bundle.large_messaging_continue
-        self._large_fragments = message_bundle.large_fragments
+        self._copc_continue = message_bundle.copc_continue
+        self._copc_fragments = message_bundle.copc_fragments
 
         self._effective_ehr = None
         self._effective_ehr_ack = None
@@ -84,7 +84,7 @@ class Gp2gpConversation:
     def intermediate_error_codes(self) -> List[int]:
         return [
             ack.error_code
-            for message in self._large_fragments
+            for message in self._copc_fragments
             for ack in message.acknowledgements
             if ack.error_code is not None
         ]
@@ -112,15 +112,15 @@ class Gp2gpConversation:
         return len(self._request_completed) == 0
 
     def is_missing_copc(self) -> bool:
-        return len(self._large_message_continue) > 0 and len(self._large_fragments) == 0
+        return len(self._copc_continue) > 0 and len(self._copc_fragments) == 0
 
     def is_missing_copc_ack(self) -> bool:
-        return any(not message.has_acknowledgements() for message in self._large_fragments)
+        return any(not message.has_acknowledgements() for message in self._copc_fragments)
 
     def contains_copc_error(self) -> bool:
         return any(
             ack.error_code is not None
-            for message in self._large_fragments
+            for message in self._copc_fragments
             for ack in message.acknowledgements
         )
 
@@ -142,12 +142,12 @@ class Gp2gpConversation:
     def effective_final_acknowledgement_time(self) -> Optional[datetime]:
         return self._effective_ehr_ack.time if self._effective_ehr_ack else None
 
-    def contains_copc_messages(self) -> bool:
-        return len(self._large_message_continue) > 0 or len(self._large_fragments) > 0
+    def contains_copc_fragments(self) -> bool:
+        return len(self._copc_continue) > 0 or len(self._copc_fragments) > 0
 
-    def contains_unacknowledged_duplicate_ehr_and_copcs(self) -> bool:
+    def contains_unacknowledged_duplicate_ehr_and_copc_fragments(self) -> bool:
         has_duplicates = self._count_duplicate_errors() > 0
-        contains_copcs = self.contains_copc_messages()
+        contains_copcs = self.contains_copc_fragments()
 
         return has_duplicates and contains_copcs and not self._all_ehr_acknowledged()
 
@@ -181,8 +181,8 @@ class ConversationMissingStart(Exception):
 
 class Gp2gpMessagesByType(NamedTuple):
     request_started: AcknowledgedMessage
-    large_messaging_continue: List[Message]
-    large_fragments: List[AcknowledgedMessage]
+    copc_continue: List[Message]
+    copc_fragments: List[AcknowledgedMessage]
     request_completed: List[AcknowledgedMessage]
 
 
@@ -222,8 +222,8 @@ def _find_effective_request_completed(
 
 def _group_message_by_type(messages: Iterable[AcknowledgedMessage]) -> Gp2gpMessagesByType:
     request_completed_messages = []
-    large_messaging_continue_messages = []
-    large_fragment_messages = []
+    copc_continue_messages = []
+    copc_fragment_messages = []
 
     request_started, *remaining_messages = messages
 
@@ -234,17 +234,17 @@ def _group_message_by_type(messages: Iterable[AcknowledgedMessage]) -> Gp2gpMess
         if acked_message.is_ehr_request_completed():
             request_completed_messages.append(acked_message)
         elif acked_message.is_copc() and acked_message.is_sent_by(requesting_asid):
-            large_messaging_continue_messages.append(acked_message.message)
+            copc_continue_messages.append(acked_message.message)
         elif acked_message.message.is_copc() and acked_message.is_sent_by(sending_asid):
-            large_fragment_messages.append(acked_message)
+            copc_fragment_messages.append(acked_message)
         else:
             warn(f"Couldn't determine purpose of message: {acked_message.message.guid}")
 
     return Gp2gpMessagesByType(
         request_started=request_started,
         request_completed=request_completed_messages,
-        large_messaging_continue=large_messaging_continue_messages,
-        large_fragments=large_fragment_messages,
+        copc_continue=copc_continue_messages,
+        copc_fragments=copc_fragment_messages,
     )
 
 

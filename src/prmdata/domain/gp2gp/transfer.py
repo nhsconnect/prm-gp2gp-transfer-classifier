@@ -82,7 +82,7 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
 
 
 def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
-    if conversation.contains_unacknowledged_duplicate_ehr_and_copcs():
+    if conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments():
         return _unclassified_failure(TransferFailureReason.AMBIGUOUS_COPCS)
     elif conversation.contains_copc_error() and not conversation.is_missing_copc_ack():
         return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
@@ -100,7 +100,7 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
         return _integrated_within_sla(conversation)
     elif conversation.has_concluded_with_failure():
         return _technical_failure(TransferFailureReason.FINAL_ERROR)
-    elif conversation.contains_copc_messages():
+    elif conversation.contains_copc_fragments():
         return _copc_transfer_outcome(conversation)
     elif conversation.contains_fatal_sender_error_code():
         return _technical_failure(TransferFailureReason.FATAL_SENDER_ERROR)

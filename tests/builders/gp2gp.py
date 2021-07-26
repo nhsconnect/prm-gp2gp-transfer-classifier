@@ -125,7 +125,7 @@ def a_transfer_where_no_core_ehr_was_sent():
     )
 
 
-def a_transfer_where_no_large_message_continue_was_sent():
+def a_transfer_where_no_copc_continue_was_sent():
     return build_transfer(
         outcome=TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
@@ -134,7 +134,7 @@ def a_transfer_where_no_large_message_continue_was_sent():
     )
 
 
-def a_transfer_where_large_messages_were_required_but_not_sent():
+def a_transfer_where_copc_fragments_were_required_but_not_sent():
     return build_transfer(
         outcome=TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
@@ -143,7 +143,7 @@ def a_transfer_where_large_messages_were_required_but_not_sent():
     )
 
 
-def a_transfer_where_large_messages_remained_unacknowledged():
+def a_transfer_where_copc_fragments_remained_unacknowledged():
     return build_transfer(
         outcome=TransferOutcome(
             status=TransferStatus.TECHNICAL_FAILURE,
@@ -161,7 +161,7 @@ def a_transfer_where_the_sender_reported_an_unrecoverable_error():
     )
 
 
-def a_transfer_where_a_large_message_triggered_an_error():
+def a_transfer_where_a_copc_triggered_an_error():
     return build_transfer(
         outcome=TransferOutcome(
             status=TransferStatus.UNCLASSIFIED_FAILURE,

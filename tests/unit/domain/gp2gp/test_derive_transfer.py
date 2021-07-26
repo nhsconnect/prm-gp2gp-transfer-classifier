@@ -47,11 +47,11 @@ def test_extracts_conversation_id():
             TransferFailureReason.CORE_EHR_NOT_SENT,
         ),
         (
-            test_cases.large_message_continue_sent,
+            test_cases.copc_continue_sent,
             TransferFailureReason.COPC_NOT_SENT,
         ),
         (
-            test_cases.pending_integration_with_large_message_fragments,
+            test_cases.pending_integration_with_copc_fragments,
             TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         ),
         (
@@ -59,7 +59,7 @@ def test_extracts_conversation_id():
             TransferFailureReason.CORE_EHR_NOT_SENT,
         ),
         (
-            test_cases.large_message_fragment_failure_and_missing_large_fragment_ack,
+            test_cases.copc_fragment_failure_and_missing_copc_fragment_ack,
             TransferFailureReason.COPC_NOT_ACKNOWLEDGED,
         ),
     ],
@@ -111,7 +111,7 @@ def test_returns_transfer_status_integrated_on_time(test_case):
             TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         ),
         (
-            test_cases.pending_integration_with_acked_large_message_fragments,
+            test_cases.pending_integration_with_acked_copc_fragments,
             TransferFailureReason.TRANSFERRED_NOT_INTEGRATED,
         ),
     ],
@@ -129,7 +129,7 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_an
 
     conversation.is_integrated.return_value = False
     conversation.has_concluded_with_failure.return_value = False
-    conversation.contains_copc_messages.return_value = False
+    conversation.contains_copc_fragments.return_value = False
     conversation.contains_fatal_sender_error_code.return_value = False
     conversation.is_missing_request_acknowledged.return_value = False
     conversation.is_missing_core_ehr.return_value = False
@@ -144,12 +144,12 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_an
     assert actual.outcome.failure_reason == expected_reason
 
 
-def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_messages():
+def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_fragments():
     conversation = build_mock_gp2gp_conversation()
 
     conversation.is_integrated.return_value = False
     conversation.has_concluded_with_failure.return_value = False
-    conversation.contains_unacknowledged_duplicate_ehr_and_copcs.return_value = True
+    conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments.return_value = True
 
     actual = derive_transfer(conversation)
 
@@ -160,7 +160,7 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_m
     assert actual.outcome.failure_reason == expected_reason
 
 
-def test_returns_process_failure_given_one_unacknowledged_ehr_with_duplicate_and_no_copc_messages():
+def test_return_process_failure_given_an_unacknowledged_ehr_with_duplicate_and_no_copc_fragments():
     gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
     conversation = Gp2gpConversation(gp2gp_messages)
     actual = derive_transfer(conversation)
@@ -173,8 +173,8 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_e
 
     conversation.is_integrated.return_value = False
     conversation.has_concluded_with_failure.return_value = False
-    conversation.contains_copc_messages.return_value = True
-    conversation.contains_unacknowledged_duplicate_ehr_and_copcs.return_value = False
+    conversation.contains_copc_fragments.return_value = True
+    conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments.return_value = False
     conversation.contains_copc_error.return_value = True
     conversation.is_missing_copc_ack.return_value = False
 
