@@ -3,7 +3,7 @@
 set -Eeo pipefail
 
 aws_region=eu-west-2
-repo_url_param="/registrations/dev/data-pipeline/ecr/url/metrics-calculator"
+repo_url_param="/registrations/dev/data-pipeline/ecr/url/transfer-classifier"
 role_arn_param="/registrations/dev/user-input/cross-account-admin-role"
 
 function assume_role() {
