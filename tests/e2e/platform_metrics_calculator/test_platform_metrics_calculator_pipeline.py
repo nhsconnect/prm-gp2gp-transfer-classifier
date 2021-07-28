@@ -93,6 +93,7 @@ def test_end_to_end_with_fake_f3(datadir):
     environ["ORGANISATION_METADATA_BUCKET"] = s3_organisation_metadata_bucket_name
     environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
     environ["S3_ENDPOINT_URL"] = fake_s3_url
+    environ["CONVERSATION_CUTOFF_DAYS"] = "14"
 
     s3 = boto3.resource(
         "s3",

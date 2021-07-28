@@ -42,7 +42,11 @@ def main():
 
     spine_messages = metrics_io.read_spine_messages()
 
-    transfers = list(parse_transfers_from_messages(spine_messages, reporting_window))
+    conversation_cutoff = config.conversation_cutoff
+
+    transfers = list(
+        parse_transfers_from_messages(spine_messages, reporting_window, conversation_cutoff)
+    )
     practice_metrics_data = calculate_practice_metrics_data(
         transfers, organisation_metadata, reporting_window
     )

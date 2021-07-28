@@ -1,4 +1,5 @@
-from typing import Iterable, List, Iterator
+from datetime import timedelta
+from typing import Iterable, List, Iterator, Optional
 
 from prmdata.domain.data_platform.national_metrics import (
     NationalMetricsPresentation,
@@ -37,9 +38,11 @@ def _parse_conversations(conversations):
 
 
 def parse_transfers_from_messages(
-    spine_messages: Iterable[Message], reporting_window: MonthlyReportingWindow
+    spine_messages: Iterable[Message],
+    reporting_window: MonthlyReportingWindow,
+    conversation_cutoff: Optional[timedelta] = None,
 ) -> Iterator[Transfer]:
-    conversations = group_into_conversations(spine_messages)
+    conversations = group_into_conversations(spine_messages, conversation_cutoff)
     gp2gp_conversations = _parse_conversations(conversations)
     conversations_started_in_reporting_window = filter_conversations_by_request_started_time(
         gp2gp_conversations, reporting_window
