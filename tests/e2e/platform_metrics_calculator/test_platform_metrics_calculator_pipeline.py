@@ -108,11 +108,9 @@ def test_end_to_end_with_fake_f3(datadir):
     input_spine_data_bucket = _build_fake_s3_bucket(s3_input_spine_data_bucket_name, s3)
     organisation_metadata_bucket = _build_fake_s3_bucket(s3_organisation_metadata_bucket_name, s3)
 
-    expected_practice_metrics_output_key = "practiceMetrics.json"
     expected_national_metrics_output_key = "nationalMetrics.json"
     expected_transfers_output_key = "transfers.parquet"
 
-    expected_practice_metrics = _read_json(datadir / "expected_outputs" / "practiceMetrics.json")
     expected_national_metrics = _read_json(datadir / "expected_outputs" / "nationalMetrics.json")
     expected_transfers = _read_parquet_columns_json(
         datadir / "expected_outputs" / "transfersParquetColumns.json"
@@ -137,9 +135,6 @@ def test_end_to_end_with_fake_f3(datadir):
 
     try:
         main()
-        actual_practice_metrics = _read_s3_json(
-            output_transfer_data_bucket, f"{s3_output_path}{expected_practice_metrics_output_key}"
-        )
         actual_national_metrics = _read_s3_json(
             output_transfer_data_bucket, f"{s3_output_path}{expected_national_metrics_output_key}"
         )
@@ -147,8 +142,6 @@ def test_end_to_end_with_fake_f3(datadir):
             output_transfer_data_bucket, f"{s3_output_path}{expected_transfers_output_key}"
         )
 
-        assert actual_practice_metrics["practices"] == expected_practice_metrics["practices"]
-        assert actual_practice_metrics["ccgs"] == expected_practice_metrics["ccgs"]
         assert actual_national_metrics["metrics"] == expected_national_metrics["metrics"]
 
         assert actual_transfers == expected_transfers

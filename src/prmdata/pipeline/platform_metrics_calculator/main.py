@@ -7,7 +7,6 @@ from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.pipeline.platform_metrics_calculator.core import (
-    calculate_practice_metrics_data,
     parse_transfers_from_messages,
     calculate_national_metrics_data,
 )
@@ -38,17 +37,12 @@ def main():
         dashboard_data_bucket=config.output_transfer_data_bucket,
     )
 
-    organisation_metadata = metrics_io.read_ods_metadata()
-
     spine_messages = metrics_io.read_spine_messages()
 
     conversation_cutoff = config.conversation_cutoff
 
     transfers = list(
         parse_transfers_from_messages(spine_messages, reporting_window, conversation_cutoff)
-    )
-    practice_metrics_data = calculate_practice_metrics_data(
-        transfers, organisation_metadata, reporting_window
     )
     national_metrics_data = calculate_national_metrics_data(
         transfers=transfers, reporting_window=reporting_window
@@ -64,7 +58,6 @@ def main():
         f"{reporting_window.metric_month}"
     )
 
-    metrics_io.write_practice_metrics(practice_metrics_data)
     metrics_io.write_national_metrics(national_metrics_data)
 
     write_table(

@@ -2,7 +2,6 @@ from dataclasses import asdict
 from typing import Iterable
 
 from prmdata.domain.data_platform.national_metrics import NationalMetricsPresentation
-from prmdata.domain.data_platform.practice_metrics import PracticeMetricsPresentation
 from prmdata.domain.ods_portal.models import OrganisationMetadata
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
 from prmdata.utils.io.dictionary import camelize_dict
@@ -19,7 +18,6 @@ class PlatformMetricsIO:
     _SPINE_MESSAGES_OVERFLOW_PREFIX = "messages-overflow"
     _DASHBOARD_DATA_VERSION = "v4"
     _NATIONAL_METRICS_FILE_NAME = "nationalMetrics.json"
-    _PRACTICE_METRICS_FILE_NAME = "practiceMetrics.json"
 
     def __init__(
         self,
@@ -111,13 +109,4 @@ class PlatformMetricsIO:
         self._s3_manager.write_json(
             f"s3://{national_metrics_path}",
             self._create_platform_json_object(national_metrics_presentation_data),
-        )
-
-    def write_practice_metrics(self, practice_metrics: PracticeMetricsPresentation):
-        practice_metrics_path = self._dashboard_data_bucket_s3_path(
-            self._PRACTICE_METRICS_FILE_NAME
-        )
-        self._s3_manager.write_json(
-            f"s3://{practice_metrics_path}",
-            self._create_platform_json_object(practice_metrics),
         )
