@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from prmdata.domain.gp2gp.practice_metrics import PracticeMetrics, IntegratedPracticeMetrics
 from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
@@ -9,7 +8,7 @@ from prmdata.domain.gp2gp.transfer import (
     TransferFailureReason,
     Practice,
 )
-from tests.builders.common import a_string, a_duration, an_integer, a_datetime
+from tests.builders.common import a_string, a_duration, a_datetime
 
 
 def build_transfer(**kwargs) -> Transfer:
@@ -31,19 +30,6 @@ def build_transfer(**kwargs) -> Transfer:
         ),
         date_requested=kwargs.get("date_requested", a_datetime()),
         date_completed=kwargs.get("date_completed", None),
-    )
-
-
-def build_practice_metrics(**kwargs) -> PracticeMetrics:
-    return PracticeMetrics(
-        ods_code=kwargs.get("ods_code", a_string(6)),
-        name=kwargs.get("name", a_string()),
-        integrated=IntegratedPracticeMetrics(
-            transfer_count=kwargs.get("transfer_count", an_integer()),
-            within_3_days=kwargs.get("within_3_days", an_integer()),
-            within_8_days=kwargs.get("within_8_days", an_integer()),
-            beyond_8_days=kwargs.get("beyond_8_days", an_integer()),
-        ),
     )
 
 
