@@ -55,7 +55,7 @@ def test_read_spine_messages():
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,
         gp2gp_spine_bucket=spine_bucket,
-        dashboard_data_bucket=a_string(),
+        transfer_data_bucket=a_string(),
     )
 
     s3_manager.read_gzip_csv.side_effect = [

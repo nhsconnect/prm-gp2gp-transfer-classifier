@@ -9,7 +9,7 @@ class PlatformMetricsIO:
     _SPINE_MESSAGES_VERSION = "v2"
     _SPINE_MESSAGES_PREFIX = "messages"
     _SPINE_MESSAGES_OVERFLOW_PREFIX = "messages-overflow"
-    _DASHBOARD_DATA_VERSION = "v4"
+    _TRANSFER_DATA_VERSION = "v4"
 
     def __init__(
         self,
@@ -17,22 +17,22 @@ class PlatformMetricsIO:
         reporting_window: MonthlyReportingWindow,
         s3_data_manager: S3DataManager,
         gp2gp_spine_bucket: str,
-        dashboard_data_bucket: str,
+        transfer_data_bucket: str,
     ):
         self._window = reporting_window
         self._s3_manager = s3_data_manager
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
-        self._dashboard_data_bucket = dashboard_data_bucket
+        self._transfer_data_bucket = transfer_data_bucket
 
     def _read_spine_gzip_csv(self, path: str) -> Iterable[Message]:
         data = self._s3_manager.read_gzip_csv(f"s3://{path}")
         return construct_messages_from_splunk_items(data)
 
-    def _dashboard_data_bucket_s3_path(self, file_name: str) -> str:
+    def _transfer_data_bucket_s3_path(self, file_name: str) -> str:
         return "/".join(
             [
-                self._dashboard_data_bucket,
-                self._DASHBOARD_DATA_VERSION,
+                self._transfer_data_bucket,
+                self._TRANSFER_DATA_VERSION,
                 self._metric_month_path_fragment(),
                 file_name,
             ]
