@@ -1,8 +1,6 @@
-from dataclasses import asdict
 from typing import Iterable
 
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
-from prmdata.utils.io.dictionary import camelize_dict
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 
@@ -39,11 +37,6 @@ class PlatformMetricsIO:
                 file_name,
             ]
         )
-
-    @staticmethod
-    def _create_platform_json_object(platform_data) -> dict:
-        content_dict = asdict(platform_data)
-        return camelize_dict(content_dict)
 
     def _metric_month_file_prefix(self) -> str:
         return f"{self._window.metric_year}-{self._window.metric_month}"
