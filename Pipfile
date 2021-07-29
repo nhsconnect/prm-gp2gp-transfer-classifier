@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-gp2gp-data-pipeline = {editable = true, path = "."}
+gp2gp-transfer-classifier = {editable = true, path = "."}
 
 [dev-packages]
 black = "==21.5b2"
