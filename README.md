@@ -24,20 +24,15 @@ index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053d"
 Configuration is achieved via the following environment variables:
 
 
-| Environment variable         | Description                                          | 
-| ---------------------------- | ---------------------------------------------------- |
-| OUTPUT_TRANSFER_DATA_BUCKET  | Bucket to write categorised transfers                |
-| INPUT_SPINE_DATA_BUCKET      | Bucket to read raw spine logs from                   |
-| ORGANISATION_METADATA_BUCKET | Bucket to read organisational metadata from.         |
-| DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                  |
-| S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to. |
+| Environment variable         | Description                                                       | 
+| ---------------------------- | ----------------------------------------------------------------- |
+| OUTPUT_TRANSFER_DATA_BUCKET  | Bucket to write categorised transfers.                            |
+| INPUT_SPINE_DATA_BUCKET      | Bucket to read raw spine logs from.                               |
+| DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                               |
+| S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to.              |
+| CONVERSATION_CUTOFF_DAYS     | Optional argument specifying how many days to classify a transfer.|
 
 #### Notes on configuration
-
-The organisational metadata is produced by the [ods-downloader](https://github.com/nhsconnect/prm-gp2gp-ods-downloader#readme).
-This metadata is a list of names, ODS codes, and ASIDs of all general practices.
-It also provides the list of practices belonging to each CCG.
-
 Instead of directly passing target year and month, a date anchor is passed in specifying "now".
 Metrics are produced for the last full month prior to this.
 This design works around a lack of flexibility in how AWS step functions schedules recurring jobs.

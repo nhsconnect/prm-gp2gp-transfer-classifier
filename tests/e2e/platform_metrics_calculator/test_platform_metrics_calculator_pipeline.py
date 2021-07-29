@@ -79,7 +79,6 @@ def test_end_to_end_with_fake_f3(datadir):
     fake_s3_region = "us-west-1"
     s3_output_transfer_data_bucket_name = "output-transfer-data-bucket"
     s3_input_spine_data_bucket_name = "input-spine-data-bucket"
-    s3_organisation_metadata_bucket_name = "organisation-metadata-bucket"
 
     fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
     fake_s3.start()
@@ -90,7 +89,6 @@ def test_end_to_end_with_fake_f3(datadir):
 
     environ["INPUT_SPINE_DATA_BUCKET"] = s3_input_spine_data_bucket_name
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
-    environ["ORGANISATION_METADATA_BUCKET"] = s3_organisation_metadata_bucket_name
     environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
     environ["S3_ENDPOINT_URL"] = fake_s3_url
     environ["CONVERSATION_CUTOFF_DAYS"] = "14"
@@ -106,7 +104,6 @@ def test_end_to_end_with_fake_f3(datadir):
 
     output_transfer_data_bucket = _build_fake_s3_bucket(s3_output_transfer_data_bucket_name, s3)
     input_spine_data_bucket = _build_fake_s3_bucket(s3_input_spine_data_bucket_name, s3)
-    organisation_metadata_bucket = _build_fake_s3_bucket(s3_organisation_metadata_bucket_name, s3)
 
     expected_transfers_output_key = "transfers.parquet"
 
@@ -122,11 +119,6 @@ def test_end_to_end_with_fake_f3(datadir):
     input_overflow_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Jan-2020-overflow.csv")
     input_spine_data_bucket.upload_fileobj(
         input_overflow_csv_gz, "v2/messages-overflow/2020/1/2020-1_spine_messages_overflow.csv.gz"
-    )
-
-    organisation_metadata_file = str(datadir / "inputs" / "organisationMetadata.json")
-    organisation_metadata_bucket.upload_file(
-        organisation_metadata_file, "v2/2020/1/organisationMetadata.json"
     )
 
     s3_output_path = "v4/2019/12/"
