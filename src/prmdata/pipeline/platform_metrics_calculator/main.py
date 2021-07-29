@@ -60,7 +60,7 @@ def main():
         filesystem=S3FileSystem(endpoint_override=config.s3_endpoint_url),
     )
     logger.info(
-        f"Successfully calculated platform metrics and uploaded to s3://{bucket_name}/{s3_path}"
+        f"Successfully classified transfers and uploaded to s3://{bucket_name}/{s3_path}"
     )
 
 
