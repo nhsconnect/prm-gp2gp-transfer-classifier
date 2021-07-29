@@ -8,6 +8,6 @@ setup(
     install_requires=[
         "python-dateutil>=2.8",
         "boto3>=1.12",
-        "PyArrow>=4.0",
+        "PyArrow>=5.0",
     ],
 )
