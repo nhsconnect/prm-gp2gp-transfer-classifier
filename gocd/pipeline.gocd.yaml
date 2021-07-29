@@ -1,6 +1,6 @@
 format_version: 4
 pipelines:
-  "prm-gp2gp-data-pipeline":
+  "prm-gp2gp-transfer-classifier":
     group: gp2gp
     label_template: "${git[:8]}"
     materials:

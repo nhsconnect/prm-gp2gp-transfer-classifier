@@ -1,6 +1,6 @@
 format_version: 4
 pipelines:
-  "prm-gp2gp-data-pipeline.audit":
+  "prm-gp2gp-transfer-classifier.audit":
     group: gp2gp-audit
     label_template: "${git[:8]}"
     materials:
