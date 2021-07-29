@@ -78,7 +78,7 @@ def test_end_to_end_with_fake_f3(datadir):
     fake_s3_secret_key = "testing"
     fake_s3_region = "us-west-1"
     s3_output_transfer_data_bucket_name = "output-transfer-data-bucket"
-    s3_input_transfer_data_bucket_name = "input-transfer-data-bucket"
+    s3_input_spine_data_bucket_name = "input-spine-data-bucket"
     s3_organisation_metadata_bucket_name = "organisation-metadata-bucket"
 
     fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
@@ -88,7 +88,7 @@ def test_end_to_end_with_fake_f3(datadir):
     environ["AWS_SECRET_ACCESS_KEY"] = fake_s3_secret_key
     environ["AWS_DEFAULT_REGION"] = fake_s3_region
 
-    environ["INPUT_TRANSFER_DATA_BUCKET"] = s3_input_transfer_data_bucket_name
+    environ["INPUT_SPINE_DATA_BUCKET"] = s3_input_spine_data_bucket_name
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
     environ["ORGANISATION_METADATA_BUCKET"] = s3_organisation_metadata_bucket_name
     environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
@@ -105,7 +105,7 @@ def test_end_to_end_with_fake_f3(datadir):
     )
 
     output_transfer_data_bucket = _build_fake_s3_bucket(s3_output_transfer_data_bucket_name, s3)
-    input_transfer_data_bucket = _build_fake_s3_bucket(s3_input_transfer_data_bucket_name, s3)
+    input_spine_data_bucket = _build_fake_s3_bucket(s3_input_spine_data_bucket_name, s3)
     organisation_metadata_bucket = _build_fake_s3_bucket(s3_organisation_metadata_bucket_name, s3)
 
     expected_practice_metrics_output_key = "practiceMetrics.json"
@@ -119,12 +119,12 @@ def test_end_to_end_with_fake_f3(datadir):
     )
 
     input_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Dec-2019.csv")
-    input_transfer_data_bucket.upload_fileobj(
+    input_spine_data_bucket.upload_fileobj(
         input_csv_gz, "v2/messages/2019/12/2019-12_spine_messages.csv.gz"
     )
 
     input_overflow_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Jan-2020-overflow.csv")
-    input_transfer_data_bucket.upload_fileobj(
+    input_spine_data_bucket.upload_fileobj(
         input_overflow_csv_gz, "v2/messages-overflow/2020/1/2020-1_spine_messages_overflow.csv.gz"
     )
 

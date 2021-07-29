@@ -11,7 +11,7 @@ from prmdata.pipeline.platform_metrics_calculator.config import (
 def test_reads_from_environment_variables_and_converts_to_required_format():
     environment = {
         "OUTPUT_TRANSFER_DATA_BUCKET": "output-transfer-data-bucket",
-        "INPUT_TRANSFER_DATA_BUCKET": "input-transfer-data-bucket",
+        "INPUT_SPINE_DATA_BUCKET": "input-spine-data-bucket",
         "ORGANISATION_METADATA_BUCKET": "metadata-bucket",
         "DATE_ANCHOR": "2020-01-30T18:44:49Z",
         "CONVERSATION_CUTOFF_DAYS": "14",
@@ -19,7 +19,7 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
     }
 
     expected_config = DataPipelineConfig(
-        input_transfer_data_bucket="input-transfer-data-bucket",
+        input_spine_data_bucket="input-spine-data-bucket",
         output_transfer_data_bucket="output-transfer-data-bucket",
         organisation_metadata_bucket="metadata-bucket",
         date_anchor=datetime(
@@ -37,13 +37,13 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
 def test_read_config_from_environment_when_optional_parameters_are_not_set():
     environment = {
         "OUTPUT_TRANSFER_DATA_BUCKET": "output-transfer-data-bucket",
-        "INPUT_TRANSFER_DATA_BUCKET": "input-transfer-data-bucket",
+        "INPUT_SPINE_DATA_BUCKET": "input-spine-data-bucket",
         "ORGANISATION_METADATA_BUCKET": "",
         "DATE_ANCHOR": "2020-01-30T18:44:49Z",
     }
 
     expected_config = DataPipelineConfig(
-        input_transfer_data_bucket="input-transfer-data-bucket",
+        input_spine_data_bucket="input-spine-data-bucket",
         output_transfer_data_bucket="output-transfer-data-bucket",
         organisation_metadata_bucket="",
         date_anchor=datetime(
@@ -61,7 +61,7 @@ def test_read_config_from_environment_when_optional_parameters_are_not_set():
 def test_error_from_environment_when_required_fields_are_not_set():
     environment = {
         "OUTPUT_TRANSFER_DATA_BUCKET": "output-transfer-data-bucket",
-        "INPUT_TRANSFER_DATA_BUCKET": "input-transfer-data-bucket",
+        "INPUT_SPINE_DATA_BUCKET": "input-spine-data-bucket",
     }
 
     try:

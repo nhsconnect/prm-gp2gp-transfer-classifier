@@ -26,8 +26,8 @@ Configuration is achieved via the following environment variables:
 
 | Environment variable         | Description                                          | 
 | ---------------------------- | ---------------------------------------------------- |
-| OUTPUT_TRANSFER_DATA_BUCKET  | Bucket to write classified transfers and metrics     |
-| INPUT_TRANSFER_DATA_BUCKET   | Bucket to read raw spine logs from                   |
+| OUTPUT_TRANSFER_DATA_BUCKET  | Bucket to write categorised transfers                |
+| INPUT_SPINE_DATA_BUCKET      | Bucket to read raw spine logs from                   |
 | ORGANISATION_METADATA_BUCKET | Bucket to read organisational metadata from.         |
 | DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                  |
 | S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to. |
