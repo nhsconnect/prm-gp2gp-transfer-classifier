@@ -4,4 +4,4 @@ COPY . /prmdata
 
 RUN cd /prmdata && python setup.py install
 
-ENTRYPOINT ["python", "-m", "prmdata.pipeline.platform_metrics_calculator.main"]
+ENTRYPOINT ["python", "-m", "prmdata.pipeline.main"]

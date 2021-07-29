@@ -8,7 +8,7 @@ from threading import Thread
 import boto3
 from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
-from prmdata.pipeline.platform_metrics_calculator.main import main
+from prmdata.pipeline.main import main
 from werkzeug.serving import make_server
 
 from tests.builders.file import read_file_to_gzip_buffer

@@ -8,7 +8,7 @@ The transfer outcome is categorised by inferring the outcome of each GP2GP trans
 The data pipeline can be installed via `python setup.py install`, or packaged into a docker container via `docker build`.
 Alternatively, you can download one of the docker containers already published to ECR.
 
-The main code entrypoint is via `python -m prmdata.pipeline.platform_metrics_calculator.main`.
+The main code entrypoint is via `python -m prmdata.pipeline.main`.
 
 ### Extracting Spine data from Splunk
 

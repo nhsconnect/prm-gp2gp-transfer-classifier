@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from dateutil.tz import UTC
 from freezegun import freeze_time
 
-from prmdata.pipeline.platform_metrics_calculator.core import (
+from prmdata.pipeline.core import (
     parse_transfers_from_messages,
 )
 

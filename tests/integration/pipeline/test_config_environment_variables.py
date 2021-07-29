@@ -2,10 +2,7 @@ from datetime import datetime, timedelta
 
 from dateutil.tz import tzutc
 
-from prmdata.pipeline.platform_metrics_calculator.config import (
-    DataPipelineConfig,
-    MissingEnvironmentVariable,
-)
+from prmdata.pipeline.config import DataPipelineConfig, MissingEnvironmentVariable
 
 
 def test_reads_from_environment_variables_and_converts_to_required_format():

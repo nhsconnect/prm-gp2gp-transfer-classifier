@@ -3,13 +3,13 @@ import logging
 import boto3
 from os import environ
 
-from prmdata.pipeline.platform_metrics_calculator.io import PlatformMetricsIO
+from prmdata.pipeline.io import PlatformMetricsIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
-from prmdata.pipeline.platform_metrics_calculator.core import (
+from prmdata.pipeline.core import (
     parse_transfers_from_messages,
 )
-from prmdata.pipeline.platform_metrics_calculator.config import DataPipelineConfig
+from prmdata.pipeline.config import DataPipelineConfig
 from prmdata.domain.gp2gp.transfer import convert_transfers_to_table
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
@@ -59,9 +59,7 @@ def main():
         where=f"{s3_path}/transfers.parquet",
         filesystem=S3FileSystem(endpoint_override=config.s3_endpoint_url),
     )
-    logger.info(
-        f"Successfully classified transfers and uploaded to s3://{bucket_name}/{s3_path}"
-    )
+    logger.info(f"Successfully classified transfers and uploaded to s3://{bucket_name}/{s3_path}")
 
 
 if __name__ == "__main__":
