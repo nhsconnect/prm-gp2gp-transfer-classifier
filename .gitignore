@@ -8,7 +8,7 @@ dist/
 venv/
 .mypy_cache/
 *.pyc
-gp2gp_data_pipeline.egg-info
+gp2gp_transfer_classifier.egg-info
 .tox
 .coverage
 audit-output.txt
