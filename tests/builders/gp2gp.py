@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from prmdata.domain.gp2gp.sla import EIGHT_DAYS_IN_SECONDS, THREE_DAYS_IN_SECONDS
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     TransferStatus,
@@ -9,6 +8,9 @@ from prmdata.domain.gp2gp.transfer import (
     Practice,
 )
 from tests.builders.common import a_string, a_duration, a_datetime
+
+THREE_DAYS_IN_SECONDS = 259200
+EIGHT_DAYS_IN_SECONDS = 691200
 
 
 def build_transfer(**kwargs) -> Transfer:
