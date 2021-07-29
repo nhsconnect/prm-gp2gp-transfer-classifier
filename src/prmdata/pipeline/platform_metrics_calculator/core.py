@@ -1,11 +1,6 @@
 from datetime import timedelta
-from typing import Iterable, List, Iterator, Optional
+from typing import Iterable, Iterator, Optional
 
-from prmdata.domain.data_platform.national_metrics import (
-    NationalMetricsPresentation,
-    construct_national_metrics,
-)
-from prmdata.domain.gp2gp.national_metrics import calculate_national_metrics
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     derive_transfer,
@@ -43,14 +38,3 @@ def parse_transfers_from_messages(
         for conversation in (conversations_started_in_reporting_window)
     )
     return transfers
-
-
-def calculate_national_metrics_data(
-    transfers: List[Transfer], reporting_window: MonthlyReportingWindow
-) -> NationalMetricsPresentation:
-    national_metrics = calculate_national_metrics(transfers=transfers)
-    return construct_national_metrics(
-        national_metrics=national_metrics,
-        year=reporting_window.metric_year,
-        month=reporting_window.metric_month,
-    )
