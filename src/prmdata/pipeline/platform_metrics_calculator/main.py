@@ -32,7 +32,6 @@ def main():
     metrics_io = PlatformMetricsIO(
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,
-        organisation_metadata_bucket=config.organisation_metadata_bucket,
         gp2gp_spine_bucket=config.input_spine_data_bucket,
         dashboard_data_bucket=config.output_transfer_data_bucket,
     )

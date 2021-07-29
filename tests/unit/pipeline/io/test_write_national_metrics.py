@@ -71,7 +71,6 @@ def test_write_national_metrics():
     metrics_io = PlatformMetricsIO(
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,
-        organisation_metadata_bucket=a_string(),
         gp2gp_spine_bucket=a_string(),
         dashboard_data_bucket=dashboard_data_bucket,
     )

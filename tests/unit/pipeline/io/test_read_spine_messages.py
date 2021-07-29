@@ -54,7 +54,6 @@ def test_read_spine_messages():
     metrics_io = PlatformMetricsIO(
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,
-        organisation_metadata_bucket=a_string(),
         gp2gp_spine_bucket=spine_bucket,
         dashboard_data_bucket=a_string(),
     )
