@@ -1,7 +1,7 @@
-# prm-gp2gp-data-pipeline
+# prm-gp2gp-transfer-classifier
 
-This repo contains the data pipeline responsible for deriving GP2GP metrics.
-These metrics are calculated by inferring the outcome of each GP2GP transfer using the logs produced by SPINE.
+This repo contains the transfer classifier (part of the data pipeline) responsible for deriving GP2GP transfer data.
+The transfer outcome is categorised by inferring the outcome of each GP2GP transfer using the logs produced by SPINE.
 
 ## Running
 
