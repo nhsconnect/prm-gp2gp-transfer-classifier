@@ -8,7 +8,6 @@ from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.pipeline.platform_metrics_calculator.core import (
     parse_transfers_from_messages,
-    calculate_national_metrics_data,
 )
 from prmdata.pipeline.platform_metrics_calculator.config import DataPipelineConfig
 from prmdata.domain.gp2gp.transfer import convert_transfers_to_table
@@ -43,9 +42,7 @@ def main():
     transfers = list(
         parse_transfers_from_messages(spine_messages, reporting_window, conversation_cutoff)
     )
-    national_metrics_data = calculate_national_metrics_data(
-        transfers=transfers, reporting_window=reporting_window
-    )
+
     transfer_table = convert_transfers_to_table(transfers)
 
     bucket_name = config.output_transfer_data_bucket
@@ -56,8 +53,6 @@ def main():
         f"{reporting_window.metric_year}/"
         f"{reporting_window.metric_month}"
     )
-
-    metrics_io.write_national_metrics(national_metrics_data)
 
     write_table(
         table=transfer_table,
