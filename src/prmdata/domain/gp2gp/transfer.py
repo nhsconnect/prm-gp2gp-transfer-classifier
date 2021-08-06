@@ -6,6 +6,7 @@ from enum import Enum
 
 import pyarrow as pa
 import pyarrow as Table
+from dateutil.tz import tzutc
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 
@@ -193,8 +194,8 @@ def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
                 ("intermediate_error_codes", pa.list_(pa.int64())),
                 ("status", pa.string()),
                 ("failure_reason", pa.string()),
-                ("date_requested", pa.timestamp("us")),
-                ("date_completed", pa.timestamp("us")),
+                ("date_requested", pa.timestamp("us", tz=tzutc())),
+                ("date_completed", pa.timestamp("us", tz=tzutc())),
             ]
         ),
     )
