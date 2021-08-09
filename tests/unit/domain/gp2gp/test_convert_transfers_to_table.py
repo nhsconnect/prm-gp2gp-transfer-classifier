@@ -1,7 +1,6 @@
 from datetime import timedelta, datetime
 
 import pyarrow as pa
-from dateutil.tz import UTC, tzutc
 
 from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
@@ -165,9 +164,7 @@ def test_status_is_converted_to_column():
 def test_date_requested_is_converted_to_column():
     transfer = build_transfer(date_requested=datetime(year=2020, month=7, day=23, hour=5))
 
-    expected_date_column = {
-        "date_requested": [datetime(year=2020, month=7, day=23, hour=5, tzinfo=UTC)]
-    }
+    expected_date_column = {"date_requested": [datetime(year=2020, month=7, day=23, hour=5)]}
 
     table = convert_transfers_to_table([transfer])
     actual_date_column = table.select(["date_requested"]).to_pydict()
@@ -178,9 +175,7 @@ def test_date_requested_is_converted_to_column():
 def test_date_completed_is_converted_to_column():
     transfer = build_transfer(date_completed=datetime(year=2020, month=7, day=28, hour=17))
 
-    expected_date_column = {
-        "date_completed": [datetime(year=2020, month=7, day=28, hour=17, tzinfo=UTC)]
-    }
+    expected_date_column = {"date_completed": [datetime(year=2020, month=7, day=28, hour=17)]}
 
     table = convert_transfers_to_table([transfer])
     actual_date_column = table.select(["date_completed"]).to_pydict()
@@ -233,8 +228,8 @@ def test_table_has_correct_schema():
             ("intermediate_error_codes", pa.list_(pa.int64())),
             ("status", pa.string()),
             ("failure_reason", pa.string()),
-            ("date_requested", pa.timestamp("us", tz=tzutc())),
-            ("date_completed", pa.timestamp("us", tz=tzutc())),
+            ("date_requested", pa.timestamp("us")),
+            ("date_completed", pa.timestamp("us")),
         ]
     )
 

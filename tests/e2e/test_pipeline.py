@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import logging
 from io import BytesIO
@@ -6,7 +7,6 @@ from threading import Thread
 
 import boto3
 from botocore.config import Config
-from dateutil.parser import isoparse
 from moto.server import DomainDispatcherApplication, create_backend_app
 from prmdata.pipeline.main import main
 from werkzeug.serving import make_server
@@ -35,7 +35,7 @@ def _read_json(path):
 
 
 def _parse_dates(items):
-    return [None if item is None else isoparse(item) for item in items]
+    return [None if item is None else datetime.fromisoformat(item) for item in items]
 
 
 def _read_parquet_columns_json(path):

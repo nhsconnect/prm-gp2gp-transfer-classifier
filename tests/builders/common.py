@@ -3,8 +3,6 @@ import string
 import sys
 from datetime import datetime, timedelta
 
-from dateutil.tz import tzutc
-
 
 def a_string(length=10, characters=string.ascii_letters + string.digits):
     return "".join(random.choice(characters) for _ in range(length))
@@ -22,7 +20,6 @@ def a_datetime(**kwargs):
         hour=kwargs.get("hour", an_integer(0, 23)),
         minute=kwargs.get("minute", an_integer(0, 59)),
         second=kwargs.get("second", an_integer(0, 59)),
-        tzinfo=tzutc(),
     )
 
 
