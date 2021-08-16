@@ -91,7 +91,6 @@ def test_end_to_end_with_fake_f3(datadir):
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
     environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
     environ["S3_ENDPOINT_URL"] = fake_s3_url
-    environ["CONVERSATION_CUTOFF_DAYS"] = "14"
 
     s3 = boto3.resource(
         "s3",
