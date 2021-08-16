@@ -13,7 +13,7 @@ def test_produces_correct_conversations():
 
     expected = [Conversation("abc", [message_one]), Conversation("xyz", [message_two])]
 
-    actual = group_into_conversations(messages)
+    actual = group_into_conversations(message_stream=messages, cutoff=timedelta(days=14))
 
     assert list(actual) == expected
 
@@ -25,7 +25,7 @@ def test_produces_correct_messages_within_conversations():
 
     expected = [Conversation("abc", [message_one, message_two])]
 
-    actual = group_into_conversations(messages)
+    actual = group_into_conversations(message_stream=messages, cutoff=timedelta(days=14))
 
     assert list(actual) == expected
 
@@ -37,7 +37,7 @@ def test_sorts_messages_within_conversations():
 
     expected = [Conversation("abc", [message_two, message_one])]
 
-    actual = group_into_conversations(messages)
+    actual = group_into_conversations(message_stream=messages, cutoff=timedelta(days=14))
 
     assert list(actual) == expected
 
@@ -62,15 +62,3 @@ def test_rejects_messages_after_cutoff(cutoff_interval, expected_message_ids):
     actual_message_ids = [m.guid for m in next(conversations).messages]
 
     assert actual_message_ids == expected_message_ids
-
-
-def test_has_no_cutoff_by_default():
-    message_one = build_message(conversation_id="abc", time=datetime(year=2020, month=6, day=6))
-    message_two = build_message(conversation_id="abc", time=datetime(year=2060, month=6, day=6))
-    messages = [message_one, message_two]
-
-    expected = [Conversation("abc", [message_one, message_two])]
-
-    actual = group_into_conversations(messages, cutoff=None)
-
-    assert list(actual) == expected

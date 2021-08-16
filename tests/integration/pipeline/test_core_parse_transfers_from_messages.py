@@ -102,6 +102,12 @@ def test_parses_transfer_correctly_given_valid_message_list():
         )
     ]
 
-    actual = list(parse_transfers_from_messages(spine_messages, reporting_window))
+    actual = list(
+        parse_transfers_from_messages(
+            spine_messages=spine_messages,
+            reporting_window=reporting_window,
+            conversation_cutoff=timedelta(14),
+        )
+    )
 
     assert actual == expected

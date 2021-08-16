@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Iterable, Iterator, Optional
+from typing import Iterable, Iterator
 
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
@@ -26,7 +26,7 @@ def _parse_conversations(conversations):
 def parse_transfers_from_messages(
     spine_messages: Iterable[Message],
     reporting_window: MonthlyReportingWindow,
-    conversation_cutoff: Optional[timedelta] = None,
+    conversation_cutoff: timedelta,
 ) -> Iterator[Transfer]:
     conversations = group_into_conversations(spine_messages, conversation_cutoff)
     gp2gp_conversations = _parse_conversations(conversations)
