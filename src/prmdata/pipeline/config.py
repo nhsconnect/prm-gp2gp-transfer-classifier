@@ -38,7 +38,7 @@ class EnvConfig:
     def read_optional_str(self, name) -> Optional[str]:
         return self._read_env(name, optional=True)
 
-    def read_optional_timedelta_days(self, name) -> timedelta:
+    def read_optional_timedelta_days(self, name) -> Optional[timedelta]:
         return self._read_env(
             name, optional=True, converter=lambda env_var: timedelta(days=int(env_var))
         )
