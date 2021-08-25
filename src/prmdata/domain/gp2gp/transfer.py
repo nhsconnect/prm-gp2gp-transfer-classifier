@@ -162,21 +162,6 @@ def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
     )
 
 
-def filter_for_successful_transfers(transfers: List[Transfer]) -> Iterator[Transfer]:
-    return (
-        transfer
-        for transfer in transfers
-        if (
-            transfer.outcome.status == TransferStatus.INTEGRATED_ON_TIME
-            and transfer.sla_duration is not None
-        )
-        or (
-            transfer.outcome.status == TransferStatus.PROCESS_FAILURE
-            and transfer.outcome.failure_reason == TransferFailureReason.INTEGRATED_LATE
-        )
-    )
-
-
 def _integrated_on_time() -> TransferOutcome:
     return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
 
