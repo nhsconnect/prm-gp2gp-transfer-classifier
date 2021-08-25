@@ -17,6 +17,7 @@ from prmdata.domain.gp2gp.transfer import (
 )
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_extracts_conversation_id():
     conversation = build_mock_gp2gp_conversation(conversation_id="1234")
 
@@ -27,6 +28,7 @@ def test_extracts_conversation_id():
     assert actual.conversation_id == expected_conversation_id
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 @pytest.mark.parametrize(
     "test_case, expected_reason",
     [
@@ -95,6 +97,7 @@ def test_returns_transfer_status_integrated_on_time(test_case):
     assert actual.outcome.failure_reason is None
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 @pytest.mark.parametrize(
     "test_case, expected_reason",
     [
@@ -124,6 +127,7 @@ def test_returns_transfer_status_process_failure_with_reason(test_case, expected
     assert actual.outcome.failure_reason == expected_reason
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_and_sender_error():
     conversation = build_mock_gp2gp_conversation()
 
@@ -144,6 +148,7 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_an
     assert actual.outcome.failure_reason == expected_reason
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_fragments():
     conversation = build_mock_gp2gp_conversation()
 
@@ -160,6 +165,7 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_f
     assert actual.outcome.failure_reason == expected_reason
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_return_process_failure_given_an_unacknowledged_ehr_with_duplicate_and_no_copc_fragments():
     gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
     conversation = Gp2gpConversation(gp2gp_messages)
@@ -168,6 +174,7 @@ def test_return_process_failure_given_an_unacknowledged_ehr_with_duplicate_and_n
     assert actual.outcome.failure_reason == TransferFailureReason.TRANSFERRED_NOT_INTEGRATED
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_error():
     conversation = build_mock_gp2gp_conversation()
 
@@ -205,6 +212,7 @@ def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
     assert actual.outcome.failure_reason == expected_reason
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_correct_transfer_outcome_given_multiple_conflicting_sender_acks():
     a_fatal_sender_error = choice(FATAL_SENDER_ERROR_CODES)
 
@@ -247,6 +255,7 @@ def test_warns_about_conversation_with_negative_sla():
         derive_transfer(conversation)
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_negative_sla_duration_clamped_to_zero():
     conversation = build_mock_gp2gp_conversation(
         request_completed_time=datetime(year=2021, month=1, day=5),
@@ -260,6 +269,7 @@ def test_negative_sla_duration_clamped_to_zero():
     assert actual.sla_duration == expected_sla_duration
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_produces_no_sla_given_no_request_completed_time():
     conversation = build_mock_gp2gp_conversation(
         request_completed_time=None,
@@ -272,6 +282,7 @@ def test_produces_no_sla_given_no_request_completed_time():
     assert actual.sla_duration == expected_sla_duration
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_produces_no_sla_given_no_final_acknowledgement_time():
     conversation = build_mock_gp2gp_conversation(
         request_completed_time=datetime(year=2021, month=1, day=5),
@@ -285,6 +296,7 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
     assert actual.sla_duration == expected_sla_duration
 
 
+@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_produces_no_sla_given_acks_with_only_duplicate_error():
     conversation = Gp2gpConversation(
         messages=test_cases.acknowledged_duplicate_and_waiting_for_integration()
