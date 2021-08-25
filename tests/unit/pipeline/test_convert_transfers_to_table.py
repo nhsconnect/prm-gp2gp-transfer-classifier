@@ -4,10 +4,10 @@ import pyarrow as pa
 
 from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
-    convert_transfers_to_table,
     TransferOutcome,
     Practice,
 )
+from prmdata.pipeline.arrow import convert_transfers_to_table
 from tests.builders.gp2gp import build_transfer
 
 

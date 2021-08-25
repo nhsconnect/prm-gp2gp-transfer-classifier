@@ -10,7 +10,7 @@ from prmdata.pipeline.core import (
     parse_transfers_from_messages,
 )
 from prmdata.pipeline.config import DataPipelineConfig
-from prmdata.domain.gp2gp.transfer import convert_transfers_to_table
+from prmdata.pipeline.arrow import convert_transfers_to_table
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
 
@@ -39,9 +39,7 @@ def main():
 
     conversation_cutoff = config.conversation_cutoff
 
-    transfers = list(
-        parse_transfers_from_messages(spine_messages, reporting_window, conversation_cutoff)
-    )
+    transfers = parse_transfers_from_messages(spine_messages, reporting_window, conversation_cutoff)
 
     transfer_table = convert_transfers_to_table(transfers)
 

@@ -1,11 +1,8 @@
 from dataclasses import dataclass
 from warnings import warn
 from datetime import timedelta, datetime
-from typing import NamedTuple, Optional, List, Iterable, Iterator
+from typing import NamedTuple, Optional, List, Iterator
 from enum import Enum
-
-import pyarrow as pa
-import pyarrow as Table
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 
@@ -35,14 +32,6 @@ class TransferOutcome:
     status: TransferStatus
     failure_reason: Optional[TransferFailureReason]
 
-    @property
-    def status_string(self):
-        return self.status.value
-
-    @property
-    def failure_reason_string(self):
-        return None if self.failure_reason is None else self.failure_reason.value
-
 
 @dataclass
 class Practice:
@@ -61,6 +50,38 @@ class Transfer(NamedTuple):
     outcome: TransferOutcome
     date_requested: datetime
     date_completed: Optional[datetime]
+
+    @property
+    def sla_duration_seconds(self) -> Optional[int]:
+        if self.sla_duration is not None:
+            return round(self.sla_duration.total_seconds())
+        else:
+            return None
+
+    @property
+    def requesting_practice_asid(self) -> str:
+        return self.requesting_practice.asid
+
+    @property
+    def requesting_supplier(self) -> str:
+        return self.requesting_practice.supplier
+
+    @property
+    def sending_practice_asid(self) -> str:
+        return self.sending_practice.asid
+
+    @property
+    def sending_supplier(self) -> str:
+        return self.sending_practice.supplier
+
+    @property
+    def status_description(self) -> str:
+        return self.outcome.status.value
+
+    @property
+    def failure_reason(self) -> Optional[str]:
+        failure_reason = self.outcome.failure_reason
+        return None if failure_reason is None else failure_reason.value
 
 
 def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
@@ -153,50 +174,6 @@ def filter_for_successful_transfers(transfers: List[Transfer]) -> Iterator[Trans
             transfer.outcome.status == TransferStatus.PROCESS_FAILURE
             and transfer.outcome.failure_reason == TransferFailureReason.INTEGRATED_LATE
         )
-    )
-
-
-def _convert_to_seconds(duration: Optional[timedelta]) -> Optional[int]:
-    if duration is not None:
-        return round(duration.total_seconds())
-    else:
-        return None
-
-
-def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
-    return pa.table(
-        {
-            "conversation_id": [t.conversation_id for t in transfers],
-            "sla_duration": [_convert_to_seconds(t.sla_duration) for t in transfers],
-            "requesting_practice_asid": [t.requesting_practice.asid for t in transfers],
-            "sending_practice_asid": [t.sending_practice.asid for t in transfers],
-            "requesting_supplier": [t.requesting_practice.supplier for t in transfers],
-            "sending_supplier": [t.sending_practice.supplier for t in transfers],
-            "sender_error_codes": [t.sender_error_codes for t in transfers],
-            "final_error_codes": [t.final_error_codes for t in transfers],
-            "intermediate_error_codes": [t.intermediate_error_codes for t in transfers],
-            "status": [t.outcome.status_string for t in transfers],
-            "failure_reason": [t.outcome.failure_reason_string for t in transfers],
-            "date_requested": [t.date_requested for t in transfers],
-            "date_completed": [t.date_completed for t in transfers],
-        },
-        schema=pa.schema(
-            [
-                ("conversation_id", pa.string()),
-                ("sla_duration", pa.uint64()),
-                ("requesting_practice_asid", pa.string()),
-                ("sending_practice_asid", pa.string()),
-                ("requesting_supplier", pa.string()),
-                ("sending_supplier", pa.string()),
-                ("sender_error_codes", pa.list_(pa.int64())),
-                ("final_error_codes", pa.list_(pa.int64())),
-                ("intermediate_error_codes", pa.list_(pa.int64())),
-                ("status", pa.string()),
-                ("failure_reason", pa.string()),
-                ("date_requested", pa.timestamp("us")),
-                ("date_completed", pa.timestamp("us")),
-            ]
-        ),
     )
 
 
