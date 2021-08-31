@@ -51,6 +51,16 @@ class Gp2gpConversationObservabilityProbe:
             },
         )
 
+    def record_unknown_message_purpose(self, message: Message):
+        self._logger.warning(
+            f":Couldn't determine purpose of message with guid: {message.guid}",
+            extra={
+                "event": "UNKNOWN_MESSAGE_PURPOSE",
+                "conversation_id": message.conversation_id,
+                "interaction_id": message.interaction_id,
+            },
+        )
+
 
 class Gp2gpConversation:
     def __init__(
@@ -67,7 +77,7 @@ class Gp2gpConversation:
         self._probe = observability_probe
 
         acked_messages = _pair_messages_with_acks(messages, self._probe)
-        message_bundle = _group_message_by_type(acked_messages)
+        message_bundle = _group_message_by_type(acked_messages, self._probe)
 
         self._request_started = message_bundle.request_started
         self._request_completed = message_bundle.request_completed
@@ -245,7 +255,9 @@ def _find_effective_request_completed(
     return None
 
 
-def _group_message_by_type(messages: Iterable[AcknowledgedMessage]) -> Gp2gpMessagesByType:
+def _group_message_by_type(
+    messages: Iterable[AcknowledgedMessage], probe: Gp2gpConversationObservabilityProbe
+) -> Gp2gpMessagesByType:
     request_completed_messages = []
     copc_continue_messages = []
     copc_fragment_messages = []
@@ -263,7 +275,7 @@ def _group_message_by_type(messages: Iterable[AcknowledgedMessage]) -> Gp2gpMess
         elif acked_message.message.is_copc() and acked_message.is_sent_by(sending_asid):
             copc_fragment_messages.append(acked_message)
         else:
-            warn(f"Couldn't determine purpose of message: {acked_message.message.guid}")
+            probe.record_unknown_message_purpose(acked_message.message)
 
     return Gp2gpMessagesByType(
         request_started=request_started,
