@@ -1,4 +1,5 @@
 from typing import NamedTuple, List, Optional, Iterable, Iterator, Tuple
+from logging import Logger, getLogger
 from datetime import datetime
 from warnings import warn
 
@@ -34,14 +35,35 @@ class AcknowledgedMessage(NamedTuple):
         return self.message.is_copc()
 
 
+module_logger = getLogger(__name__)
+
+
+class Gp2gpConversationObservabilityProbe:
+    def __init__(self, logger: Logger = module_logger):
+        self._logger = logger
+
+    def record_ehr_missing_message_for_an_acknowledgement(self, message: Message):
+        self._logger.warning(
+            f":Couldn't pair acknowledgement with message for ref: {message.message_ref}",
+            extra={"event": "MISSING_MESSAGE_FOR_ACKNOWLEDGEMENT"},
+        )
+
+
 class Gp2gpConversation:
-    def __init__(self, messages: List[Message]):
+    def __init__(
+        self,
+        messages: List[Message],
+        # flake8: noqa: E501
+        observability_probe: Gp2gpConversationObservabilityProbe = Gp2gpConversationObservabilityProbe(),
+    ):
 
         first_message = messages[0]
         if not first_message.is_ehr_request_started():
             raise ConversationMissingStart()
 
-        acked_messages = _pair_messages_with_acks(messages)
+        self._probe = observability_probe
+
+        acked_messages = _pair_messages_with_acks(messages, self._probe)
         message_bundle = _group_message_by_type(acked_messages)
 
         self._request_started = message_bundle.request_started
@@ -248,7 +270,9 @@ def _group_message_by_type(messages: Iterable[AcknowledgedMessage]) -> Gp2gpMess
     )
 
 
-def _pair_messages_with_acks(messages: Iterable[Message]) -> List[AcknowledgedMessage]:
+def _pair_messages_with_acks(
+    messages: Iterable[Message], probe: Gp2gpConversationObservabilityProbe
+) -> List[AcknowledgedMessage]:
     acked_messages: dict[str, AcknowledgedMessage] = {}
 
     for message in messages:
@@ -256,7 +280,7 @@ def _pair_messages_with_acks(messages: Iterable[Message]) -> List[AcknowledgedMe
             try:
                 acked_messages[message.message_ref].acknowledgements.append(message)
             except KeyError:
-                warn(f"Couldn't pair acknowledgement with message for ref: {message.message_ref}")
+                probe.record_ehr_missing_message_for_an_acknowledgement(message)
         else:
             acked_messages[message.guid] = AcknowledgedMessage(message=message, acknowledgements=[])
 

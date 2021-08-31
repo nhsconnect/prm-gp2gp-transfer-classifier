@@ -1,7 +1,11 @@
-import pytest
-import warnings
+from unittest.mock import Mock
 
-from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+import pytest
+
+from prmdata.domain.spine.gp2gp_conversation import (
+    Gp2gpConversation,
+    Gp2gpConversationObservabilityProbe,
+)
 from tests.builders import test_cases
 from tests.builders.test_cases import ehr_missing_message_for_an_acknowledgement
 
@@ -20,7 +24,11 @@ from tests.builders.test_cases import ehr_missing_message_for_an_acknowledgement
     ],
 )
 def test_returns_false_given_pending_transfer(test_case):
-    conversation = Gp2gpConversation(messages=test_case())
+    mock_observability_probe = Mock()
+
+    conversation = Gp2gpConversation(
+        messages=test_case(), observability_probe=mock_observability_probe
+    )
 
     expected = False
 
@@ -48,7 +56,11 @@ def test_returns_false_given_pending_transfer(test_case):
     ],
 )
 def test_returns_false_given_successful_transfer(test_case):
-    conversation = Gp2gpConversation(messages=test_case())
+    mock_observability_probe = Mock()
+
+    conversation = Gp2gpConversation(
+        messages=test_case(), observability_probe=mock_observability_probe
+    )
 
     expected = False
 
@@ -66,7 +78,11 @@ def test_returns_false_given_successful_transfer(test_case):
     ],
 )
 def test_returns_false_given_intermediate_error(test_case):
-    conversation = Gp2gpConversation(messages=test_case())
+    mock_observability_probe = Mock()
+
+    conversation = Gp2gpConversation(
+        messages=test_case(), observability_probe=mock_observability_probe
+    )
 
     expected = False
 
@@ -85,7 +101,11 @@ def test_returns_false_given_intermediate_error(test_case):
     ],
 )
 def test_returns_true_given_failed_transfer(test_case):
-    conversation = Gp2gpConversation(messages=test_case())
+    mock_observability_probe = Mock()
+
+    conversation = Gp2gpConversation(
+        messages=test_case(), observability_probe=mock_observability_probe
+    )
 
     expected = True
 
@@ -95,12 +115,17 @@ def test_returns_true_given_failed_transfer(test_case):
 
 
 def test_warning_when_missing_message_for_an_acknowledgement():
-    with warnings.catch_warnings(record=True) as logged_warning:
-        warnings.simplefilter("always")
+    mock_logger = Mock()
+    probe = Gp2gpConversationObservabilityProbe(mock_logger)
 
-        Gp2gpConversation(messages=ehr_missing_message_for_an_acknowledgement())
+    messages = ehr_missing_message_for_an_acknowledgement()
+    acknowledgement_for_missing_message = messages[1]
 
-        assert len(logged_warning) == 1
-        assert "Couldn't pair acknowledgement with message for ref:" in str(
-            logged_warning[-1].message
-        )
+    Gp2gpConversation(messages=messages, observability_probe=probe)
+
+    message_ref = acknowledgement_for_missing_message.message_ref
+
+    mock_logger.warning.assert_called_once_with(
+        f":Couldn't pair acknowledgement with message for ref: {message_ref}",
+        extra={"event": "MISSING_MESSAGE_FOR_ACKNOWLEDGEMENT"},
+    )
