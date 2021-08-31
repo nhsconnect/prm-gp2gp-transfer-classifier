@@ -45,7 +45,10 @@ class Gp2gpConversationObservabilityProbe:
     def record_ehr_missing_message_for_an_acknowledgement(self, message: Message):
         self._logger.warning(
             f":Couldn't pair acknowledgement with message for ref: {message.message_ref}",
-            extra={"event": "MISSING_MESSAGE_FOR_ACKNOWLEDGEMENT"},
+            extra={
+                "event": "MISSING_MESSAGE_FOR_ACKNOWLEDGEMENT",
+                "conversation_id": message.conversation_id,
+            },
         )
 
 

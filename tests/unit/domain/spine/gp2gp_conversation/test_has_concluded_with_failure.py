@@ -127,5 +127,8 @@ def test_warning_when_missing_message_for_an_acknowledgement():
 
     mock_logger.warning.assert_called_once_with(
         f":Couldn't pair acknowledgement with message for ref: {message_ref}",
-        extra={"event": "MISSING_MESSAGE_FOR_ACKNOWLEDGEMENT"},
+        extra={
+            "event": "MISSING_MESSAGE_FOR_ACKNOWLEDGEMENT",
+            "conversation_id": acknowledgement_for_missing_message.conversation_id,
+        },
     )
