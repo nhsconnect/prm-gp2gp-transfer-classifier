@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
 from typing import List
 from random import choice
+from unittest.mock import Mock
 
 import pytest
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from prmdata.domain.spine.message import Message, FATAL_SENDER_ERROR_CODES
 from tests.builders import test_cases
+from tests.builders.common import a_string, a_datetime
 from tests.builders.spine import (
     build_mock_gp2gp_conversation,
 )
@@ -16,19 +18,20 @@ from prmdata.domain.gp2gp.transfer import (
     TransferFailureReason,
 )
 
+mock_probe = Mock()
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
+
 def test_extracts_conversation_id():
+
     conversation = build_mock_gp2gp_conversation(conversation_id="1234")
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_conversation_id = "1234"
 
     assert actual.conversation_id == expected_conversation_id
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 @pytest.mark.parametrize(
     "test_case, expected_reason",
     [
@@ -70,7 +73,7 @@ def test_returns_transfer_status_technical_failure_with_reason(test_case, expect
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     assert actual.outcome.status == TransferStatus.TECHNICAL_FAILURE
     assert actual.outcome.failure_reason == expected_reason
@@ -91,13 +94,12 @@ def test_returns_transfer_status_integrated_on_time(test_case):
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     assert actual.outcome.status == TransferStatus.INTEGRATED_ON_TIME
     assert actual.outcome.failure_reason is None
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 @pytest.mark.parametrize(
     "test_case, expected_reason",
     [
@@ -122,12 +124,11 @@ def test_returns_transfer_status_integrated_on_time(test_case):
 def test_returns_transfer_status_process_failure_with_reason(test_case, expected_reason):
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation(gp2gp_messages)
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
     assert actual.outcome.status == TransferStatus.PROCESS_FAILURE
     assert actual.outcome.failure_reason == expected_reason
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_and_sender_error():
     conversation = build_mock_gp2gp_conversation()
 
@@ -139,7 +140,7 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_an
     conversation.is_missing_core_ehr.return_value = False
     conversation.contains_core_ehr_with_sender_error.return_value = True
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_status = TransferStatus.UNCLASSIFIED_FAILURE
     expected_reason = TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
@@ -148,7 +149,6 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_an
     assert actual.outcome.failure_reason == expected_reason
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_fragments():
     conversation = build_mock_gp2gp_conversation()
 
@@ -156,7 +156,7 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_f
     conversation.has_concluded_with_failure.return_value = False
     conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments.return_value = True
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_status = TransferStatus.UNCLASSIFIED_FAILURE
     expected_reason = TransferFailureReason.AMBIGUOUS_COPCS
@@ -165,16 +165,14 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_f
     assert actual.outcome.failure_reason == expected_reason
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_return_process_failure_given_an_unacknowledged_ehr_with_duplicate_and_no_copc_fragments():
     gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
     conversation = Gp2gpConversation(gp2gp_messages)
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
     assert actual.outcome.status == TransferStatus.PROCESS_FAILURE
     assert actual.outcome.failure_reason == TransferFailureReason.TRANSFERRED_NOT_INTEGRATED
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_error():
     conversation = build_mock_gp2gp_conversation()
 
@@ -185,7 +183,7 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_e
     conversation.contains_copc_error.return_value = True
     conversation.is_missing_copc_ack.return_value = False
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_status = TransferStatus.UNCLASSIFIED_FAILURE
     expected_reason = TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
@@ -203,7 +201,7 @@ def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
     )
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_status = TransferStatus.TECHNICAL_FAILURE
     expected_reason = TransferFailureReason.FATAL_SENDER_ERROR
@@ -212,7 +210,6 @@ def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
     assert actual.outcome.failure_reason == expected_reason
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_returns_correct_transfer_outcome_given_multiple_conflicting_sender_acks():
     a_fatal_sender_error = choice(FATAL_SENDER_ERROR_CODES)
 
@@ -221,7 +218,7 @@ def test_returns_correct_transfer_outcome_given_multiple_conflicting_sender_acks
     )
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_status = TransferStatus.TECHNICAL_FAILURE
     expected_reason = TransferFailureReason.FATAL_SENDER_ERROR
@@ -238,24 +235,27 @@ def test_produces_sla_of_successful_conversation():
         ),
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
     assert actual.sla_duration == expected_sla_duration
 
 
-def test_warns_about_conversation_with_negative_sla():
+def test_logs_negative_sla_warning():
+    conversation_id = a_string()
+    mock_probe = Mock()
     conversation = build_mock_gp2gp_conversation(
-        request_completed_time=datetime(year=2021, month=1, day=5),
-        final_acknowledgement_time=datetime(year=2021, month=1, day=4),
+        conversation_id=conversation_id,
+        final_acknowledgement_time=a_datetime(year=2021, month=12, day=1),
+        request_completed_time=a_datetime(year=2021, month=12, day=2),
     )
 
-    with pytest.warns(RuntimeWarning):
-        derive_transfer(conversation)
+    derive_transfer(conversation, mock_probe)
+
+    mock_probe.record_negative_sla.assert_called_once_with(conversation)
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_negative_sla_duration_clamped_to_zero():
     conversation = build_mock_gp2gp_conversation(
         request_completed_time=datetime(year=2021, month=1, day=5),
@@ -264,45 +264,42 @@ def test_negative_sla_duration_clamped_to_zero():
 
     expected_sla_duration = timedelta(0)
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     assert actual.sla_duration == expected_sla_duration
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_produces_no_sla_given_no_request_completed_time():
     conversation = build_mock_gp2gp_conversation(
         request_completed_time=None,
         final_acknowledgement_time=None,
     )
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = None
 
     assert actual.sla_duration == expected_sla_duration
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_produces_no_sla_given_no_final_acknowledgement_time():
     conversation = build_mock_gp2gp_conversation(
         request_completed_time=datetime(year=2021, month=1, day=5),
         final_acknowledgement_time=None,
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = None
 
     assert actual.sla_duration == expected_sla_duration
 
 
-@pytest.mark.filterwarnings("ignore:Negative SLA duration for conversation:RuntimeWarning")
 def test_produces_no_sla_given_acks_with_only_duplicate_error():
     conversation = Gp2gpConversation(
         messages=test_cases.acknowledged_duplicate_and_waiting_for_integration()
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = None
     expected_date_completed = None
@@ -325,7 +322,7 @@ def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs
         )
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
@@ -346,7 +343,7 @@ def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs
         )
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
@@ -367,7 +364,7 @@ def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
         )
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
@@ -389,7 +386,7 @@ def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_ack
         )
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
 
@@ -411,7 +408,7 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
         )
     )
 
-    actual = derive_transfer(conversation)
+    actual = derive_transfer(conversation, mock_probe)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
 

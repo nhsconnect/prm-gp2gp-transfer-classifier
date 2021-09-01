@@ -1,10 +1,12 @@
 from dataclasses import dataclass
-from warnings import warn
 from datetime import timedelta, datetime
-from typing import NamedTuple, Optional, List, Iterator
+from logging import getLogger, Logger
+from typing import NamedTuple, Optional, List
 from enum import Enum
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+
+module_logger = getLogger(__name__)
 
 
 class TransferStatus(Enum):
@@ -84,7 +86,25 @@ class Transfer(NamedTuple):
         return None if failure_reason is None else failure_reason.value
 
 
-def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
+class TransferObservabilityProbe:
+    def __init__(self, logger: Logger = module_logger):
+        self._logger = logger
+
+    def record_negative_sla(self, conversation: Gp2gpConversation):
+        self._logger.warning(
+            f":Negative SLA duration for conversation: {conversation.conversation_id()}",
+            extra={
+                "event": "NEGATIVE_SLA_DETECTED",
+                "conversation_id": conversation.conversation_id(),
+                "final_acknowledgement_time": conversation.effective_final_acknowledgement_time(),
+                "request_completed_time": conversation.effective_request_completed_time(),
+            },
+        )
+
+
+def _calculate_sla(
+    conversation: Gp2gpConversation, probe: TransferObservabilityProbe
+) -> Optional[timedelta]:
     final_acknowledgement_time = conversation.effective_final_acknowledgement_time()
     request_completed_time = conversation.effective_request_completed_time()
 
@@ -94,10 +114,7 @@ def _calculate_sla(conversation: Gp2gpConversation) -> Optional[timedelta]:
     sla_duration = final_acknowledgement_time - request_completed_time
 
     if sla_duration.total_seconds() < 0:
-        warn(
-            f"Negative SLA duration for conversation: {conversation.conversation_id()}",
-            RuntimeWarning,
-        )
+        probe.record_negative_sla(conversation)
 
     return max(timedelta(0), sla_duration)
 
@@ -143,8 +160,11 @@ def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome
     return _process_failure(TransferFailureReason.INTEGRATED_LATE)
 
 
-def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
-    sla_duration = _calculate_sla(conversation)
+def derive_transfer(
+    conversation: Gp2gpConversation,
+    probe: TransferObservabilityProbe = TransferObservabilityProbe(),
+) -> Transfer:
+    sla_duration = _calculate_sla(conversation, probe)
     return Transfer(
         conversation_id=conversation.conversation_id(),
         sla_duration=sla_duration,
