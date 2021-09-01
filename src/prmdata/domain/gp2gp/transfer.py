@@ -116,9 +116,11 @@ def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
 
 
 # flake8: noqa: C901
-def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
+def _assign_transfer_outcome(
+    conversation: Gp2gpConversation, sla_duration: Optional[timedelta]
+) -> TransferOutcome:
     if conversation.is_integrated():
-        return _integrated_within_sla(conversation)
+        return _integrated_within_sla(sla_duration)
     elif conversation.has_concluded_with_failure():
         return _technical_failure(TransferFailureReason.FINAL_ERROR)
     elif conversation.contains_copc_fragments():
@@ -135,17 +137,17 @@ def _assign_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome
         return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
 
 
-def _integrated_within_sla(conversation: Gp2gpConversation) -> TransferOutcome:
-    sla_duration = _calculate_sla(conversation)
+def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome:
     if sla_duration is not None and sla_duration <= timedelta(days=8):
         return _integrated_on_time()
     return _process_failure(TransferFailureReason.INTEGRATED_LATE)
 
 
 def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
+    sla_duration = _calculate_sla(conversation)
     return Transfer(
         conversation_id=conversation.conversation_id(),
-        sla_duration=_calculate_sla(conversation),
+        sla_duration=sla_duration,
         requesting_practice=Practice(
             asid=conversation.requesting_practice_asid(),
             supplier=conversation.requesting_supplier(),
@@ -156,7 +158,7 @@ def derive_transfer(conversation: Gp2gpConversation) -> Transfer:
         sender_error_codes=conversation.sender_error_codes(),
         final_error_codes=conversation.final_error_codes(),
         intermediate_error_codes=conversation.intermediate_error_codes(),
-        outcome=_assign_transfer_outcome(conversation),
+        outcome=_assign_transfer_outcome(conversation, sla_duration),
         date_requested=conversation.date_requested(),
         date_completed=conversation.effective_final_acknowledgement_time(),
     )
