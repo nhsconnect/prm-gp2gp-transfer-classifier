@@ -2,7 +2,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from prmdata.domain.spine.conversation import Conversation, group_into_conversations
+from prmdata.domain.gp2gp.transfer_service import TransferService
+from prmdata.domain.spine.conversation import Conversation
 from tests.builders.spine import build_message
 
 
@@ -13,7 +14,8 @@ def test_produces_correct_conversations():
 
     expected = [Conversation("abc", [message_one]), Conversation("xyz", [message_two])]
 
-    actual = group_into_conversations(message_stream=messages, cutoff=timedelta(days=14))
+    transfer_service = TransferService(message_stream=messages, cutoff=timedelta(days=14))
+    actual = transfer_service.group_into_conversations()
 
     assert list(actual) == expected
 
@@ -25,7 +27,8 @@ def test_produces_correct_messages_within_conversations():
 
     expected = [Conversation("abc", [message_one, message_two])]
 
-    actual = group_into_conversations(message_stream=messages, cutoff=timedelta(days=14))
+    transfer_service = TransferService(message_stream=messages, cutoff=timedelta(days=14))
+    actual = transfer_service.group_into_conversations()
 
     assert list(actual) == expected
 
@@ -37,7 +40,8 @@ def test_sorts_messages_within_conversations():
 
     expected = [Conversation("abc", [message_two, message_one])]
 
-    actual = group_into_conversations(message_stream=messages, cutoff=timedelta(days=14))
+    transfer_service = TransferService(message_stream=messages, cutoff=timedelta(days=14))
+    actual = transfer_service.group_into_conversations()
 
     assert list(actual) == expected
 
@@ -58,7 +62,9 @@ def test_rejects_messages_after_cutoff(cutoff_interval, expected_message_ids):
         build_message(conversation_id="a", guid="3", time=datetime(year=2020, month=6, day=8)),
     ]
 
-    conversations = group_into_conversations(messages, cutoff=cutoff_interval)
+    transfer_service = TransferService(message_stream=messages, cutoff=cutoff_interval)
+    conversations = transfer_service.group_into_conversations()
+
     actual_message_ids = [m.guid for m in next(conversations).messages]
 
     assert actual_message_ids == expected_message_ids
