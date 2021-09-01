@@ -3,7 +3,8 @@ import logging
 import boto3
 from os import environ
 
-from prmdata.pipeline.io import PlatformMetricsIO
+from prmdata.pipeline.io.io import PlatformMetricsIO
+from prmdata.pipeline.io.logging import JsonFormatter
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.pipeline.core import (
@@ -19,7 +20,17 @@ logger = logging.getLogger(__name__)
 _PARQUET_VERSION = "v4"
 
 
+def _setup_logger():
+    logger.setLevel(logging.INFO)
+    formatter = JsonFormatter()
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+
 def main():
+    _setup_logger()
+
     config = DataPipelineConfig.from_environment_variables(environ)
 
     logging.basicConfig(level=logging.INFO)
@@ -52,12 +63,21 @@ def main():
         f"{reporting_window.metric_month}"
     )
 
+    logger.info(
+        f"Attempting to upload transfer parquet to s3://{bucket_name}/{s3_path}",
+        extra={"event": "ATTEMPTING_UPLOAD_TRANSFER_PARQUET"},
+    )
+
     write_table(
         table=transfer_table,
         where=f"{s3_path}/transfers.parquet",
         filesystem=S3FileSystem(endpoint_override=config.s3_endpoint_url),
     )
-    logger.info(f"Successfully classified transfers and uploaded to s3://{bucket_name}/{s3_path}")
+
+    logger.info(
+        f"Successfully uploaded transfer parquet to s3://{bucket_name}/{s3_path}",
+        extra={"event": "UPLOADED_TRANSFER_PARQUET_TO_S3"},
+    )
 
 
 if __name__ == "__main__":

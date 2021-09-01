@@ -30,6 +30,7 @@ python_version = "3.9"
 
 [scripts]
 test = "pytest --cov=prmdata --cov-report=term-missing tests/unit tests/integration tests/e2e"
+e2etest-verbose = "pytest  -p no:logging -rA tests/e2e"
 format = "black -t py38 -l100 src/ tests/ setup.py"
 check-format = "black --check -t py38 -l100 src/ tests/ setup.py"
 typecheck = "mypy src/ tests/"
