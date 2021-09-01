@@ -3,8 +3,9 @@ from typing import Iterable, Iterator
 
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
-    derive_transfer,
 )
+
+from prmdata.domain.gp2gp.transfer_service import TransferService
 from prmdata.domain.spine.message import Message
 from prmdata.domain.spine.gp2gp_conversation import (
     ConversationMissingStart,
@@ -33,8 +34,7 @@ def parse_transfers_from_messages(
     conversations_started_in_reporting_window = filter_conversations_by_request_started_time(
         gp2gp_conversations, reporting_window
     )
-    transfers = (
-        derive_transfer(conversation)
-        for conversation in (conversations_started_in_reporting_window)
-    )
-    return transfers
+
+    transfer_service = TransferService()
+
+    return transfer_service.convert_to_transfers(conversations_started_in_reporting_window)

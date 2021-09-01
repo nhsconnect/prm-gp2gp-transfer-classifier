@@ -162,7 +162,7 @@ def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome
 
 def derive_transfer(
     conversation: Gp2gpConversation,
-    probe: TransferObservabilityProbe = TransferObservabilityProbe(),
+    probe: TransferObservabilityProbe,
 ) -> Transfer:
     sla_duration = _calculate_sla(conversation, probe)
     return Transfer(
