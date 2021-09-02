@@ -1,4 +1,5 @@
 from datetime import timedelta
+from logging import getLogger
 from typing import Iterable, Iterator
 
 from prmdata.domain.gp2gp.transfer import (
@@ -13,13 +14,15 @@ from prmdata.domain.spine.gp2gp_conversation import (
 )
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
+module_logger = getLogger(__name__)
+
 
 def parse_transfers_from_messages(
     spine_messages: Iterable[Message],
     reporting_window: MonthlyReportingWindow,
     conversation_cutoff: timedelta,
 ) -> Iterator[Transfer]:
-    transfer_observability_probe = TransferObservabilityProbe()
+    transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
     transfer_service = TransferService(
         message_stream=spine_messages,
         cutoff=conversation_cutoff,

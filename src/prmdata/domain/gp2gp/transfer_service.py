@@ -48,8 +48,9 @@ class TransferService:
 
     @staticmethod
     def parse_conversations_into_gp2gp_conversations(conversations: Iterator[Conversation]):
-        logger = module_logger
-        gp2gp_conversation_observability_probe = Gp2gpConversationObservabilityProbe(logger)
+        gp2gp_conversation_observability_probe = Gp2gpConversationObservabilityProbe(
+            logger=module_logger
+        )
 
         for conversation in conversations:
             try:
