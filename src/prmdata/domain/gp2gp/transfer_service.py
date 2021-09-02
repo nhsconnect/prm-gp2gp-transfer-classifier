@@ -4,7 +4,7 @@ from typing import List, Iterable, Iterator, Dict
 
 from prmdata.domain.gp2gp.transfer import derive_transfer, TransferObservabilityProbe
 from prmdata.domain.spine.conversation import Conversation
-from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation, ConversationMissingStart
 from prmdata.domain.spine.message import Message
 
 
@@ -27,6 +27,14 @@ class TransferService:
                 conversation_id,
                 messages=filtered_messages,
             )
+
+    @staticmethod
+    def parse_conversations_into_gp2gp_conversations(conversations: Iterator[Conversation]):
+        for conversation in conversations:
+            try:
+                yield Gp2gpConversation(conversation.messages)
+            except ConversationMissingStart:
+                pass
 
     def convert_to_transfers(self, conversations: Iterator[Gp2gpConversation]):
         return (derive_transfer(conversation, self._probe) for conversation in conversations)

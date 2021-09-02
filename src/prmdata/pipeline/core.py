@@ -15,14 +15,6 @@ from prmdata.domain.spine.gp2gp_conversation import (
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 
 
-def _parse_conversations(conversations):
-    for conversation in conversations:
-        try:
-            yield Gp2gpConversation(conversation.messages)
-        except ConversationMissingStart:
-            pass
-
-
 def parse_transfers_from_messages(
     spine_messages: Iterable[Message],
     reporting_window: MonthlyReportingWindow,
@@ -31,7 +23,7 @@ def parse_transfers_from_messages(
     transfer_service = TransferService(spine_messages, conversation_cutoff)
 
     conversations = transfer_service.group_into_conversations()
-    gp2gp_conversations = _parse_conversations(conversations)
+    gp2gp_conversations = transfer_service.parse_conversations_into_gp2gp_conversations(conversations)
     conversations_started_in_reporting_window = filter_conversations_by_request_started_time(
         gp2gp_conversations, reporting_window
     )
