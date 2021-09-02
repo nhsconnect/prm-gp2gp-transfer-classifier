@@ -3,8 +3,8 @@ import logging
 import boto3
 from os import environ
 
-from prmdata.pipeline.io.io import PlatformMetricsIO
-from prmdata.pipeline.io.logging import JsonFormatter
+from prmdata.pipeline.io import PlatformMetricsIO
+from prmdata.utils.io.json_formatter import JsonFormatter
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.pipeline.core import (

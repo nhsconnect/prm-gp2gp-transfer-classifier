@@ -4,7 +4,7 @@ from unittest.mock import Mock, call
 from dateutil.tz import tzutc
 
 from prmdata.domain.spine.message import Message
-from prmdata.pipeline.io.io import PlatformMetricsIO
+from prmdata.pipeline.io import PlatformMetricsIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from tests.builders.common import a_datetime, a_string
 

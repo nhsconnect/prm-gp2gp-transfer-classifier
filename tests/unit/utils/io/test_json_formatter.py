@@ -1,7 +1,7 @@
 import json
 from logging import makeLogRecord
 
-from prmdata.pipeline.io.logging import JsonFormatter
+from prmdata.utils.io.json_formatter import JsonFormatter
 
 
 def test_json_formatter_correctly_formats_record():
