@@ -26,8 +26,7 @@ class TransferService:
         self,
         message_stream: Iterable[Message],
         cutoff: timedelta,
-        # flake8: noqa: E501
-        observability_probe: TransferObservabilityProbe = TransferObservabilityProbe(),
+        observability_probe: TransferObservabilityProbe,
     ):
         self._probe = observability_probe
         self._message_stream = message_stream
