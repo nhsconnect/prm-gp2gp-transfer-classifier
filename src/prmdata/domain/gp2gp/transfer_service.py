@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import timedelta
+from logging import getLogger
 from typing import List, Iterable, Iterator, Dict
 
 from prmdata.domain.gp2gp.transfer import (
@@ -10,8 +11,14 @@ from prmdata.domain.gp2gp.transfer import (
     _assign_transfer_outcome,
 )
 from prmdata.domain.spine.conversation import Conversation
-from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation, ConversationMissingStart
+from prmdata.domain.spine.gp2gp_conversation import (
+    Gp2gpConversation,
+    ConversationMissingStart,
+    Gp2gpConversationObservabilityProbe,
+)
 from prmdata.domain.spine.message import Message
+
+module_logger = getLogger(__name__)
 
 
 class TransferService:
@@ -42,9 +49,14 @@ class TransferService:
 
     @staticmethod
     def parse_conversations_into_gp2gp_conversations(conversations: Iterator[Conversation]):
+        logger = module_logger
+        gp2gp_conversation_observability_probe = Gp2gpConversationObservabilityProbe(logger)
+
         for conversation in conversations:
             try:
-                yield Gp2gpConversation(conversation.messages)
+                yield Gp2gpConversation(
+                    conversation.messages, gp2gp_conversation_observability_probe
+                )
             except ConversationMissingStart:
                 pass
 

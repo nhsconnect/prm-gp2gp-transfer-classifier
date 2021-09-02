@@ -1,4 +1,5 @@
 from typing import List
+from unittest.mock import Mock
 
 import pytest
 
@@ -6,6 +7,8 @@ from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
 from tests.builders.common import a_datetime
 from prmdata.domain.spine.message import Message
+
+mock_gp2gp_conversation_observability_probe = Mock()
 
 
 @pytest.mark.parametrize(
@@ -21,7 +24,7 @@ from prmdata.domain.spine.message import Message
 )
 def test_returns_none_when_transfer_in_progress(test_case):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages, mock_gp2gp_conversation_observability_probe)
 
     expected = None
 
@@ -52,7 +55,7 @@ def test_returns_none_when_transfer_in_progress(test_case):
 def test_returns_correct_time_when_conversation_has_concluded(test_case):
     request_completed_time = a_datetime()
     gp2gp_messages: List[Message] = test_case(request_completed_time=request_completed_time)
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages, mock_gp2gp_conversation_observability_probe)
 
     expected = request_completed_time
 

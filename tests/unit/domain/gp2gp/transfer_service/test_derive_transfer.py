@@ -18,6 +18,9 @@ from prmdata.domain.gp2gp.transfer import (
     TransferFailureReason,
 )
 
+mock_transfer_observability_probe = Mock()
+mock_gp2gp_conversation_observability_probe = Mock()
+
 
 def test_extracts_conversation_id():
     conversation = build_mock_gp2gp_conversation(conversation_id="1234")
@@ -69,7 +72,7 @@ def test_extracts_conversation_id():
 )
 def test_returns_transfer_status_technical_failure_with_reason(test_case, expected_reason):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages, mock_gp2gp_conversation_observability_probe)
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
@@ -92,7 +95,7 @@ def test_returns_transfer_status_technical_failure_with_reason(test_case, expect
 )
 def test_returns_transfer_status_integrated_on_time(test_case):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages, mock_gp2gp_conversation_observability_probe)
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
@@ -125,7 +128,9 @@ def test_returns_transfer_status_integrated_on_time(test_case):
 )
 def test_returns_transfer_status_process_failure_with_reason(test_case, expected_reason):
     gp2gp_messages: List[Message] = test_case()
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(
+        gp2gp_messages, probe=mock_gp2gp_conversation_observability_probe
+    )
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
     actual = transfer_service.derive_transfer(conversation)
@@ -176,7 +181,7 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_f
 
 def test_return_process_failure_given_an_unacknowledged_ehr_with_duplicate_and_no_copc_fragments():
     gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages, mock_gp2gp_conversation_observability_probe)
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
     actual = transfer_service.derive_transfer(conversation)
@@ -212,7 +217,7 @@ def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
     gp2gp_messages: List[Message] = test_cases.request_acknowledged_with_error(
         error_code=fatal_sender_error_code
     )
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages, mock_gp2gp_conversation_observability_probe)
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
@@ -231,7 +236,7 @@ def test_returns_correct_transfer_outcome_given_multiple_conflicting_sender_acks
     gp2gp_messages: List[Message] = test_cases.multiple_sender_acknowledgements(
         error_codes=[None, a_fatal_sender_error]
     )
-    conversation = Gp2gpConversation(gp2gp_messages)
+    conversation = Gp2gpConversation(gp2gp_messages, mock_gp2gp_conversation_observability_probe)
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
@@ -324,7 +329,8 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
 
 def test_produces_no_sla_given_acks_with_only_duplicate_error():
     conversation = Gp2gpConversation(
-        messages=test_cases.acknowledged_duplicate_and_waiting_for_integration()
+        messages=test_cases.acknowledged_duplicate_and_waiting_for_integration(),
+        probe=mock_gp2gp_conversation_observability_probe,
     )
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
@@ -349,7 +355,8 @@ def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
-        )
+        ),
+        probe=mock_gp2gp_conversation_observability_probe,
     )
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
@@ -372,7 +379,8 @@ def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
-        )
+        ),
+        probe=mock_gp2gp_conversation_observability_probe,
     )
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
@@ -395,7 +403,8 @@ def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=failed_acknowledgement_datetime,
-        )
+        ),
+        probe=mock_gp2gp_conversation_observability_probe,
     )
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
@@ -419,7 +428,8 @@ def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_ack
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
-        )
+        ),
+        probe=mock_gp2gp_conversation_observability_probe,
     )
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
@@ -443,7 +453,8 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
-        )
+        ),
+        probe=mock_gp2gp_conversation_observability_probe,
     )
 
     transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))

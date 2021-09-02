@@ -1,7 +1,11 @@
+from unittest.mock import Mock
+
 import pytest
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
+
+mock_gp2gp_conversation_observability_probe = Mock()
 
 
 @pytest.mark.parametrize(
@@ -17,7 +21,9 @@ from tests.builders import test_cases
     ],
 )
 def test_returns_false_when_transfer_is_still_in_progress(test_case):
-    conversation = Gp2gpConversation(messages=test_case())
+    conversation = Gp2gpConversation(
+        messages=test_case(), probe=mock_gp2gp_conversation_observability_probe
+    )
 
     expected = False
 
@@ -39,7 +45,9 @@ def test_returns_false_when_transfer_is_still_in_progress(test_case):
     ],
 )
 def test_returns_false_when_transfer_concluded_with_failure(test_case):
-    conversation = Gp2gpConversation(messages=test_case())
+    conversation = Gp2gpConversation(
+        messages=test_case(), probe=mock_gp2gp_conversation_observability_probe
+    )
 
     expected = False
 
@@ -67,7 +75,9 @@ def test_returns_false_when_transfer_concluded_with_failure(test_case):
     ],
 )
 def test_returns_true_when_transfer_was_integrated(test_case):
-    conversation = Gp2gpConversation(messages=test_case())
+    conversation = Gp2gpConversation(
+        messages=test_case(), probe=mock_gp2gp_conversation_observability_probe
+    )
 
     expected = True
 

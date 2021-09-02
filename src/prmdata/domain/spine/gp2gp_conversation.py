@@ -1,8 +1,6 @@
 from typing import NamedTuple, List, Optional, Iterable, Iterator, Tuple
 from logging import Logger, getLogger
 from datetime import datetime
-from warnings import warn
-
 from prmdata.domain.spine.message import (
     Message,
     DUPLICATE_ERROR,
@@ -10,6 +8,8 @@ from prmdata.domain.spine.message import (
     FATAL_SENDER_ERROR_CODES,
 )
 from prmdata.utils.reporting_window import MonthlyReportingWindow
+
+module_logger = getLogger(__name__)
 
 
 class AcknowledgedMessage(NamedTuple):
@@ -35,7 +35,15 @@ class AcknowledgedMessage(NamedTuple):
         return self.message.is_copc()
 
 
-module_logger = getLogger(__name__)
+class ConversationMissingStart(Exception):
+    pass
+
+
+class Gp2gpMessagesByType(NamedTuple):
+    request_started: AcknowledgedMessage
+    copc_continue: List[Message]
+    copc_fragments: List[AcknowledgedMessage]
+    request_completed: List[AcknowledgedMessage]
 
 
 class Gp2gpConversationObservabilityProbe:
@@ -66,18 +74,16 @@ class Gp2gpConversation:
     def __init__(
         self,
         messages: List[Message],
-        # flake8: noqa: E501
-        observability_probe: Gp2gpConversationObservabilityProbe = Gp2gpConversationObservabilityProbe(),
+        probe: Gp2gpConversationObservabilityProbe,
     ):
-
         first_message = messages[0]
         if not first_message.is_ehr_request_started():
             raise ConversationMissingStart()
 
-        self._probe = observability_probe
+        self._probe = probe
 
-        acked_messages = _pair_messages_with_acks(messages, self._probe)
-        message_bundle = _group_message_by_type(acked_messages, self._probe)
+        acked_messages = self._pair_messages_with_acks(messages)
+        message_bundle = self._group_message_by_type(acked_messages)
 
         self._request_started = message_bundle.request_started
         self._request_completed = message_bundle.request_completed
@@ -202,23 +208,57 @@ class Gp2gpConversation:
     def _count_duplicate_errors(self) -> int:
         return self.final_error_codes().count(DUPLICATE_ERROR)
 
+    def _pair_messages_with_acks(self, messages: Iterable[Message]) -> List[AcknowledgedMessage]:
+        acked_messages: dict[str, AcknowledgedMessage] = {}
+
+        for message in messages:
+            if message.is_acknowledgement():
+                try:
+                    acked_messages[message.message_ref].acknowledgements.append(message)
+                except KeyError:
+                    self._probe.record_ehr_missing_message_for_an_acknowledgement(message)
+            else:
+                acked_messages[message.guid] = AcknowledgedMessage(
+                    message=message, acknowledgements=[]
+                )
+
+        return list(acked_messages.values())
+
+    def _group_message_by_type(
+        self, messages: Iterable[AcknowledgedMessage]
+    ) -> Gp2gpMessagesByType:
+        request_completed_messages = []
+        copc_continue_messages = []
+        copc_fragment_messages = []
+
+        request_started, *remaining_messages = messages
+
+        requesting_asid = request_started.from_asid()
+        sending_asid = request_started.to_asid()
+
+        for acked_message in remaining_messages:
+            if acked_message.is_ehr_request_completed():
+                request_completed_messages.append(acked_message)
+            elif acked_message.is_copc() and acked_message.is_sent_by(requesting_asid):
+                copc_continue_messages.append(acked_message.message)
+            elif acked_message.message.is_copc() and acked_message.is_sent_by(sending_asid):
+                copc_fragment_messages.append(acked_message)
+            else:
+                self._probe.record_unknown_message_purpose(acked_message.message)
+
+        return Gp2gpMessagesByType(
+            request_started=request_started,
+            request_completed=request_completed_messages,
+            copc_continue=copc_continue_messages,
+            copc_fragments=copc_fragment_messages,
+        )
+
 
 def _integrated_or_suppressed(request_completed_ack: Message) -> bool:
     return (
         request_completed_ack.error_code is None
         or request_completed_ack.error_code == ERROR_SUPPRESSED
     )
-
-
-class ConversationMissingStart(Exception):
-    pass
-
-
-class Gp2gpMessagesByType(NamedTuple):
-    request_started: AcknowledgedMessage
-    copc_continue: List[Message]
-    copc_fragments: List[AcknowledgedMessage]
-    request_completed: List[AcknowledgedMessage]
 
 
 def _find_acked_ehr_completed_where_ack(
@@ -253,53 +293,6 @@ def _find_effective_request_completed(
         return unsuccessfully_acked_ehr
 
     return None
-
-
-def _group_message_by_type(
-    messages: Iterable[AcknowledgedMessage], probe: Gp2gpConversationObservabilityProbe
-) -> Gp2gpMessagesByType:
-    request_completed_messages = []
-    copc_continue_messages = []
-    copc_fragment_messages = []
-
-    request_started, *remaining_messages = messages
-
-    requesting_asid = request_started.from_asid()
-    sending_asid = request_started.to_asid()
-
-    for acked_message in remaining_messages:
-        if acked_message.is_ehr_request_completed():
-            request_completed_messages.append(acked_message)
-        elif acked_message.is_copc() and acked_message.is_sent_by(requesting_asid):
-            copc_continue_messages.append(acked_message.message)
-        elif acked_message.message.is_copc() and acked_message.is_sent_by(sending_asid):
-            copc_fragment_messages.append(acked_message)
-        else:
-            probe.record_unknown_message_purpose(acked_message.message)
-
-    return Gp2gpMessagesByType(
-        request_started=request_started,
-        request_completed=request_completed_messages,
-        copc_continue=copc_continue_messages,
-        copc_fragments=copc_fragment_messages,
-    )
-
-
-def _pair_messages_with_acks(
-    messages: Iterable[Message], probe: Gp2gpConversationObservabilityProbe
-) -> List[AcknowledgedMessage]:
-    acked_messages: dict[str, AcknowledgedMessage] = {}
-
-    for message in messages:
-        if message.is_acknowledgement():
-            try:
-                acked_messages[message.message_ref].acknowledgements.append(message)
-            except KeyError:
-                probe.record_ehr_missing_message_for_an_acknowledgement(message)
-        else:
-            acked_messages[message.guid] = AcknowledgedMessage(message=message, acknowledgements=[])
-
-    return list(acked_messages.values())
 
 
 def filter_conversations_by_request_started_time(
