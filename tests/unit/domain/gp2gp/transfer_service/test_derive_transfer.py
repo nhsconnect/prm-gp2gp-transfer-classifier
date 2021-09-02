@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from prmdata.domain.gp2gp.transfer_service import TransferService
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from prmdata.domain.spine.message import Message, FATAL_SENDER_ERROR_CODES
 from tests.builders import test_cases
@@ -14,19 +15,16 @@ from tests.builders.spine import (
 )
 from prmdata.domain.gp2gp.transfer import (
     TransferStatus,
-    derive_transfer,
     TransferFailureReason,
 )
 
-mock_probe = Mock()
-
 
 def test_extracts_conversation_id():
-
     conversation = build_mock_gp2gp_conversation(conversation_id="1234")
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
+    actual = transfer_service.derive_transfer(conversation)
     expected_conversation_id = "1234"
 
     assert actual.conversation_id == expected_conversation_id
@@ -73,7 +71,9 @@ def test_returns_transfer_status_technical_failure_with_reason(test_case, expect
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     assert actual.outcome.status == TransferStatus.TECHNICAL_FAILURE
     assert actual.outcome.failure_reason == expected_reason
@@ -94,7 +94,9 @@ def test_returns_transfer_status_integrated_on_time(test_case):
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     assert actual.outcome.status == TransferStatus.INTEGRATED_ON_TIME
     assert actual.outcome.failure_reason is None
@@ -124,7 +126,10 @@ def test_returns_transfer_status_integrated_on_time(test_case):
 def test_returns_transfer_status_process_failure_with_reason(test_case, expected_reason):
     gp2gp_messages: List[Message] = test_case()
     conversation = Gp2gpConversation(gp2gp_messages)
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
+
     assert actual.outcome.status == TransferStatus.PROCESS_FAILURE
     assert actual.outcome.failure_reason == expected_reason
 
@@ -140,7 +145,9 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_ehr_an
     conversation.is_missing_core_ehr.return_value = False
     conversation.contains_core_ehr_with_sender_error.return_value = True
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_status = TransferStatus.UNCLASSIFIED_FAILURE
     expected_reason = TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
@@ -156,7 +163,9 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_f
     conversation.has_concluded_with_failure.return_value = False
     conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments.return_value = True
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_status = TransferStatus.UNCLASSIFIED_FAILURE
     expected_reason = TransferFailureReason.AMBIGUOUS_COPCS
@@ -168,7 +177,9 @@ def test_returns_unclassified_given_unacknowledged_ehr_with_duplicate_and_copc_f
 def test_return_process_failure_given_an_unacknowledged_ehr_with_duplicate_and_no_copc_fragments():
     gp2gp_messages: List[Message] = test_cases.acknowledged_duplicate_and_waiting_for_integration()
     conversation = Gp2gpConversation(gp2gp_messages)
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
     assert actual.outcome.status == TransferStatus.PROCESS_FAILURE
     assert actual.outcome.failure_reason == TransferFailureReason.TRANSFERRED_NOT_INTEGRATED
 
@@ -183,7 +194,9 @@ def test_returns_transferred_not_integrated_with_error_given_stalled_with_copc_e
     conversation.contains_copc_error.return_value = True
     conversation.is_missing_copc_ack.return_value = False
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_status = TransferStatus.UNCLASSIFIED_FAILURE
     expected_reason = TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR
@@ -201,7 +214,9 @@ def test_returns_correct_transfer_outcome_if_fatal_sender_error_code_present(
     )
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_status = TransferStatus.TECHNICAL_FAILURE
     expected_reason = TransferFailureReason.FATAL_SENDER_ERROR
@@ -218,7 +233,9 @@ def test_returns_correct_transfer_outcome_given_multiple_conflicting_sender_acks
     )
     conversation = Gp2gpConversation(gp2gp_messages)
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_status = TransferStatus.TECHNICAL_FAILURE
     expected_reason = TransferFailureReason.FATAL_SENDER_ERROR
@@ -234,8 +251,9 @@ def test_produces_sla_of_successful_conversation():
             year=2020, month=6, day=1, hour=13, minute=52, second=0
         ),
     )
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
-    actual = derive_transfer(conversation, mock_probe)
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
@@ -251,7 +269,11 @@ def test_logs_negative_sla_warning():
         request_completed_time=a_datetime(year=2021, month=12, day=2),
     )
 
-    derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(
+        message_stream=[], cutoff=timedelta(days=14), observability_probe=mock_probe
+    )
+
+    transfer_service.derive_transfer(conversation)
 
     mock_probe.record_negative_sla.assert_called_once_with(conversation)
 
@@ -264,7 +286,9 @@ def test_negative_sla_duration_clamped_to_zero():
 
     expected_sla_duration = timedelta(0)
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     assert actual.sla_duration == expected_sla_duration
 
@@ -274,7 +298,9 @@ def test_produces_no_sla_given_no_request_completed_time():
         request_completed_time=None,
         final_acknowledgement_time=None,
     )
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = None
 
@@ -287,7 +313,9 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
         final_acknowledgement_time=None,
     )
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = None
 
@@ -299,7 +327,9 @@ def test_produces_no_sla_given_acks_with_only_duplicate_error():
         messages=test_cases.acknowledged_duplicate_and_waiting_for_integration()
     )
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = None
     expected_date_completed = None
@@ -322,7 +352,9 @@ def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs
         )
     )
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
@@ -343,7 +375,9 @@ def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs
         )
     )
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
@@ -364,7 +398,9 @@ def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
         )
     )
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=1, minutes=10)
 
@@ -386,7 +422,9 @@ def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_ack
         )
     )
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
 
@@ -408,7 +446,9 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
         )
     )
 
-    actual = derive_transfer(conversation, mock_probe)
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
+
+    actual = transfer_service.derive_transfer(conversation)
 
     expected_sla_duration = timedelta(hours=4, minutes=0, seconds=1)
 

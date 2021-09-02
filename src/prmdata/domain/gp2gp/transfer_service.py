@@ -2,15 +2,27 @@ from collections import defaultdict
 from datetime import timedelta
 from typing import List, Iterable, Iterator, Dict
 
-from prmdata.domain.gp2gp.transfer import derive_transfer, TransferObservabilityProbe
+from prmdata.domain.gp2gp.transfer import (
+    TransferObservabilityProbe,
+    Transfer,
+    _calculate_sla,
+    Practice,
+    _assign_transfer_outcome,
+)
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation, ConversationMissingStart
 from prmdata.domain.spine.message import Message
 
 
 class TransferService:
-    def __init__(self, message_stream: Iterable[Message], cutoff: timedelta):
-        self._probe = TransferObservabilityProbe()
+    def __init__(
+        self,
+        message_stream: Iterable[Message],
+        cutoff: timedelta,
+        # flake8: noqa: E501
+        observability_probe: TransferObservabilityProbe = TransferObservabilityProbe(),
+    ):
+        self._probe = observability_probe
         self._message_stream = message_stream
         self._cutoff = cutoff
 
@@ -37,7 +49,30 @@ class TransferService:
                 pass
 
     def convert_to_transfers(self, conversations: Iterator[Gp2gpConversation]):
-        return (derive_transfer(conversation, self._probe) for conversation in conversations)
+        return (self.derive_transfer(conversation) for conversation in conversations)
+
+    def derive_transfer(
+        self,
+        conversation: Gp2gpConversation,
+    ) -> Transfer:
+        sla_duration = _calculate_sla(conversation, self._probe)
+        return Transfer(
+            conversation_id=conversation.conversation_id(),
+            sla_duration=sla_duration,
+            requesting_practice=Practice(
+                asid=conversation.requesting_practice_asid(),
+                supplier=conversation.requesting_supplier(),
+            ),
+            sending_practice=Practice(
+                asid=conversation.sending_practice_asid(), supplier=conversation.sending_supplier()
+            ),
+            sender_error_codes=conversation.sender_error_codes(),
+            final_error_codes=conversation.final_error_codes(),
+            intermediate_error_codes=conversation.intermediate_error_codes(),
+            outcome=_assign_transfer_outcome(conversation, sla_duration),
+            date_requested=conversation.date_requested(),
+            date_completed=conversation.effective_final_acknowledgement_time(),
+        )
 
 
 def _ignore_messages_sent_after(cutoff: timedelta, messages: List[Message]) -> List[Message]:

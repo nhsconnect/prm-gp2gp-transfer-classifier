@@ -160,30 +160,6 @@ def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome
     return _process_failure(TransferFailureReason.INTEGRATED_LATE)
 
 
-def derive_transfer(
-    conversation: Gp2gpConversation,
-    probe: TransferObservabilityProbe,
-) -> Transfer:
-    sla_duration = _calculate_sla(conversation, probe)
-    return Transfer(
-        conversation_id=conversation.conversation_id(),
-        sla_duration=sla_duration,
-        requesting_practice=Practice(
-            asid=conversation.requesting_practice_asid(),
-            supplier=conversation.requesting_supplier(),
-        ),
-        sending_practice=Practice(
-            asid=conversation.sending_practice_asid(), supplier=conversation.sending_supplier()
-        ),
-        sender_error_codes=conversation.sender_error_codes(),
-        final_error_codes=conversation.final_error_codes(),
-        intermediate_error_codes=conversation.intermediate_error_codes(),
-        outcome=_assign_transfer_outcome(conversation, sla_duration),
-        date_requested=conversation.date_requested(),
-        date_completed=conversation.effective_final_acknowledgement_time(),
-    )
-
-
 def _integrated_on_time() -> TransferOutcome:
     return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
 
