@@ -61,9 +61,14 @@ def main():
         f"{reporting_window.metric_month}"
     )
 
+    transfer_object_uri = f"s3://{transfer_data_bucket}/{s3_path}"
+
     logger.info(
-        f"Attempting to upload transfer parquet to s3://{transfer_data_bucket}/{s3_path}",
-        extra={"event": "ATTEMPTING_UPLOAD_TRANSFER_PARQUET"},
+        f"Attempting to upload: {transfer_object_uri}",
+        extra={
+            "event": "ATTEMPTING_UPLOAD_TRANSFER_PARQUET_TO_S3",
+            "object_uri": transfer_object_uri,
+        },
     )
 
     write_table(
@@ -73,8 +78,8 @@ def main():
     )
 
     logger.info(
-        f"Successfully uploaded transfer parquet to s3://{transfer_data_bucket}/{s3_path}",
-        extra={"event": "UPLOADED_TRANSFER_PARQUET_TO_S3"},
+        f"Successfully uploaded to: {transfer_object_uri}",
+        extra={"event": "UPLOADED_TRANSFER_PARQUET_TO_S3", "object_uri": transfer_object_uri},
     )
 
 
