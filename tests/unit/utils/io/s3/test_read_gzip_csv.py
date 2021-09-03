@@ -46,11 +46,12 @@ def test_will_log_reading_file_event():
     )
 
     s3_manager = S3DataManager(conn)
-    s3_file_path = f"s3://{bucket_name}/test_object.csv.gz"
+    object_uri = f"s3://{bucket_name}/test_object.csv.gz"
 
     with mock.patch.object(logger, "info") as mock_log_info:
-        gzip_csv = s3_manager.read_gzip_csv(s3_file_path)
+        gzip_csv = s3_manager.read_gzip_csv(object_uri)
         list(gzip_csv)
         mock_log_info.assert_called_once_with(
-            f"Reading file from: {s3_file_path}", extra={"event": "READING_FILE_FROM_S3"}
+            f"Reading file from: {object_uri}",
+            extra={"event": "READING_FILE_FROM_S3", "object_uri": object_uri},
         )

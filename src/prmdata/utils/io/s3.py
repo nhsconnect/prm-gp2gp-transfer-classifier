@@ -19,7 +19,7 @@ class S3DataManager:
     def read_gzip_csv(self, object_uri: str):
         logger.info(
             "Reading file from: " + object_uri,
-            extra={"event": "READING_FILE_FROM_S3"},
+            extra={"event": "READING_FILE_FROM_S3", "object_uri": object_uri},
         )
         s3_object = self._object_from_uri(object_uri)
         response = s3_object.get()
