@@ -28,11 +28,6 @@ class PlatformMetricsIO:
         self._transfer_data_bucket = transfer_data_bucket
 
     def _read_spine_gzip_csv(self, path: str) -> Iterable[Message]:
-        logger.info(
-            "Reading file from: " + path,
-            extra={"event": "READING_FILE_FROM_S3"},
-        )
-
         data = self._s3_manager.read_gzip_csv(f"s3://{path}")
         return construct_messages_from_splunk_items(data)
 
