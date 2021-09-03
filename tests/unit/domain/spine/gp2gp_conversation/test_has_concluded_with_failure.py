@@ -2,10 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from prmdata.domain.spine.gp2gp_conversation import (
-    Gp2gpConversation,
-    Gp2gpConversationObservabilityProbe,
-)
+from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from prmdata.domain.spine.message import EHR_REQUEST_STARTED
 from tests.builders import test_cases
 from tests.builders.spine import build_message
@@ -110,30 +107,21 @@ def test_returns_true_given_failed_transfer(test_case):
     assert actual == expected
 
 
-def test_warning_when_missing_message_for_an_acknowledgement():
-    mock_logger = Mock()
-    mock_probe = Gp2gpConversationObservabilityProbe(mock_logger)
+def test_observability_probe_called_when_missing_message_for_an_acknowledgement():
+    mock_probe = Mock()
 
     messages = ehr_missing_message_for_an_acknowledgement()
     acknowledgement_for_missing_message = messages[1]
 
     Gp2gpConversation(messages=messages, probe=mock_probe)
 
-    message_ref = acknowledgement_for_missing_message.message_ref
-
-    mock_logger.warning.assert_called_once_with(
-        f":Couldn't pair acknowledgement with message for ref: {message_ref}",
-        extra={
-            "event": "MISSING_MESSAGE_FOR_ACKNOWLEDGEMENT",
-            "conversation_id": acknowledgement_for_missing_message.conversation_id,
-        },
+    mock_probe.record_ehr_missing_message_for_an_acknowledgement.assert_called_once_with(
+        acknowledgement_for_missing_message
     )
 
 
-def test_warning_when_unable_to_determine_purpose_of_message():
-    mock_logger = Mock()
-    mock_probe = Gp2gpConversationObservabilityProbe(mock_logger)
-
+def test_observability_probe_called_when_unable_to_determine_purpose_of_message():
+    mock_probe = Mock()
     unknown_message_purpose_message = build_message(
         conversation_id="ASD",
         guid="abc",
@@ -149,11 +137,6 @@ def test_warning_when_unable_to_determine_purpose_of_message():
 
     Gp2gpConversation(messages=messages, probe=mock_probe)
 
-    mock_logger.warning.assert_called_once_with(
-        f":Couldn't determine purpose of message with guid: {unknown_message_purpose_message.guid}",
-        extra={
-            "event": "UNKNOWN_MESSAGE_PURPOSE",
-            "conversation_id": unknown_message_purpose_message.conversation_id,
-            "interaction_id": unknown_message_purpose_message.interaction_id,
-        },
+    mock_probe.record_unknown_message_purpose.assert_called_once_with(
+        unknown_message_purpose_message
     )
