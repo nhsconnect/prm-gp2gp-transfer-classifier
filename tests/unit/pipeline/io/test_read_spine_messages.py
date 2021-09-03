@@ -6,7 +6,7 @@ from dateutil.tz import tzutc
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.io import PlatformMetricsIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
-from tests.builders.common import a_datetime, a_string
+from tests.builders.common import a_datetime
 
 _MESSAGE_TIME = datetime(2019, 12, 1, 8, 41, 48, 337000, tzinfo=tzutc())
 _MESSAGE_TIME_STR = "2019-12-01T08:41:48.337+0000"
@@ -55,7 +55,6 @@ def test_read_spine_messages():
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,
         gp2gp_spine_bucket=spine_bucket,
-        transfer_data_bucket=a_string(),
     )
 
     s3_manager.read_gzip_csv.side_effect = [
