@@ -15,7 +15,7 @@ from prmdata.pipeline.arrow import convert_transfers_to_table
 from pyarrow.parquet import write_table
 from pyarrow.fs import S3FileSystem
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("prmdata")
 
 _PARQUET_VERSION = "v4"
 
