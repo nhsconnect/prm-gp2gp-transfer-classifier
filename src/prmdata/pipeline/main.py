@@ -33,8 +33,6 @@ def main():
 
     config = DataPipelineConfig.from_environment_variables(environ)
 
-    logging.basicConfig(level=logging.INFO)
-
     s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
     s3_manager = S3DataManager(s3)
 
