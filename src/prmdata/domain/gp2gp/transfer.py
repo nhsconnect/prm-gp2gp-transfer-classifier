@@ -1,33 +1,8 @@
 from dataclasses import dataclass
 from datetime import timedelta, datetime
 from typing import NamedTuple, Optional, List
-from enum import Enum
 
-
-class TransferStatus(Enum):
-    INTEGRATED_ON_TIME = "INTEGRATED_ON_TIME"
-    TECHNICAL_FAILURE = "TECHNICAL_FAILURE"
-    PROCESS_FAILURE = "PROCESS_FAILURE"
-    UNCLASSIFIED_FAILURE = "UNCLASSIFIED_FAILURE"
-
-
-class TransferFailureReason(Enum):
-    INTEGRATED_LATE = "Integrated Late"
-    FINAL_ERROR = "Final Error"
-    TRANSFERRED_NOT_INTEGRATED = "Transferred, not integrated"
-    REQUEST_NOT_ACKNOWLEDGED = "Request not Acknowledged"
-    CORE_EHR_NOT_SENT = "Core Extract not Sent"
-    FATAL_SENDER_ERROR = "Contains Fatal Sender Error"
-    COPC_NOT_SENT = "COPC(s) not sent"
-    COPC_NOT_ACKNOWLEDGED = "COPC(s) not Acknowledged"
-    TRANSFERRED_NOT_INTEGRATED_WITH_ERROR = "Transferred, not integrated, with error"
-    AMBIGUOUS_COPCS = "Ambiguous COPC messages"
-
-
-@dataclass
-class TransferOutcome:
-    status: TransferStatus
-    failure_reason: Optional[TransferFailureReason]
+from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome
 
 
 @dataclass

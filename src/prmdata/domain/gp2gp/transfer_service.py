@@ -6,9 +6,9 @@ from typing import List, Iterable, Iterator, Dict, Optional
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
     Practice,
+)
+from prmdata.domain.gp2gp.transfer_outcome import (
     TransferOutcome,
-    TransferFailureReason,
-    TransferStatus,
 )
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.gp2gp_conversation import (
@@ -97,7 +97,7 @@ class TransferService:
             sender_error_codes=conversation.sender_error_codes(),
             final_error_codes=conversation.final_error_codes(),
             intermediate_error_codes=conversation.intermediate_error_codes(),
-            outcome=_assign_transfer_outcome(conversation, sla_duration),
+            outcome=TransferOutcome.from_gp2gp_conversation(conversation, sla_duration),
             date_requested=conversation.date_requested(),
             date_completed=conversation.effective_final_acknowledgement_time(),
         )
@@ -126,61 +126,62 @@ def _calculate_sla(
     return max(timedelta(0), sla_duration)
 
 
-def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
-    if conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments():
-        return _unclassified_failure(TransferFailureReason.AMBIGUOUS_COPCS)
-    elif conversation.contains_copc_error() and not conversation.is_missing_copc_ack():
-        return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
-    elif conversation.is_missing_copc():
-        return _technical_failure(TransferFailureReason.COPC_NOT_SENT)
-    elif conversation.is_missing_copc_ack():
-        return _technical_failure(TransferFailureReason.COPC_NOT_ACKNOWLEDGED)
-    else:
-        return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
+#
+# # flake8: noqa: C901
+# def _assign_transfer_outcome(
+#     conversation: Gp2gpConversation, sla_duration: Optional[timedelta]
+# ) -> TransferOutcome:
+#     if conversation.is_integrated():
+#         return _integrated_within_sla(sla_duration)
+#     elif conversation.has_concluded_with_failure():
+#         return _technical_failure(TransferFailureReason.FINAL_ERROR)
+#     elif conversation.contains_copc_fragments():
+#         return _copc_transfer_outcome(conversation)
+#     elif conversation.contains_fatal_sender_error_code():
+#         return _technical_failure(TransferFailureReason.FATAL_SENDER_ERROR)
+#     elif conversation.is_missing_request_acknowledged():
+#         return _technical_failure(TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED)
+#     elif conversation.is_missing_core_ehr():
+#         return _technical_failure(TransferFailureReason.CORE_EHR_NOT_SENT)
+#     elif conversation.contains_core_ehr_with_sender_error():
+#         return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
+#     else:
+#         return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
+#
+#
+# def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
+#     if conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments():
+#         return _unclassified_failure(TransferFailureReason.AMBIGUOUS_COPCS)
+#     elif conversation.contains_copc_error() and not conversation.is_missing_copc_ack():
+#         return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
+#     elif conversation.is_missing_copc():
+#         return _technical_failure(TransferFailureReason.COPC_NOT_SENT)
+#     elif conversation.is_missing_copc_ack():
+#         return _technical_failure(TransferFailureReason.COPC_NOT_ACKNOWLEDGED)
+#     else:
+#         return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
 
-
-# flake8: noqa: C901
-def _assign_transfer_outcome(
-    conversation: Gp2gpConversation, sla_duration: Optional[timedelta]
-) -> TransferOutcome:
-    if conversation.is_integrated():
-        return _integrated_within_sla(sla_duration)
-    elif conversation.has_concluded_with_failure():
-        return _technical_failure(TransferFailureReason.FINAL_ERROR)
-    elif conversation.contains_copc_fragments():
-        return _copc_transfer_outcome(conversation)
-    elif conversation.contains_fatal_sender_error_code():
-        return _technical_failure(TransferFailureReason.FATAL_SENDER_ERROR)
-    elif conversation.is_missing_request_acknowledged():
-        return _technical_failure(TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED)
-    elif conversation.is_missing_core_ehr():
-        return _technical_failure(TransferFailureReason.CORE_EHR_NOT_SENT)
-    elif conversation.contains_core_ehr_with_sender_error():
-        return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
-    else:
-        return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
-
-
-def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome:
-    if sla_duration is not None and sla_duration <= timedelta(days=8):
-        return _integrated_on_time()
-    return _process_failure(TransferFailureReason.INTEGRATED_LATE)
-
-
-def _integrated_on_time() -> TransferOutcome:
-    return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
-
-
-def _technical_failure(reason: TransferFailureReason) -> TransferOutcome:
-    return TransferOutcome(status=TransferStatus.TECHNICAL_FAILURE, failure_reason=reason)
-
-
-def _process_failure(reason: TransferFailureReason) -> TransferOutcome:
-    return TransferOutcome(status=TransferStatus.PROCESS_FAILURE, failure_reason=reason)
-
-
-def _unclassified_failure(reason: TransferFailureReason = None) -> TransferOutcome:
-    return TransferOutcome(
-        status=TransferStatus.UNCLASSIFIED_FAILURE,
-        failure_reason=reason,
-    )
+#
+# def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome:
+#     if sla_duration is not None and sla_duration <= timedelta(days=8):
+#         return _integrated_on_time()
+#     return _process_failure(TransferFailureReason.INTEGRATED_LATE)
+#
+#
+# def _integrated_on_time() -> TransferOutcome:
+#     return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
+#
+#
+# def _technical_failure(reason: TransferFailureReason) -> TransferOutcome:
+#     return TransferOutcome(status=TransferStatus.TECHNICAL_FAILURE, failure_reason=reason)
+#
+#
+# def _process_failure(reason: TransferFailureReason) -> TransferOutcome:
+#     return TransferOutcome(status=TransferStatus.PROCESS_FAILURE, failure_reason=reason)
+#
+#
+# def _unclassified_failure(reason: TransferFailureReason = None) -> TransferOutcome:
+#     return TransferOutcome(
+#         status=TransferStatus.UNCLASSIFIED_FAILURE,
+#         failure_reason=reason,
+#     )

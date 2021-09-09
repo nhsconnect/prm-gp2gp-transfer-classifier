@@ -2,10 +2,12 @@ from datetime import timedelta
 
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
-    TransferStatus,
-    TransferOutcome,
-    TransferFailureReason,
     Practice,
+)
+from prmdata.domain.gp2gp.transfer_outcome import (
+    TransferStatus,
+    TransferFailureReason,
+    TransferOutcome,
 )
 from tests.builders.common import a_string, a_duration, a_datetime
 

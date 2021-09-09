@@ -13,10 +13,7 @@ from tests.builders.common import a_string, a_datetime
 from tests.builders.spine import (
     build_mock_gp2gp_conversation,
 )
-from prmdata.domain.gp2gp.transfer import (
-    TransferStatus,
-    TransferFailureReason,
-)
+from prmdata.domain.gp2gp.transfer_outcome import TransferStatus, TransferFailureReason
 
 mock_transfer_observability_probe = Mock()
 mock_gp2gp_conversation_observability_probe = Mock()
