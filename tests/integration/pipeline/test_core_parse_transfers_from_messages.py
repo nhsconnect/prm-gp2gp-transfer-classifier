@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from dateutil.tz import UTC
 from freezegun import freeze_time
 
-from prmdata.pipeline.core import (
+from prmdata.pipeline.parse_transfers_from_messages import (
     parse_transfers_from_messages,
 )
 

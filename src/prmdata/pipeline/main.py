@@ -8,7 +8,7 @@ from prmdata.pipeline.io import PlatformMetricsIO
 from prmdata.utils.io.json_formatter import JsonFormatter
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
-from prmdata.pipeline.core import (
+from prmdata.pipeline.parse_transfers_from_messages import (
     parse_transfers_from_messages,
 )
 from prmdata.pipeline.config import DataPipelineConfig
