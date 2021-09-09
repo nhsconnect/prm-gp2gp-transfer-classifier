@@ -3,6 +3,7 @@ import logging
 import boto3
 from os import environ
 
+from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
 from prmdata.pipeline.io import PlatformMetricsIO
 from prmdata.utils.io.json_formatter import JsonFormatter
 from prmdata.utils.reporting_window import MonthlyReportingWindow
@@ -47,7 +48,13 @@ def main():
 
     conversation_cutoff = config.conversation_cutoff
 
-    transfers = parse_transfers_from_messages(spine_messages, reporting_window, conversation_cutoff)
+    transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
+    transfers = parse_transfers_from_messages(
+        spine_messages=spine_messages,
+        reporting_window=reporting_window,
+        conversation_cutoff=conversation_cutoff,
+        observability_probe=transfer_observability_probe,
+    )
 
     transfer_table = convert_transfers_to_table(transfers)
 

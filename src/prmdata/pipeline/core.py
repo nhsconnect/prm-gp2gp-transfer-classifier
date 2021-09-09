@@ -20,12 +20,12 @@ def parse_transfers_from_messages(
     spine_messages: Iterable[Message],
     reporting_window: MonthlyReportingWindow,
     conversation_cutoff: timedelta,
+    observability_probe: TransferObservabilityProbe,
 ) -> Iterator[Transfer]:
-    transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
     transfer_service = TransferService(
         message_stream=spine_messages,
         cutoff=conversation_cutoff,
-        observability_probe=transfer_observability_probe,
+        observability_probe=observability_probe,
     )
 
     conversations = transfer_service.group_into_conversations()
