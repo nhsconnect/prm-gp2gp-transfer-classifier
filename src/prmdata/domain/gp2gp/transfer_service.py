@@ -1,14 +1,14 @@
 from collections import defaultdict
 from datetime import timedelta
-from logging import getLogger
-from typing import List, Iterable, Iterator, Dict
+from logging import getLogger, Logger
+from typing import List, Iterable, Iterator, Dict, Optional
 
 from prmdata.domain.gp2gp.transfer import (
-    TransferObservabilityProbe,
     Transfer,
-    _calculate_sla,
     Practice,
-    _assign_transfer_outcome,
+    TransferOutcome,
+    TransferFailureReason,
+    TransferStatus,
 )
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.gp2gp_conversation import (
@@ -19,6 +19,22 @@ from prmdata.domain.spine.gp2gp_conversation import (
 from prmdata.domain.spine.message import Message
 
 module_logger = getLogger(__name__)
+
+
+class TransferObservabilityProbe:
+    def __init__(self, logger: Logger = module_logger):
+        self._logger = logger
+
+    def record_negative_sla(self, conversation: Gp2gpConversation):
+        self._logger.warning(
+            f":Negative SLA duration for conversation: {conversation.conversation_id()}",
+            extra={
+                "event": "NEGATIVE_SLA_DETECTED",
+                "conversation_id": conversation.conversation_id(),
+                "final_acknowledgement_time": conversation.effective_final_acknowledgement_time(),
+                "request_completed_time": conversation.effective_request_completed_time(),
+            },
+        )
 
 
 class TransferService:
@@ -91,3 +107,80 @@ def _ignore_messages_sent_after(cutoff: timedelta, messages: List[Message]) -> L
     first_message_in_conversation = messages[0]
     start_of_conversation = first_message_in_conversation.time
     return [message for message in messages if message.time - start_of_conversation <= cutoff]
+
+
+def _calculate_sla(
+    conversation: Gp2gpConversation, probe: TransferObservabilityProbe
+) -> Optional[timedelta]:
+    final_acknowledgement_time = conversation.effective_final_acknowledgement_time()
+    request_completed_time = conversation.effective_request_completed_time()
+
+    if final_acknowledgement_time is None:
+        return None
+
+    sla_duration = final_acknowledgement_time - request_completed_time
+
+    if sla_duration.total_seconds() < 0:
+        probe.record_negative_sla(conversation)
+
+    return max(timedelta(0), sla_duration)
+
+
+def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
+    if conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments():
+        return _unclassified_failure(TransferFailureReason.AMBIGUOUS_COPCS)
+    elif conversation.contains_copc_error() and not conversation.is_missing_copc_ack():
+        return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
+    elif conversation.is_missing_copc():
+        return _technical_failure(TransferFailureReason.COPC_NOT_SENT)
+    elif conversation.is_missing_copc_ack():
+        return _technical_failure(TransferFailureReason.COPC_NOT_ACKNOWLEDGED)
+    else:
+        return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
+
+
+# flake8: noqa: C901
+def _assign_transfer_outcome(
+    conversation: Gp2gpConversation, sla_duration: Optional[timedelta]
+) -> TransferOutcome:
+    if conversation.is_integrated():
+        return _integrated_within_sla(sla_duration)
+    elif conversation.has_concluded_with_failure():
+        return _technical_failure(TransferFailureReason.FINAL_ERROR)
+    elif conversation.contains_copc_fragments():
+        return _copc_transfer_outcome(conversation)
+    elif conversation.contains_fatal_sender_error_code():
+        return _technical_failure(TransferFailureReason.FATAL_SENDER_ERROR)
+    elif conversation.is_missing_request_acknowledged():
+        return _technical_failure(TransferFailureReason.REQUEST_NOT_ACKNOWLEDGED)
+    elif conversation.is_missing_core_ehr():
+        return _technical_failure(TransferFailureReason.CORE_EHR_NOT_SENT)
+    elif conversation.contains_core_ehr_with_sender_error():
+        return _unclassified_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED_WITH_ERROR)
+    else:
+        return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
+
+
+def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome:
+    if sla_duration is not None and sla_duration <= timedelta(days=8):
+        return _integrated_on_time()
+    return _process_failure(TransferFailureReason.INTEGRATED_LATE)
+
+
+def _integrated_on_time() -> TransferOutcome:
+    return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
+
+
+def _technical_failure(reason: TransferFailureReason) -> TransferOutcome:
+    return TransferOutcome(status=TransferStatus.TECHNICAL_FAILURE, failure_reason=reason)
+
+
+def _process_failure(reason: TransferFailureReason) -> TransferOutcome:
+    return TransferOutcome(status=TransferStatus.PROCESS_FAILURE, failure_reason=reason)
+
+
+def _unclassified_failure(reason: TransferFailureReason = None) -> TransferOutcome:
+    return TransferOutcome(
+        status=TransferStatus.UNCLASSIFIED_FAILURE,
+        failure_reason=reason,
+    )

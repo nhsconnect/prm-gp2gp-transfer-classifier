@@ -4,10 +4,9 @@ from typing import Iterable, Iterator
 
 from prmdata.domain.gp2gp.transfer import (
     Transfer,
-    TransferObservabilityProbe,
 )
 
-from prmdata.domain.gp2gp.transfer_service import TransferService
+from prmdata.domain.gp2gp.transfer_service import TransferService, TransferObservabilityProbe
 from prmdata.domain.spine.message import Message
 from prmdata.domain.spine.gp2gp_conversation import (
     filter_conversations_by_request_started_time,
