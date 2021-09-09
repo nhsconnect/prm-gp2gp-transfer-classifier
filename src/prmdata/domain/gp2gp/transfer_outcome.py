@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import timedelta
 from enum import Enum
-from typing import Optional
+from typing import Optional, Tuple
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 
@@ -32,8 +32,8 @@ class TransferOutcome:
     def from_gp2gp_conversation(
         cls, conversation: Gp2gpConversation, sla_duration: Optional[timedelta]
     ):
-        transfer_outcome = _assign_transfer_outcome(conversation, sla_duration)
-        return cls(transfer_outcome.status, transfer_outcome.failure_reason)
+        [status, failure_reason] = _assign_transfer_outcome(conversation, sla_duration)
+        return cls(status, failure_reason)
 
     def __init__(self, status: TransferStatus, failure_reason: Optional[TransferFailureReason]):
         self.status = status
@@ -43,7 +43,7 @@ class TransferOutcome:
 # flake8: noqa: C901
 def _assign_transfer_outcome(
     conversation: Gp2gpConversation, sla_duration: Optional[timedelta]
-) -> TransferOutcome:
+) -> Tuple[TransferStatus, Optional[TransferFailureReason]]:
     if conversation.is_integrated():
         return _integrated_within_sla(sla_duration)
     elif conversation.has_concluded_with_failure():
@@ -62,7 +62,9 @@ def _assign_transfer_outcome(
         return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
 
 
-def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
+def _copc_transfer_outcome(
+    conversation: Gp2gpConversation,
+) -> Tuple[TransferStatus, Optional[TransferFailureReason]]:
     if conversation.contains_unacknowledged_duplicate_ehr_and_copc_fragments():
         return _unclassified_failure(TransferFailureReason.AMBIGUOUS_COPCS)
     elif conversation.contains_copc_error() and not conversation.is_missing_copc_ack():
@@ -75,26 +77,29 @@ def _copc_transfer_outcome(conversation: Gp2gpConversation) -> TransferOutcome:
         return _process_failure(TransferFailureReason.TRANSFERRED_NOT_INTEGRATED)
 
 
-def _integrated_within_sla(sla_duration: Optional[timedelta]) -> TransferOutcome:
+def _integrated_within_sla(
+    sla_duration: Optional[timedelta],
+) -> Tuple[TransferStatus, Optional[TransferFailureReason]]:
     if sla_duration is not None and sla_duration <= timedelta(days=8):
         return _integrated_on_time()
     return _process_failure(TransferFailureReason.INTEGRATED_LATE)
 
 
-def _integrated_on_time() -> TransferOutcome:
-    return TransferOutcome(status=TransferStatus.INTEGRATED_ON_TIME, failure_reason=None)
+def _integrated_on_time() -> Tuple[TransferStatus, Optional[TransferFailureReason]]:
+    return TransferStatus.INTEGRATED_ON_TIME, None
 
 
-def _technical_failure(reason: TransferFailureReason) -> TransferOutcome:
-    return TransferOutcome(status=TransferStatus.TECHNICAL_FAILURE, failure_reason=reason)
+def _technical_failure(
+    reason: TransferFailureReason,
+) -> Tuple[TransferStatus, TransferFailureReason]:
+    return TransferStatus.TECHNICAL_FAILURE, reason
 
 
-def _process_failure(reason: TransferFailureReason) -> TransferOutcome:
-    return TransferOutcome(status=TransferStatus.PROCESS_FAILURE, failure_reason=reason)
+def _process_failure(reason: TransferFailureReason) -> Tuple[TransferStatus, TransferFailureReason]:
+    return TransferStatus.PROCESS_FAILURE, reason
 
 
-def _unclassified_failure(reason: TransferFailureReason = None) -> TransferOutcome:
-    return TransferOutcome(
-        status=TransferStatus.UNCLASSIFIED_FAILURE,
-        failure_reason=reason,
-    )
+def _unclassified_failure(
+    reason: TransferFailureReason = None,
+) -> Tuple[TransferStatus, Optional[TransferFailureReason]]:
+    return TransferStatus.UNCLASSIFIED_FAILURE, reason
