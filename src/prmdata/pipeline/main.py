@@ -63,7 +63,11 @@ def main():
         f"{reporting_window.metric_month}"
     )
 
-    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet", {})
+    output_metadata = {
+        "date-anchor": config.date_anchor.isoformat(),
+    }
+
+    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet", output_metadata)
 
 
 if __name__ == "__main__":

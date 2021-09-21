@@ -44,6 +44,10 @@ def _read_parquet_columns_json(path):
     }
 
 
+def _read_s3_metadata(bucket, key):
+    return bucket.Object(key).get()["Metadata"]
+
+
 def _read_s3_json(bucket, key):
     f = BytesIO()
     bucket.download_fileobj(key, f)
@@ -99,6 +103,10 @@ def test_end_to_end_with_fake_f3(datadir):
 
     expected_transfers_output_key = "transfers.parquet"
 
+    expected_metadata = {
+        "date-anchor": "2020-01-30T18:44:49+00:00",
+    }
+
     expected_transfers = _read_parquet_columns_json(
         datadir / "expected_outputs" / "transfersParquetColumns.json"
     )
@@ -113,14 +121,16 @@ def test_end_to_end_with_fake_f3(datadir):
         input_overflow_csv_gz, "v2/messages-overflow/2020/1/2020-1_spine_messages_overflow.csv.gz"
     )
 
-    s3_output_path = "v4/2019/12/"
+    s3_output_path = f"v4/2019/12/{expected_transfers_output_key}"
 
     try:
         main()
-        actual_transfers = read_s3_parquet(
-            output_transfer_data_bucket, f"{s3_output_path}{expected_transfers_output_key}"
-        )
+        actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
+        actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
+
         assert actual_transfers == expected_transfers
+        assert actual_metadata == expected_metadata
+
     finally:
         output_transfer_data_bucket.objects.all().delete()
         output_transfer_data_bucket.delete()
