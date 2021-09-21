@@ -56,7 +56,6 @@ def main():
 
     transfer_table = convert_transfers_to_table(transfers)
 
-    transfer_data_bucket = config.output_transfer_data_bucket
     s3_path = (
         f"{config.output_transfer_data_bucket}/"
         f"{_PARQUET_VERSION}/"
@@ -64,22 +63,7 @@ def main():
         f"{reporting_window.metric_month}"
     )
 
-    transfer_object_uri = f"s3://{transfer_data_bucket}/{s3_path}"
-
-    logger.info(
-        f"Attempting to upload: {transfer_object_uri}",
-        extra={
-            "event": "ATTEMPTING_UPLOAD_TRANSFER_PARQUET_TO_S3",
-            "object_uri": transfer_object_uri,
-        },
-    )
-
     s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet", {})
-
-    logger.info(
-        f"Successfully uploaded to: {transfer_object_uri}",
-        extra={"event": "UPLOADED_TRANSFER_PARQUET_TO_S3", "object_uri": transfer_object_uri},
-    )
 
 
 if __name__ == "__main__":
