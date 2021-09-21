@@ -74,7 +74,7 @@ def main():
         },
     )
 
-    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet")
+    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet", {})
 
     logger.info(
         f"Successfully uploaded to: {transfer_object_uri}",

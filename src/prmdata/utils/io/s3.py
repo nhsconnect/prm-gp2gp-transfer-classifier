@@ -31,7 +31,7 @@ class S3DataManager:
             input_csv = csv.DictReader(f)
             yield from input_csv
 
-    def write_parquet(self, table: Table, object_uri: str):
+    def write_parquet(self, table: Table, object_uri: str, metadata: dict[str, str]):
         logger.info(
             f"Attempting to upload: {object_uri}",
             extra={"event": "ATTEMPTING_UPLOAD_PARQUET_TO_S3", "object_uri": object_uri},
@@ -43,7 +43,7 @@ class S3DataManager:
         parquet.write_table(table, buffer_file)
         buffer.seek(0)
 
-        s3_object.put(Body=buffer)
+        s3_object.put(Body=buffer, Metadata=metadata)
 
         logger.info(
             f"Successfully uploaded to: {object_uri}",

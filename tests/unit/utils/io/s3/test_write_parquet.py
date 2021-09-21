@@ -8,6 +8,8 @@ from prmdata.utils.io.s3 import S3DataManager, logger
 from tests.builders.file import read_s3_parquet
 from tests.unit.utils.io.s3 import MOTO_MOCK_REGION
 
+SOME_METADATA = {"metadata_field": "metadata_value"}
+
 
 @mock_s3
 def test_writes_table_as_parquet():
@@ -18,7 +20,7 @@ def test_writes_table_as_parquet():
     fruit_table = pa.table(data)
 
     s3_manager = S3DataManager(conn)
-    s3_manager.write_parquet(fruit_table, "s3://test_bucket/fruits.parquet")
+    s3_manager.write_parquet(fruit_table, "s3://test_bucket/fruits.parquet", SOME_METADATA)
 
     actual = read_s3_parquet(bucket, "fruits.parquet")
 
@@ -38,7 +40,7 @@ def test_will_log_writing_table_events():
     object_uri = f"s3://{bucket_name}/test_object.parquet"
 
     with mock.patch.object(logger, "info") as mock_log_info:
-        s3_manager.write_parquet(fruit_table, object_uri)
+        s3_manager.write_parquet(fruit_table, object_uri, SOME_METADATA)
         mock_log_info.assert_has_calls(
             [
                 mock.call(
@@ -51,3 +53,29 @@ def test_will_log_writing_table_events():
                 ),
             ]
         )
+
+
+@mock_s3
+def test_will_write_metatdata():
+    conn = boto3.resource("s3", region_name=MOTO_MOCK_REGION)
+    bucket_name = "test_bucket"
+    bucket = conn.create_bucket(Bucket=bucket_name)
+
+    data = {"fruit": ["mango", "lemon"]}
+    fruit_table = pa.table(data)
+
+    metadata = {
+        "metadata_field": "metadata_field_value",
+        "second_metadata_field": "metadata_field_second_value",
+    }
+
+    s3_manager = S3DataManager(conn)
+
+    s3_manager.write_parquet(
+        table=fruit_table, object_uri=f"s3://{bucket_name}/test_object.parquet", metadata=metadata
+    )
+
+    expected = metadata
+    actual = bucket.Object("test_object.parquet").get()["Metadata"]
+
+    assert actual == expected
