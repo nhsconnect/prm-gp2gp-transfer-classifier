@@ -1,7 +1,10 @@
 import csv
 import gzip
 import logging
+from io import BytesIO
 from urllib.parse import urlparse
+
+from pyarrow import Table, PythonFile, parquet
 
 logger = logging.getLogger(__name__)
 
@@ -27,3 +30,13 @@ class S3DataManager:
         with gzip.open(body, mode="rt") as f:
             input_csv = csv.DictReader(f)
             yield from input_csv
+
+    def write_parquet(self, table: Table, object_uri: str):
+        s3_object = self._object_from_uri(object_uri)
+
+        buffer = BytesIO()
+        buffer_file = PythonFile(buffer)
+        parquet.write_table(table, buffer_file)
+        buffer.seek(0)
+
+        s3_object.put(Body=buffer)

@@ -11,8 +11,7 @@ from moto.server import DomainDispatcherApplication, create_backend_app
 from prmdata.pipeline.main import main
 from werkzeug.serving import make_server
 
-from tests.builders.file import read_file_to_gzip_buffer
-import pyarrow.parquet as pq
+from tests.builders.file import read_file_to_gzip_buffer, read_s3_parquet
 
 logger = logging.getLogger(__name__)
 
@@ -50,12 +49,6 @@ def _read_s3_json(bucket, key):
     bucket.download_fileobj(key, f)
     f.seek(0)
     return json.loads(f.read().decode("utf-8"))
-
-
-def _read_s3_parquet(bucket, key):
-    f = BytesIO()
-    bucket.download_fileobj(key, f)
-    return pq.read_table(f).to_pydict()
 
 
 def _build_fake_s3(host, port):
@@ -124,7 +117,7 @@ def test_end_to_end_with_fake_f3(datadir):
 
     try:
         main()
-        actual_transfers = _read_s3_parquet(
+        actual_transfers = read_s3_parquet(
             output_transfer_data_bucket, f"{s3_output_path}{expected_transfers_output_key}"
         )
         assert actual_transfers == expected_transfers
