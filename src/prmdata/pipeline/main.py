@@ -13,8 +13,6 @@ from prmdata.pipeline.parse_transfers_from_messages import (
 )
 from prmdata.pipeline.config import DataPipelineConfig
 from prmdata.pipeline.arrow import convert_transfers_to_table
-from pyarrow.parquet import write_table
-from pyarrow.fs import S3FileSystem
 
 logger = logging.getLogger("prmdata")
 
@@ -76,11 +74,7 @@ def main():
         },
     )
 
-    write_table(
-        table=transfer_table,
-        where=f"{s3_path}/transfers.parquet",
-        filesystem=S3FileSystem(endpoint_override=config.s3_endpoint_url),
-    )
+    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet")
 
     logger.info(
         f"Successfully uploaded to: {transfer_object_uri}",
