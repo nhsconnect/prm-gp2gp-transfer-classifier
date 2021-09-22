@@ -103,9 +103,7 @@ def test_end_to_end_with_fake_f3(datadir):
 
     expected_transfers_output_key = "transfers.parquet"
 
-    expected_metadata = {
-        "date-anchor": "2020-01-30T18:44:49+00:00",
-    }
+    expected_metadata = {"date-anchor": "2020-01-30T18:44:49+00:00", "cutoff-days": "14"}
 
     expected_transfers = _read_parquet_columns_json(
         datadir / "expected_outputs" / "transfersParquetColumns.json"

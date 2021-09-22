@@ -13,6 +13,9 @@ class MissingEnvironmentVariable(Exception):
     pass
 
 
+DEFAULT_CUTOFF_DAYS = 14
+
+
 class EnvConfig:
     def __init__(self, env_vars):
         self._env_vars = env_vars
@@ -63,6 +66,6 @@ class DataPipelineConfig:
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
             date_anchor=env.read_datetime("DATE_ANCHOR"),
             conversation_cutoff=env.read_optional_timedelta_days("CONVERSATION_CUTOFF_DAYS")
-            or timedelta(days=14),
+            or timedelta(days=DEFAULT_CUTOFF_DAYS),
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),
         )
