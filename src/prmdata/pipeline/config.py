@@ -55,6 +55,7 @@ class DataPipelineConfig:
     output_transfer_data_bucket: str
     input_spine_data_bucket: str
     date_anchor: datetime
+    build_tag: str
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
 
@@ -65,6 +66,7 @@ class DataPipelineConfig:
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
             date_anchor=env.read_datetime("DATE_ANCHOR"),
+            build_tag=env.read_str("BUILD_TAG"),
             conversation_cutoff=env.read_optional_timedelta_days("CONVERSATION_CUTOFF_DAYS")
             or timedelta(days=DEFAULT_CUTOFF_DAYS),
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),

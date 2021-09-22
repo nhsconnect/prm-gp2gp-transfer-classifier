@@ -66,6 +66,7 @@ def main():
     output_metadata = {
         "date-anchor": config.date_anchor.isoformat(),
         "cutoff-days": str(config.conversation_cutoff.days),
+        "build-tag": config.build_tag,
     }
 
     s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet", output_metadata)

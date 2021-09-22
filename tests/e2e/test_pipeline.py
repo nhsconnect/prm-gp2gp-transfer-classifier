@@ -88,6 +88,7 @@ def test_end_to_end_with_fake_f3(datadir):
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
     environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
     environ["S3_ENDPOINT_URL"] = fake_s3_url
+    environ["BUILD_TAG"] = "abc456"
 
     s3 = boto3.resource(
         "s3",
@@ -103,7 +104,11 @@ def test_end_to_end_with_fake_f3(datadir):
 
     expected_transfers_output_key = "transfers.parquet"
 
-    expected_metadata = {"date-anchor": "2020-01-30T18:44:49+00:00", "cutoff-days": "14"}
+    expected_metadata = {
+        "date-anchor": "2020-01-30T18:44:49+00:00",
+        "cutoff-days": "14",
+        "build-tag": "abc456",
+    }
 
     expected_transfers = _read_parquet_columns_json(
         datadir / "expected_outputs" / "transfersParquetColumns.json"
