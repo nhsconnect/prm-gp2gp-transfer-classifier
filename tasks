@@ -52,7 +52,7 @@ do
         fi
         ecr_login=$(dojo "./scripts/ecr-helper get-login")
         ecr_repo_uri=$(dojo "./scripts/ecr-helper get-repo-uri")
-        docker build -t ${ecr_repo_uri}:latest -t ${ecr_repo_uri}:${IMAGE_TAG} .
+        docker build -t ${ecr_repo_uri}:latest -t ${ecr_repo_uri}:${IMAGE_TAG} --build-arg IMAGE_TAG=$IMAGE_TAG .
         eval $ecr_login
         docker push ${ecr_repo_uri}:${IMAGE_TAG}
         ;;
