@@ -152,7 +152,7 @@ def test_status_is_converted_to_column():
     )
     transfer = build_transfer(transfer_outcome=integrated_transfer_outcome)
 
-    expected_status_column = {"status": ["INTEGRATED_ON_TIME"]}
+    expected_status_column = {"status": ["Integrated On Time"]}
 
     table = convert_transfers_to_table([transfer])
     actual_status_column = table.select(["status"]).to_pydict()
