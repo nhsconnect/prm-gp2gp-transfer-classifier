@@ -16,7 +16,7 @@ from prmdata.pipeline.arrow import convert_transfers_to_table
 
 logger = logging.getLogger("prmdata")
 
-_PARQUET_VERSION = "v4"
+_PARQUET_VERSION = "v5"
 
 
 def _setup_logger():
