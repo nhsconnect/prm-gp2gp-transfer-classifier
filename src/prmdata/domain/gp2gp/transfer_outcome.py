@@ -18,7 +18,7 @@ class TransferFailureReason(Enum):
     FINAL_ERROR = "Final error"
     TRANSFERRED_NOT_INTEGRATED = "Transferred, not integrated"
     REQUEST_NOT_ACKNOWLEDGED = "Request not acknowledged"
-    CORE_EHR_NOT_SENT = "Core Extract not sent"
+    CORE_EHR_NOT_SENT = "Core extract not sent"
     FATAL_SENDER_ERROR = "Contains fatal sender error"
     COPC_NOT_SENT = "COPC(s) not sent"
     COPC_NOT_ACKNOWLEDGED = "COPC(s) not acknowledged"
