@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 from dateutil.tz import tzutc
 
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 
 
 def test_prior_to_correctly_determines_metric_month():

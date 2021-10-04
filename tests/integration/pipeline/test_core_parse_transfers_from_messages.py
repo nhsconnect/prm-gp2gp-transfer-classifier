@@ -13,7 +13,7 @@ from prmdata.domain.gp2gp.transfer import (
     Practice,
 )
 from prmdata.domain.gp2gp.transfer_outcome import TransferStatus, TransferOutcome
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 
 from tests.builders.spine import build_message
 

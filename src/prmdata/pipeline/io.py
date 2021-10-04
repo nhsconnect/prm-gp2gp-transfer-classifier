@@ -2,7 +2,7 @@ import logging
 from typing import Iterable
 
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 
 logger = logging.getLogger(__name__)

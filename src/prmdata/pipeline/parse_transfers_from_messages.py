@@ -11,7 +11,7 @@ from prmdata.domain.spine.message import Message
 from prmdata.domain.spine.gp2gp_conversation import (
     filter_conversations_by_request_started_time,
 )
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 
 module_logger = getLogger(__name__)
 

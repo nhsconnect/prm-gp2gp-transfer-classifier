@@ -6,7 +6,7 @@ from prmdata.domain.spine.gp2gp_conversation import (
     filter_conversations_by_request_started_time,
     Gp2gpConversation,
 )
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 from tests.builders import test_cases
 
 

@@ -5,7 +5,7 @@ from dateutil.tz import tzutc
 
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.io import TransferClassifierIO
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 from tests.builders.common import a_datetime
 
 _MESSAGE_TIME = datetime(2019, 12, 1, 8, 41, 48, 337000, tzinfo=tzutc())

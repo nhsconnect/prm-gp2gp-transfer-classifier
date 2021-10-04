@@ -6,7 +6,7 @@ from os import environ
 from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.utils.io.json_formatter import JsonFormatter
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
 from prmdata.pipeline.parse_transfers_from_messages import (
     parse_transfers_from_messages,

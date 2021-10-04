@@ -7,7 +7,7 @@ from prmdata.domain.spine.message import (
     ERROR_SUPPRESSED,
     FATAL_SENDER_ERROR_CODES,
 )
-from prmdata.utils.reporting_window import MonthlyReportingWindow
+from prmdata.domain.datetime import MonthlyReportingWindow
 
 module_logger = getLogger(__name__)
 
