@@ -61,16 +61,16 @@
     "sending_supplier": ["", "SupplierA","SupplierA", "SupplierB", "Unknown", "SupplierB", "", "SupplierB", "SupplierB"],
     "sla_duration": [398306, 830306, null, 139106, 52706, null, 311906, 3, null],
     "status": [
-        "Integrated On Time",
-        "Process Failure",
-        "Process Failure",
-        "Integrated On Time",
-        "Technical Failure",
-        "Process Failure",
-        "Integrated On Time",
-        "Integrated On Time",
-        "Technical Failure"
+        "Integrated on time",
+        "Process failure",
+        "Process failure",
+        "Integrated on time",
+        "Technical failure",
+        "Process failure",
+        "Integrated on time",
+        "Integrated on time",
+        "Technical failure"
     ],
-    "failure_reason": [null, "Integrated Late", "Transferred, not integrated", null, "Final Error", "Transferred, not integrated", null, null, "Contains Fatal Sender Error"]
+    "failure_reason": [null, "Integrated late", "Transferred, not integrated", null, "Final error", "Transferred, not integrated", null, null, "Contains fatal sender error"]
 }
 
