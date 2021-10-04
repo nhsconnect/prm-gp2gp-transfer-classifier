@@ -62,6 +62,9 @@ def main():
         f"{reporting_window.metric_year}/"
         f"{reporting_window.metric_month}"
     )
+    s3_file_name = (
+        f"{reporting_window.metric_year}-{reporting_window.metric_month}-transfers.parquet"
+    )
 
     output_metadata = {
         "date-anchor": config.date_anchor.isoformat(),
@@ -69,7 +72,7 @@ def main():
         "build-tag": config.build_tag,
     }
 
-    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/transfers.parquet", output_metadata)
+    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/{s3_file_name}", output_metadata)
 
 
 if __name__ == "__main__":
