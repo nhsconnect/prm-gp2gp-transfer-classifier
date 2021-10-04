@@ -8,7 +8,7 @@ from prmdata.utils.io.s3 import S3DataManager
 logger = logging.getLogger(__name__)
 
 
-class PlatformMetricsIO:
+class TransferClassifierIO:
     _SPINE_MESSAGES_VERSION = "v2"
     _SPINE_MESSAGES_PREFIX = "messages"
     _SPINE_MESSAGES_OVERFLOW_PREFIX = "messages-overflow"

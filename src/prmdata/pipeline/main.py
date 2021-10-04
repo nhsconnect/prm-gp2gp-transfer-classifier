@@ -4,7 +4,7 @@ import boto3
 from os import environ
 
 from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
-from prmdata.pipeline.io import PlatformMetricsIO
+from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.utils.io.json_formatter import JsonFormatter
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
@@ -36,13 +36,13 @@ def main():
     s3_manager = S3DataManager(s3)
 
     reporting_window = MonthlyReportingWindow.prior_to(config.date_anchor)
-    metrics_io = PlatformMetricsIO(
+    transfer_classifier_io = TransferClassifierIO(
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,
         gp2gp_spine_bucket=config.input_spine_data_bucket,
     )
 
-    spine_messages = metrics_io.read_spine_messages()
+    spine_messages = transfer_classifier_io.read_spine_messages()
 
     conversation_cutoff = config.conversation_cutoff
 

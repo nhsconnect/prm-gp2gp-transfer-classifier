@@ -4,7 +4,7 @@ from unittest.mock import Mock, call
 from dateutil.tz import tzutc
 
 from prmdata.domain.spine.message import Message
-from prmdata.pipeline.io import PlatformMetricsIO
+from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.utils.reporting_window import MonthlyReportingWindow
 from tests.builders.common import a_datetime
 
@@ -51,7 +51,7 @@ def test_read_spine_messages():
     spine_message_three = _spine_message_obj_number(3)
     spine_bucket = "test_spine_bucket"
 
-    metrics_io = PlatformMetricsIO(
+    transfer_classifier_io = TransferClassifierIO(
         reporting_window=reporting_window,
         s3_data_manager=s3_manager,
         gp2gp_spine_bucket=spine_bucket,
@@ -68,7 +68,7 @@ def test_read_spine_messages():
         f"s3://{spine_bucket}/v2/messages-overflow/2021/2/2021-2_spine_messages_overflow.csv.gz"
     )
 
-    actual_data = list(metrics_io.read_spine_messages())
+    actual_data = list(transfer_classifier_io.read_spine_messages())
 
     assert actual_data == expected_data
 
