@@ -7,7 +7,7 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         "python-dateutil>=2.8",
-        "boto3>=1.12",
+        "boto3>=1.18",
         "PyArrow>=5.0",
     ],
 )
