@@ -4,7 +4,7 @@ import boto3
 from os import environ
 
 from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
-from prmdata.pipeline.io import TransferClassifierIO
+from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
 from prmdata.utils.io.json_formatter import JsonFormatter
 from prmdata.domain.datetime import MonthlyReportingWindow
 from prmdata.utils.io.s3 import S3DataManager
@@ -36,13 +36,18 @@ def main():
     s3_manager = S3DataManager(s3)
 
     reporting_window = MonthlyReportingWindow.prior_to(config.date_anchor)
-    transfer_classifier_io = TransferClassifierIO(
-        reporting_window=reporting_window,
-        s3_data_manager=s3_manager,
+
+    uris = TransferClassifierS3UriResolver(
         gp2gp_spine_bucket=config.input_spine_data_bucket,
+        transfers_bucket=config.output_transfer_data_bucket,
     )
 
-    spine_messages = transfer_classifier_io.read_spine_messages()
+    transfer_classifier_io = TransferClassifierIO(
+        s3_data_manager=s3_manager,
+    )
+
+    input_path = uris.spine_messages(reporting_window)
+    spine_messages = transfer_classifier_io.read_spine_messages(input_path)
 
     conversation_cutoff = config.conversation_cutoff
 
@@ -56,23 +61,15 @@ def main():
 
     transfer_table = convert_transfers_to_table(transfers)
 
-    s3_path = (
-        f"{config.output_transfer_data_bucket}/"
-        f"{_PARQUET_VERSION}/"
-        f"{reporting_window.metric_year}/"
-        f"{reporting_window.metric_month}"
-    )
-    s3_file_name = (
-        f"{reporting_window.metric_year}-{reporting_window.metric_month}-transfers.parquet"
-    )
-
     output_metadata = {
         "date-anchor": config.date_anchor.isoformat(),
         "cutoff-days": str(config.conversation_cutoff.days),
         "build-tag": config.build_tag,
     }
 
-    s3_manager.write_parquet(transfer_table, f"s3://{s3_path}/{s3_file_name}", output_metadata)
+    output_path = uris.gp2gp_transfers(reporting_window)
+
+    s3_manager.write_parquet(transfer_table, output_path, output_metadata)
 
 
 if __name__ == "__main__":

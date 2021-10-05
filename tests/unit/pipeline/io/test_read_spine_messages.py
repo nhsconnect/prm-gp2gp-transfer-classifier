@@ -5,8 +5,7 @@ from dateutil.tz import tzutc
 
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.io import TransferClassifierIO
-from prmdata.domain.datetime import MonthlyReportingWindow
-from tests.builders.common import a_datetime
+from tests.builders.common import a_string
 
 _MESSAGE_TIME = datetime(2019, 12, 1, 8, 41, 48, 337000, tzinfo=tzutc())
 _MESSAGE_TIME_STR = "2019-12-01T08:41:48.337+0000"
@@ -44,32 +43,25 @@ def _spine_message_dict_number(number):
 
 def test_read_spine_messages():
     s3_manager = Mock()
-    reporting_window = MonthlyReportingWindow.prior_to(a_datetime(year=2021, month=2))
 
     spine_message_one = _spine_message_obj_number(1)
     spine_message_two = _spine_message_obj_number(2)
     spine_message_three = _spine_message_obj_number(3)
-    spine_bucket = "test_spine_bucket"
 
-    transfer_classifier_io = TransferClassifierIO(
-        reporting_window=reporting_window,
-        s3_data_manager=s3_manager,
-        gp2gp_spine_bucket=spine_bucket,
-    )
+    transfer_classifier_io = TransferClassifierIO(s3_manager)
 
     s3_manager.read_gzip_csv.side_effect = [
         iter([_spine_message_dict_number(1), _spine_message_dict_number(2)]),
         iter([_spine_message_dict_number(3)]),
     ]
 
-    expected_data = [spine_message_one, spine_message_two, spine_message_three]
-    expected_path = f"s3://{spine_bucket}/v2/messages/2021/1/2021-1_spine_messages.csv.gz"
-    expected_overflow_path = (
-        f"s3://{spine_bucket}/v2/messages-overflow/2021/2/2021-2_spine_messages_overflow.csv.gz"
-    )
+    path_one = a_string()
+    path_two = a_string()
 
-    actual_data = list(transfer_classifier_io.read_spine_messages())
+    expected_data = [spine_message_one, spine_message_two, spine_message_three]
+
+    actual_data = list(transfer_classifier_io.read_spine_messages([path_one, path_two]))
 
     assert actual_data == expected_data
 
-    s3_manager.read_gzip_csv.assert_has_calls([call(expected_path), call(expected_overflow_path)])
+    s3_manager.read_gzip_csv.assert_has_calls([call(path_one), call(path_two)])
