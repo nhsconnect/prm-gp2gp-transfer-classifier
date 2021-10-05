@@ -1,67 +1,73 @@
-from datetime import datetime
-from unittest.mock import Mock, call
+from collections import OrderedDict
+from io import BytesIO
 
-from dateutil.tz import tzutc
-
-from prmdata.domain.spine.message import Message
 from prmdata.pipeline.io import TransferClassifierIO
-from tests.builders.common import a_string
+from prmdata.utils.io.s3 import S3DataManager
+from tests.builders.file import build_gzip_csv
+from tests.builders.spine import build_message
 
-_MESSAGE_TIME = datetime(2019, 12, 1, 8, 41, 48, 337000, tzinfo=tzutc())
-_MESSAGE_TIME_STR = "2019-12-01T08:41:48.337+0000"
+_SPINE_CSV_MAPPING = OrderedDict(
+    [
+        ("_time", lambda m: m.time.isoformat()),
+        ("conversationID", lambda m: m.conversation_id),
+        ("GUID", lambda m: m.guid),
+        ("interactionID", lambda m: m.interaction_id),
+        ("messageSender", lambda m: m.from_party_asid),
+        ("messageRecipient", lambda m: m.to_party_asid),
+        ("messageRef", lambda m: "NotProvided" if m.message_ref is None else m.message_ref),
+        ("fromSystem", lambda m: m.from_system),
+        ("toSystem", lambda m: m.to_system),
+        ("jdiEvent", lambda m: "NONE" if m.error_code is None else str(m.error_code)),
+    ]
+)
 
 
-def _spine_message_obj_number(number):
-    return Message(
-        time=_MESSAGE_TIME,
-        guid=f"guid{number}",
-        conversation_id=f"conversation{number}",
-        interaction_id=f"interaction{number}",
-        from_party_asid=f"fromasid{number}",
-        to_party_asid=f"toasid{number}",
-        message_ref=f"ref{number}",
-        error_code=None,
-        from_system=f"fromsys{number}",
-        to_system=f"tosys{number}",
+def _spine_csv_gz(messages):
+    return build_gzip_csv(
+        header=_SPINE_CSV_MAPPING.keys(),
+        rows=[[field(msg) for field in _SPINE_CSV_MAPPING.values()] for msg in messages],
     )
 
 
-def _spine_message_dict_number(number):
-    return {
-        "_time": _MESSAGE_TIME_STR,
-        "conversationID": f"conversation{number}",
-        "GUID": f"guid{number}",
-        "interactionID": f"interaction{number}",
-        "messageSender": f"fromasid{number}",
-        "messageRecipient": f"toasid{number}",
-        "messageRef": f"ref{number}",
-        "fromSystem": f"fromsys{number}",
-        "toSystem": f"tosys{number}",
-        "jdiEvent": "NONE",
-    }
+class MockS3Object:
+    def __init__(self, bucket, key, contents):
+        self.bucket = bucket
+        self.key = key
+        self._contents = contents
+
+    def get(self):
+        return {"Body": BytesIO(self._contents)}
+
+
+class MockS3:
+    def __init__(self, objects):
+        lookup = {(obj.bucket, obj.key): obj for obj in objects}
+        self.Object = lambda bucket, key: lookup[(bucket, key)]
 
 
 def test_read_spine_messages():
-    s3_manager = Mock()
 
-    spine_message_one = _spine_message_obj_number(1)
-    spine_message_two = _spine_message_obj_number(2)
-    spine_message_three = _spine_message_obj_number(3)
+    spine_messages = [build_message() for _ in range(10)]
 
-    transfer_classifier_io = TransferClassifierIO(s3_manager)
+    mock_s3_conn = MockS3(
+        objects=[
+            MockS3Object(
+                bucket="test_bucket",
+                key="data/1.csv.gz",
+                contents=_spine_csv_gz(messages=spine_messages[:4]),
+            ),
+            MockS3Object(
+                bucket="test_bucket",
+                key="data/2.csv.gz",
+                contents=_spine_csv_gz(messages=spine_messages[4:]),
+            ),
+        ]
+    )
 
-    s3_manager.read_gzip_csv.side_effect = [
-        iter([_spine_message_dict_number(1), _spine_message_dict_number(2)]),
-        iter([_spine_message_dict_number(3)]),
-    ]
+    io = TransferClassifierIO(s3_data_manager=S3DataManager(mock_s3_conn))
 
-    path_one = a_string()
-    path_two = a_string()
+    actual = io.read_spine_messages(
+        ["s3://test_bucket/data/1.csv.gz", "s3://test_bucket/data/2.csv.gz"]
+    )
 
-    expected_data = [spine_message_one, spine_message_two, spine_message_three]
-
-    actual_data = list(transfer_classifier_io.read_spine_messages([path_one, path_two]))
-
-    assert actual_data == expected_data
-
-    s3_manager.read_gzip_csv.assert_has_calls([call(path_one), call(path_two)])
+    assert list(actual) == spine_messages
