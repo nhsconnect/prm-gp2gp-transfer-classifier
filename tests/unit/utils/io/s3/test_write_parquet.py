@@ -5,7 +5,7 @@ from moto import mock_s3
 import pyarrow as pa
 
 from prmdata.utils.io.s3 import S3DataManager, logger
-from tests.builders.file import read_s3_parquet
+from tests.builders.s3 import read_s3_parquet
 from tests.unit.utils.io.s3 import MOTO_MOCK_REGION
 
 SOME_METADATA = {"metadata_field": "metadata_value"}

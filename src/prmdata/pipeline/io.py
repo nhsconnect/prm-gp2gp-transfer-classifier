@@ -1,8 +1,10 @@
 import logging
 from typing import Iterable
 
+from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
 from prmdata.domain.datetime import MonthlyReportingWindow
+from prmdata.pipeline.arrow import convert_transfers_to_table
 from prmdata.utils.io.s3 import S3DataManager
 
 logger = logging.getLogger(__name__)
@@ -49,10 +51,6 @@ class TransferClassifierS3UriResolver:
 
 
 class TransferClassifierIO:
-    _SPINE_MESSAGES_VERSION = "v2"
-    _SPINE_MESSAGES_PREFIX = "messages"
-    _SPINE_MESSAGES_OVERFLOW_PREFIX = "messages-overflow"
-
     def __init__(self, s3_data_manager: S3DataManager):
         self._s3_manager = s3_data_manager
 
@@ -60,3 +58,10 @@ class TransferClassifierIO:
         for uri in s3_uris:
             data = self._s3_manager.read_gzip_csv(uri)
             yield from construct_messages_from_splunk_items(data)
+
+    def write_transfers(self, transfers: Iterable[Transfer], s3_uri: str, metadata: dict[str, str]):
+        self._s3_manager.write_parquet(
+            table=convert_transfers_to_table(transfers),
+            object_uri=s3_uri,
+            metadata=metadata,
+        )

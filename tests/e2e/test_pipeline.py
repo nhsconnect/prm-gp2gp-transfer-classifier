@@ -11,7 +11,8 @@ from moto.server import DomainDispatcherApplication, create_backend_app
 from prmdata.pipeline.main import main
 from werkzeug.serving import make_server
 
-from tests.builders.file import read_file_to_gzip_buffer, read_s3_parquet
+from tests.builders.file import read_file_to_gzip_buffer
+from tests.builders.s3 import read_s3_parquet
 
 logger = logging.getLogger(__name__)
 

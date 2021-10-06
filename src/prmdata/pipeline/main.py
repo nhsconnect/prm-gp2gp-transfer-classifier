@@ -12,7 +12,6 @@ from prmdata.pipeline.parse_transfers_from_messages import (
     parse_transfers_from_messages,
 )
 from prmdata.pipeline.config import DataPipelineConfig
-from prmdata.pipeline.arrow import convert_transfers_to_table
 
 logger = logging.getLogger("prmdata")
 
@@ -40,12 +39,10 @@ def main():
         transfers_bucket=config.output_transfer_data_bucket,
     )
 
-    transfer_classifier_io = TransferClassifierIO(
-        s3_data_manager=s3_manager,
-    )
+    io = TransferClassifierIO(s3_manager)
 
     input_path = uris.spine_messages(reporting_window)
-    spine_messages = transfer_classifier_io.read_spine_messages(input_path)
+    spine_messages = io.read_spine_messages(input_path)
 
     conversation_cutoff = config.conversation_cutoff
 
@@ -57,8 +54,6 @@ def main():
         observability_probe=transfer_observability_probe,
     )
 
-    transfer_table = convert_transfers_to_table(transfers)
-
     output_metadata = {
         "date-anchor": config.date_anchor.isoformat(),
         "cutoff-days": str(config.conversation_cutoff.days),
@@ -67,7 +62,7 @@ def main():
 
     output_path = uris.gp2gp_transfers(reporting_window)
 
-    s3_manager.write_parquet(transfer_table, output_path, output_metadata)
+    io.write_transfers(transfers, output_path, output_metadata)
 
 
 if __name__ == "__main__":

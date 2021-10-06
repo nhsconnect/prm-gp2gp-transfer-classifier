@@ -2,8 +2,6 @@ import gzip
 import shutil
 from io import BytesIO
 
-from pyarrow import parquet as pq
-
 
 def _build_csv_contents(header, rows):
     def build_line(values):
@@ -36,9 +34,3 @@ def read_file_to_gzip_buffer(input_file_path):
             shutil.copyfileobj(input_file, output_file)
     gzip_buffer.seek(0)
     return gzip_buffer
-
-
-def read_s3_parquet(bucket, key):
-    f = BytesIO()
-    bucket.download_fileobj(key, f)
-    return pq.read_table(f).to_pydict()

@@ -1,9 +1,9 @@
 from collections import OrderedDict
-from io import BytesIO
 
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.utils.io.s3 import S3DataManager
 from tests.builders.file import build_gzip_csv
+from tests.builders.s3 import MockS3Object, MockS3
 from tests.builders.spine import build_message
 
 _SPINE_CSV_MAPPING = OrderedDict(
@@ -27,22 +27,6 @@ def _spine_csv_gz(messages):
         header=_SPINE_CSV_MAPPING.keys(),
         rows=[[field(msg) for field in _SPINE_CSV_MAPPING.values()] for msg in messages],
     )
-
-
-class MockS3Object:
-    def __init__(self, bucket, key, contents):
-        self.bucket = bucket
-        self.key = key
-        self._contents = contents
-
-    def get(self):
-        return {"Body": BytesIO(self._contents)}
-
-
-class MockS3:
-    def __init__(self, objects):
-        lookup = {(obj.bucket, obj.key): obj for obj in objects}
-        self.Object = lambda bucket, key: lookup[(bucket, key)]
 
 
 def test_read_spine_messages():
