@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import pytest
 from dateutil.tz import tzutc
 
 from prmdata.pipeline.config import DataPipelineConfig, MissingEnvironmentVariable
@@ -60,10 +61,9 @@ def test_error_from_environment_when_required_fields_are_not_set():
         "OUTPUT_TRANSFER_DATA_BUCKET": "output-transfer-data-bucket",
     }
 
-    try:
+    with pytest.raises(MissingEnvironmentVariable) as e:
         DataPipelineConfig.from_environment_variables(environment)
-    except MissingEnvironmentVariable as ex:
         assert (
-            str(ex)
+            str(e)
             == "Expected environment variable INPUT_SPINE_DATA_BUCKET was not set, exiting..."
         )
