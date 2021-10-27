@@ -1,7 +1,12 @@
 from datetime import datetime
+from typing import Tuple
 
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
+
+YearNumber = int
+MonthNumber = int
+YearMonth = Tuple[YearNumber, MonthNumber]
 
 
 class MonthlyReportingWindow:
@@ -16,20 +21,14 @@ class MonthlyReportingWindow:
         self._overflow_month_start = overflow_month_start
 
     @property
-    def metric_month(self) -> int:
-        return self._metric_month_start.month
+    def metric_month(self) -> YearMonth:
+        month = self._metric_month_start
+        return month.year, month.month
 
     @property
-    def metric_year(self) -> int:
-        return self._metric_month_start.year
-
-    @property
-    def overflow_month(self) -> int:
-        return self._overflow_month_start.month
-
-    @property
-    def overflow_year(self) -> int:
-        return self._overflow_month_start.year
+    def overflow_month(self) -> YearMonth:
+        month = self._overflow_month_start
+        return month.year, month.month
 
     def contains(self, time: datetime):
         return self._metric_month_start <= time < self._overflow_month_start

@@ -46,16 +46,18 @@ class TransferClassifierPipeline:
 
         self._io = TransferClassifierIO(s3_manager, output_metadata)
 
-    def _read_spine_messages(self):
-        input_path = self._uris.spine_messages(self._reporting_window)
+    def _read_spine_messages(self, metric_month, overflow_month):
+        input_path = self._uris.spine_messages(metric_month, overflow_month)
         return self._io.read_spine_messages(input_path)
 
-    def _write_transfers(self, transfers):
-        output_path = self._uris.gp2gp_transfers(self._reporting_window)
+    def _write_transfers(self, transfers, metric_month):
+        output_path = self._uris.gp2gp_transfers(metric_month)
         self._io.write_transfers(transfers, output_path)
 
     def run(self):
-        spine_messages = self._read_spine_messages()
+        metric_month = self._reporting_window.metric_month
+        overflow_month = self._reporting_window.overflow_month
+        spine_messages = self._read_spine_messages(metric_month, overflow_month)
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
         transfers = parse_transfers_from_messages(
             spine_messages=spine_messages,
@@ -63,7 +65,7 @@ class TransferClassifierPipeline:
             conversation_cutoff=self._cutoff,
             observability_probe=transfer_observability_probe,
         )
-        self._write_transfers(transfers)
+        self._write_transfers(transfers, metric_month)
 
 
 def main():

@@ -3,7 +3,7 @@ from typing import Iterable, Dict
 
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
-from prmdata.domain.datetime import MonthlyReportingWindow
+from prmdata.domain.datetime import YearMonth
 from prmdata.pipeline.arrow import convert_transfers_to_table
 from prmdata.utils.io.s3 import S3DataManager
 
@@ -23,30 +23,36 @@ class TransferClassifierS3UriResolver:
     def _s3_path(*fragments):
         return "s3://" + "/".join(fragments)
 
-    def spine_messages(self, window: MonthlyReportingWindow) -> list[str]:
-        spine_messages_path = self._s3_path(
+    def _metric_month_path(self, year_month: YearMonth):
+        year, month = year_month
+        return self._s3_path(
             self._gp2gp_spine_bucket,
             self._SPINE_MESSAGES_VERSION,
             "messages",
-            f"{window.metric_year}/{window.metric_month}",
-            f"{window.metric_year}-{window.metric_month}_spine_messages.csv.gz",
+            f"{year}/{month}",
+            f"{year}-{month}_spine_messages.csv.gz",
         )
-        spine_messages_overflow_path = self._s3_path(
+
+    def _overflow_month_path(self, year_month: YearMonth):
+        year, month = year_month
+        return self._s3_path(
             self._gp2gp_spine_bucket,
             self._SPINE_MESSAGES_VERSION,
             "messages-overflow",
-            f"{window.overflow_year}/{window.overflow_month}",
-            f"{window.overflow_year}-{window.overflow_month}_spine_messages_overflow.csv.gz",
+            f"{year}/{month}",
+            f"{year}-{month}_spine_messages_overflow.csv.gz",
         )
 
-        return [spine_messages_path, spine_messages_overflow_path]
+    def spine_messages(self, metric_month: YearMonth, overflow_month: YearMonth) -> list[str]:
+        return [self._metric_month_path(metric_month), self._overflow_month_path(overflow_month)]
 
-    def gp2gp_transfers(self, window: MonthlyReportingWindow) -> str:
+    def gp2gp_transfers(self, year_month: YearMonth) -> str:
+        year, month = year_month
         return self._s3_path(
             self._transfers_bucket,
             self._TRANSFERS_PARQUET_VERSION,
-            f"{window.metric_year}/{window.metric_month}",
-            f"{window.metric_year}-{window.metric_month}-transfers.parquet",
+            f"{year}/{month}",
+            f"{year}-{month}-transfers.parquet",
         )
 
 
