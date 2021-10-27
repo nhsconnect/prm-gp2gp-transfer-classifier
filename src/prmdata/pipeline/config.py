@@ -51,7 +51,7 @@ class EnvConfig:
 
 
 @dataclass
-class DataPipelineConfig:
+class TransferClassifierConfig:
     output_transfer_data_bucket: str
     input_spine_data_bucket: str
     date_anchor: datetime
@@ -62,7 +62,7 @@ class DataPipelineConfig:
     @classmethod
     def from_environment_variables(cls, env_vars):
         env = EnvConfig(env_vars)
-        return DataPipelineConfig(
+        return TransferClassifierConfig(
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
             date_anchor=env.read_datetime("DATE_ANCHOR"),

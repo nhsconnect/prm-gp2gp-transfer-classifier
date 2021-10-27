@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from dateutil.tz import tzutc
 
-from prmdata.pipeline.config import DataPipelineConfig, MissingEnvironmentVariable
+from prmdata.pipeline.config import TransferClassifierConfig, MissingEnvironmentVariable
 
 
 def test_reads_from_environment_variables_and_converts_to_required_format():
@@ -16,7 +16,7 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
         "BUILD_TAG": "12345",
     }
 
-    expected_config = DataPipelineConfig(
+    expected_config = TransferClassifierConfig(
         input_spine_data_bucket="input-spine-data-bucket",
         output_transfer_data_bucket="output-transfer-data-bucket",
         date_anchor=datetime(
@@ -27,7 +27,7 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
         build_tag="12345",
     )
 
-    actual_config = DataPipelineConfig.from_environment_variables(environment)
+    actual_config = TransferClassifierConfig.from_environment_variables(environment)
 
     assert actual_config == expected_config
 
@@ -40,7 +40,7 @@ def test_read_config_from_environment_when_optional_parameters_are_not_set():
         "BUILD_TAG": "12345",
     }
 
-    expected_config = DataPipelineConfig(
+    expected_config = TransferClassifierConfig(
         input_spine_data_bucket="input-spine-data-bucket",
         output_transfer_data_bucket="output-transfer-data-bucket",
         date_anchor=datetime(
@@ -51,7 +51,7 @@ def test_read_config_from_environment_when_optional_parameters_are_not_set():
         build_tag="12345",
     )
 
-    actual_config = DataPipelineConfig.from_environment_variables(environment)
+    actual_config = TransferClassifierConfig.from_environment_variables(environment)
 
     assert actual_config == expected_config
 
@@ -62,7 +62,7 @@ def test_error_from_environment_when_required_fields_are_not_set():
     }
 
     with pytest.raises(MissingEnvironmentVariable) as e:
-        DataPipelineConfig.from_environment_variables(environment)
+        TransferClassifierConfig.from_environment_variables(environment)
         assert (
             str(e)
             == "Expected environment variable INPUT_SPINE_DATA_BUCKET was not set, exiting..."

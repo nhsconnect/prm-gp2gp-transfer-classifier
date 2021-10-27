@@ -11,7 +11,7 @@ from prmdata.utils.io.s3 import S3DataManager
 from prmdata.pipeline.parse_transfers_from_messages import (
     parse_transfers_from_messages,
 )
-from prmdata.pipeline.config import DataPipelineConfig
+from prmdata.pipeline.config import TransferClassifierConfig
 
 logger = logging.getLogger("prmdata")
 
@@ -25,7 +25,7 @@ def _setup_logger():
 
 
 class TransferClassifierPipeline:
-    def __init__(self, config: DataPipelineConfig):
+    def __init__(self, config: TransferClassifierConfig):
         s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
         s3_manager = S3DataManager(s3)
 
@@ -68,7 +68,7 @@ class TransferClassifierPipeline:
 
 def main():
     _setup_logger()
-    config = DataPipelineConfig.from_environment_variables(environ)
+    config = TransferClassifierConfig.from_environment_variables(environ)
     pipeline = TransferClassifierPipeline(config)
     pipeline.run()
 
