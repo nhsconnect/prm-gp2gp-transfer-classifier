@@ -1,5 +1,5 @@
 import logging
-from typing import Iterable
+from typing import Iterable, Dict
 
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
@@ -51,17 +51,18 @@ class TransferClassifierS3UriResolver:
 
 
 class TransferClassifierIO:
-    def __init__(self, s3_data_manager: S3DataManager):
+    def __init__(self, s3_data_manager: S3DataManager, output_metadata: Dict[str, str]):
         self._s3_manager = s3_data_manager
+        self._output_metadata = output_metadata
 
     def read_spine_messages(self, s3_uris: list[str]) -> Iterable[Message]:
         for uri in s3_uris:
             data = self._s3_manager.read_gzip_csv(uri)
             yield from construct_messages_from_splunk_items(data)
 
-    def write_transfers(self, transfers: Iterable[Transfer], s3_uri: str, metadata: dict[str, str]):
+    def write_transfers(self, transfers: Iterable[Transfer], s3_uri: str):
         self._s3_manager.write_parquet(
             table=convert_transfers_to_table(transfers),
             object_uri=s3_uri,
-            metadata=metadata,
+            metadata=self._output_metadata,
         )

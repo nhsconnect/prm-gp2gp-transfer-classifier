@@ -31,12 +31,6 @@ class TransferClassifierPipeline:
 
         self._reporting_window = MonthlyReportingWindow.prior_to(config.date_anchor)
 
-        self._output_metadata = {
-            "date-anchor": config.date_anchor.isoformat(),
-            "cutoff-days": str(config.conversation_cutoff.days),
-            "build-tag": config.build_tag,
-        }
-
         self._cutoff = config.conversation_cutoff
 
         self._uris = TransferClassifierS3UriResolver(
@@ -44,7 +38,13 @@ class TransferClassifierPipeline:
             transfers_bucket=config.output_transfer_data_bucket,
         )
 
-        self._io = TransferClassifierIO(s3_manager)
+        output_metadata = {
+            "date-anchor": config.date_anchor.isoformat(),
+            "cutoff-days": str(config.conversation_cutoff.days),
+            "build-tag": config.build_tag,
+        }
+
+        self._io = TransferClassifierIO(s3_manager, output_metadata)
 
     def _read_spine_messages(self):
         input_path = self._uris.spine_messages(self._reporting_window)
@@ -52,7 +52,7 @@ class TransferClassifierPipeline:
 
     def _write_transfers(self, transfers):
         output_path = self._uris.gp2gp_transfers(self._reporting_window)
-        self._io.write_transfers(transfers, output_path, self._output_metadata)
+        self._io.write_transfers(transfers, output_path)
 
     def run(self):
         spine_messages = self._read_spine_messages()
