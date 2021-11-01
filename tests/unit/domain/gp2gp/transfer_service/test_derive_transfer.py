@@ -284,3 +284,49 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
 
     assert actual.sla_duration == expected_sla_duration
     assert actual.date_completed == successful_acknowledgement_datetime
+
+
+def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_transfer():
+
+    request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+
+    conversation = Gp2gpConversation(
+        messages=test_cases.ehr_integrated_successfully(
+            request_completed_time=request_completed_date
+        ),
+        probe=mock_gp2gp_conversation_observability_probe,
+    )
+
+    transfer_service = TransferService(
+        message_stream=[],
+        cutoff=timedelta(days=14),
+        observability_probe=mock_transfer_observability_probe,
+    )
+
+    actual = transfer_service.derive_transfer(conversation)
+
+    expected_last_sender_message_timestamp = request_completed_date
+
+    assert actual.last_sender_message_timestamp == expected_last_sender_message_timestamp
+
+
+def test_produces_last_sender_message_timestamp_given_a_transfer_awaiting_for_integration():
+
+    request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+
+    conversation = Gp2gpConversation(
+        messages=test_cases.core_ehr_sent(request_completed_time=request_completed_date),
+        probe=mock_gp2gp_conversation_observability_probe,
+    )
+
+    transfer_service = TransferService(
+        message_stream=[],
+        cutoff=timedelta(days=14),
+        observability_probe=mock_transfer_observability_probe,
+    )
+
+    actual = transfer_service.derive_transfer(conversation)
+
+    expected_last_sender_message_timestamp = request_completed_date
+
+    assert actual.last_sender_message_timestamp == expected_last_sender_message_timestamp

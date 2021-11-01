@@ -68,7 +68,7 @@ def _build_fake_s3_bucket(bucket_name: str, s3):
     return s3_fake_bucket
 
 
-def test_end_to_end_with_fake_f3(datadir):
+def test_end_to_end_with_fake_s3(datadir):
     fake_s3_host = "127.0.0.1"
     fake_s3_port = 8887
     fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"

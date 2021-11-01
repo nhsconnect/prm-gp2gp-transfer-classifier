@@ -22,6 +22,7 @@ class Transfer(NamedTuple):
     outcome: TransferOutcome
     date_requested: datetime
     date_completed: Optional[datetime]
+    last_sender_message_timestamp: Optional[datetime]
 
     @property
     def sla_duration_seconds(self) -> Optional[int]:

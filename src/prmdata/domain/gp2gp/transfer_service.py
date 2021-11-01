@@ -76,7 +76,9 @@ class TransferService:
             except ConversationMissingStart:
                 pass
 
-    def convert_to_transfers(self, conversations: Iterator[Gp2gpConversation]):
+    def convert_to_transfers(
+        self, conversations: Iterator[Gp2gpConversation]
+    ) -> Iterator[Transfer]:
         return (self.derive_transfer(conversation) for conversation in conversations)
 
     def derive_transfer(
@@ -100,6 +102,7 @@ class TransferService:
             outcome=TransferOutcome.from_gp2gp_conversation(conversation, sla_duration),
             date_requested=conversation.date_requested(),
             date_completed=conversation.effective_final_acknowledgement_time(),
+            last_sender_message_timestamp=conversation.last_sender_message_timestamp(),
         )
 
 

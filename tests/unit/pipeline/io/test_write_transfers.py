@@ -33,6 +33,7 @@ def test_write_transfers_correctly_writes_all_fields():
         ),
         date_requested=datetime(year=2021, month=3, day=5),
         date_completed=None,
+        last_sender_message_timestamp=None,
     )
 
     io.write_transfers(

@@ -34,6 +34,7 @@ def build_transfer(**kwargs) -> Transfer:
         ),
         date_requested=kwargs.get("date_requested", a_datetime()),
         date_completed=kwargs.get("date_completed", None),
+        last_sender_message_timestamp=None,
     )
 
 
