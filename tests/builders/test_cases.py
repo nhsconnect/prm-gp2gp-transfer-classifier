@@ -165,14 +165,15 @@ def request_acknowledged_with_error(**kwargs):
     )
 
 
-def core_ehr_sent():
+def core_ehr_sent(**kwargs):
     conversation_id = a_string()
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
 
     return (
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr()
+        .with_core_ehr(time=req_complete_time)
         .build()
     )
 

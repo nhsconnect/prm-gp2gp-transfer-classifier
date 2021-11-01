@@ -101,6 +101,7 @@ def test_parses_transfer_correctly_given_valid_message_list():
             sender_error_codes=[None],
             final_error_codes=[None],
             intermediate_error_codes=[],
+            last_sender_message_timestamp=None,
         )
     ]
 

@@ -133,6 +133,9 @@ class Gp2gpConversation:
     def date_requested(self) -> datetime:
         return self._request_started.message.time
 
+    def last_sender_message_timestamp(self) -> datetime:
+        return self._request_completed[0].message.time
+
     def is_integrated(self) -> bool:
         return self._effective_ehr_ack is not None and _integrated_or_suppressed(
             self._effective_ehr_ack
