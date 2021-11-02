@@ -84,6 +84,7 @@ def test_parses_transfer_correctly_given_valid_message_list():
         requesting_supplier=requesting_practice.supplier,
         sending_supplier=sending_practice.supplier,
         ehr_request_started_on=datetime(2019, 12, 30, 18, 2, 29, tzinfo=UTC),
+        # core ehr/request completed sometimes gets sent before request started acknowledgement
         ehr_request_completed_on=datetime(2019, 12, 30, 18, 3, 21, tzinfo=UTC),
         ehr_request_started_acknowledged_on=datetime(2019, 12, 30, 18, 3, 23, tzinfo=UTC),
         ehr_request_completed_acknowledged_on=datetime(2020, 1, 1, 8, 41, 48, tzinfo=UTC),
@@ -101,7 +102,7 @@ def test_parses_transfer_correctly_given_valid_message_list():
             sender_error_codes=[None],
             final_error_codes=[None],
             intermediate_error_codes=[],
-            last_sender_message_timestamp=datetime(2019, 12, 30, 18, 3, 21, tzinfo=UTC),
+            last_sender_message_timestamp=datetime(2019, 12, 30, 18, 3, 23, tzinfo=UTC),
         )
     ]
 

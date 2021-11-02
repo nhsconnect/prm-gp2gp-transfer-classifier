@@ -144,12 +144,15 @@ def request_made(**kwargs):
     )
 
 
-def request_acknowledged_successfully():
+def request_acknowledged_successfully(**kwargs):
     conversation_id = a_string()
     return (
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
-        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_sender_acknowledgement(
+            message_ref=conversation_id,
+            time=kwargs.get("time", a_datetime()),
+        )
         .build()
     )
 
@@ -172,7 +175,9 @@ def core_ehr_sent(**kwargs):
     return (
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
-        .with_sender_acknowledgement(message_ref=conversation_id)
+        .with_sender_acknowledgement(
+            message_ref=conversation_id, time=req_complete_time - timedelta(hours=1)
+        )
         .with_core_ehr(time=req_complete_time)
         .build()
     )
@@ -264,6 +269,33 @@ def ehr_integrated_successfully(**kwargs):
         .with_sender_acknowledgement(message_ref=conversation_id)
         .with_core_ehr(guid=ehr_guid, time=req_complete_time)
         .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
+        .build()
+    )
+
+
+def ehr_integrated_with_duplicate_having_second_sender_ack_after_integration(**kwargs):
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    req_complete_time_duplicate = req_complete_time - timedelta(hours=1)
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time)
+    sender_ack_time = ehr_ack_time - timedelta(hours=1)
+    sender_ack_time_after_integration = ehr_ack_time + timedelta(hours=1)
+    conversation_id = a_string()
+    ehr_guid = a_string()
+    duplicate_ehr_guid = a_string()
+
+    return (
+        GP2GPTestCase(conversation_id=conversation_id)
+        .with_request()
+        .with_sender_acknowledgement(message_ref=conversation_id, time=sender_ack_time)
+        .with_core_ehr(guid=duplicate_ehr_guid, time=req_complete_time_duplicate)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
+        .with_requester_acknowledgement(
+            message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
+        )
+        .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
+        .with_sender_acknowledgement(
+            message_ref=conversation_id, time=sender_ack_time_after_integration
+        )
         .build()
     )
 

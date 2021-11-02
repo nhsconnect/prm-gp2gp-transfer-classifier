@@ -6,6 +6,7 @@ from prmdata.domain.spine.message import (
     DUPLICATE_ERROR,
     ERROR_SUPPRESSED,
     FATAL_SENDER_ERROR_CODES,
+    EHR_REQUEST_STARTED,
 )
 from prmdata.domain.datetime import MonthlyReportingWindow
 
@@ -82,6 +83,8 @@ class Gp2gpConversation:
 
         self._probe = probe
 
+        self._sender_messages = _group_sender_messages(messages)
+
         acked_messages = self._pair_messages_with_acks(messages)
         message_bundle = self._group_message_by_type(acked_messages)
 
@@ -134,8 +137,20 @@ class Gp2gpConversation:
         return self._request_started.message.time
 
     def last_sender_message_timestamp(self) -> Optional[datetime]:
-        return (
-            self._request_completed[0].message.time if len(self._request_completed) != 0 else None
+        if len(self._sender_messages) == 0:
+            return None
+
+        # not integrated
+        if self._effective_ehr_ack is None:
+            return max([message.time for message in self._sender_messages])
+
+        # integrated
+        return max(
+            [
+                message.time
+                for message in self._sender_messages
+                if message.time <= self._effective_ehr_ack.time
+            ]
         )
 
     def is_integrated(self) -> bool:
@@ -257,6 +272,18 @@ class Gp2gpConversation:
             copc_continue=copc_continue_messages,
             copc_fragments=copc_fragment_messages,
         )
+
+
+def _group_sender_messages(messages: List[Message]) -> List[Message]:
+    request_started_message = [
+        message for message in messages if message.interaction_id == EHR_REQUEST_STARTED
+    ]
+    sender_messages = [
+        message
+        for message in messages
+        if request_started_message[0].from_party_asid != message.from_party_asid
+    ]
+    return sender_messages
 
 
 def _integrated_or_suppressed(request_completed_ack: Message) -> bool:
