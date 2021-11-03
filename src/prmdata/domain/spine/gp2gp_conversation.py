@@ -148,14 +148,12 @@ class Gp2gpConversation:
             return None
 
         # check if integrated and get latest message before integration
-        if self._effective_ehr_ack is not None and _integrated_or_suppressed(
-            self._effective_ehr_ack
-        ):
+        if self.is_integrated():
             return max(
                 [
                     message.time
                     for message in self._sender_messages
-                    if message.time <= self._effective_ehr_ack.time
+                    if message.time <= self.effective_final_acknowledgement_time()
                 ]
             )
 
