@@ -6,7 +6,6 @@ from prmdata.domain.spine.message import (
     DUPLICATE_ERROR,
     ERROR_SUPPRESSED,
     FATAL_SENDER_ERROR_CODES,
-    EHR_REQUEST_STARTED,
 )
 from prmdata.domain.datetime import MonthlyReportingWindow
 
@@ -83,8 +82,6 @@ class Gp2gpConversation:
 
         self._probe = probe
 
-        self._sender_messages = _group_sender_messages(messages)
-
         acked_messages = self._pair_messages_with_acks(messages)
         message_bundle = self._group_message_by_type(acked_messages)
 
@@ -99,6 +96,8 @@ class Gp2gpConversation:
         effective_request_completed = _find_effective_request_completed(self._request_completed)
         if effective_request_completed is not None:
             (self._effective_ehr, self._effective_ehr_ack) = effective_request_completed
+
+        self._sender_messages = self._find_sender_messages(messages)
 
     def conversation_id(self) -> str:
         return self._request_started.message.conversation_id
@@ -136,22 +135,31 @@ class Gp2gpConversation:
     def date_requested(self) -> datetime:
         return self._request_started.message.time
 
+    def _find_sender_messages(self, messages: List[Message]) -> List[Message]:
+        sender_messages = [
+            message
+            for message in messages
+            if self.sending_practice_asid() == message.from_party_asid
+        ]
+        return sender_messages
+
     def last_sender_message_timestamp(self) -> Optional[datetime]:
         if len(self._sender_messages) == 0:
             return None
 
-        # not integrated
-        if self._effective_ehr_ack is None:
-            return max([message.time for message in self._sender_messages])
+        # check if integrated and get latest message before integration
+        if self._effective_ehr_ack is not None and _integrated_or_suppressed(
+            self._effective_ehr_ack
+        ):
+            return max(
+                [
+                    message.time
+                    for message in self._sender_messages
+                    if message.time <= self._effective_ehr_ack.time
+                ]
+            )
 
-        # integrated
-        return max(
-            [
-                message.time
-                for message in self._sender_messages
-                if message.time <= self._effective_ehr_ack.time
-            ]
-        )
+        return max([message.time for message in self._sender_messages])
 
     def is_integrated(self) -> bool:
         return self._effective_ehr_ack is not None and _integrated_or_suppressed(
@@ -272,18 +280,6 @@ class Gp2gpConversation:
             copc_continue=copc_continue_messages,
             copc_fragments=copc_fragment_messages,
         )
-
-
-def _group_sender_messages(messages: List[Message]) -> List[Message]:
-    request_started_message = [
-        message for message in messages if message.interaction_id == EHR_REQUEST_STARTED
-    ]
-    sender_messages = [
-        message
-        for message in messages
-        if request_started_message[0].from_party_asid != message.from_party_asid
-    ]
-    return sender_messages
 
 
 def _integrated_or_suppressed(request_completed_ack: Message) -> bool:

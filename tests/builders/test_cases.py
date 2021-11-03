@@ -278,7 +278,7 @@ def ehr_integrated_with_duplicate_having_second_sender_ack_after_integration(**k
     req_complete_time_duplicate = req_complete_time - timedelta(hours=1)
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time)
     sender_ack_time = ehr_ack_time - timedelta(hours=1)
-    sender_ack_time_after_integration = ehr_ack_time + timedelta(hours=1)
+    request_complete_time_after_integration = ehr_ack_time + timedelta(hours=1)
     conversation_id = a_string()
     ehr_guid = a_string()
     duplicate_ehr_guid = a_string()
@@ -293,9 +293,7 @@ def ehr_integrated_with_duplicate_having_second_sender_ack_after_integration(**k
             message_ref=duplicate_ehr_guid, error_code=DUPLICATE_EHR_ERROR
         )
         .with_requester_acknowledgement(time=ehr_ack_time, message_ref=ehr_guid)
-        .with_sender_acknowledgement(
-            message_ref=conversation_id, time=sender_ack_time_after_integration
-        )
+        .with_core_ehr(guid=duplicate_ehr_guid, time=request_complete_time_after_integration)
         .build()
     )
 

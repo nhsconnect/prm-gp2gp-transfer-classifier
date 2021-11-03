@@ -44,6 +44,11 @@ def _new_transfer_columns():
         Column("failure_reason", pa.string(), lambda t: t.failure_reason),
         Column("date_requested", pa.timestamp("us"), lambda t: t.date_requested),
         Column("date_completed", pa.timestamp("us"), lambda t: t.date_completed),
+        Column(
+            "last_sender_message_timestamp",
+            pa.timestamp("us"),
+            lambda t: t.last_sender_message_timestamp,
+        ),
     ]
 
 

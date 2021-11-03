@@ -55,6 +55,7 @@ def test_write_transfers_correctly_writes_all_fields():
         "failure_reason": ["Final error"],
         "date_requested": [datetime(year=2021, month=3, day=5)],
         "date_completed": [None],
+        "last_sender_message_timestamp": [None],
     }
 
     actual_table = mock_s3.object("a_bucket", "some_data.parquet").read_parquet().to_pydict()

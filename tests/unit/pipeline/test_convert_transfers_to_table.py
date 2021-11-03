@@ -229,6 +229,7 @@ def test_table_has_correct_schema():
             ("failure_reason", pa.string()),
             ("date_requested", pa.timestamp("us")),
             ("date_completed", pa.timestamp("us")),
+            ("last_sender_message_timestamp", pa.timestamp("us")),
         ]
     )
 
