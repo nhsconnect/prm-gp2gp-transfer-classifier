@@ -62,6 +62,9 @@ do
     dojo-dep)
         dojo "./tasks devenv dep"
         ;;
+    install-visualiser)
+        python setup_visualiser.py install
+        ;;
     *)
         echo "Invalid command: '${command}'"
         exit 1
