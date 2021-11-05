@@ -309,7 +309,30 @@ def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_trans
     assert actual.last_sender_message_timestamp == expected_last_sender_message_timestamp
 
 
-def test_produces_last_sender_message_timestamp_given_a_transfer_awaiting_for_integration():
+def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_transfer_with_copcs():
+    request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+
+    conversation = Gp2gpConversation(
+        messages=test_cases.successful_integration_with_copc_fragments(
+            request_completed_time=request_completed_date
+        ),
+        probe=mock_gp2gp_conversation_observability_probe,
+    )
+
+    transfer_service = TransferService(
+        message_stream=[],
+        cutoff=timedelta(days=14),
+        observability_probe=mock_transfer_observability_probe,
+    )
+
+    actual = transfer_service.derive_transfer(conversation)
+
+    expected_last_sender_message_timestamp = request_completed_date
+
+    assert actual.last_sender_message_timestamp == expected_last_sender_message_timestamp
+
+
+def test_produces_last_sender_message_timestamp_given_core_ehr_sent():
     request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     conversation = Gp2gpConversation(
@@ -330,7 +353,28 @@ def test_produces_last_sender_message_timestamp_given_a_transfer_awaiting_for_in
     assert actual.last_sender_message_timestamp == expected_last_sender_message_timestamp
 
 
-def test_produces_none_as_last_sender_message_timestamp_given_a_transfer_just_starting():
+def test_produces_last_sender_message_timestamp_given_copc_fragment_failure():
+    copc_fragment_time = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+
+    conversation = Gp2gpConversation(
+        messages=test_cases.copc_fragment_failure(copc_fragment_time=copc_fragment_time),
+        probe=mock_gp2gp_conversation_observability_probe,
+    )
+
+    transfer_service = TransferService(
+        message_stream=[],
+        cutoff=timedelta(days=14),
+        observability_probe=mock_transfer_observability_probe,
+    )
+
+    actual = transfer_service.derive_transfer(conversation)
+
+    expected_last_sender_message_timestamp = copc_fragment_time
+
+    assert actual.last_sender_message_timestamp == expected_last_sender_message_timestamp
+
+
+def test_produces_none_as_last_sender_message_timestamp_given_request_made():
     conversation = Gp2gpConversation(
         messages=test_cases.request_made(),
         probe=mock_gp2gp_conversation_observability_probe,
@@ -347,11 +391,13 @@ def test_produces_none_as_last_sender_message_timestamp_given_a_transfer_just_st
     assert actual.last_sender_message_timestamp is None
 
 
-def test_produces_last_sender_message_timestamp_given_only_a_request_started():
+def test_produces_last_sender_message_timestamp_given_request_acked_successfully():
     request_acknowledged_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     conversation = Gp2gpConversation(
-        messages=test_cases.request_acknowledged_successfully(time=request_acknowledged_date),
+        messages=test_cases.request_acknowledged_successfully(
+            sender_ack_time=request_acknowledged_date
+        ),
         probe=mock_gp2gp_conversation_observability_probe,
     )
 

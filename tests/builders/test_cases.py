@@ -151,7 +151,7 @@ def request_acknowledged_successfully(**kwargs):
         .with_request()
         .with_sender_acknowledgement(
             message_ref=conversation_id,
-            time=kwargs.get("time", a_datetime()),
+            time=kwargs.get("sender_ack_time", a_datetime()),
         )
         .build()
     )
@@ -534,14 +534,17 @@ def copc_fragment_failure(**kwargs):
     conversation_id = a_string()
     fragment_guid = a_string()
     fragment_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    copc_fragment_time = kwargs.get("copc_fragment_time", a_datetime())
 
     return (
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
-        .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr()
+        .with_sender_acknowledgement(
+            message_ref=conversation_id, time=copc_fragment_time - timedelta(hours=2)
+        )
+        .with_core_ehr(time=copc_fragment_time - timedelta(hours=1))
         .with_copc_fragment_continue()
-        .with_copc_fragment(guid=fragment_guid)
+        .with_copc_fragment(guid=fragment_guid, time=copc_fragment_time)
         .with_requester_acknowledgement(message_ref=fragment_guid, error_code=fragment_error)
         .build()
     )
@@ -566,6 +569,8 @@ def copc_fragment_failure_and_missing_copc_fragment_ack(**kwargs):
 
 
 def successful_integration_with_copc_fragments(**kwargs):
+    req_complete_time = kwargs.get("request_completed_time", a_datetime())
+    ehr_ack_time = kwargs.get("ehr_acknowledge_time", req_complete_time + timedelta(days=1))
     conversation_id = a_string()
     ehr_guid = a_string()
     fragment1_guid = a_string()
@@ -576,7 +581,7 @@ def successful_integration_with_copc_fragments(**kwargs):
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
         .with_sender_acknowledgement(message_ref=conversation_id)
-        .with_core_ehr(guid=ehr_guid)
+        .with_core_ehr(guid=ehr_guid, time=req_complete_time)
         .with_copc_fragment_continue()
         .with_copc_fragment(guid=fragment1_guid)
         .with_copc_fragment(guid=fragment2_guid)
@@ -584,7 +589,7 @@ def successful_integration_with_copc_fragments(**kwargs):
         .with_requester_acknowledgement(message_ref=fragment2_guid)
         .with_copc_fragment(guid=fragment3_guid)
         .with_requester_acknowledgement(message_ref=fragment3_guid)
-        .with_requester_acknowledgement(message_ref=ehr_guid)
+        .with_requester_acknowledgement(message_ref=ehr_guid, time=ehr_ack_time)
         .build()
     )
 
