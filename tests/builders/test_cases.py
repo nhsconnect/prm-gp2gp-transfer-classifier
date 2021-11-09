@@ -171,7 +171,7 @@ def request_acknowledged_with_error(**kwargs) -> List[Message]:
     In this example, the sender responded to the initial request with an error code.
     """
     conversation_id = a_string()
-    request_ack_error = kwargs.get("error_code", 28)
+    request_ack_error = kwargs.get("error_code", 19)
     return (
         GP2GPTestCase(conversation_id=conversation_id)
         .with_request()
@@ -358,7 +358,7 @@ def ehr_integration_failed(**kwargs) -> List[Message]:
     """
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
-    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    ehr_ack_error = kwargs.get("error_code", 28)
     conversation_id = a_string()
     ehr_guid = a_string()
 
@@ -427,7 +427,7 @@ def integration_failed_after_duplicate(**kwargs) -> List[Message]:
     """
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
-    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    ehr_ack_error = kwargs.get("error_code", 11)
     conversation_id = a_string()
     ehr_guid = a_string()
     duplicate_ehr_guid = a_string()
@@ -457,7 +457,7 @@ def first_ehr_integrated_after_second_ehr_failed(**kwargs) -> List[Message]:
     """
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
-    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    ehr_ack_error = kwargs.get("error_code", 11)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()
@@ -483,7 +483,7 @@ def first_ehr_integrated_before_second_ehr_failed(**kwargs) -> List[Message]:
     """
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
-    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    ehr_ack_error = kwargs.get("error_code", 11)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()
@@ -509,7 +509,7 @@ def second_ehr_integrated_after_first_ehr_failed(**kwargs) -> List[Message]:
     """
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
-    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    ehr_ack_error = kwargs.get("error_code", 11)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()
@@ -535,7 +535,7 @@ def second_ehr_integrated_before_first_ehr_failed(**kwargs) -> List[Message]:
     """
     ehr_ack_time = kwargs.get("ehr_acknowledge_time", a_datetime())
     req_complete_time = kwargs.get("request_completed_time", a_datetime())
-    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    ehr_ack_error = kwargs.get("error_code", 11)
     conversation_id = a_string()
     first_ehr_guid = a_string()
     second_ehr_guid = a_string()
@@ -587,16 +587,12 @@ def ehr_integrated_with_duplicate_having_second_sender_ack_after_integration(
     )
 
 
-def _some_error_codes():
-    return [an_integer(20, 30) for _ in range(an_integer(2, 4))]
-
-
 def multiple_integration_failures(**kwargs) -> List[Message]:
     """
     A GP2GP transfer where the sender returned multiple CORE EHRs,
     each of which the requester replied to with an error message.
     """
-    error_codes = kwargs.get("error_codes", _some_error_codes())
+    error_codes = kwargs.get("error_codes", [99, 28, 21])
 
     ehr_guids = [a_string() for _ in range(len(error_codes))]
     conversation_id = a_string()
@@ -853,7 +849,7 @@ def integration_failed_with_conflicting_acks_and_duplicate_ehrs(**kwargs) -> Lis
     the first reviving a duplicate ack, the second receiving both a duplicate and a negative ack,
     and the third receiving no ack at all.
     """
-    ehr_ack_error = kwargs.get("error_code", an_integer(a=20, b=30))
+    ehr_ack_error = kwargs.get("error_code", 11)
     return _concluded_with_conflicting_acks_and_duplicate_ehrs(ehr_ack_code=ehr_ack_error, **kwargs)
 
 
