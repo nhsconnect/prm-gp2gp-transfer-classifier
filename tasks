@@ -65,6 +65,9 @@ do
     install-visualiser)
         python setup_visualiser.py install
         ;;
+    generate-examples)
+        PYTHONPATH=$(pwd) python scripts/generate_examples.py > gp2gp_examples.md
+        ;;
     *)
         echo "Invalid command: '${command}'"
         exit 1

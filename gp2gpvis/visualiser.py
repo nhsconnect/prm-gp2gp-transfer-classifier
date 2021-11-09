@@ -27,7 +27,7 @@ class ConversationFormatter:
     _HEADER_PADDING = (_PADDING_WIDTH - 4) * " "
     _ARROW_WIDTH = 56
     _CENTRAL_WIDTH = _ARROW_WIDTH + 6
-    _HEADER_LINE = _HEADER_PADDING + "Requester" + _ARROW_WIDTH * " " + "Sender"
+    _INTERACTION_HEADER = _HEADER_PADDING + "Requester" + _ARROW_WIDTH * " " + "Sender"
     _SPACING_LINE = _PADDING + "|" + _CENTRAL_WIDTH * " " + "|"
     _GUID_CHARS_LENGTH = 5
 
@@ -69,7 +69,7 @@ class ConversationFormatter:
         99: "Unexpected",
     }
 
-    def __init__(self, messages: List[RowMessage]):
+    def __init__(self, messages: List[RowMessage], minimal_output=False):
         first_message = messages[0]
 
         if first_message.interaction_id != self._EHR_REQUEST_STARTED:
@@ -83,19 +83,23 @@ class ConversationFormatter:
         self._requesting_system = first_message.from_system
         self._sending_system = first_message.to_system
 
-    def format(self):
-        return "\n".join(chain(self._build_header_lines(), self._build_interaction_lines()))
+        self._minimal = minimal_output
 
-    def _build_header_lines(self):
+    def format(self):
+        interactions = self._build_interaction_lines()
+        lines = interactions if self._minimal else chain(self._build_meta_lines(), interactions)
+        return "\n".join(lines)
+
+    def _build_meta_lines(self):
         return [
             f"GP2GP Conversation: {self._conversation_id}",
             f"Requester: {self._requesting_asid} ({self._requesting_system})",
             f"Sender: {self._sending_asid} ({self._sending_system})",
             "",
-            self._HEADER_LINE,
         ]
 
     def _build_interaction_lines(self):
+        yield self._INTERACTION_HEADER
         for message in self._messages:
             if message.conversation_id != self._conversation_id:
                 error = f"{message.guid} not from conversation: {self._conversation_id}"
@@ -114,7 +118,10 @@ class ConversationFormatter:
         timestamp = message.time.strftime("%y-%m-%d %H:%M:%S")
         from_requester = message.from_party_asid == self._requesting_asid
         arrow = self._right_arrow(content) if from_requester else self._left_arrow(content)
-        return f"{arrow}   {timestamp}"
+        line = arrow
+        if not self._minimal:
+            line += f"   {timestamp}"
+        return line
 
     def _message_description(self, message):
         interaction_name = self._INTERACTION_NAMES[message.interaction_id]
@@ -150,10 +157,12 @@ def read_rows(filepath):
     return list(csv.DictReader(input_file))
 
 
-def format_csv_rows(rows):
+def format_csv_rows(rows, sort_messages=True, minimal_output=False):
     messages = [RowMessage(row) for row in rows]
-    sorted_messages = sorted(messages, key=lambda m: m.time)
-    return ConversationFormatter(sorted_messages).format()
+    if sort_messages:
+        messages = sorted(messages, key=lambda m: m.time)
+    formatter = ConversationFormatter(messages, minimal_output)
+    return formatter.format()
 
 
 def parse_arguments() -> Namespace:

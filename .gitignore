@@ -8,8 +8,9 @@ dist/
 venv/
 .mypy_cache/
 *.pyc
-gp2gp_transfer_classifier.egg-info
+*.egg-info
 .tox
 .coverage
 audit-output.txt
 typings
+gp2gp_examples.md
