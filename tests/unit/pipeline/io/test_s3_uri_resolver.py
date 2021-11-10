@@ -32,7 +32,7 @@ def test_returns_correct_transfers_uri():
         transfers_bucket=transfers_bucket,
     )
 
-    expected = f"s3://{transfers_bucket}/v5/2021/1/2021-1-transfers.parquet"
+    expected = f"s3://{transfers_bucket}/v6/2021/1/2021-1-transfers.parquet"
 
     actual = uri_resolver.gp2gp_transfers(year_month)
 

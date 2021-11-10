@@ -127,7 +127,7 @@ def test_end_to_end_with_fake_s3(datadir):
         input_overflow_csv_gz, "v2/messages-overflow/2020/1/2020-1_spine_messages_overflow.csv.gz"
     )
 
-    s3_output_path = f"v5/2019/12/2019-12-{expected_transfers_output_key}"
+    s3_output_path = f"v6/2019/12/2019-12-{expected_transfers_output_key}"
 
     try:
         main()

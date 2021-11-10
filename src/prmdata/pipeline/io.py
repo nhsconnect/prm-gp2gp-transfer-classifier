@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class TransferClassifierS3UriResolver:
 
     _SPINE_MESSAGES_VERSION = "v2"
-    _TRANSFERS_PARQUET_VERSION = "v5"
+    _TRANSFERS_PARQUET_VERSION = "v6"
 
     def __init__(self, gp2gp_spine_bucket, transfers_bucket):
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
