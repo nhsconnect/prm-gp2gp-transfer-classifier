@@ -43,7 +43,7 @@ Common development workflows are defined in the `tasks` script.
 
 This project is written in Python 3.9.
 
-### Recommended developer envrionment
+### Recommended developer environment
 
 - [pyenv](https://github.com/pyenv/pyenv) to easily switch Python versions.
 - [Pipenv](https://pypi.org/project/pipenv/) to manage dependencies and virtual environments.
