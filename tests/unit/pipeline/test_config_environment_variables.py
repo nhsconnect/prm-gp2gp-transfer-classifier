@@ -63,7 +63,8 @@ def test_error_from_environment_when_required_fields_are_not_set():
 
     with pytest.raises(MissingEnvironmentVariable) as e:
         TransferClassifierConfig.from_environment_variables(environment)
-        assert (
-            str(e)
-            == "Expected environment variable INPUT_SPINE_DATA_BUCKET was not set, exiting..."
-        )
+
+    assert (
+        str(e.value)
+        == "Expected environment variable INPUT_SPINE_DATA_BUCKET was not set, exiting..."
+    )
