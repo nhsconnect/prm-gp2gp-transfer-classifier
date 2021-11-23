@@ -36,4 +36,6 @@ def parse_transfers_from_messages(
         gp2gp_conversations, reporting_window
     )
 
+    module_logger.info("Converting to transfers in parse_transfers_from_messages")
+
     return transfer_service.convert_to_transfers(conversations_started_in_reporting_window)

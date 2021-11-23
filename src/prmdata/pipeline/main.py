@@ -59,13 +59,16 @@ class TransferClassifierPipeline:
         overflow_month = self._reporting_window.overflow_month
         spine_messages = self._read_spine_messages(metric_month, overflow_month)
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
+        logger.info("Attempting to parse transfers from messages from main")
         transfers = parse_transfers_from_messages(
             spine_messages=spine_messages,
             reporting_window=self._reporting_window,
             conversation_cutoff=self._cutoff,
             observability_probe=transfer_observability_probe,
         )
+        logger.info("Attempting to write transfers from main")
         self._write_transfers(transfers, metric_month)
+        logger.info("Successfully wrote transfers from main")
 
 
 def main():
