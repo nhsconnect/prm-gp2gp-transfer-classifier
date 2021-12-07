@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from prmdata.domain.spine.message import Message
-from tests.builders.common import a_string, a_datetime
+from tests.builders.common import a_datetime, a_string
 
 
 def build_mock_gp2gp_conversation(**kwargs):

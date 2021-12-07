@@ -5,12 +5,12 @@ from typing import List
 import pytest
 
 from prmdata.domain.gp2gp.transfer_outcome import (
-    TransferStatus,
     TransferFailureReason,
     TransferOutcome,
+    TransferStatus,
 )
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
-from prmdata.domain.spine.message import Message, FATAL_SENDER_ERROR_CODES
+from prmdata.domain.spine.message import FATAL_SENDER_ERROR_CODES, Message
 from tests.builders import test_cases
 from tests.builders.common import a_duration
 from tests.builders.spine import build_mock_gp2gp_conversation

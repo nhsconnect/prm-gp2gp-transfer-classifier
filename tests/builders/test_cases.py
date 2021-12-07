@@ -2,11 +2,11 @@ from datetime import timedelta
 from typing import List
 
 from prmdata.domain.spine.message import (
-    Message,
-    EHR_REQUEST_STARTED,
     APPLICATION_ACK,
-    EHR_REQUEST_COMPLETED,
     COMMON_POINT_TO_POINT,
+    EHR_REQUEST_COMPLETED,
+    EHR_REQUEST_STARTED,
+    Message,
 )
 from tests.builders.common import a_datetime, a_string, an_integer
 

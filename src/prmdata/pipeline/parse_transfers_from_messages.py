@@ -2,16 +2,11 @@ from datetime import timedelta
 from logging import getLogger
 from typing import Iterable, Iterator
 
-from prmdata.domain.gp2gp.transfer import (
-    Transfer,
-)
-
-from prmdata.domain.gp2gp.transfer_service import TransferService, TransferObservabilityProbe
-from prmdata.domain.spine.message import Message
-from prmdata.domain.spine.gp2gp_conversation import (
-    filter_conversations_by_request_started_time,
-)
 from prmdata.domain.datetime import MonthlyReportingWindow
+from prmdata.domain.gp2gp.transfer import Transfer
+from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, TransferService
+from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_request_started_time
+from prmdata.domain.spine.message import Message
 
 module_logger = getLogger(__name__)
 

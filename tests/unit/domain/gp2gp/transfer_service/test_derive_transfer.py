@@ -4,10 +4,8 @@ from unittest.mock import Mock
 from prmdata.domain.gp2gp.transfer_service import TransferService
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
-from tests.builders.common import a_string, a_datetime
-from tests.builders.spine import (
-    build_mock_gp2gp_conversation,
-)
+from tests.builders.common import a_datetime, a_string
+from tests.builders.spine import build_mock_gp2gp_conversation
 
 mock_transfer_observability_probe = Mock()
 mock_gp2gp_conversation_observability_probe = Mock()

@@ -1,10 +1,10 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 from prmdata.domain.gp2gp.transfer import Practice, Transfer
 from prmdata.domain.gp2gp.transfer_outcome import (
+    TransferFailureReason,
     TransferOutcome,
     TransferStatus,
-    TransferFailureReason,
 )
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.utils.io.s3 import S3DataManager

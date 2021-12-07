@@ -1,9 +1,9 @@
 import logging
-from typing import Iterable, Dict
+from typing import Dict, Iterable
 
-from prmdata.domain.gp2gp.transfer import Transfer
-from prmdata.domain.spine.message import construct_messages_from_splunk_items, Message
 from prmdata.domain.datetime import YearMonth
+from prmdata.domain.gp2gp.transfer import Transfer
+from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from prmdata.pipeline.arrow import convert_transfers_to_table
 from prmdata.utils.io.s3 import S3DataManager
 

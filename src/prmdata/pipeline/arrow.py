@@ -1,8 +1,9 @@
-from typing import Tuple, List, Iterable, Callable, Generic, TypeVar
-from pyarrow import DataType, Table
-from prmdata.domain.gp2gp.transfer import Transfer
+from typing import Callable, Generic, Iterable, List, Tuple, TypeVar
 
 import pyarrow as pa
+from pyarrow import DataType, Table
+
+from prmdata.domain.gp2gp.transfer import Transfer
 
 Value = TypeVar("Value")
 

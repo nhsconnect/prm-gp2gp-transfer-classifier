@@ -1,9 +1,9 @@
 from typing import List
 from unittest.mock import Mock
 
-from tests.builders import test_cases
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from prmdata.domain.spine.message import Message
+from tests.builders import test_cases
 
 mock_gp2gp_conversation_observability_probe = Mock()
 

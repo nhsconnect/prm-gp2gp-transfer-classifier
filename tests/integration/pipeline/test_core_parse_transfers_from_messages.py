@@ -4,17 +4,10 @@ from unittest.mock import Mock
 from dateutil.tz import UTC
 from freezegun import freeze_time
 
-from prmdata.pipeline.parse_transfers_from_messages import (
-    parse_transfers_from_messages,
-)
-
-from prmdata.domain.gp2gp.transfer import (
-    Transfer,
-    Practice,
-)
-from prmdata.domain.gp2gp.transfer_outcome import TransferStatus, TransferOutcome
 from prmdata.domain.datetime import MonthlyReportingWindow
-
+from prmdata.domain.gp2gp.transfer import Practice, Transfer
+from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome, TransferStatus
+from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages
 from tests.builders.spine import build_message
 
 mock_probe = Mock()

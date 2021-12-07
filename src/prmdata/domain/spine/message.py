@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import NamedTuple, Optional, Iterable, Iterator
+from typing import Iterable, Iterator, NamedTuple, Optional
 
 from dateutil import parser
 

@@ -4,9 +4,9 @@ from unittest.mock import Mock
 import pytest
 
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
+from prmdata.domain.spine.message import Message
 from tests.builders import test_cases
 from tests.builders.common import a_datetime
-from prmdata.domain.spine.message import Message
 
 mock_gp2gp_conversation_observability_probe = Mock()
 

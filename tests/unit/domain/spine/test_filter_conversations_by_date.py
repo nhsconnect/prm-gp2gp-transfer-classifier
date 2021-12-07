@@ -2,13 +2,12 @@ from datetime import datetime
 from typing import List
 from unittest.mock import Mock
 
-from prmdata.domain.spine.gp2gp_conversation import (
-    filter_conversations_by_request_started_time,
-    Gp2gpConversation,
-)
 from prmdata.domain.datetime import MonthlyReportingWindow
+from prmdata.domain.spine.gp2gp_conversation import (
+    Gp2gpConversation,
+    filter_conversations_by_request_started_time,
+)
 from tests.builders import test_cases
-
 
 mock_gp2gp_conversation_observability_probe = Mock()
 

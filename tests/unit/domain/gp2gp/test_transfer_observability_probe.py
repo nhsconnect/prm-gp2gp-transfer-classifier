@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe
-from tests.builders.common import a_string, a_datetime
+from tests.builders.common import a_datetime, a_string
 from tests.builders.spine import build_mock_gp2gp_conversation
 
 

@@ -1,17 +1,15 @@
 import logging
-
-import boto3
 from os import environ
 
-from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
-from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
-from prmdata.utils.io.json_formatter import JsonFormatter
+import boto3
+
 from prmdata.domain.datetime import MonthlyReportingWindow
-from prmdata.utils.io.s3 import S3DataManager
-from prmdata.pipeline.parse_transfers_from_messages import (
-    parse_transfers_from_messages,
-)
+from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
 from prmdata.pipeline.config import TransferClassifierConfig
+from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
+from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages
+from prmdata.utils.io.json_formatter import JsonFormatter
+from prmdata.utils.io.s3 import S3DataManager
 
 logger = logging.getLogger("prmdata")
 

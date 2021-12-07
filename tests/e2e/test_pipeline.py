@@ -1,6 +1,6 @@
-from datetime import datetime
 import json
 import logging
+from datetime import datetime
 from io import BytesIO
 from os import environ
 from threading import Thread
@@ -8,9 +8,9 @@ from threading import Thread
 import boto3
 from botocore.config import Config
 from moto.server import DomainDispatcherApplication, create_backend_app
-from prmdata.pipeline.main import main
 from werkzeug.serving import make_server
 
+from prmdata.pipeline.main import main
 from tests.builders.file import read_file_to_gzip_buffer
 from tests.builders.s3 import read_s3_parquet
 

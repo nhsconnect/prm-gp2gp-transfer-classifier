@@ -1,11 +1,9 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 import pyarrow as pa
 
-from prmdata.domain.gp2gp.transfer import (
-    Practice,
-)
-from prmdata.domain.gp2gp.transfer_outcome import TransferStatus, TransferOutcome
+from prmdata.domain.gp2gp.transfer import Practice
+from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome, TransferStatus
 from prmdata.pipeline.arrow import convert_transfers_to_table
 from tests.builders.gp2gp import build_transfer
 

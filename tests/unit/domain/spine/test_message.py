@@ -1,7 +1,7 @@
 from prmdata.domain.spine.message import (
-    EHR_REQUEST_COMPLETED,
     APPLICATION_ACK,
     COMMON_POINT_TO_POINT,
+    EHR_REQUEST_COMPLETED,
     EHR_REQUEST_STARTED,
 )
 from tests.builders.spine import build_message

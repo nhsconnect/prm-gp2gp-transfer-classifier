@@ -1,15 +1,12 @@
 from datetime import timedelta
 
-from prmdata.domain.gp2gp.transfer import (
-    Transfer,
-    Practice,
-)
+from prmdata.domain.gp2gp.transfer import Practice, Transfer
 from prmdata.domain.gp2gp.transfer_outcome import (
-    TransferStatus,
     TransferFailureReason,
     TransferOutcome,
+    TransferStatus,
 )
-from tests.builders.common import a_string, a_duration, a_datetime
+from tests.builders.common import a_datetime, a_duration, a_string
 
 THREE_DAYS_IN_SECONDS = 259200
 EIGHT_DAYS_IN_SECONDS = 691200

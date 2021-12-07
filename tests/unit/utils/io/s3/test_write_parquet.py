@@ -1,8 +1,8 @@
 from unittest import mock
 
 import boto3
-from moto import mock_s3
 import pyarrow as pa
+from moto import mock_s3
 
 from prmdata.utils.io.s3 import S3DataManager, logger
 from tests.builders.s3 import read_s3_parquet

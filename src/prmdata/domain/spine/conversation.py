@@ -1,4 +1,4 @@
-from typing import NamedTuple, List
+from typing import List, NamedTuple
 
 from prmdata.domain.spine.message import Message
 

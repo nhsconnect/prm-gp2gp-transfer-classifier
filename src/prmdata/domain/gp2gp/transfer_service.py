@@ -1,19 +1,14 @@
 from collections import defaultdict
 from datetime import timedelta
-from logging import getLogger, Logger
-from typing import List, Iterable, Iterator, Dict, Optional
+from logging import Logger, getLogger
+from typing import Dict, Iterable, Iterator, List, Optional
 
-from prmdata.domain.gp2gp.transfer import (
-    Transfer,
-    Practice,
-)
-from prmdata.domain.gp2gp.transfer_outcome import (
-    TransferOutcome,
-)
+from prmdata.domain.gp2gp.transfer import Practice, Transfer
+from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.gp2gp_conversation import (
-    Gp2gpConversation,
     ConversationMissingStart,
+    Gp2gpConversation,
     Gp2gpConversationObservabilityProbe,
 )
 from prmdata.domain.spine.message import Message

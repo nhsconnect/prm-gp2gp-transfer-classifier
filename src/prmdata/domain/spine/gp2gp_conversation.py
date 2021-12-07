@@ -1,13 +1,14 @@
-from typing import NamedTuple, List, Optional, Iterable, Iterator, Tuple
-from logging import Logger, getLogger
 from datetime import datetime
+from logging import Logger, getLogger
+from typing import Iterable, Iterator, List, NamedTuple, Optional, Tuple
+
+from prmdata.domain.datetime import MonthlyReportingWindow
 from prmdata.domain.spine.message import (
-    Message,
     DUPLICATE_ERROR,
     ERROR_SUPPRESSED,
     FATAL_SENDER_ERROR_CODES,
+    Message,
 )
-from prmdata.domain.datetime import MonthlyReportingWindow
 
 module_logger = getLogger(__name__)
 

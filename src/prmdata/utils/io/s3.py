@@ -4,7 +4,7 @@ import logging
 from io import BytesIO
 from urllib.parse import urlparse
 
-from pyarrow import Table, PythonFile, parquet
+from pyarrow import PythonFile, Table, parquet
 
 logger = logging.getLogger(__name__)
 

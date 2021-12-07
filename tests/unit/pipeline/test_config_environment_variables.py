@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 from dateutil.tz import tzutc
 
-from prmdata.pipeline.config import TransferClassifierConfig, MissingEnvironmentVariable
+from prmdata.pipeline.config import MissingEnvironmentVariable, TransferClassifierConfig
 
 
 def test_reads_from_environment_variables_and_converts_to_required_format():

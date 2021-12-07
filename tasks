@@ -10,6 +10,7 @@ do
         pipenv run test
         ;;
     format)
+        pipenv run format-import
         pipenv run format
         ;;
     check-format)

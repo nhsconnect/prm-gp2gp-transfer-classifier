@@ -1,8 +1,8 @@
 from unittest.mock import Mock
 
 from prmdata.domain.spine.gp2gp_conversation import (
-    Gp2gpConversationObservabilityProbe,
     Gp2gpConversation,
+    Gp2gpConversationObservabilityProbe,
 )
 from prmdata.domain.spine.message import EHR_REQUEST_STARTED
 from tests.builders.spine import build_message

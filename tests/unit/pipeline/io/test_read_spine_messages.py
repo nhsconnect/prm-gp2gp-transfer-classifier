@@ -7,7 +7,7 @@ from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.utils.io.s3 import S3DataManager
 from tests.builders.common import a_string
 from tests.builders.file import build_gzip_csv
-from tests.builders.s3 import MockS3Object, MockS3
+from tests.builders.s3 import MockS3, MockS3Object
 from tests.builders.spine import build_spine_item
 
 _SPINE_CSV_COLUMNS = [

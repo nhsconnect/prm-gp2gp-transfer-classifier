@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from datetime import timedelta, datetime
-from typing import NamedTuple, Optional, List
+from datetime import datetime, timedelta
+from typing import List, NamedTuple, Optional
 
 from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome
 
