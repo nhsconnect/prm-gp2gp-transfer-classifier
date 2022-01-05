@@ -70,9 +70,9 @@ def _build_fake_s3_bucket(bucket_name: str, s3):
     return s3_fake_bucket
 
 
-def test_end_to_end_with_fake_s3(datadir):
+def test_end_to_end_with_fake_s3_deprecated(datadir):
     fake_s3_host = "127.0.0.1"
-    fake_s3_port = 8887
+    fake_s3_port = 8886
     fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"
     fake_s3_access_key = "testing"
     fake_s3_secret_key = "testing"
@@ -91,10 +91,6 @@ def test_end_to_end_with_fake_s3(datadir):
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
     environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
     environ["S3_ENDPOINT_URL"] = fake_s3_url
-    environ["SPINE_DATA_S3_URIS"] = (
-        f'["s3://{s3_input_spine_data_bucket_name}/v3/2019/10/2019-10_spine_messages.csv.gz",'
-        f'"s3://{s3_input_spine_data_bucket_name}/v3/2019/11/2019-11_spine_messages.csv.gz"]'
-    )
     environ["BUILD_TAG"] = "abc456"
 
     s3 = boto3.resource(
@@ -121,12 +117,14 @@ def test_end_to_end_with_fake_s3(datadir):
         datadir / "expected_outputs" / "transfersParquetColumns.json"
     )
 
-    input_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Oct-2019.csv")
-    input_spine_data_bucket.upload_fileobj(input_csv_gz, "v3/2019/10/2019-10_spine_messages.csv.gz")
-
-    input_overflow_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Nov-2019-overflow.csv")
+    input_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Dec-2019.csv")
     input_spine_data_bucket.upload_fileobj(
-        input_overflow_csv_gz, "v3/2019/11/2019-11_spine_messages.csv.gz"
+        input_csv_gz, "v2/messages/2019/12/2019-12_spine_messages.csv.gz"
+    )
+
+    input_overflow_csv_gz = read_file_to_gzip_buffer(datadir / "inputs" / "Jan-2020-overflow.csv")
+    input_spine_data_bucket.upload_fileobj(
+        input_overflow_csv_gz, "v2/messages-overflow/2020/1/2020-1_spine_messages_overflow.csv.gz"
     )
 
     s3_output_path = f"v6/2019/12/2019-12-{expected_transfers_output_key}"
