@@ -30,6 +30,7 @@ Configuration is achieved via the following environment variables:
 | INPUT_SPINE_DATA_BUCKET      | Bucket to read raw spine logs from.                               |
 | DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                               |
 | S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to.              |
+| SPINE_DATA_S3_URIS           | Optional argument specifying a JSON list of S3 Spine data URIs. Example value: `'["an_uri", "another_s3_uri", "third_s3_uri"]'`  |
 | CONVERSATION_CUTOFF_DAYS     | Optional argument specifying how many days to classify a transfer.|
 
 #### Notes on configuration

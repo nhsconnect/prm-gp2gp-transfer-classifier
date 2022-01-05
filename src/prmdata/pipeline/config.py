@@ -1,7 +1,8 @@
+import json
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import List, Optional
 
 from dateutil.parser import isoparse
 
@@ -45,6 +46,9 @@ class EnvConfig:
             name, optional=True, converter=lambda env_var: timedelta(days=int(env_var))
         )
 
+    def read_optional_list(self, name: str) -> Optional[List[str]]:
+        return self._read_env(name, optional=True, converter=lambda env_var: json.loads(env_var))
+
     def read_datetime(self, name) -> datetime:
         return self._read_env(name, optional=False, converter=isoparse)
 
@@ -57,6 +61,7 @@ class TransferClassifierConfig:
     build_tag: str
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
+    spine_data_s3_uris: Optional[List[str]]
 
     @classmethod
     def from_environment_variables(cls, env_vars):
@@ -65,6 +70,7 @@ class TransferClassifierConfig:
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
             date_anchor=env.read_datetime("DATE_ANCHOR"),
+            spine_data_s3_uris=env.read_optional_list("SPINE_DATA_S3_URIS"),
             build_tag=env.read_str("BUILD_TAG"),
             conversation_cutoff=env.read_optional_timedelta_days("CONVERSATION_CUTOFF_DAYS")
             or timedelta(days=DEFAULT_CUTOFF_DAYS),
