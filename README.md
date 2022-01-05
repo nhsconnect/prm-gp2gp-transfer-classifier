@@ -31,6 +31,7 @@ Configuration is achieved via the following environment variables:
 | DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                               |
 | S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to.              |
 | SPINE_DATA_S3_URIS           | Optional argument specifying a JSON list of S3 Spine data URIs. Example value: `'["an_uri", "another_s3_uri", "third_s3_uri"]'`  |
+| OUTPUT_S3_URI                | Optional argument specifying S3 location for uploading the transfer parquet file|
 | CONVERSATION_CUTOFF_DAYS     | Optional argument specifying how many days to classify a transfer.|
 
 #### Notes on configuration

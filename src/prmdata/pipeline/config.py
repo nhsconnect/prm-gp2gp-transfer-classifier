@@ -62,6 +62,7 @@ class TransferClassifierConfig:
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
     spine_data_s3_uris: Optional[List[str]]
+    output_s3_uri: Optional[str]
 
     @classmethod
     def from_environment_variables(cls, env_vars):
@@ -75,4 +76,5 @@ class TransferClassifierConfig:
             conversation_cutoff=env.read_optional_timedelta_days("CONVERSATION_CUTOFF_DAYS")
             or timedelta(days=DEFAULT_CUTOFF_DAYS),
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),
+            output_s3_uri=env.read_optional_str("OUTPUT_S3_URI"),
         )
