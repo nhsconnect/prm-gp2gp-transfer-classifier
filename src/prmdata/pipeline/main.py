@@ -1,6 +1,5 @@
 import logging
 from os import environ
-from typing import List
 
 import boto3
 
@@ -37,8 +36,6 @@ class TransferClassifierPipeline:
             transfers_bucket=config.output_transfer_data_bucket,
         )
 
-        self._spine_data_uris = config.spine_data_s3_uris
-
         output_metadata = {
             "date-anchor": config.date_anchor.isoformat(),
             "cutoff-days": str(config.conversation_cutoff.days),
@@ -47,12 +44,9 @@ class TransferClassifierPipeline:
 
         self._io = TransferClassifierIO(s3_manager, output_metadata)
 
-    def _read_spine_messages_deprecated(self, metric_month, overflow_month):
+    def _read_spine_messages(self, metric_month, overflow_month):
         input_path = self._uris.spine_messages(metric_month, overflow_month)
         return self._io.read_spine_messages(input_path)
-
-    def _read_spine_messages(self, spine_data_uris: List[str]):
-        return self._io.read_spine_messages(s3_uris=spine_data_uris)
 
     def _write_transfers(self, transfers, metric_month):
         output_path = self._uris.gp2gp_transfers(metric_month)
@@ -61,11 +55,7 @@ class TransferClassifierPipeline:
     def run(self):
         metric_month = self._reporting_window.metric_month
         overflow_month = self._reporting_window.overflow_month
-        if self._spine_data_uris is None:
-            spine_messages = self._read_spine_messages_deprecated(metric_month, overflow_month)
-        else:
-            spine_messages = self._read_spine_messages(self._spine_data_uris)
-
+        spine_messages = self._read_spine_messages(metric_month, overflow_month)
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
         transfers = parse_transfers_from_messages(
             spine_messages=spine_messages,
