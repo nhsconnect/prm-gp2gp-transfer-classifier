@@ -48,12 +48,17 @@ class EnvConfig:
     def read_datetime(self, name) -> datetime:
         return self._read_env(name, optional=False, converter=isoparse)
 
+    def read_optional_datetime(self, name) -> datetime:
+        return self._read_env(name, optional=True, converter=isoparse)
+
 
 @dataclass
 class TransferClassifierConfig:
     output_transfer_data_bucket: str
     input_spine_data_bucket: str
     date_anchor: datetime
+    start_datetime: Optional[datetime]
+    end_datetime: Optional[datetime]
     build_tag: str
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
@@ -65,6 +70,8 @@ class TransferClassifierConfig:
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
             date_anchor=env.read_datetime("DATE_ANCHOR"),
+            start_datetime=env.read_optional_datetime("START_DATETIME"),
+            end_datetime=env.read_optional_datetime("END_DATETIME"),
             build_tag=env.read_str("BUILD_TAG"),
             conversation_cutoff=env.read_optional_timedelta_days("CONVERSATION_CUTOFF_DAYS")
             or timedelta(days=DEFAULT_CUTOFF_DAYS),

@@ -24,13 +24,15 @@ index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053d"
 Configuration is achieved via the following environment variables:
 
 
-| Environment variable         | Description                                                       | 
-| ---------------------------- | ----------------------------------------------------------------- |
-| OUTPUT_TRANSFER_DATA_BUCKET  | Bucket to write categorised transfers.                            |
-| INPUT_SPINE_DATA_BUCKET      | Bucket to read raw spine logs from.                               |
-| DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                               |
-| S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to.              |
-| CONVERSATION_CUTOFF_DAYS     | Optional argument specifying how many days to classify a transfer.|
+| Environment variable        | Description                                                                                            | 
+|-----------------------------|--------------------------------------------------------------------------------------------------------|
+| OUTPUT_TRANSFER_DATA_BUCKET | Bucket to write categorised transfers.                                                                 |
+| INPUT_SPINE_DATA_BUCKET     | Bucket to read raw spine logs from.                                                                    |
+| DATE_ANCHOR                 | ISO-8601 datetime specifying "now".                                                                    |
+| START_DATETIME              | Optional ISO-8601 datetime specifying start of date range of transfer classification, on a daily basis |
+| END_DATETIME                | Optional ISO-8601 datetime specifying end of date range of transfer classification, on a daily basis   |
+| S3_ENDPOINT_URL             | Optional argument specifying which S3 to connect to.                                                   |
+| CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer.                                     |
 
 #### Notes on configuration
 Instead of directly passing target year and month, a date anchor is passed in specifying "now".
