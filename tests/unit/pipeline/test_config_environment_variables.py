@@ -13,7 +13,6 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
         "DATE_ANCHOR": "2020-01-30T18:44:49Z",
         "CONVERSATION_CUTOFF_DAYS": "28",
         "S3_ENDPOINT_URL": "a_url",
-        "OUTPUT_S3_URI": "s3://anything",
         "BUILD_TAG": "12345",
     }
 
@@ -25,7 +24,6 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
         ),
         conversation_cutoff=timedelta(days=28),
         s3_endpoint_url="a_url",
-        output_s3_uri="s3://anything",
         build_tag="12345",
     )
 
@@ -49,7 +47,6 @@ def test_read_config_from_environment_when_optional_parameters_are_not_set():
             year=2020, month=1, day=30, hour=18, minute=44, second=49, tzinfo=tzutc()
         ),
         s3_endpoint_url=None,
-        output_s3_uri=None,
         conversation_cutoff=timedelta(days=14),
         build_tag="12345",
     )

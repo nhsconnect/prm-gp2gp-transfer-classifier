@@ -30,7 +30,6 @@ Configuration is achieved via the following environment variables:
 | INPUT_SPINE_DATA_BUCKET      | Bucket to read raw spine logs from.                               |
 | DATE_ANCHOR                  | ISO-8601 datetime specifying "now".                               |
 | S3_ENDPOINT_URL              | Optional argument specifying which S3 to connect to.              |
-| OUTPUT_S3_URI                | Optional argument specifying S3 location for uploading the transfer parquet file|
 | CONVERSATION_CUTOFF_DAYS     | Optional argument specifying how many days to classify a transfer.|
 
 #### Notes on configuration
