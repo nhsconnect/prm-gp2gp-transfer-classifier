@@ -7,6 +7,7 @@ from prmdata.domain.monthly_reporting_window import YearMonth
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from prmdata.pipeline.arrow import convert_transfers_to_table
+from prmdata.utils.add_leading_zero import add_leading_zero
 from prmdata.utils.io.s3 import S3DataManager
 
 logger = logging.getLogger(__name__)
@@ -69,23 +70,20 @@ class TransferClassifierS3UriResolver:
         return "s3://" + "/".join(fragments)
 
     @staticmethod
-    def _add_leading_zero(num: int) -> str:
-        return str(num).zfill(2)
-
-    def _spine_message_filename(self, date: datetime) -> str:
-        year = self._add_leading_zero(date.year)
-        month = self._add_leading_zero(date.month)
-        day = self._add_leading_zero(date.day)
+    def _spine_message_filename(date: datetime) -> str:
+        year = add_leading_zero(date.year)
+        month = add_leading_zero(date.month)
+        day = add_leading_zero(date.day)
         return f"{year}-{month}-{day}_spine_messages.csv.gz"
 
     def spine_messages(self, reporting_window: ReportingWindow) -> list[str]:
         return [
             self._s3_path(
                 self._gp2gp_spine_bucket,
-                "v3",
-                f"{self._add_leading_zero(date.year)}",
-                f"{self._add_leading_zero(date.month)}",
-                f"{self._add_leading_zero(date.day)}",
+                self._SPINE_MESSAGES_VERSION,
+                f"{add_leading_zero(date.year)}",
+                f"{add_leading_zero(date.month)}",
+                f"{add_leading_zero(date.day)}",
                 self._spine_message_filename(date),
             )
             for date in reporting_window.get_dates()
