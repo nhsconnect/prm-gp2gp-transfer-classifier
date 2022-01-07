@@ -45,9 +45,6 @@ class EnvConfig:
             name, optional=True, converter=lambda env_var: timedelta(days=int(env_var))
         )
 
-    def read_datetime(self, name) -> datetime:
-        return self._read_env(name, optional=False, converter=isoparse)
-
     def read_optional_datetime(self, name) -> datetime:
         return self._read_env(name, optional=True, converter=isoparse)
 
@@ -56,7 +53,7 @@ class EnvConfig:
 class TransferClassifierConfig:
     output_transfer_data_bucket: str
     input_spine_data_bucket: str
-    date_anchor: datetime
+    date_anchor: Optional[datetime]
     start_datetime: Optional[datetime]
     end_datetime: Optional[datetime]
     build_tag: str
@@ -69,7 +66,7 @@ class TransferClassifierConfig:
         return TransferClassifierConfig(
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
-            date_anchor=env.read_datetime("DATE_ANCHOR"),
+            date_anchor=env.read_optional_datetime("DATE_ANCHOR"),
             start_datetime=env.read_optional_datetime("START_DATETIME"),
             end_datetime=env.read_optional_datetime("END_DATETIME"),
             build_tag=env.read_str("BUILD_TAG"),
