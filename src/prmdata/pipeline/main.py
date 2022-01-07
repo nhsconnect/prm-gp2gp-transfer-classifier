@@ -6,7 +6,7 @@ import boto3
 from prmdata.domain.datetime import MonthlyReportingWindow
 from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
 from prmdata.pipeline.config import TransferClassifierConfig
-from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
+from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierMonthlyS3UriResolver
 from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages
 from prmdata.utils.io.json_formatter import JsonFormatter
 from prmdata.utils.io.s3 import S3DataManager
@@ -31,7 +31,7 @@ class TransferClassifierMonthlyPipeline:
 
         self._cutoff = config.conversation_cutoff
 
-        self._uris = TransferClassifierS3UriResolver(
+        self._uris = TransferClassifierMonthlyS3UriResolver(
             gp2gp_spine_bucket=config.input_spine_data_bucket,
             transfers_bucket=config.output_transfer_data_bucket,
         )

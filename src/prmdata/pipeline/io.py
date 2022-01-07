@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Iterable
+from datetime import datetime, timedelta
+from typing import Dict, Iterable, List
 
 from prmdata.domain.datetime import YearMonth
 from prmdata.domain.gp2gp.transfer import Transfer
@@ -10,8 +11,7 @@ from prmdata.utils.io.s3 import S3DataManager
 logger = logging.getLogger(__name__)
 
 
-class TransferClassifierS3UriResolver:
-
+class TransferClassifierMonthlyS3UriResolver:
     _SPINE_MESSAGES_VERSION = "v2"
     _TRANSFERS_PARQUET_VERSION = "v6"
 
@@ -54,6 +54,46 @@ class TransferClassifierS3UriResolver:
             f"{year}/{month}",
             f"{year}-{month}-transfers.parquet",
         )
+
+
+class TransferClassifierS3UriResolver:
+    _SPINE_MESSAGES_VERSION = "v3"
+
+    def __init__(self, gp2gp_spine_bucket, transfers_bucket):
+        self._gp2gp_spine_bucket = gp2gp_spine_bucket
+        self._transfers_bucket = transfers_bucket
+
+    @staticmethod
+    def _s3_path(*fragments):
+        return "s3://" + "/".join(fragments)
+
+    @staticmethod
+    def _add_leading_zero(num: int) -> str:
+        return str(num).zfill(2)
+
+    @staticmethod
+    def _range_dates(start_datetime: datetime, end_datetime: datetime) -> List[datetime]:
+        delta = end_datetime - start_datetime
+        return [start_datetime + timedelta(days=days) for days in range(delta.days)]
+
+    def _spine_message_filename(self, date: datetime) -> str:
+        year = self._add_leading_zero(date.year)
+        month = self._add_leading_zero(date.month)
+        day = self._add_leading_zero(date.day)
+        return f"{year}-{month}-{day}_spine_messages.csv.gz"
+
+    def spine_messages(self, start_datetime: datetime, end_datetime: datetime) -> list[str]:
+        return [
+            self._s3_path(
+                self._gp2gp_spine_bucket,
+                "v3",
+                f"{self._add_leading_zero(date.year)}",
+                f"{self._add_leading_zero(date.month)}",
+                f"{self._add_leading_zero(date.day)}",
+                self._spine_message_filename(date),
+            )
+            for date in self._range_dates(start_datetime, end_datetime)
+        ]
 
 
 class TransferClassifierIO:
