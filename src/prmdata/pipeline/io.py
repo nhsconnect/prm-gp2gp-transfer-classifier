@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 from typing import Dict, Iterable
 
-from prmdata.domain.datetime import YearMonth
 from prmdata.domain.gp2gp.transfer import Transfer
+from prmdata.domain.monthly_reporting_window import YearMonth
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from prmdata.pipeline.arrow import convert_transfers_to_table
 from prmdata.utils.date_converter import date_range_to_dates_converter

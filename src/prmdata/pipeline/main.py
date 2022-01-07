@@ -3,8 +3,8 @@ from os import environ
 
 import boto3
 
-from prmdata.domain.datetime import MonthlyReportingWindow
 from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
+from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierMonthlyS3UriResolver
 from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages

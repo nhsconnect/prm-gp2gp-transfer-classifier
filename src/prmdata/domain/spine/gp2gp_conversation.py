@@ -2,7 +2,7 @@ from datetime import datetime
 from logging import Logger, getLogger
 from typing import Iterable, Iterator, List, NamedTuple, Optional, Tuple
 
-from prmdata.domain.datetime import MonthlyReportingWindow
+from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.domain.spine.message import (
     DUPLICATE_ERROR,
     ERROR_SUPPRESSED,

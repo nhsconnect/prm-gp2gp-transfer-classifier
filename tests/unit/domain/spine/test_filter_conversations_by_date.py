@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 from unittest.mock import Mock
 
-from prmdata.domain.datetime import MonthlyReportingWindow
+from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.domain.spine.gp2gp_conversation import (
     Gp2gpConversation,
     filter_conversations_by_request_started_time,
