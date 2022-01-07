@@ -1,11 +1,12 @@
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, Iterable, List
+from datetime import datetime
+from typing import Dict, Iterable
 
 from prmdata.domain.datetime import YearMonth
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from prmdata.pipeline.arrow import convert_transfers_to_table
+from prmdata.utils.date_converter import date_range_to_dates_converter
 from prmdata.utils.io.s3 import S3DataManager
 
 logger = logging.getLogger(__name__)
@@ -71,11 +72,6 @@ class TransferClassifierS3UriResolver:
     def _add_leading_zero(num: int) -> str:
         return str(num).zfill(2)
 
-    @staticmethod
-    def _range_dates(start_datetime: datetime, end_datetime: datetime) -> List[datetime]:
-        delta = end_datetime - start_datetime
-        return [start_datetime + timedelta(days=days) for days in range(delta.days)]
-
     def _spine_message_filename(self, date: datetime) -> str:
         year = self._add_leading_zero(date.year)
         month = self._add_leading_zero(date.month)
@@ -92,7 +88,7 @@ class TransferClassifierS3UriResolver:
                 f"{self._add_leading_zero(date.day)}",
                 self._spine_message_filename(date),
             )
-            for date in self._range_dates(start_datetime, end_datetime)
+            for date in date_range_to_dates_converter(start_datetime, end_datetime)
         ]
 
 
