@@ -22,7 +22,7 @@ def _setup_logger():
     logger.addHandler(handler)
 
 
-class TransferClassifierPipeline:
+class TransferClassifierMonthlyPipeline:
     def __init__(self, config: TransferClassifierConfig):
         s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
         s3_manager = S3DataManager(s3)
@@ -69,7 +69,7 @@ class TransferClassifierPipeline:
 def main():
     _setup_logger()
     config = TransferClassifierConfig.from_environment_variables(environ)
-    pipeline = TransferClassifierPipeline(config)
+    pipeline = TransferClassifierMonthlyPipeline(config)
     pipeline.run()
 
 
