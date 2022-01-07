@@ -1,8 +1,11 @@
+from datetime import datetime
+from unittest.mock import Mock
+
 from prmdata.pipeline.io import (
     TransferClassifierMonthlyS3UriResolver,
     TransferClassifierS3UriResolver,
 )
-from tests.builders.common import a_datetime, a_string
+from tests.builders.common import a_string
 
 
 def test_returns_correct_monthly_spine_messages_uris():
@@ -44,8 +47,14 @@ def test_returns_correct_monthly_transfers_uri():
 
 def test_returns_correct_spine_messages_uris():
     spine_bucket = a_string()
-    start_datetime = a_datetime(year=2020, month=12, day=30, hour=0, minute=0, second=0)
-    end_datetime = a_datetime(year=2021, month=1, day=2, hour=0, minute=0, second=0)
+    reporting_window = Mock()
+    reporting_window.get_dates = Mock(
+        return_value=[
+            datetime(year=2020, month=12, day=30),
+            datetime(year=2020, month=12, day=31),
+            datetime(year=2021, month=1, day=1),
+        ]
+    )
 
     uri_resolver = TransferClassifierS3UriResolver(
         gp2gp_spine_bucket=spine_bucket,
@@ -58,6 +67,6 @@ def test_returns_correct_spine_messages_uris():
         f"s3://{spine_bucket}/v3/2021/01/01/2021-01-01_spine_messages.csv.gz",
     ]
 
-    actual = uri_resolver.spine_messages(start_datetime, end_datetime)
+    actual = uri_resolver.spine_messages(reporting_window)
 
     assert actual == expected

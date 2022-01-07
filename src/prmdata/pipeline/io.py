@@ -4,9 +4,9 @@ from typing import Dict, Iterable
 
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.monthly_reporting_window import YearMonth
+from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from prmdata.pipeline.arrow import convert_transfers_to_table
-from prmdata.utils.date_converter import date_range_to_dates_converter
 from prmdata.utils.io.s3 import S3DataManager
 
 logger = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ class TransferClassifierS3UriResolver:
         day = self._add_leading_zero(date.day)
         return f"{year}-{month}-{day}_spine_messages.csv.gz"
 
-    def spine_messages(self, start_datetime: datetime, end_datetime: datetime) -> list[str]:
+    def spine_messages(self, reporting_window: ReportingWindow) -> list[str]:
         return [
             self._s3_path(
                 self._gp2gp_spine_bucket,
@@ -88,7 +88,7 @@ class TransferClassifierS3UriResolver:
                 f"{self._add_leading_zero(date.day)}",
                 self._spine_message_filename(date),
             )
-            for date in date_range_to_dates_converter(start_datetime, end_datetime)
+            for date in reporting_window.get_dates()
         ]
 
 
