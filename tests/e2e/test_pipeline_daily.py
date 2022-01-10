@@ -77,7 +77,7 @@ def _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir):
         datadir, input_spine_data_bucket, year=2019, data_month=12, time_range=range(1, 32)
     )
 
-    for day in [1, 3, 5, 6, 7, 15, 19, 20, 30, 31]:
+    for day in [1, 2, 3, 5, 6, 7, 15, 19, 20, 30, 31]:
         _override_day_spine_messages(
             datadir, input_spine_data_bucket, year=2019, data_month=12, data_day=day
         )
@@ -141,7 +141,7 @@ def test_end_to_end_with_fake_s3(datadir):
 
     environ["INPUT_SPINE_DATA_BUCKET"] = s3_input_spine_data_bucket_name
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
-    environ["START_DATETIME"] = "2019-12-01T00:00:00Z"
+    environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
     environ["END_DATETIME"] = "2020-01-01T00:00:00Z"
 
     environ["S3_ENDPOINT_URL"] = fake_s3_url

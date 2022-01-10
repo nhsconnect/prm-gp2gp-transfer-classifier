@@ -77,7 +77,6 @@ class TransferClassifierPipeline:
         s3_manager = S3DataManager(s3)
         self._metric_month = (config.start_datetime.year, config.start_datetime.month)
 
-        self._monthly_reporting_window = MonthlyReportingWindow.prior_to(config.end_datetime)
         self._reporting_window = ReportingWindow(
             config.start_datetime, config.end_datetime, config.conversation_cutoff
         )
@@ -114,7 +113,7 @@ class TransferClassifierPipeline:
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
         transfers = parse_transfers_from_messages(
             spine_messages=spine_messages,
-            reporting_window=self._monthly_reporting_window,
+            reporting_window=self._reporting_window,
             conversation_cutoff=self._cutoff,
             observability_probe=transfer_observability_probe,
         )
