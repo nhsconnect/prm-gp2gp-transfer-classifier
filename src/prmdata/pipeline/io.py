@@ -77,6 +77,7 @@ class TransferClassifierS3UriResolver:
         return f"{year}-{month}-{day}_spine_messages.csv.gz"
 
     def spine_messages(self, reporting_window: ReportingWindow) -> list[str]:
+        dates = reporting_window.get_dates() + reporting_window.get_overflow_dates()
         return [
             self._s3_path(
                 self._gp2gp_spine_bucket,
@@ -86,7 +87,7 @@ class TransferClassifierS3UriResolver:
                 f"{add_leading_zero(date.day)}",
                 self._spine_message_filename(date),
             )
-            for date in reporting_window.get_dates()
+            for date in dates
         ]
 
 

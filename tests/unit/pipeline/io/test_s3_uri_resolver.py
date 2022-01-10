@@ -55,6 +55,12 @@ def test_returns_correct_spine_messages_uris():
             datetime(year=2021, month=1, day=1),
         ]
     )
+    reporting_window.get_overflow_dates = Mock(
+        return_value=[
+            datetime(year=2021, month=1, day=2),
+            datetime(year=2021, month=1, day=3),
+        ]
+    )
 
     uri_resolver = TransferClassifierS3UriResolver(
         gp2gp_spine_bucket=spine_bucket,
@@ -65,6 +71,8 @@ def test_returns_correct_spine_messages_uris():
         f"s3://{spine_bucket}/v3/2020/12/30/2020-12-30_spine_messages.csv.gz",
         f"s3://{spine_bucket}/v3/2020/12/31/2020-12-31_spine_messages.csv.gz",
         f"s3://{spine_bucket}/v3/2021/01/01/2021-01-01_spine_messages.csv.gz",
+        f"s3://{spine_bucket}/v3/2021/01/02/2021-01-02_spine_messages.csv.gz",
+        f"s3://{spine_bucket}/v3/2021/01/03/2021-01-03_spine_messages.csv.gz",
     ]
 
     actual = uri_resolver.spine_messages(reporting_window)
