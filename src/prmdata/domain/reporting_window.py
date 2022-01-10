@@ -8,6 +8,8 @@ class ReportingWindow:
     def __init__(
         self, start_datetime: datetime, end_datetime: datetime, conversation_cutoff: timedelta
     ):
+        self._start_datetime = start_datetime
+        self._end_datetime = end_datetime
         self._dates = date_range_to_dates_converter(start_datetime, end_datetime)
 
         cutoff_datetime = end_datetime + conversation_cutoff
@@ -18,3 +20,6 @@ class ReportingWindow:
 
     def get_overflow_dates(self) -> List[datetime]:
         return self._overflow_dates
+
+    def contains(self, time: datetime) -> bool:
+        return self._start_datetime <= time <= self._end_datetime

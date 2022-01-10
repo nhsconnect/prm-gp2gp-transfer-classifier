@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
 
+import pytest
+from dateutil.tz import tzutc
+
 from prmdata.domain.reporting_window import ReportingWindow
 
 
@@ -38,3 +41,29 @@ def test_get_overflow_dates_returns_list_of_datetimes_within_cutoff_period():
     actual = reporting_window.get_overflow_dates()
 
     assert actual == expected_overflow_dates
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        ({"date": datetime(2021, 1, 31, tzinfo=tzutc()), "expected": False}),
+        ({"date": datetime(2021, 2, 1, tzinfo=tzutc()), "expected": False}),
+        ({"date": datetime(2021, 2, 19, 0, 0, 1, tzinfo=tzutc()), "expected": True}),
+        ({"date": datetime(2021, 2, 20, tzinfo=tzutc()), "expected": True}),
+        ({"date": datetime(2021, 2, 28, tzinfo=tzutc()), "expected": True}),
+        ({"date": datetime(2021, 2, 28, 0, 0, 1, tzinfo=tzutc()), "expected": False}),
+        ({"date": datetime(2021, 3, 1, tzinfo=tzutc()), "expected": False}),
+    ],
+)
+def test_contains_returns_correct_boolean(test_case):
+    start_datetime = datetime(
+        year=2021, month=2, day=19, hour=0, minute=0, second=0, tzinfo=tzutc()
+    )
+    end_datetime = datetime(year=2021, month=2, day=28, hour=0, minute=0, second=0, tzinfo=tzutc())
+    conversation_cutoff = timedelta(days=3)
+
+    reporting_window = ReportingWindow(start_datetime, end_datetime, conversation_cutoff)
+
+    actual = reporting_window.contains(test_case["date"])
+
+    assert actual == test_case["expected"]
