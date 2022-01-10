@@ -52,7 +52,7 @@ def _parse_message_ref(ref):
 def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Message]:
     for item in items:
         yield Message(
-            time=parser.isoparse(item["_time"]),
+            time=parser.parse(item["_time"]),
             conversation_id=item["conversationID"],
             guid=item["GUID"],
             interaction_id=item["interactionID"],
