@@ -164,6 +164,8 @@ def test_end_to_end_with_fake_s3(datadir):
     expected_metadata = {
         "cutoff-days": "14",
         "build-tag": "abc456",
+        "start-datetime": "2019-12-02T00:00:00+00:00",
+        "end-datetime": "2020-01-01T00:00:00+00:00",
     }
 
     expected_transfers = _read_parquet_columns_json(
