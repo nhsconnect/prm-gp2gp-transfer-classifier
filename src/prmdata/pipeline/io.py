@@ -60,6 +60,7 @@ class TransferClassifierMonthlyS3UriResolver:
 
 class TransferClassifierS3UriResolver:
     _SPINE_MESSAGES_VERSION = "v3"
+    _TRANSFERS_PARQUET_VERSION = "v7"
 
     def __init__(self, gp2gp_spine_bucket, transfers_bucket):
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
@@ -89,6 +90,17 @@ class TransferClassifierS3UriResolver:
             )
             for date in dates
         ]
+
+    def gp2gp_transfers(self, daily_start_datetime: datetime) -> str:
+        year = add_leading_zero(daily_start_datetime.year)
+        month = add_leading_zero(daily_start_datetime.month)
+        day = add_leading_zero(daily_start_datetime.day)
+        return self._s3_path(
+            self._transfers_bucket,
+            self._TRANSFERS_PARQUET_VERSION,
+            f"{year}/{month}/{day}",
+            f"{year}-{month}-{day}-transfers.parquet",
+        )
 
 
 class TransferClassifierIO:

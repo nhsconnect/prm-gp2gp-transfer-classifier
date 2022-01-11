@@ -5,7 +5,7 @@ from prmdata.pipeline.io import (
     TransferClassifierMonthlyS3UriResolver,
     TransferClassifierS3UriResolver,
 )
-from tests.builders.common import a_string
+from tests.builders.common import a_datetime, a_string
 
 
 def test_returns_correct_monthly_spine_messages_uris():
@@ -76,5 +76,21 @@ def test_returns_correct_spine_messages_uris():
     ]
 
     actual = uri_resolver.spine_messages(reporting_window)
+
+    assert actual == expected
+
+
+def test_returns_correct_transfers_uri():
+    transfers_bucket = a_string()
+    daily_start_datetime = a_datetime(year=2021, month=1, day=3)
+
+    uri_resolver = TransferClassifierS3UriResolver(
+        gp2gp_spine_bucket=a_string(),
+        transfers_bucket=transfers_bucket,
+    )
+
+    expected = f"s3://{transfers_bucket}/v7/2021/01/03/2021-01-03-transfers.parquet"
+
+    actual = uri_resolver.gp2gp_transfers(daily_start_datetime)
 
     assert actual == expected
