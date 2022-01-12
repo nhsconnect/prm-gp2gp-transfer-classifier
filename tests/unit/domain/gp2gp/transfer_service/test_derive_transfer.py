@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest.mock import Mock
 
 from prmdata.domain.gp2gp.transfer_service import TransferService
@@ -28,8 +28,8 @@ def test_extracts_conversation_id():
 
 def test_produces_sla_of_successful_conversation():
     conversation = build_mock_gp2gp_conversation(
-        request_completed_time=datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
-        final_acknowledgement_time=datetime(
+        request_completed_time=a_datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0),
+        final_acknowledgement_time=a_datetime(
             year=2020, month=6, day=1, hour=13, minute=52, second=0
         ),
     )
@@ -66,8 +66,8 @@ def test_logs_negative_sla_warning():
 
 def test_negative_sla_duration_clamped_to_zero():
     conversation = build_mock_gp2gp_conversation(
-        request_completed_time=datetime(year=2021, month=1, day=5),
-        final_acknowledgement_time=datetime(year=2021, month=1, day=4),
+        request_completed_time=a_datetime(year=2021, month=1, day=5),
+        final_acknowledgement_time=a_datetime(year=2021, month=1, day=4),
     )
 
     expected_sla_duration = timedelta(0)
@@ -103,7 +103,7 @@ def test_produces_no_sla_given_no_request_completed_time():
 
 def test_produces_no_sla_given_no_final_acknowledgement_time():
     conversation = build_mock_gp2gp_conversation(
-        request_completed_time=datetime(year=2021, month=1, day=5),
+        request_completed_time=a_datetime(year=2021, month=1, day=5),
         final_acknowledgement_time=None,
     )
 
@@ -142,13 +142,13 @@ def test_produces_no_sla_given_acks_with_only_duplicate_error():
 
 
 def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs():
-    successful_acknowledgement_datetime = datetime(
+    successful_acknowledgement_datetime = a_datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
 
     conversation = Gp2gpConversation(
         messages=test_cases.ehr_integrated_with_conflicting_acks_and_duplicate_ehrs(
-            request_completed_time=datetime(
+            request_completed_time=a_datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
@@ -171,12 +171,12 @@ def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs
 
 
 def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs():
-    successful_acknowledgement_datetime = datetime(
+    successful_acknowledgement_datetime = a_datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
     conversation = Gp2gpConversation(
         messages=test_cases.ehr_suppressed_with_conflicting_acks_and_duplicate_ehrs(
-            request_completed_time=datetime(
+            request_completed_time=a_datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
@@ -199,12 +199,12 @@ def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs
 
 
 def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
-    failed_acknowledgement_datetime = datetime(
+    failed_acknowledgement_datetime = a_datetime(
         year=2020, month=6, day=1, hour=13, minute=52, second=0
     )
     conversation = Gp2gpConversation(
         messages=test_cases.integration_failed_with_conflicting_acks_and_duplicate_ehrs(
-            request_completed_time=datetime(
+            request_completed_time=a_datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=failed_acknowledgement_datetime,
@@ -227,13 +227,13 @@ def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
 
 
 def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_acks():
-    successful_acknowledgement_datetime = datetime(
+    successful_acknowledgement_datetime = a_datetime(
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
 
     conversation = Gp2gpConversation(
         messages=test_cases.ehr_integrated_with_conflicting_duplicate_and_conflicting_error_ack(
-            request_completed_time=datetime(
+            request_completed_time=a_datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
@@ -256,13 +256,13 @@ def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_ack
 
 
 def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_acks():
-    successful_acknowledgement_datetime = datetime(
+    successful_acknowledgement_datetime = a_datetime(
         year=2020, month=6, day=1, hour=16, minute=42, second=1
     )
 
     conversation = Gp2gpConversation(
         messages=test_cases.ehr_suppressed_with_conflicting_duplicate_and_conflicting_error_ack(
-            request_completed_time=datetime(
+            request_completed_time=a_datetime(
                 year=2020, month=6, day=1, hour=12, minute=42, second=0
             ),
             ehr_acknowledge_time=successful_acknowledgement_datetime,
@@ -285,7 +285,7 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
 
 
 def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_transfer():
-    request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+    request_completed_date = a_datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     conversation = Gp2gpConversation(
         messages=test_cases.ehr_integrated_successfully(
@@ -308,7 +308,7 @@ def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_trans
 
 
 def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_transfer_with_copcs():
-    request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+    request_completed_date = a_datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     conversation = Gp2gpConversation(
         messages=test_cases.successful_integration_with_copc_fragments(
@@ -331,7 +331,7 @@ def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_trans
 
 
 def test_produces_last_sender_message_timestamp_given_core_ehr_sent():
-    request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+    request_completed_date = a_datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     conversation = Gp2gpConversation(
         messages=test_cases.core_ehr_sent(request_completed_time=request_completed_date),
@@ -352,7 +352,7 @@ def test_produces_last_sender_message_timestamp_given_core_ehr_sent():
 
 
 def test_produces_last_sender_message_timestamp_given_copc_fragment_failure():
-    copc_fragment_time = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+    copc_fragment_time = a_datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     conversation = Gp2gpConversation(
         messages=test_cases.copc_fragment_failure(copc_fragment_time=copc_fragment_time),
@@ -390,7 +390,7 @@ def test_produces_none_as_last_sender_message_timestamp_given_request_made():
 
 
 def test_produces_last_sender_message_timestamp_given_request_acked_successfully():
-    request_acknowledged_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+    request_acknowledged_date = a_datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     conversation = Gp2gpConversation(
         messages=test_cases.request_acknowledged_successfully(
@@ -411,7 +411,7 @@ def test_produces_last_sender_message_timestamp_given_request_acked_successfully
 
 
 def test_produces_last_sender_message_timestamp_from_request_completed_before_integration_only():
-    request_completed_date = datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
+    request_completed_date = a_datetime(year=2020, month=6, day=1, hour=12, minute=42, second=0)
 
     messages = test_cases.ehr_integrated_with_duplicate_having_second_sender_ack_after_integration(
         request_completed_time=request_completed_date

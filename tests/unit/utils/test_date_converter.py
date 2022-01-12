@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from dateutil.tz import UTC
+
 from prmdata.utils.date_converter import date_range_to_dates_converter
 from tests.builders.common import a_datetime
 
@@ -11,8 +13,8 @@ def test_date_range_to_dates_converter_returns_datetimes_between_start_and_end_d
     actual = date_range_to_dates_converter(start_datetime, end_datetime)
 
     expected = [
-        datetime(year=2021, month=2, day=1, hour=0, minute=0, second=0),
-        datetime(year=2021, month=2, day=2, hour=0, minute=0, second=0),
+        datetime(year=2021, month=2, day=1, hour=0, minute=0, second=0, tzinfo=UTC),
+        datetime(year=2021, month=2, day=2, hour=0, minute=0, second=0, tzinfo=UTC),
     ]
 
     assert actual == expected
