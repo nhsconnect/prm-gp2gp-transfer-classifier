@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging import Logger, getLogger
 from typing import Iterable, Iterator, List, NamedTuple, Optional, Tuple, Union
 
@@ -331,4 +331,16 @@ def filter_conversations_by_request_started_time(
         conversation
         for conversation in conversations
         if reporting_window.contains(conversation.date_requested())
+    )
+
+
+def filter_conversations_by_day(
+    conversations: Iterable[Gp2gpConversation],
+    daily_start_datetime: datetime,
+) -> Iterator[Gp2gpConversation]:
+    daily_end_datetime = daily_start_datetime + timedelta(days=1)
+    return (
+        conversation
+        for conversation in conversations
+        if daily_start_datetime <= conversation.date_requested() < daily_end_datetime
     )
