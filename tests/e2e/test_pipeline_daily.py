@@ -168,21 +168,37 @@ def test_end_to_end_with_fake_s3(datadir):
         "end-datetime": "2020-01-01T00:00:00+00:00",
     }
 
-    expected_transfers = _read_parquet_columns_json(
-        datadir / "expected_outputs" / "transfersParquetColumns.json"
-    )
-
     _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir)
-
-    s3_output_path = f"v6/2019/12/2019-12-{expected_transfers_output_key}"
 
     try:
         main()
-        actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
-        actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
 
-        assert actual_transfers == expected_transfers
-        assert actual_metadata == expected_metadata
+        days_with_data = [2, 3, 5, 19, 20, 30, 31]
+        expected_days = [(2019, 12, day) for day in range(2, 32)]
+
+        for (year, data_month, data_day) in expected_days:
+            month = add_leading_zero(data_month)
+            day = add_leading_zero(data_day)
+
+            if data_day in days_with_data:
+                expected_transfers = _read_parquet_columns_json(
+                    datadir / "expected_outputs" / f"{year}-{month}-{day}-transferParquet.json"
+                )
+            else:
+                expected_transfers = _read_parquet_columns_json(
+                    datadir / "expected_outputs" / "template-transferParquet.json"
+                )
+
+            s3_output_path = (
+                f"v7/{year}/{month}/{day}/{year}-{month}-{day}-{expected_transfers_output_key}"
+            )
+
+            actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
+
+            assert actual_transfers == expected_transfers
+
+            actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
+            assert actual_metadata == expected_metadata
 
     finally:
         output_transfer_data_bucket.objects.all().delete()

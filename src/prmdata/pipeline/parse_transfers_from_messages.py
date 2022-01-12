@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from logging import getLogger
-from typing import Iterable, Iterator, Union
+from typing import Iterable, Iterator, List, Union
 
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, TransferService
@@ -39,7 +39,7 @@ def parse_transfers_from_messages_monthly(
 
 
 def parse_transfers_from_messages(
-    spine_messages: Iterable[Message],
+    spine_messages: List[Message],
     daily_start_datetime: datetime,
     conversation_cutoff: timedelta,
     observability_probe: TransferObservabilityProbe,
