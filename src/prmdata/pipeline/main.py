@@ -12,7 +12,7 @@ from prmdata.pipeline.io import (
     TransferClassifierMonthlyS3UriResolver,
     TransferClassifierS3UriResolver,
 )
-from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages
+from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages_monthly
 from prmdata.utils.io.json_formatter import JsonFormatter
 from prmdata.utils.io.s3 import S3DataManager
 
@@ -62,7 +62,7 @@ class TransferClassifierMonthlyPipeline:
         overflow_month = self._reporting_window.overflow_month
         spine_messages = self._read_spine_messages(metric_month, overflow_month)
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
-        transfers = parse_transfers_from_messages(
+        transfers = parse_transfers_from_messages_monthly(
             spine_messages=spine_messages,
             reporting_window=self._reporting_window,
             conversation_cutoff=self._cutoff,
@@ -113,7 +113,7 @@ class TransferClassifierPipeline:
     def run(self):
         spine_messages = self._read_spine_messages()
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
-        transfers = parse_transfers_from_messages(
+        transfers = parse_transfers_from_messages_monthly(
             spine_messages=spine_messages,
             reporting_window=self._reporting_window,
             conversation_cutoff=self._cutoff,

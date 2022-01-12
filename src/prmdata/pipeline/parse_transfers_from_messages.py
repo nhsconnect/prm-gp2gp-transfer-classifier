@@ -12,7 +12,7 @@ from prmdata.domain.spine.message import Message
 module_logger = getLogger(__name__)
 
 
-def parse_transfers_from_messages(
+def parse_transfers_from_messages_monthly(
     spine_messages: Iterable[Message],
     reporting_window: Union[MonthlyReportingWindow, ReportingWindow],
     conversation_cutoff: timedelta,

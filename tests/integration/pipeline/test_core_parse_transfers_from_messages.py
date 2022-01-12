@@ -2,12 +2,11 @@ from datetime import datetime, timedelta
 from unittest.mock import Mock
 
 from dateutil.tz import UTC
-from freezegun import freeze_time
 
 from prmdata.domain.gp2gp.transfer import Practice, Transfer
 from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome, TransferStatus
 from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
-from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages
+from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages_monthly
 from tests.builders.spine import build_message
 
 mock_probe = Mock()
@@ -60,7 +59,6 @@ def _build_successful_conversation(**kwargs):
     ]
 
 
-@freeze_time(datetime(year=2020, month=1, day=15, hour=23, second=42), tz_offset=0)
 def test_parses_transfer_correctly_given_valid_message_list():
     reporting_window = MonthlyReportingWindow(
         metric_month_start=datetime(2019, 12, 1, tzinfo=UTC),
@@ -100,7 +98,7 @@ def test_parses_transfer_correctly_given_valid_message_list():
     ]
 
     actual = list(
-        parse_transfers_from_messages(
+        parse_transfers_from_messages_monthly(
             spine_messages=spine_messages,
             reporting_window=reporting_window,
             conversation_cutoff=timedelta(14),
