@@ -20,6 +20,3 @@ class ReportingWindow:
 
     def get_overflow_dates(self) -> List[datetime]:
         return self._overflow_dates
-
-    def contains(self, time: datetime) -> bool:
-        return self._start_datetime <= time <= self._end_datetime
