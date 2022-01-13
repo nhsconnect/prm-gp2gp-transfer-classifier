@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from os import environ
 from typing import Iterator
 
@@ -109,8 +109,12 @@ class TransferClassifierPipeline:
         input_paths = self._uris.spine_messages(self._reporting_window)
         return self._io.read_spine_messages(input_paths)
 
-    def _write_transfers(self, transfers: Iterator[Transfer], daily_start_datetime: datetime):
-        output_path = self._uris.gp2gp_transfers(daily_start_datetime=daily_start_datetime)
+    def _write_transfers(
+        self, transfers: Iterator[Transfer], daily_start_datetime: datetime, cutoff: timedelta
+    ):
+        output_path = self._uris.gp2gp_transfers(
+            daily_start_datetime=daily_start_datetime, cutoff=cutoff
+        )
         self._io.write_transfers(transfers, output_path)
 
     def run(self):
@@ -135,7 +139,9 @@ class TransferClassifierPipeline:
             transfers = transfer_service.convert_to_transfers(
                 conversations_started_in_reporting_window
             )
-            self._write_transfers(transfers=transfers, daily_start_datetime=daily_start_datetime)
+            self._write_transfers(
+                transfers=transfers, daily_start_datetime=daily_start_datetime, cutoff=self._cutoff
+            )
 
 
 def main():

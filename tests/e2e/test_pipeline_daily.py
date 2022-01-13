@@ -189,9 +189,8 @@ def test_end_to_end_with_fake_s3(datadir):
                     datadir / "expected_outputs" / "template-transferParquet.json"
                 )
 
-            s3_output_path = (
-                f"v7/{year}/{month}/{day}/{year}-{month}-{day}-{expected_transfers_output_key}"
-            )
+            s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
+            s3_output_path = f"v7/cutoff-14/{year}/{month}/{day}/{s3_filename}"
 
             actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 

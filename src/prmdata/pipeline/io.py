@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Iterable, Iterator, List
 
 from prmdata.domain.gp2gp.transfer import Transfer
@@ -91,13 +91,14 @@ class TransferClassifierS3UriResolver:
             for date in dates
         ]
 
-    def gp2gp_transfers(self, daily_start_datetime: datetime) -> str:
+    def gp2gp_transfers(self, daily_start_datetime: datetime, cutoff: timedelta) -> str:
         year = add_leading_zero(daily_start_datetime.year)
         month = add_leading_zero(daily_start_datetime.month)
         day = add_leading_zero(daily_start_datetime.day)
         return self._s3_path(
             self._transfers_bucket,
             self._TRANSFERS_PARQUET_VERSION,
+            f"cutoff-{cutoff.days}",
             f"{year}/{month}/{day}",
             f"{year}-{month}-{day}-transfers.parquet",
         )
