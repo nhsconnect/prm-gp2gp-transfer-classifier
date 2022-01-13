@@ -14,7 +14,7 @@ from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_day
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
-from prmdata.utils.io.s3 import S3DataManager
+from prmdata.utils.input_output.s3 import S3DataManager
 
 
 class TransferClassifier:

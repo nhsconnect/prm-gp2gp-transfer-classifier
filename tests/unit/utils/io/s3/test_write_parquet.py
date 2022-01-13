@@ -4,7 +4,7 @@ import boto3
 import pyarrow as pa
 from moto import mock_s3
 
-from prmdata.utils.io.s3 import S3DataManager, logger
+from prmdata.utils.input_output.s3 import S3DataManager, logger
 from tests.builders.s3 import read_s3_parquet
 from tests.unit.utils.io.s3 import MOTO_MOCK_REGION
 

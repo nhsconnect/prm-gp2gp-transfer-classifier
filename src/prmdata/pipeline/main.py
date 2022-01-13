@@ -4,7 +4,7 @@ from os import environ
 from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.transfer_classifier import TransferClassifier
 from prmdata.pipeline.transfer_classifier_monthly import TransferClassifierMonthly
-from prmdata.utils.io.json_formatter import JsonFormatter
+from prmdata.utils.input_output.json_formatter import JsonFormatter
 
 logger = logging.getLogger("prmdata")
 

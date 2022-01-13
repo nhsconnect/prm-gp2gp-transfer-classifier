@@ -8,7 +8,7 @@ from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from prmdata.pipeline.arrow import convert_transfers_to_table
 from prmdata.utils.add_leading_zero import add_leading_zero
-from prmdata.utils.io.s3 import S3DataManager
+from prmdata.utils.input_output.s3 import S3DataManager
 
 logger = logging.getLogger(__name__)
 

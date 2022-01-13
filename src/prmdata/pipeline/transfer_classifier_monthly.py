@@ -5,7 +5,7 @@ from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierMonthlyS3UriResolver
 from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages_monthly
-from prmdata.utils.io.s3 import S3DataManager
+from prmdata.utils.input_output.s3 import S3DataManager
 
 
 class TransferClassifierMonthly:

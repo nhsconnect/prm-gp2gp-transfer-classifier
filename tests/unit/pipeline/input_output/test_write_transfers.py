@@ -7,7 +7,7 @@ from prmdata.domain.gp2gp.transfer_outcome import (
     TransferStatus,
 )
 from prmdata.pipeline.io import TransferClassifierIO
-from prmdata.utils.io.s3 import S3DataManager
+from prmdata.utils.input_output.s3 import S3DataManager
 from tests.builders.common import a_string
 from tests.builders.gp2gp import build_transfer
 from tests.builders.s3 import MockS3
