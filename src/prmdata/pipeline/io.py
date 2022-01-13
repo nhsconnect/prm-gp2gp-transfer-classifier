@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, Iterator, List
 
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.monthly_reporting_window import YearMonth
@@ -108,14 +108,10 @@ class TransferClassifierIO:
         self._s3_manager = s3_data_manager
         self._output_metadata = output_metadata
 
-    def read_spine_messages(self, s3_uris: List[str]) -> List[Message]:
-        spine_messages = []
-
+    def read_spine_messages(self, s3_uris: List[str]) -> Iterator[Message]:
         for uri in s3_uris:
             data = self._s3_manager.read_gzip_csv(uri)
-            spine_messages += construct_messages_from_splunk_items(data)
-
-        return spine_messages
+            yield from construct_messages_from_splunk_items(data)
 
     def write_transfers(self, transfers: Iterable[Transfer], s3_uri: str):
         self._s3_manager.write_parquet(

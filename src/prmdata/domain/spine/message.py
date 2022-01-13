@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Iterable, List, NamedTuple, Optional
+from typing import Iterable, Iterator, NamedTuple, Optional
 
 from dateutil import parser
 
@@ -49,9 +49,9 @@ def _parse_message_ref(ref):
     return None if ref == "NotProvided" else ref
 
 
-def construct_messages_from_splunk_items(items: Iterable[dict]) -> List[Message]:
-    return [
-        Message(
+def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Message]:
+    for item in items:
+        yield Message(
             time=parser.parse(item["_time"]),
             conversation_id=item["conversationID"],
             guid=item["GUID"],
@@ -63,5 +63,3 @@ def construct_messages_from_splunk_items(items: Iterable[dict]) -> List[Message]
             from_system=item.get("fromSystem"),
             to_system=item.get("toSystem"),
         )
-        for item in items
-    ]
