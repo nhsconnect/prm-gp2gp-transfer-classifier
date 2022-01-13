@@ -63,6 +63,8 @@ class TransferClassifierConfig:
     @classmethod
     def from_environment_variables(cls, env_vars):
         env = EnvConfig(env_vars)
+        env_cutoff = env.read_optional_timedelta_days("CONVERSATION_CUTOFF_DAYS")
+        default_cutoff = timedelta(days=DEFAULT_CUTOFF_DAYS)
         return TransferClassifierConfig(
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
@@ -70,7 +72,6 @@ class TransferClassifierConfig:
             start_datetime=env.read_optional_datetime("START_DATETIME"),
             end_datetime=env.read_optional_datetime("END_DATETIME"),
             build_tag=env.read_str("BUILD_TAG"),
-            conversation_cutoff=env.read_optional_timedelta_days("CONVERSATION_CUTOFF_DAYS")
-            or timedelta(days=DEFAULT_CUTOFF_DAYS),
+            conversation_cutoff=default_cutoff if env_cutoff is None else env_cutoff,
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),
         )
