@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytest
 from dateutil.tz import tzutc
 
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
@@ -101,3 +102,29 @@ def test_returns_correct_message_when_from_system_and_to_system_is_not_present()
     actual = construct_messages_from_splunk_items(items)
 
     assert list(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "time_input",
+    ["2019-07-01T09:10:00.334+0000", "2019-07-01 09:10:00.334 UTC", "2019-07-01 10:10:00.334 BST"],
+)
+def test_returns_appropriate_time_given_time_with_british_timezones(time_input):
+    items = [
+        build_spine_item(
+            time=time_input,
+            conversation_id="convo_abc",
+            guid="message_a",
+            interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
+            message_sender="123456789012",
+            message_recipient="121212121212",
+            message_ref="NotProvided",
+            jdi_event="NONE",
+            raw="",
+        )
+    ]
+    expected_time = datetime(2019, 7, 1, 9, 10, 0, 334000, tzutc())
+
+    messages = construct_messages_from_splunk_items(items)
+    actual_time = next(messages).time
+
+    assert actual_time == expected_time
