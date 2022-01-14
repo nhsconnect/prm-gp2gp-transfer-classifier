@@ -21,6 +21,12 @@ index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053d"
 
 ### Configuration
 
+#### Date range options
+- When START_DATETIME and END_DATETIME are **not** passed then DATE_ANCHOR must be passed in and it will use the date anchor to generate a month's worth of transfers
+- When START_DATETIME and END_DATETIME are both passed (which both must be at midnight), and not a DATE_ANCHOR, then the data retrieved will be from the daily spine exporter output, and it will output a daily transfer parquet file for each date within the date range.
+
+#### Environment variables
+
 Configuration is achieved via the following environment variables:
 
 
