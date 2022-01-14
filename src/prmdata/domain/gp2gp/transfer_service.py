@@ -36,7 +36,7 @@ class TransferService:
     def __init__(
         self,
         message_stream: Iterable[Message],
-        cutoff: timedelta,
+        cutoff: Optional[timedelta],
         observability_probe: TransferObservabilityProbe,
     ):
         self._probe = observability_probe
@@ -51,7 +51,11 @@ class TransferService:
 
         for conversation_id, unordered_messages in conversations.items():
             sorted_messages = sorted(unordered_messages, key=lambda m: m.time)
-            filtered_messages = _ignore_messages_sent_after(self._cutoff, sorted_messages)
+            filtered_messages = (
+                sorted_messages
+                if self._cutoff is None
+                else _ignore_messages_sent_after(self._cutoff, sorted_messages)
+            )
             yield Conversation(
                 conversation_id,
                 messages=filtered_messages,
@@ -107,7 +111,9 @@ class TransferService:
         )
 
 
-def _ignore_messages_sent_after(cutoff: timedelta, messages: List[Message]) -> List[Message]:
+def _ignore_messages_sent_after(
+    cutoff: Optional[timedelta], messages: List[Message]
+) -> List[Message]:
     first_message_in_conversation = messages[0]
     start_of_conversation = first_message_in_conversation.time
     return [message for message in messages if message.time - start_of_conversation <= cutoff]

@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List
 
+import pytest
 from dateutil.tz import UTC
 
 from prmdata.domain.reporting_window import ReportingWindow
@@ -43,10 +44,13 @@ def test_get_overflow_dates_returns_list_of_datetimes_within_cutoff_period():
     assert actual == expected_overflow_dates
 
 
-def test_returns_empty_list_given_0_cutoff():
+@pytest.mark.parametrize(
+    "conversation_cutoff",
+    [timedelta(days=0), None],
+)
+def test_returns_empty_list_given_no_cutoff(conversation_cutoff):
     start_datetime = datetime(year=2022, month=1, day=12, hour=0, minute=0, second=0, tzinfo=UTC)
     end_datetime = datetime(year=2022, month=1, day=13, hour=0, minute=0, second=0, tzinfo=UTC)
-    conversation_cutoff = timedelta(days=0)
 
     reporting_window = ReportingWindow(start_datetime, end_datetime, conversation_cutoff)
 

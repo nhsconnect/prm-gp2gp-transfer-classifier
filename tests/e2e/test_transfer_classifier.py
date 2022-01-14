@@ -143,6 +143,7 @@ def test_end_to_end_with_fake_s3(datadir):
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
     environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
     environ["END_DATETIME"] = "2020-01-01T00:00:00Z"
+    environ["CONVERSATION_CUTOFF_DAYS"] = "14"
 
     environ["S3_ENDPOINT_URL"] = fake_s3_url
     environ["BUILD_TAG"] = "abc456"

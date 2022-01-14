@@ -90,6 +90,7 @@ def test_end_to_end_with_fake_s3(datadir):
     environ["INPUT_SPINE_DATA_BUCKET"] = s3_input_spine_data_bucket_name
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
     environ["DATE_ANCHOR"] = "2020-01-30T18:44:49Z"
+    environ["CONVERSATION_CUTOFF_DAYS"] = "14"
     environ["S3_ENDPOINT_URL"] = fake_s3_url
     environ["BUILD_TAG"] = "abc456"
 
