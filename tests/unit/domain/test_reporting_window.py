@@ -59,3 +59,50 @@ def test_returns_empty_list_given_no_cutoff(conversation_cutoff):
     actual = reporting_window.get_overflow_dates()
 
     assert actual == expected_overflow_dates
+
+
+def test_throws_value_error_given_end_datetime_but_no_start_datetime():
+    end_datetime = datetime(year=2019, month=12, day=31, hour=0, minute=0, second=0, tzinfo=UTC)
+    conversation_cutoff = timedelta(days=3)
+
+    with pytest.raises(ValueError) as e:
+        ReportingWindow(
+            start_datetime=None, end_datetime=end_datetime, conversation_cutoff=conversation_cutoff
+        )
+    assert str(e.value) == "Start datetime must be provided if end datetime is provided"
+
+
+def test_throws_value_error_given_start_datetime_is_after_end_datetime():
+    start_datetime = datetime(year=2019, month=12, day=2, hour=0, minute=0, second=0, tzinfo=UTC)
+    end_datetime = datetime(year=2019, month=12, day=1, hour=0, minute=0, second=0, tzinfo=UTC)
+    conversation_cutoff = timedelta(days=3)
+
+    with pytest.raises(ValueError) as e:
+        ReportingWindow(
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+            conversation_cutoff=conversation_cutoff,
+        )
+    assert str(e.value) == "Start datetime must be before end datetime"
+
+
+@pytest.mark.parametrize(
+    "start_hour, end_hour",
+    [(12, 0), (0, 12)],
+)
+def test_throws_value_error_given_datetimes_that_are_not_midnight(start_hour, end_hour):
+    start_datetime = datetime(
+        year=2019, month=12, day=1, hour=start_hour, minute=0, second=0, tzinfo=UTC
+    )
+    end_datetime = datetime(
+        year=2019, month=12, day=2, hour=end_hour, minute=0, second=0, tzinfo=UTC
+    )
+    conversation_cutoff = timedelta(days=3)
+
+    with pytest.raises(ValueError) as e:
+        ReportingWindow(
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+            conversation_cutoff=conversation_cutoff,
+        )
+    assert str(e.value) == "Datetime must be at midnight"
