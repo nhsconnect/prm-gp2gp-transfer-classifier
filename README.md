@@ -22,7 +22,8 @@ index="spine2vfmmonitor" service="gp2gp" logReference="MPS0053d"
 ### Configuration
 
 #### Date range options
-- When START_DATETIME and END_DATETIME are **not** passed then DATE_ANCHOR must be passed in and it will use the date anchor to generate a month's worth of transfers
+- When START_DATETIME and END_DATETIME are **not** passed, and DATE_ANCHOR is passed in, then it will use the date anchor to generate a month's worth of transfers
+- When START_DATETIME and END_DATETIME and DATE_ANCHOR are **not** passed, then it will output one transfer parquet file for yesterday's midnight minus the number of cutoff days.
 - When START_DATETIME and END_DATETIME are both passed (which both must be at midnight), and not a DATE_ANCHOR, then the data retrieved will be from the daily spine exporter output, and it will output a daily transfer parquet file for each date within the date range.
 
 #### Environment variables
@@ -38,7 +39,7 @@ Configuration is achieved via the following environment variables:
 | START_DATETIME              | Optional ISO-8601 datetime specifying start of date range of transfer classification, on a daily basis                                                                   |
 | END_DATETIME                | Optional ISO-8601 datetime specifying end of date range of transfer classification, on a daily basis                                                                     |
 | S3_ENDPOINT_URL             | Optional argument specifying which S3 to connect to.                                                                                                                     |
-| CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer.                                                                                                       |
+| CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer. Defaults to ignoring any cutoff unless specified                                                      |
 
 #### Notes on configuration
 Instead of directly passing target year and month, a date anchor is passed in specifying "now".

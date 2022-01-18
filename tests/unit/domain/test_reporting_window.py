@@ -3,6 +3,7 @@ from typing import List
 
 import pytest
 from dateutil.tz import UTC
+from freezegun import freeze_time
 
 from prmdata.domain.reporting_window import ReportingWindow
 
@@ -44,15 +45,13 @@ def test_get_overflow_dates_returns_list_of_datetimes_within_cutoff_period():
     assert actual == expected_overflow_dates
 
 
-@pytest.mark.parametrize(
-    "conversation_cutoff",
-    [timedelta(days=0), None],
-)
-def test_returns_empty_list_given_no_cutoff(conversation_cutoff):
+def test_returns_empty_list_given_cutoff_of_0():
     start_datetime = datetime(year=2022, month=1, day=12, hour=0, minute=0, second=0, tzinfo=UTC)
     end_datetime = datetime(year=2022, month=1, day=13, hour=0, minute=0, second=0, tzinfo=UTC)
 
-    reporting_window = ReportingWindow(start_datetime, end_datetime, conversation_cutoff)
+    reporting_window = ReportingWindow(
+        start_datetime, end_datetime, conversation_cutoff=timedelta(days=0)
+    )
 
     expected_overflow_dates: List = []
 
@@ -70,6 +69,19 @@ def test_throws_value_error_given_end_datetime_but_no_start_datetime():
             start_datetime=None, end_datetime=end_datetime, conversation_cutoff=conversation_cutoff
         )
     assert str(e.value) == "Start datetime must be provided if end datetime is provided"
+
+
+def test_throws_value_error_given_start_datetime_but_no_end_datetime():
+    start_datetime = datetime(year=2019, month=12, day=31, hour=0, minute=0, second=0, tzinfo=UTC)
+    conversation_cutoff = timedelta(days=3)
+
+    with pytest.raises(ValueError) as e:
+        ReportingWindow(
+            start_datetime=start_datetime,
+            end_datetime=None,
+            conversation_cutoff=conversation_cutoff,
+        )
+    assert str(e.value) == "End datetime must be provided if start datetime is provided"
 
 
 def test_throws_value_error_given_start_datetime_is_after_end_datetime():
@@ -106,3 +118,52 @@ def test_throws_value_error_given_datetimes_that_are_not_midnight(start_hour, en
             conversation_cutoff=conversation_cutoff,
         )
     assert str(e.value) == "Datetime must be at midnight"
+
+
+@pytest.mark.parametrize(
+    "cutoff_days, expected_dates",
+    [
+        (0, [datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0)]),
+        (1, [datetime(year=2020, month=12, day=30, hour=0, minute=0, second=0)]),
+        (14, [datetime(year=2020, month=12, day=17, hour=0, minute=0, second=0)]),
+    ],
+)
+@freeze_time(datetime(year=2021, month=1, day=1, hour=3, minute=0, second=0))
+def test_returns_dates_list_from_yesterday_midnight_minus_cutoff_when_datetimes_are_none(
+    cutoff_days, expected_dates
+):
+    reporting_window = ReportingWindow(
+        start_datetime=None, end_datetime=None, conversation_cutoff=timedelta(days=cutoff_days)
+    )
+
+    actual_dates = reporting_window.get_dates()
+
+    assert actual_dates == expected_dates
+
+
+@pytest.mark.parametrize(
+    "cutoff_days, expected_overflow_dates",
+    [
+        (0, []),
+        (1, [datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0)]),
+        (
+            3,
+            [
+                datetime(year=2020, month=12, day=29, hour=0, minute=0, second=0),
+                datetime(year=2020, month=12, day=30, hour=0, minute=0, second=0),
+                datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0),
+            ],
+        ),
+    ],
+)
+@freeze_time(datetime(year=2021, month=1, day=1, hour=3, minute=0, second=0))
+def test_returns_list_of_overflow_dates_depending_on_cutoff_when_start_and_end_datetime_are_none(
+    cutoff_days, expected_overflow_dates
+):
+    reporting_window = ReportingWindow(
+        start_datetime=None, end_datetime=None, conversation_cutoff=timedelta(days=cutoff_days)
+    )
+
+    actual_dates = reporting_window.get_overflow_dates()
+
+    assert actual_dates == expected_overflow_dates
