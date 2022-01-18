@@ -64,7 +64,7 @@ def test_sorts_messages_within_conversations():
 @pytest.mark.parametrize(
     ["cutoff_interval", "expected_message_ids"],
     [
-        (timedelta(days=0, hours=0), ["1"]),
+        (timedelta(days=0, hours=0), ["1", "2", "3"]),
         (timedelta(days=0, hours=12), ["1"]),
         (timedelta(days=1, hours=12), ["1", "2"]),
         (timedelta(days=2, hours=12), ["1", "2", "3"]),
@@ -85,26 +85,5 @@ def test_rejects_messages_after_cutoff(cutoff_interval, expected_message_ids):
     conversations = transfer_service.group_into_conversations()
 
     actual_message_ids = [m.guid for m in next(conversations).messages]
-
-    assert actual_message_ids == expected_message_ids
-
-
-def test_returns_all_messages_given_no_cutoff():
-    messages = [
-        build_message(conversation_id="a", guid="1", time=datetime(year=2020, month=6, day=6)),
-        build_message(conversation_id="a", guid="2", time=datetime(year=2020, month=6, day=7)),
-        build_message(conversation_id="a", guid="3", time=datetime(year=2020, month=6, day=8)),
-        build_message(conversation_id="a", guid="4", time=datetime(year=2020, month=6, day=9)),
-    ]
-
-    transfer_service = TransferService(
-        message_stream=messages,
-        cutoff=None,
-        observability_probe=mock_transfer_observability_probe,
-    )
-    conversations = transfer_service.group_into_conversations()
-
-    actual_message_ids = [m.guid for m in next(conversations).messages]
-    expected_message_ids = ["1", "2", "3", "4"]
 
     assert actual_message_ids == expected_message_ids

@@ -54,7 +54,7 @@ def test_read_config_from_environment_when_optional_parameters_are_not_set():
         start_datetime=None,
         end_datetime=None,
         s3_endpoint_url=None,
-        conversation_cutoff=None,
+        conversation_cutoff=timedelta(days=0),
         build_tag="12345",
     )
 

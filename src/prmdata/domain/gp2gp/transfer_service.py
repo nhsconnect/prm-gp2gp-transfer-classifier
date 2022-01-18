@@ -111,9 +111,10 @@ class TransferService:
         )
 
 
-def _ignore_messages_sent_after(
-    cutoff: Optional[timedelta], messages: List[Message]
-) -> List[Message]:
+def _ignore_messages_sent_after(cutoff: timedelta, messages: List[Message]) -> List[Message]:
+    if cutoff.total_seconds() == 0:
+        return messages
+
     first_message_in_conversation = messages[0]
     start_of_conversation = first_message_in_conversation.time
     return [message for message in messages if message.time - start_of_conversation <= cutoff]
