@@ -36,8 +36,10 @@ class TransferClassifier:
         output_metadata = {
             "cutoff-days": str(config.conversation_cutoff.days),
             "build-tag": config.build_tag,
-            "start-datetime": config.start_datetime.isoformat(),
-            "end-datetime": config.end_datetime.isoformat(),
+            "start-datetime": config.start_datetime.isoformat()
+            if config.start_datetime
+            else "None",
+            "end-datetime": config.end_datetime.isoformat() if config.end_datetime else "None",
         }
 
         self._io = TransferClassifierIO(s3_manager, output_metadata)
