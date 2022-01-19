@@ -31,6 +31,41 @@ class ThreadedServer:
         self._thread.join()
 
 
+FAKE_AWS_HOST = "127.0.0.1"
+FAKE_AWS_PORT = 8887
+FAKE_AWS_URL = f"http://{FAKE_AWS_HOST}:{FAKE_AWS_PORT}"
+FAKE_S3_ACCESS_KEY = "testing"
+FAKE_S3_SECRET_KEY = "testing"
+FAKE_S3_REGION = "us-west-1"
+
+S3_INPUT_SPINE_DATA_BUCKET_NAME = "input-spine-data-bucket"
+S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME = "output-transfer-data-bucket"
+
+
+def _setup():
+    s3_client = boto3.resource(
+        "s3",
+        endpoint_url=FAKE_AWS_URL,
+        aws_access_key_id=FAKE_S3_ACCESS_KEY,
+        aws_secret_access_key=FAKE_S3_SECRET_KEY,
+        config=Config(signature_version="s3v4"),
+        region_name=FAKE_S3_REGION,
+    )
+
+    environ["AWS_ACCESS_KEY_ID"] = FAKE_S3_ACCESS_KEY
+    environ["AWS_SECRET_ACCESS_KEY"] = FAKE_S3_SECRET_KEY
+    environ["AWS_DEFAULT_REGION"] = FAKE_S3_REGION
+
+    environ["INPUT_SPINE_DATA_BUCKET"] = S3_INPUT_SPINE_DATA_BUCKET_NAME
+    environ["OUTPUT_TRANSFER_DATA_BUCKET"] = S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME
+
+    environ["S3_ENDPOINT_URL"] = FAKE_AWS_URL
+    environ["BUILD_TAG"] = "abc456"
+
+    fake_s3 = _build_fake_s3(FAKE_AWS_HOST, FAKE_AWS_PORT)
+    return fake_s3, s3_client
+
+
 def _read_json(path):
     return json.loads(path.read_text())
 
@@ -123,59 +158,32 @@ def _upload_template_spine_data(
 
 
 def test_end_to_end_with_fake_s3(datadir):
-    fake_s3_host = "127.0.0.1"
-    fake_s3_port = 8887
-    fake_s3_url = f"http://{fake_s3_host}:{fake_s3_port}"
-    fake_s3_access_key = "testing"
-    fake_s3_secret_key = "testing"
-    fake_s3_region = "us-west-1"
-    s3_output_transfer_data_bucket_name = "output-transfer-data-bucket"
-    s3_input_spine_data_bucket_name = "input-spine-data-bucket"
-
-    fake_s3 = _build_fake_s3(fake_s3_host, fake_s3_port)
+    fake_s3, s3_client = _setup()
     fake_s3.start()
 
-    environ["AWS_ACCESS_KEY_ID"] = fake_s3_access_key
-    environ["AWS_SECRET_ACCESS_KEY"] = fake_s3_secret_key
-    environ["AWS_DEFAULT_REGION"] = fake_s3_region
-
-    environ["INPUT_SPINE_DATA_BUCKET"] = s3_input_spine_data_bucket_name
-    environ["OUTPUT_TRANSFER_DATA_BUCKET"] = s3_output_transfer_data_bucket_name
-    environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
-    environ["END_DATETIME"] = "2020-01-01T00:00:00Z"
-    environ["CONVERSATION_CUTOFF_DAYS"] = "14"
-
-    environ["S3_ENDPOINT_URL"] = fake_s3_url
-    environ["BUILD_TAG"] = "abc456"
-
-    s3 = boto3.resource(
-        "s3",
-        endpoint_url=fake_s3_url,
-        aws_access_key_id=fake_s3_access_key,
-        aws_secret_access_key=fake_s3_secret_key,
-        config=Config(signature_version="s3v4"),
-        region_name=fake_s3_region,
+    output_transfer_data_bucket = _build_fake_s3_bucket(
+        S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
     )
-
-    output_transfer_data_bucket = _build_fake_s3_bucket(s3_output_transfer_data_bucket_name, s3)
-    input_spine_data_bucket = _build_fake_s3_bucket(s3_input_spine_data_bucket_name, s3)
-
-    expected_transfers_output_key = "transfers.parquet"
-
-    expected_metadata = {
-        "cutoff-days": "14",
-        "build-tag": "abc456",
-        "start-datetime": "2019-12-02T00:00:00+00:00",
-        "end-datetime": "2020-01-01T00:00:00+00:00",
-    }
+    input_spine_data_bucket = _build_fake_s3_bucket(S3_INPUT_SPINE_DATA_BUCKET_NAME, s3_client)
 
     _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir)
 
     try:
+        environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
+        environ["END_DATETIME"] = "2020-01-01T00:00:00Z"
+        environ["CONVERSATION_CUTOFF_DAYS"] = "14"
+
         main()
 
         days_with_data = [2, 3, 5, 19, 20, 30, 31]
         expected_days = [(2019, 12, day) for day in range(2, 32)]
+        expected_transfers_output_key = "transfers.parquet"
+        expected_metadata = {
+            "cutoff-days": "14",
+            "build-tag": "abc456",
+            "start-datetime": "2019-12-02T00:00:00+00:00",
+            "end-datetime": "2020-01-01T00:00:00+00:00",
+        }
 
         for (year, data_month, data_day) in expected_days:
             month = add_leading_zero(data_month)
@@ -198,6 +206,7 @@ def test_end_to_end_with_fake_s3(datadir):
             assert actual_transfers == expected_transfers
 
             actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
+
             assert actual_metadata == expected_metadata
 
     finally:
