@@ -1,6 +1,8 @@
 from datetime import datetime, time, timedelta
 from typing import List, Optional
 
+from dateutil.tz import UTC
+
 from prmdata.utils.date_converter import convert_date_range_to_dates
 
 
@@ -53,8 +55,9 @@ class ReportingWindow:
 
     @staticmethod
     def _calculate_yesterday_midnight_datetime() -> datetime:
-        today_midnight_datetime = datetime.combine(datetime.utcnow().date(), time.min)
-        return today_midnight_datetime - timedelta(days=1)
+        today = datetime.now(UTC).date()
+        today_midnight_utc = datetime.combine(today, time.min).astimezone(UTC)
+        return today_midnight_utc - timedelta(days=1)
 
     def get_dates(self) -> List[datetime]:
         return self._dates

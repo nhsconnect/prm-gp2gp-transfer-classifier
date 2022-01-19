@@ -7,6 +7,8 @@ from threading import Thread
 
 import boto3
 from botocore.config import Config
+from dateutil.tz import UTC
+from freezegun import freeze_time
 from moto.server import DomainDispatcherApplication, create_backend_app
 from werkzeug.serving import make_server
 
@@ -157,7 +159,7 @@ def _upload_template_spine_data(
         input_spine_data_bucket.upload_fileobj(empty_spine_messages, _get_s3_path(year, month, day))
 
 
-def test_end_to_end_with_fake_s3(datadir):
+def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(datadir):
     fake_s3, s3_client = _setup()
     fake_s3.start()
 
@@ -208,6 +210,54 @@ def test_end_to_end_with_fake_s3(datadir):
             actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
 
             assert actual_metadata == expected_metadata
+
+    finally:
+        output_transfer_data_bucket.objects.all().delete()
+        output_transfer_data_bucket.delete()
+        fake_s3.stop()
+        environ.clear()
+
+
+@freeze_time(datetime(year=2020, month=1, day=1, hour=3, minute=0, second=0, tzinfo=UTC))
+def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_cutoff(datadir):
+    fake_s3, s3_client = _setup()
+    fake_s3.start()
+
+    output_transfer_data_bucket = _build_fake_s3_bucket(
+        S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
+    )
+    input_spine_data_bucket = _build_fake_s3_bucket(S3_INPUT_SPINE_DATA_BUCKET_NAME, s3_client)
+
+    _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir)
+
+    try:
+        main()
+
+        expected_transfers_output_key = "transfers.parquet"
+        expected_metadata = {
+            "cutoff-days": "0",
+            "build-tag": "abc456",
+            "start-datetime": "None",
+            "end-datetime": "None",
+        }
+        year = 2019
+        month = 12
+        day = 31
+
+        expected_transfers = _read_parquet_columns_json(
+            datadir / "expected_outputs" / f"{year}-{month}-{day}-transferParquet.json"
+        )
+
+        s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
+        s3_output_path = f"v7/cutoff-0/{year}/{month}/{day}/{s3_filename}"
+
+        actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
+
+        assert actual_transfers == expected_transfers
+
+        actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
+
+        assert actual_metadata == expected_metadata
 
     finally:
         output_transfer_data_bucket.objects.all().delete()

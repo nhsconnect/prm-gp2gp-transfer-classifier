@@ -123,12 +123,12 @@ def test_throws_value_error_given_datetimes_that_are_not_midnight(start_hour, en
 @pytest.mark.parametrize(
     "cutoff_days, expected_dates",
     [
-        (0, [datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0)]),
-        (1, [datetime(year=2020, month=12, day=30, hour=0, minute=0, second=0)]),
-        (14, [datetime(year=2020, month=12, day=17, hour=0, minute=0, second=0)]),
+        (0, [datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0, tzinfo=UTC)]),
+        (1, [datetime(year=2020, month=12, day=30, hour=0, minute=0, second=0, tzinfo=UTC)]),
+        (14, [datetime(year=2020, month=12, day=17, hour=0, minute=0, second=0, tzinfo=UTC)]),
     ],
 )
-@freeze_time(datetime(year=2021, month=1, day=1, hour=3, minute=0, second=0))
+@freeze_time(datetime(year=2021, month=1, day=1, hour=3, minute=0, second=0, tzinfo=UTC))
 def test_returns_dates_list_from_yesterday_midnight_minus_cutoff_when_datetimes_are_none(
     cutoff_days, expected_dates
 ):
@@ -145,18 +145,18 @@ def test_returns_dates_list_from_yesterday_midnight_minus_cutoff_when_datetimes_
     "cutoff_days, expected_overflow_dates",
     [
         (0, []),
-        (1, [datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0)]),
+        (1, [datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0, tzinfo=UTC)]),
         (
             3,
             [
-                datetime(year=2020, month=12, day=29, hour=0, minute=0, second=0),
-                datetime(year=2020, month=12, day=30, hour=0, minute=0, second=0),
-                datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0),
+                datetime(year=2020, month=12, day=29, hour=0, minute=0, second=0, tzinfo=UTC),
+                datetime(year=2020, month=12, day=30, hour=0, minute=0, second=0, tzinfo=UTC),
+                datetime(year=2020, month=12, day=31, hour=0, minute=0, second=0, tzinfo=UTC),
             ],
         ),
     ],
 )
-@freeze_time(datetime(year=2021, month=1, day=1, hour=3, minute=0, second=0))
+@freeze_time(datetime(year=2021, month=1, day=1, hour=3, minute=0, second=0, tzinfo=UTC))
 def test_returns_list_of_overflow_dates_depending_on_cutoff_when_start_and_end_datetime_are_none(
     cutoff_days, expected_overflow_dates
 ):
