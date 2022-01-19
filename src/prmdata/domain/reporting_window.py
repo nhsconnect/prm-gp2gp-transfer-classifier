@@ -56,7 +56,7 @@ class ReportingWindow:
     @staticmethod
     def _calculate_yesterday_midnight_datetime() -> datetime:
         today = datetime.now(UTC).date()
-        today_midnight_utc = datetime.combine(today, time.min).astimezone(UTC)
+        today_midnight_utc = datetime.combine(today, time.min, tzinfo=UTC)
         return today_midnight_utc - timedelta(days=1)
 
     def get_dates(self) -> List[datetime]:

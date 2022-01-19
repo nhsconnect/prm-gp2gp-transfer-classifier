@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import List
 
 import pytest
-from dateutil.tz import UTC
+from dateutil.tz import UTC, gettz
 from freezegun import freeze_time
 
 from prmdata.domain.reporting_window import ReportingWindow
@@ -137,6 +137,22 @@ def test_returns_dates_list_from_yesterday_midnight_minus_cutoff_when_datetimes_
     )
 
     actual_dates = reporting_window.get_dates()
+
+    assert actual_dates == expected_dates
+
+
+@freeze_time(
+    datetime(year=2021, month=5, day=1, hour=3, minute=0, second=0, tzinfo=UTC).astimezone(
+        gettz("Europe/London")
+    )
+)
+def test_returns_dates_list_when_today_time_is_bst():
+    reporting_window = ReportingWindow(
+        start_datetime=None, end_datetime=None, conversation_cutoff=timedelta(days=0)
+    )
+
+    actual_dates = reporting_window.get_dates()
+    expected_dates = [datetime(year=2021, month=4, day=30, hour=0, minute=0, second=0, tzinfo=UTC)]
 
     assert actual_dates == expected_dates
 
