@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from unittest.mock import Mock
 
 from dateutil.tz import UTC
 
@@ -8,8 +7,6 @@ from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome, TransferStatu
 from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.pipeline.parse_transfers_from_messages import parse_transfers_from_messages_monthly
 from tests.builders.spine import build_message
-
-mock_probe = Mock()
 
 
 def _build_successful_conversation(**kwargs):
@@ -102,7 +99,6 @@ def test_returns_transfers_given_valid_message_list():
             spine_messages=spine_messages,
             reporting_window=reporting_window,
             conversation_cutoff=timedelta(14),
-            observability_probe=mock_probe,
         )
     )
 

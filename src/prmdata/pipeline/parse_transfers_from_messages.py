@@ -3,7 +3,7 @@ from logging import getLogger
 from typing import Iterable, Iterator, Union
 
 from prmdata.domain.gp2gp.transfer import Transfer
-from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, TransferService
+from prmdata.domain.gp2gp.transfer_service import TransferService
 from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_request_started_time
@@ -16,12 +16,10 @@ def parse_transfers_from_messages_monthly(
     spine_messages: Iterable[Message],
     reporting_window: Union[MonthlyReportingWindow, ReportingWindow],
     conversation_cutoff: timedelta,
-    observability_probe: TransferObservabilityProbe,
 ) -> Iterator[Transfer]:
     transfer_service = TransferService(
         message_stream=spine_messages,
         cutoff=conversation_cutoff,
-        observability_probe=observability_probe,
     )
 
     conversations = transfer_service.group_into_conversations()

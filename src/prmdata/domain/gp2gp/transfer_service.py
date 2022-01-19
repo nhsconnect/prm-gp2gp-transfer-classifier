@@ -36,10 +36,9 @@ class TransferService:
     def __init__(
         self,
         message_stream: Iterable[Message],
-        cutoff: timedelta,
-        observability_probe: TransferObservabilityProbe,
+        cutoff: Optional[timedelta],
     ):
-        self._probe = observability_probe
+        self._probe = TransferObservabilityProbe(logger=module_logger)
         self._message_stream = message_stream
         self._cutoff = cutoff
 

@@ -1,15 +1,11 @@
-import logging
 from datetime import datetime, timedelta
+from logging import getLogger
 from typing import Iterator
 
 import boto3
 
 from prmdata.domain.gp2gp.transfer import Transfer
-from prmdata.domain.gp2gp.transfer_service import (
-    TransferObservabilityProbe,
-    TransferService,
-    module_logger,
-)
+from prmdata.domain.gp2gp.transfer_service import TransferService
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_day
 from prmdata.domain.spine.message import Message
@@ -17,7 +13,7 @@ from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
 from prmdata.utils.input_output.s3 import S3DataManager
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class TransferClassifier:
@@ -72,13 +68,11 @@ class TransferClassifier:
         }
 
     def run(self):
-        transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
         spine_messages = self._read_spine_messages()
 
         transfer_service = TransferService(
             message_stream=spine_messages,
             cutoff=self._cutoff,
-            observability_probe=transfer_observability_probe,
         )
 
         conversations = transfer_service.group_into_conversations()

@@ -1,13 +1,12 @@
 from datetime import timedelta
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
-from prmdata.domain.gp2gp.transfer_service import TransferService
+from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, TransferService
 from prmdata.domain.spine.gp2gp_conversation import Gp2gpConversation
 from tests.builders import test_cases
 from tests.builders.common import a_datetime, a_string
 from tests.builders.spine import build_mock_gp2gp_conversation
 
-mock_transfer_observability_probe = Mock()
 mock_gp2gp_conversation_observability_probe = Mock()
 
 
@@ -17,7 +16,6 @@ def test_extracts_conversation_id():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -36,7 +34,6 @@ def test_produces_sla_of_successful_conversation():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -46,22 +43,19 @@ def test_produces_sla_of_successful_conversation():
     assert actual.sla_duration == expected_sla_duration
 
 
-def test_logs_negative_sla_warning():
+@patch.object(TransferObservabilityProbe, "record_negative_sla")
+def test_logs_negative_sla_warning(mock_record_negative_sla):
     conversation_id = a_string()
-    mock_probe = Mock()
     conversation = build_mock_gp2gp_conversation(
         conversation_id=conversation_id,
         final_acknowledgement_time=a_datetime(year=2021, month=12, day=1),
         request_completed_time=a_datetime(year=2021, month=12, day=2),
     )
 
-    transfer_service = TransferService(
-        message_stream=[], cutoff=timedelta(days=14), observability_probe=mock_probe
-    )
+    transfer_service = TransferService(message_stream=[], cutoff=timedelta(days=14))
 
     transfer_service.derive_transfer(conversation)
-
-    mock_probe.record_negative_sla.assert_called_once_with(conversation)
+    mock_record_negative_sla.assert_called_once_with(conversation)
 
 
 def test_negative_sla_duration_clamped_to_zero():
@@ -75,7 +69,6 @@ def test_negative_sla_duration_clamped_to_zero():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -91,7 +84,6 @@ def test_produces_no_sla_given_no_request_completed_time():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -110,7 +102,6 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -129,7 +120,6 @@ def test_produces_no_sla_given_acks_with_only_duplicate_error():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -159,7 +149,6 @@ def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -187,7 +176,6 @@ def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -215,7 +203,6 @@ def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -244,7 +231,6 @@ def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_ack
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -273,7 +259,6 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -297,7 +282,6 @@ def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_trans
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -320,7 +304,6 @@ def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_trans
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -341,7 +324,6 @@ def test_produces_last_sender_message_timestamp_given_core_ehr_sent():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -362,7 +344,6 @@ def test_produces_last_sender_message_timestamp_given_copc_fragment_failure():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -381,7 +362,6 @@ def test_produces_none_as_last_sender_message_timestamp_given_request_made():
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -402,7 +382,6 @@ def test_produces_last_sender_message_timestamp_given_request_acked_successfully
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)
@@ -425,7 +404,6 @@ def test_produces_last_sender_message_timestamp_from_request_completed_before_in
     transfer_service = TransferService(
         message_stream=[],
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
 
     actual = transfer_service.derive_transfer(conversation)

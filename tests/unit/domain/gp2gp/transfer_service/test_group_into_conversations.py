@@ -1,13 +1,10 @@
 from datetime import datetime, timedelta
-from unittest.mock import Mock
 
 import pytest
 
 from prmdata.domain.gp2gp.transfer_service import TransferService
 from prmdata.domain.spine.conversation import Conversation
 from tests.builders.spine import build_message
-
-mock_transfer_observability_probe = Mock()
 
 
 def test_produces_correct_conversations():
@@ -20,7 +17,6 @@ def test_produces_correct_conversations():
     transfer_service = TransferService(
         message_stream=messages,
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
     actual = transfer_service.group_into_conversations()
 
@@ -37,7 +33,6 @@ def test_produces_correct_messages_within_conversations():
     transfer_service = TransferService(
         message_stream=messages,
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
     actual = transfer_service.group_into_conversations()
 
@@ -54,7 +49,6 @@ def test_sorts_messages_within_conversations():
     transfer_service = TransferService(
         message_stream=messages,
         cutoff=timedelta(days=14),
-        observability_probe=mock_transfer_observability_probe,
     )
     actual = transfer_service.group_into_conversations()
 
@@ -80,7 +74,6 @@ def test_rejects_messages_after_cutoff(cutoff_interval, expected_message_ids):
     transfer_service = TransferService(
         message_stream=messages,
         cutoff=cutoff_interval,
-        observability_probe=mock_transfer_observability_probe,
     )
     conversations = transfer_service.group_into_conversations()
 
