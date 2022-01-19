@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import Iterator
 
@@ -16,6 +17,8 @@ from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
 from prmdata.utils.input_output.s3 import S3DataManager
 
+logger = logging.getLogger(__name__)
+
 
 class TransferClassifier:
     def __init__(self, config: TransferClassifierConfig):
@@ -33,13 +36,17 @@ class TransferClassifier:
             transfers_bucket=config.output_transfer_data_bucket,
         )
 
+        self._start_datetime_config_string = (
+            config.start_datetime.isoformat() if config.start_datetime else "None"
+        )
+        self._end_datetime_config_string = (
+            config.end_datetime.isoformat() if config.end_datetime else "None"
+        )
         output_metadata = {
             "cutoff-days": str(config.conversation_cutoff.days),
             "build-tag": config.build_tag,
-            "start-datetime": config.start_datetime.isoformat()
-            if config.start_datetime
-            else "None",
-            "end-datetime": config.end_datetime.isoformat() if config.end_datetime else "None",
+            "start-datetime": self._start_datetime_config_string,
+            "end-datetime": self._end_datetime_config_string,
         }
 
         self._io = TransferClassifierIO(s3_manager, output_metadata)
@@ -56,6 +63,14 @@ class TransferClassifier:
         )
         self._io.write_transfers(transfers, output_path)
 
+    def _construct_json_log_date_range_info(self) -> dict:
+        return {
+            "config_start_datetime": self._start_datetime_config_string,
+            "config_end_datetime": self._end_datetime_config_string,
+            "datetimes": self._reporting_window.get_dates(),
+            "overflow_datetimes": self._reporting_window.get_overflow_dates(),
+        }
+
     def run(self):
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
         spine_messages = self._read_spine_messages()
@@ -69,6 +84,14 @@ class TransferClassifier:
         conversations = transfer_service.group_into_conversations()
         gp2gp_conversations = transfer_service.parse_conversations_into_gp2gp_conversations(
             conversations
+        )
+
+        logger.info(
+            "Attempting to classify conversations for a date range",
+            extra={
+                "event": "ATTEMPTING_CLASSIFY_CONVERSATIONS_FOR_A_DATE_RANGE",
+                **self._construct_json_log_date_range_info(),
+            },
         )
 
         for daily_start_datetime in self._reporting_window.get_dates():
