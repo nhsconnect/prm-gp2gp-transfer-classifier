@@ -13,19 +13,10 @@ class ReportingWindow:
         end_datetime: Optional[datetime],
         conversation_cutoff: timedelta,
     ):
-        self._start_datetime = start_datetime
-        self._end_datetime = end_datetime
+        self._validate_datetimes(start_datetime, end_datetime)
 
-        self._validate_datetimes(self._start_datetime, self._end_datetime)
-
-        yesterday_midnight_datetime = self._calculate_yesterday_midnight_datetime()
-        if self._start_datetime is None:
-            self._start_datetime = yesterday_midnight_datetime - conversation_cutoff
-        if self._end_datetime is None:
-            self._end_datetime = (
-                yesterday_midnight_datetime - conversation_cutoff + timedelta(days=1)
-            )
-
+        self._start_datetime = self._calculate_start_datetime(start_datetime, conversation_cutoff)
+        self._end_datetime = self._calculate_end_datetime(end_datetime, conversation_cutoff)
         self._dates = convert_date_range_to_dates(self._start_datetime, self._end_datetime)
 
         cutoff_datetime = self._end_datetime + conversation_cutoff
@@ -53,6 +44,26 @@ class ReportingWindow:
         today = datetime.now(UTC).date()
         today_midnight_utc = datetime.combine(today, time.min, tzinfo=UTC)
         return today_midnight_utc - timedelta(days=1)
+
+    def _calculate_start_datetime(
+        self, start_datetime: Optional[datetime], conversation_cutoff: timedelta
+    ):
+        if start_datetime:
+            return start_datetime
+        else:
+            return self._calculate_yesterday_midnight_datetime() - conversation_cutoff
+
+    def _calculate_end_datetime(
+        self, end_datetime: Optional[datetime], conversation_cutoff: timedelta
+    ):
+        if end_datetime:
+            return end_datetime
+        else:
+            return (
+                self._calculate_yesterday_midnight_datetime()
+                - conversation_cutoff
+                + timedelta(days=1)
+            )
 
     def get_dates(self) -> List[datetime]:
         return self._dates
