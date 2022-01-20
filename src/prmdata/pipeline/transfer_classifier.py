@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Iterator
+from typing import Dict, Iterator
 
 import boto3
 
@@ -30,43 +30,38 @@ class TransferClassifier:
             config.start_datetime, config.end_datetime, config.conversation_cutoff
         )
 
-        self._cutoff = config.conversation_cutoff
+        self._config = config
 
         self._uris = TransferClassifierS3UriResolver(
             gp2gp_spine_bucket=config.input_spine_data_bucket,
             transfers_bucket=config.output_transfer_data_bucket,
         )
 
-        self._start_datetime_config_string = convert_to_datetime_string(config.start_datetime)
-        self._end_datetime_config_string = convert_to_datetime_string(config.end_datetime)
-        output_metadata = {
-            "cutoff-days": str(config.conversation_cutoff.days),
-            "build-tag": config.build_tag,
-            "start-datetime": self._start_datetime_config_string,
-            "end-datetime": self._end_datetime_config_string,
-        }
-
-        self._io = TransferClassifierIO(s3_manager, output_metadata)
+        self._io = TransferClassifierIO(s3_manager)
 
     def _read_spine_messages(self) -> Iterator[Message]:
         input_paths = self._uris.spine_messages(self._reporting_window)
         return self._io.read_spine_messages(input_paths)
 
     def _write_transfers(
-        self, transfers: Iterator[Transfer], daily_start_datetime: datetime, cutoff: timedelta
+        self,
+        transfers: Iterator[Transfer],
+        daily_start_datetime: datetime,
+        cutoff: timedelta,
+        metadata: Dict[str, str],
     ):
         output_path = self._uris.gp2gp_transfers(
             daily_start_datetime=daily_start_datetime, cutoff=cutoff
         )
-        self._io.write_transfers(transfers, output_path)
+        self._io.write_transfers(transfers, output_path, metadata)
 
     def _construct_json_log_date_range_info(self) -> dict:
         reporting_window_dates = self._reporting_window.get_dates()
         reporting_window_overflow_dates = self._reporting_window.get_overflow_dates()
         return {
-            "config_start_datetime": self._start_datetime_config_string,
-            "config_end_datetime": self._end_datetime_config_string,
-            "conversation_cutoff": str(self._cutoff),
+            "config_start_datetime": convert_to_datetime_string(self._config.start_datetime),
+            "config_end_datetime": convert_to_datetime_string(self._config.end_datetime),
+            "conversation_cutoff": str(self._config.conversation_cutoff),
             "reporting_window_dates": convert_to_datetimes_string(reporting_window_dates),
             "reporting_window_overflow_dates": convert_to_datetimes_string(
                 reporting_window_overflow_dates
@@ -89,7 +84,7 @@ class TransferClassifier:
 
         transfer_service = TransferService(
             message_stream=spine_messages,
-            cutoff=self._cutoff,
+            cutoff=self._config.conversation_cutoff,
             observability_probe=transfer_observability_probe,
         )
 
@@ -99,6 +94,15 @@ class TransferClassifier:
         )
 
         for daily_start_datetime in self._reporting_window.get_dates():
+            metadata = {
+                "cutoff-days": str(self._config.conversation_cutoff.days),
+                "build-tag": self._config.build_tag,
+                "start-datetime": convert_to_datetime_string(daily_start_datetime),
+                "end-datetime": convert_to_datetime_string(
+                    daily_start_datetime + timedelta(days=1)
+                ),
+            }
+
             conversations_started_in_reporting_window = filter_conversations_by_day(
                 gp2gp_conversations, daily_start_datetime
             )
@@ -106,7 +110,10 @@ class TransferClassifier:
                 conversations_started_in_reporting_window
             )
             self._write_transfers(
-                transfers=transfers, daily_start_datetime=daily_start_datetime, cutoff=self._cutoff
+                transfers=transfers,
+                daily_start_datetime=daily_start_datetime,
+                cutoff=self._config.conversation_cutoff,
+                metadata=metadata,
             )
 
         logger.info(

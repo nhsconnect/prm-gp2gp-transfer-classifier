@@ -18,7 +18,7 @@ _SOME_METADATA: dict[str, str] = {}
 def test_write_transfers_correctly_writes_all_fields():
     mock_s3 = MockS3()
     s3_data_manager = S3DataManager(mock_s3)
-    io = TransferClassifierIO(s3_data_manager, _SOME_METADATA)
+    io = TransferClassifierIO(s3_data_manager)
 
     transfer = Transfer(
         conversation_id="1234",
@@ -37,8 +37,7 @@ def test_write_transfers_correctly_writes_all_fields():
     )
 
     io.write_transfers(
-        transfers=[transfer],
-        s3_uri="s3://a_bucket/some_data.parquet",
+        transfers=[transfer], s3_uri="s3://a_bucket/some_data.parquet", metadata=_SOME_METADATA
     )
 
     expected_table = {
@@ -66,7 +65,7 @@ def test_write_transfers_correctly_writes_all_fields():
 def test_write_transfers_correctly_writes_multiple_rows():
     mock_s3 = MockS3()
     s3_data_manager = S3DataManager(mock_s3)
-    io = TransferClassifierIO(s3_data_manager, _SOME_METADATA)
+    io = TransferClassifierIO(s3_data_manager)
 
     transfers = [
         build_transfer(conversation_id="a"),
@@ -74,7 +73,9 @@ def test_write_transfers_correctly_writes_multiple_rows():
         build_transfer(conversation_id="c"),
     ]
 
-    io.write_transfers(transfers=transfers, s3_uri="s3://a_bucket/multi_row.parquet")
+    io.write_transfers(
+        transfers=transfers, s3_uri="s3://a_bucket/multi_row.parquet", metadata=_SOME_METADATA
+    )
 
     expected_conversation_ids = ["a", "b", "c"]
 
@@ -94,11 +95,10 @@ def test_write_transfers_writes_metadata():
 
     metadata = {a_string(): a_string()}
 
-    io = TransferClassifierIO(s3_data_manager, metadata)
+    io = TransferClassifierIO(s3_data_manager)
 
     io.write_transfers(
-        transfers=[build_transfer()],
-        s3_uri="s3://a_bucket/some_data.parquet",
+        transfers=[build_transfer()], s3_uri="s3://a_bucket/some_data.parquet", metadata=metadata
     )
 
     actual_meta_data = mock_s3.object("a_bucket", "some_data.parquet").get_metadata()

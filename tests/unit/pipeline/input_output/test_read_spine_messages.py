@@ -23,8 +23,6 @@ _SPINE_CSV_COLUMNS = [
     "jdiEvent",
 ]
 
-_SOME_METADATA: dict[str, str] = {}
-
 
 def _spine_csv_gz(rows):
     return build_gzip_csv(
@@ -56,9 +54,7 @@ def test_read_spine_messages_reads_single_message_correctly():
         ]
     )
 
-    io = TransferClassifierIO(
-        s3_data_manager=S3DataManager(mock_s3_conn), output_metadata=_SOME_METADATA
-    )
+    io = TransferClassifierIO(s3_data_manager=S3DataManager(mock_s3_conn))
 
     expected_spine_message = Message(
         time=datetime(2019, 12, 31, 23, 37, 55, 334000, tzutc()),
@@ -96,9 +92,7 @@ def test_read_spine_messages_reads_multiple_messages():
         ]
     )
 
-    io = TransferClassifierIO(
-        s3_data_manager=S3DataManager(mock_s3_conn), output_metadata=_SOME_METADATA
-    )
+    io = TransferClassifierIO(s3_data_manager=S3DataManager(mock_s3_conn))
 
     expected_guids = [f"guid{i}" for i in range(10)]
 

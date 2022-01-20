@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
 from os import environ
 from threading import Thread
@@ -159,6 +159,14 @@ def _upload_template_spine_data(
         input_spine_data_bucket.upload_fileobj(empty_spine_messages, _get_s3_path(year, month, day))
 
 
+def _end_datetime_metadata(year: int, data_month: int, data_day: int) -> str:
+    end_datetime = datetime(year, data_month, data_day) + timedelta(days=1)
+    end_datetime_year = add_leading_zero(end_datetime.year)
+    end_datetime_month = add_leading_zero(end_datetime.month)
+    end_datetime_day = add_leading_zero(end_datetime.day)
+    return f"{end_datetime_year}-{end_datetime_month}-{end_datetime_day}T00:00:00+00:00"
+
+
 def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(datadir):
     fake_s3, s3_client = _setup()
     fake_s3.start()
@@ -180,12 +188,6 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
         days_with_data = [2, 3, 5, 19, 20, 30, 31]
         expected_days = [(2019, 12, day) for day in range(2, 32)]
         expected_transfers_output_key = "transfers.parquet"
-        expected_metadata = {
-            "cutoff-days": "14",
-            "build-tag": "abc456",
-            "start-datetime": "2019-12-02T00:00:00+00:00",
-            "end-datetime": "2020-01-01T00:00:00+00:00",
-        }
 
         for (year, data_month, data_day) in expected_days:
             month = add_leading_zero(data_month)
@@ -208,6 +210,13 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
             assert actual_transfers == expected_transfers
 
             actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
+
+            expected_metadata = {
+                "cutoff-days": "14",
+                "build-tag": "abc456",
+                "start-datetime": f"{year}-{month}-{day}T00:00:00+00:00",
+                "end-datetime": _end_datetime_metadata(year, data_month, data_day),
+            }
 
             assert actual_metadata == expected_metadata
 
@@ -237,8 +246,8 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
         expected_metadata = {
             "cutoff-days": "0",
             "build-tag": "abc456",
-            "start-datetime": "None",
-            "end-datetime": "None",
+            "start-datetime": "2019-12-31T00:00:00+00:00",
+            "end-datetime": "2020-01-01T00:00:00+00:00",
         }
         year = 2019
         month = 12

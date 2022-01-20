@@ -22,13 +22,13 @@ class TransferClassifierMonthly:
             transfers_bucket=config.output_transfer_data_bucket,
         )
 
-        output_metadata = {
+        self._metadata = {
             "date-anchor": config.date_anchor.isoformat(),
             "cutoff-days": str(config.conversation_cutoff.days),
             "build-tag": config.build_tag,
         }
 
-        self._io = TransferClassifierIO(s3_manager, output_metadata)
+        self._io = TransferClassifierIO(s3_manager)
 
     def _read_spine_messages(self, metric_month, overflow_month):
         input_path = self._uris.spine_messages(metric_month, overflow_month)
@@ -36,7 +36,7 @@ class TransferClassifierMonthly:
 
     def _write_transfers(self, transfers, metric_month):
         output_path = self._uris.gp2gp_transfers(metric_month)
-        self._io.write_transfers(transfers, output_path)
+        self._io.write_transfers(transfers, output_path, self._metadata)
 
     def run(self):
         metric_month = self._reporting_window.metric_month
