@@ -11,6 +11,7 @@ from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_day
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
+from prmdata.utils.date_converter import convert_to_datetime_string, convert_to_datetimes_string
 from prmdata.utils.input_output.s3 import S3DataManager
 
 logger = getLogger(__name__)
@@ -32,12 +33,8 @@ class TransferClassifier:
             transfers_bucket=config.output_transfer_data_bucket,
         )
 
-        self._start_datetime_config_string = (
-            config.start_datetime.isoformat() if config.start_datetime else "None"
-        )
-        self._end_datetime_config_string = (
-            config.end_datetime.isoformat() if config.end_datetime else "None"
-        )
+        self._start_datetime_config_string = convert_to_datetime_string(config.start_datetime)
+        self._end_datetime_config_string = convert_to_datetime_string(config.end_datetime)
         output_metadata = {
             "cutoff-days": str(config.conversation_cutoff.days),
             "build-tag": config.build_tag,
@@ -60,11 +57,15 @@ class TransferClassifier:
         self._io.write_transfers(transfers, output_path)
 
     def _construct_json_log_date_range_info(self) -> dict:
+        reporting_window_dates = self._reporting_window.get_dates()
+        reporting_window_overflow_dates = self._reporting_window.get_overflow_dates()
         return {
             "config_start_datetime": self._start_datetime_config_string,
             "config_end_datetime": self._end_datetime_config_string,
-            "datetimes": self._reporting_window.get_dates(),
-            "overflow_datetimes": self._reporting_window.get_overflow_dates(),
+            "reporting_window_dates": convert_to_datetimes_string(reporting_window_dates),
+            "reporting_window_overflow_dates": convert_to_datetimes_string(
+                reporting_window_overflow_dates
+            ),
         }
 
     def run(self):
