@@ -37,8 +37,9 @@ class TransferService:
         self,
         message_stream: Iterable[Message],
         cutoff: timedelta,
+        observability_probe: TransferObservabilityProbe,
     ):
-        self._probe = TransferObservabilityProbe(logger=module_logger)
+        self._probe = observability_probe
         self._message_stream = message_stream
         self._cutoff = cutoff
 

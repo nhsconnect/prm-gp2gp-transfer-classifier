@@ -1,5 +1,6 @@
 import boto3
 
+from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe, module_logger
 from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierMonthlyS3UriResolver
@@ -41,9 +42,11 @@ class TransferClassifierMonthly:
         metric_month = self._reporting_window.metric_month
         overflow_month = self._reporting_window.overflow_month
         spine_messages = self._read_spine_messages(metric_month, overflow_month)
+        transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
         transfers = parse_transfers_from_messages_monthly(
             spine_messages=spine_messages,
             reporting_window=self._reporting_window,
             conversation_cutoff=self._cutoff,
+            observability_probe=transfer_observability_probe,
         )
         self._write_transfers(transfers, metric_month)
