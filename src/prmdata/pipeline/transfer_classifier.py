@@ -66,6 +66,7 @@ class TransferClassifier:
         return {
             "config_start_datetime": self._start_datetime_config_string,
             "config_end_datetime": self._end_datetime_config_string,
+            "conversation_cutoff": str(self._cutoff),
             "reporting_window_dates": convert_to_datetimes_string(reporting_window_dates),
             "reporting_window_overflow_dates": convert_to_datetimes_string(
                 reporting_window_overflow_dates
@@ -74,6 +75,16 @@ class TransferClassifier:
 
     def run(self):
         transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
+
+        log_date_range_info = self._construct_json_log_date_range_info()
+        logger.info(
+            "Attempting to classify conversations for a date range",
+            extra={
+                "event": "ATTEMPTING_CLASSIFY_CONVERSATIONS_FOR_A_DATE_RANGE",
+                **log_date_range_info,
+            },
+        )
+
         spine_messages = self._read_spine_messages()
 
         transfer_service = TransferService(
@@ -87,14 +98,6 @@ class TransferClassifier:
             conversations
         )
 
-        logger.info(
-            "Attempting to classify conversations for a date range",
-            extra={
-                "event": "ATTEMPTING_CLASSIFY_CONVERSATIONS_FOR_A_DATE_RANGE",
-                **self._construct_json_log_date_range_info(),
-            },
-        )
-
         for daily_start_datetime in self._reporting_window.get_dates():
             conversations_started_in_reporting_window = filter_conversations_by_day(
                 gp2gp_conversations, daily_start_datetime
@@ -105,3 +108,11 @@ class TransferClassifier:
             self._write_transfers(
                 transfers=transfers, daily_start_datetime=daily_start_datetime, cutoff=self._cutoff
             )
+
+        logger.info(
+            "Successfully classified conversations for a date range",
+            extra={
+                "event": "CLASSIFIED_CONVERSATIONS_FOR_A_DATE_RANGE",
+                **log_date_range_info,
+            },
+        )
