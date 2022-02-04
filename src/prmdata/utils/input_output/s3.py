@@ -47,5 +47,5 @@ class S3DataManager:
 
         logger.info(
             f"Successfully uploaded to: {object_uri}",
-            extra={"event": "UPLOADED_PARQUET_TO_S3", "object_uri": object_uri},
+            extra={"event": "SUCCESSFULLY_UPLOADED_PARQUET_TO_S3", "object_uri": object_uri},
         )
