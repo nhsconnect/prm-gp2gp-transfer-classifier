@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 from logging import Logger, getLogger
 from typing import Iterable, Iterator, List, NamedTuple, Optional, Tuple
 
-from prmdata.domain.monthly_reporting_window import MonthlyReportingWindow
 from prmdata.domain.spine.message import (
     DUPLICATE_ERROR,
     ERROR_SUPPRESSED,
@@ -320,17 +319,6 @@ def _find_effective_request_completed(
         return unsuccessfully_acked_ehr
 
     return None
-
-
-def filter_conversations_by_request_started_time(
-    conversations: Iterable[Gp2gpConversation],
-    reporting_window: MonthlyReportingWindow,
-) -> Iterator[Gp2gpConversation]:
-    return (
-        conversation
-        for conversation in conversations
-        if reporting_window.contains(conversation.date_requested())
-    )
 
 
 def filter_conversations_by_day(

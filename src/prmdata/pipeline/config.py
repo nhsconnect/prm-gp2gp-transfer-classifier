@@ -53,7 +53,6 @@ class EnvConfig:
 class TransferClassifierConfig:
     output_transfer_data_bucket: str
     input_spine_data_bucket: str
-    date_anchor: Optional[datetime]
     start_datetime: Optional[datetime]
     end_datetime: Optional[datetime]
     build_tag: str
@@ -66,7 +65,6 @@ class TransferClassifierConfig:
         return TransferClassifierConfig(
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),
             input_spine_data_bucket=env.read_str("INPUT_SPINE_DATA_BUCKET"),
-            date_anchor=env.read_optional_datetime("DATE_ANCHOR"),
             start_datetime=env.read_optional_datetime("START_DATETIME"),
             end_datetime=env.read_optional_datetime("END_DATETIME"),
             build_tag=env.read_str("BUILD_TAG"),

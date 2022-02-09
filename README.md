@@ -32,20 +32,15 @@ Example of ISO-8601 datetime that is specified for DATE_ANCHOR, START_DATETIME o
 Configuration is achieved via the following environment variables:
 
 
-| Environment variable        | Description                                                                                                                                                                       | 
-|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| OUTPUT_TRANSFER_DATA_BUCKET | Bucket to write categorised transfers.                                                                                                                                            |
-| INPUT_SPINE_DATA_BUCKET     | Bucket to read raw spine logs from.                                                                                                                                               |
-| DATE_ANCHOR                 | Optional ISO-8601 datetime specifying "now". If this is present, it will output monthly transfer data. Otherwise will read daily input spine data and output daily transfer data. |
-| START_DATETIME              | Optional ISO-8601 datetime specifying start of date range of transfer classification, on a daily basis.                                                                           |
-| END_DATETIME                | Optional ISO-8601 datetime specifying end of date range of transfer classification, on a daily basis.                                                                             |
-| S3_ENDPOINT_URL             | Optional argument specifying which S3 to connect to.                                                                                                                              |
-| CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer. Defaults to 0 (which means there is no cutoff).                                                                |
+| Environment variable        | Description                                                                                                        | 
+|-----------------------------|--------------------------------------------------------------------------------------------------------------------|
+| OUTPUT_TRANSFER_DATA_BUCKET | Bucket to write categorised transfers.                                                                             |
+| INPUT_SPINE_DATA_BUCKET     | Bucket to read raw spine logs from.                                                                                |
+| START_DATETIME              | Optional ISO-8601 datetime specifying start of date range of transfer classification, on a daily basis.            |
+| END_DATETIME                | Optional ISO-8601 datetime specifying end of date range of transfer classification, on a daily basis.              |
+| S3_ENDPOINT_URL             | Optional argument specifying which S3 to connect to.                                                               |
+| CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer. Defaults to 0 (which means there is no cutoff). |
 
-#### Notes on configuration
-Instead of directly passing target year and month, a date anchor is passed in specifying "now".
-Metrics are produced for the last full month prior to this.
-This design works around a lack of flexibility in how AWS step functions schedules recurring jobs.
 
 ## Developing
 
