@@ -35,6 +35,7 @@ class TransferClassifier:
         self._uris = TransferClassifierS3UriResolver(
             gp2gp_spine_bucket=config.input_spine_data_bucket,
             transfers_bucket=config.output_transfer_data_bucket,
+            ods_metadata_bucket="",
         )
 
         self._io = TransferClassifierIO(s3_manager)

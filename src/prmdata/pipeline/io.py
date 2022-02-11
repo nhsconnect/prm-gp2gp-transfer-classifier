@@ -15,11 +15,13 @@ logger = logging.getLogger(__name__)
 
 class TransferClassifierS3UriResolver:
     _SPINE_MESSAGES_VERSION = "v3"
+    _ODS_METADATA_VERSION = "v2"
     _TRANSFERS_PARQUET_VERSION = "v7"
 
-    def __init__(self, gp2gp_spine_bucket, transfers_bucket):
+    def __init__(self, gp2gp_spine_bucket: str, transfers_bucket: str, ods_metadata_bucket: str):
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
         self._transfers_bucket = transfers_bucket
+        self._ods_metadata_bucket = ods_metadata_bucket
 
     @staticmethod
     def _s3_path(*fragments):
@@ -32,7 +34,7 @@ class TransferClassifierS3UriResolver:
         day = add_leading_zero(date.day)
         return f"{year}-{month}-{day}_spine_messages.csv.gz"
 
-    def spine_messages(self, reporting_window: ReportingWindow) -> list[str]:
+    def spine_messages(self, reporting_window: ReportingWindow) -> List[str]:
         dates = reporting_window.get_dates() + reporting_window.get_overflow_dates()
         return [
             self._s3_path(
@@ -44,6 +46,17 @@ class TransferClassifierS3UriResolver:
                 self._spine_message_filename(date),
             )
             for date in dates
+        ]
+
+    def ods_metadata(self, reporting_window: ReportingWindow) -> List[str]:
+        return [
+            self._s3_path(
+                self._ods_metadata_bucket,
+                self._ODS_METADATA_VERSION,
+                f"{date.year}/{date.month}/{date.day}",
+                "organisationMetadata.json",
+            )
+            for date in reporting_window.get_dates()
         ]
 
     def gp2gp_transfers(self, daily_start_datetime: datetime, cutoff: timedelta) -> str:

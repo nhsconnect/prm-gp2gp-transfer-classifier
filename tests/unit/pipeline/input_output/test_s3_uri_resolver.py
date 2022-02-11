@@ -23,8 +23,7 @@ def test_returns_correct_spine_messages_uris():
     )
 
     uri_resolver = TransferClassifierS3UriResolver(
-        gp2gp_spine_bucket=spine_bucket,
-        transfers_bucket=a_string(),
+        gp2gp_spine_bucket=spine_bucket, transfers_bucket=a_string(), ods_metadata_bucket=a_string()
     )
 
     expected = [
@@ -40,6 +39,29 @@ def test_returns_correct_spine_messages_uris():
     assert actual == expected
 
 
+def test_returns_correct_ods_metadata_uris():
+    ods_metadata_bucket = a_string()
+    reporting_window = Mock()
+    reporting_window.get_dates = Mock(
+        return_value=[datetime(year=2020, month=12, day=31), datetime(year=2021, month=1, day=1)]
+    )
+
+    uri_resolver = TransferClassifierS3UriResolver(
+        gp2gp_spine_bucket=a_string(),
+        transfers_bucket=a_string(),
+        ods_metadata_bucket=ods_metadata_bucket,
+    )
+
+    expected = [
+        f"s3://{ods_metadata_bucket}/v2/2020/12/31/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v2/2021/1/1/organisationMetadata.json",
+    ]
+
+    actual = uri_resolver.ods_metadata(reporting_window)
+
+    assert actual == expected
+
+
 def test_returns_correct_transfers_uri():
     transfers_bucket = a_string()
     daily_start_datetime = a_datetime(year=2021, month=1, day=3)
@@ -49,6 +71,7 @@ def test_returns_correct_transfers_uri():
     uri_resolver = TransferClassifierS3UriResolver(
         gp2gp_spine_bucket=a_string(),
         transfers_bucket=transfers_bucket,
+        ods_metadata_bucket=a_string(),
     )
 
     expected_filename = "2021-01-03-transfers.parquet"
