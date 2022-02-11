@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Iterable, Iterator, List
 
 from prmdata.domain.gp2gp.transfer import Transfer
+from prmdata.domain.ods_portal.organisation_metadata_lookup import OrganisationMetadataLookup
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
 from prmdata.pipeline.arrow import convert_transfers_to_table
@@ -73,3 +74,10 @@ class TransferClassifierIO:
             object_uri=s3_uri,
             metadata=metadata,
         )
+
+    def _read_ods_metadata(self, s3_uris: List[str]) -> Iterator[Dict]:
+        for uri in s3_uris:
+            yield self._s3_manager.read_json(uri)
+
+    def read_ods_metadata_files(self, s3_uris: List[str]) -> OrganisationMetadataLookup:
+        return OrganisationMetadataLookup.from_list(self._read_ods_metadata(s3_uris))
