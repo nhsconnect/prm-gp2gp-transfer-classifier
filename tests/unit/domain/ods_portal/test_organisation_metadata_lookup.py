@@ -1,4 +1,5 @@
-from prmdata.domain.ods_portal.organisation_metadata import OrganisationMetadata
+from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
+from prmdata.domain.ods_portal.organisation_metadata import CcgDetails, PracticeDetails
 from prmdata.domain.ods_portal.organisation_metadata_lookup import OrganisationMetadataLookup
 
 
@@ -10,17 +11,33 @@ def test_from_list_of_data_returns_dict_of_organisation_metadata():
     }
     second_month_data = {
         "generated_on": "2020-08-23T00:00:00",
-        "practices": [{"ods_code": "A12345", "name": "GP Practice", "asids": ["123456789123"]}],
+        "practices": [{"ods_code": "ABC543", "name": "GP Practice", "asids": ["123456789123"]}],
         "ccgs": [{"ods_code": "22A", "name": "CCG", "practices": ["A12345"]}],
     }
     list_of_data = iter([first_month_data, second_month_data])
 
-    expected_first_month_metadata = OrganisationMetadata.from_dict(first_month_data)
-    expected_second_month_metadata = OrganisationMetadata.from_dict(second_month_data)
+    expected_first_month_practices = [
+        PracticeDetails(ods_code="A12345", name="GP Practice", asids=["123456789123"])
+    ]
+    expected_second_month_practices = [
+        PracticeDetails(ods_code="ABC543", name="GP Practice", asids=["123456789123"])
+    ]
+    expected_first_month_ccgs = [CcgDetails(ods_code="12A", name="CCG", practices=["A12345"])]
+    expected_second_month_ccgs = [CcgDetails(ods_code="22A", name="CCG", practices=["A12345"])]
+    expected_first_month_lookup = OrganisationLookup(
+        expected_first_month_practices, expected_first_month_ccgs
+    )
+    expected_second_month_lookup = OrganisationLookup(
+        expected_second_month_practices, expected_second_month_ccgs
+    )
+
     actual_metadata_lookup = OrganisationMetadataLookup.from_list(list_of_data)
+    actual_first_month_lookup = actual_metadata_lookup.get_month_lookup((2020, 7))
+    actual_second_month_lookup = actual_metadata_lookup.get_month_lookup((2020, 8))
 
-    actual_first_month_metadata = actual_metadata_lookup.get_month_metadata((2020, 7))
-    actual_second_month_metadata = actual_metadata_lookup.get_month_metadata((2020, 8))
-
-    assert actual_first_month_metadata == expected_first_month_metadata
-    assert actual_second_month_metadata == expected_second_month_metadata
+    assert actual_first_month_lookup.practice_ods_code_from_asid(
+        "123456789123"
+    ) == expected_first_month_lookup.practice_ods_code_from_asid("123456789123")
+    assert actual_second_month_lookup.practice_ods_code_from_asid(
+        "123456789123"
+    ) == expected_second_month_lookup.practice_ods_code_from_asid("123456789123")

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from prmdata.domain.ods_portal.organisation_metadata import CcgDetails, PracticeDetails
 
@@ -12,11 +12,11 @@ class OrganisationLookup:
             practice_ods_code: ccg.ods_code for ccg in ccgs for practice_ods_code in ccg.practices
         }
 
-    def has_asid_code(self, asid: str):
+    def has_asid_code(self, asid: str) -> bool:
         return asid in self._asid_to_practice_ods_mapping
 
-    def practice_ods_code_from_asid(self, asid: str):
+    def practice_ods_code_from_asid(self, asid: str) -> Optional[str]:
         return self._asid_to_practice_ods_mapping.get(asid)
 
-    def ccg_ods_code_from_practice_ods_code(self, ods_code: str):
+    def ccg_ods_code_from_practice_ods_code(self, ods_code: str) -> Optional[str]:
         return self._ods_to_ccg_ods_mapping.get(ods_code)
