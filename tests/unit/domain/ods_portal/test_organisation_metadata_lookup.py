@@ -1,5 +1,5 @@
 from prmdata.domain.ods_portal.organisation_metadata import OrganisationMetadata
-from prmdata.domain.ods_portal.organisation_metadatas import OrganisationMetadataLookup
+from prmdata.domain.ods_portal.organisation_metadata_lookup import OrganisationMetadataLookup
 
 
 def test_from_list_of_data_returns_dict_of_organisation_metadata():
