@@ -99,7 +99,7 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_multiple_pr
     assert actual == expected
 
 
-def test_ccg_ods_code_from_practice_ods_code_returns_none_given_no_practices():
+def test_ccg_ods_code_from_practice_ods_code_returns_none_given_no_ccgs():
     practice_lookup = OrganisationLookup(practices=[], ccgs=[])
 
     expected = None
