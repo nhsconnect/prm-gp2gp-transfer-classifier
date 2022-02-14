@@ -35,7 +35,9 @@ def _new_transfer_columns():
         Column("conversation_id", pa.string(), lambda t: t.conversation_id),
         Column("sla_duration", pa.uint64(), lambda t: t.sla_duration_seconds),
         Column("requesting_practice_asid", pa.string(), lambda t: t.requesting_practice_asid),
-        Column("requesting_practice_ods_code", pa.string(), lambda t: t.requesting_practice_ods_code),
+        Column(
+            "requesting_practice_ods_code", pa.string(), lambda t: t.requesting_practice_ods_code
+        ),
         Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice_asid),
         Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice_ods_code),
         Column("requesting_supplier", pa.string(), lambda t: t.requesting_supplier),
