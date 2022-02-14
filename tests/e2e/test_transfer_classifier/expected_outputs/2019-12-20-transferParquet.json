@@ -17,6 +17,9 @@
     "requesting_practice_asid": [
         "123456789123"
     ],
+    "requesting_practice_ods_code": [
+        null
+    ],
     "requesting_supplier": [
         "SupplierA"
     ],
@@ -25,6 +28,9 @@
     ],
     "sending_practice_asid": [
         "003456789123"
+    ],
+    "sending_practice_ods_code": [
+        null
     ],
     "sending_supplier": [
         "SupplierB"

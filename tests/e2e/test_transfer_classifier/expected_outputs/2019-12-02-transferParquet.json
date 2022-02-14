@@ -13,10 +13,16 @@
     "requesting_practice_asid": [
         "123456789123"
     ],
+    "requesting_practice_ods_code": [
+        null
+    ],
     "requesting_supplier": [""],
     "sender_error_codes": [[null]],
     "sending_practice_asid": [
         "003456789123"
+    ],
+    "sending_practice_ods_code": [
+        null
     ],
     "sending_supplier": [""],
     "sla_duration": [311906],

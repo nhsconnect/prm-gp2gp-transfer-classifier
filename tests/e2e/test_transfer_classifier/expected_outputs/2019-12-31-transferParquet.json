@@ -23,6 +23,10 @@
         "987654321240",
         "987654321240"
     ],
+    "requesting_practice_ods_code": [
+        null,
+        null
+    ],
     "requesting_supplier": [
         "SupplierC",
         "SupplierC"
@@ -34,6 +38,10 @@
     "sending_practice_asid": [
         "003456789123",
         "003456789123"
+    ],
+    "sending_practice_ods_code": [
+        null,
+        null
     ],
     "sending_supplier": [
         "SupplierB",

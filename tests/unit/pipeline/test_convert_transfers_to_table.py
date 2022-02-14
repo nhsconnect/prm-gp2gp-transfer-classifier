@@ -80,6 +80,32 @@ def test_sending_practice_asid_is_converted_to_column():
     assert actual_asid_column == expected_asid_column
 
 
+def test_requesting_practice_ods_is_converted_to_column():
+    transfer = build_transfer(
+        requesting_practice=Practice(asid="003212345678", supplier="supplier", ods_code="A12")
+    )
+
+    expected_ods_column = {"requesting_practice_ods_code": ["A12"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_ods_column = table.select(["requesting_practice_ods_code"]).to_pydict()
+
+    assert actual_ods_column == expected_ods_column
+
+
+def test_sending_practice_ods_is_converted_to_column():
+    transfer = build_transfer(
+        sending_practice=Practice(asid="001112345678", supplier="supplier", ods_code="A12")
+    )
+
+    expected_ods_column = {"sending_practice_ods_code": ["A12"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_ods_column = table.select(["sending_practice_ods_code"]).to_pydict()
+
+    assert actual_ods_column == expected_ods_column
+
+
 def test_sender_error_codes_are_converted_to_column():
     transfer = build_transfer(sender_error_codes=[10])
 
@@ -219,7 +245,9 @@ def test_table_has_correct_schema():
             ("conversation_id", pa.string()),
             ("sla_duration", pa.uint64()),
             ("requesting_practice_asid", pa.string()),
+            ("requesting_practice_ods_code", pa.string()),
             ("sending_practice_asid", pa.string()),
+            ("sending_practice_ods_code", pa.string()),
             ("requesting_supplier", pa.string()),
             ("sending_supplier", pa.string()),
             ("sender_error_codes", pa.list_(pa.int64())),

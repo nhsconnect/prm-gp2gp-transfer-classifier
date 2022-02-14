@@ -37,12 +37,20 @@ class Transfer(NamedTuple):
         return self.requesting_practice.asid
 
     @property
+    def requesting_practice_ods_code(self) -> Optional[str]:
+        return self.requesting_practice.ods_code
+
+    @property
     def requesting_supplier(self) -> str:
         return self.requesting_practice.supplier
 
     @property
     def sending_practice_asid(self) -> str:
         return self.sending_practice.asid
+
+    @property
+    def sending_practice_ods_code(self) -> Optional[str]:
+        return self.sending_practice.ods_code
 
     @property
     def sending_supplier(self) -> str:
