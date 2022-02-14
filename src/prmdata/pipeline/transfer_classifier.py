@@ -10,6 +10,7 @@ from prmdata.domain.gp2gp.transfer_service import (
     TransferService,
     module_logger,
 )
+from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_day
 from prmdata.domain.spine.message import Message
@@ -35,7 +36,7 @@ class TransferClassifier:
         self._uris = TransferClassifierS3UriResolver(
             gp2gp_spine_bucket=config.input_spine_data_bucket,
             transfers_bucket=config.output_transfer_data_bucket,
-            ods_metadata_bucket="",
+            ods_metadata_bucket=config.input_ods_metadata_bucket,
         )
 
         self._io = TransferClassifierIO(s3_manager)
@@ -43,6 +44,10 @@ class TransferClassifier:
     def _read_spine_messages(self) -> Iterator[Message]:
         input_paths = self._uris.spine_messages(self._reporting_window)
         return self._io.read_spine_messages(input_paths)
+
+    def _read_ods_metadata(self) -> OrganisationMetadataMonthly:
+        input_paths = self._uris.ods_metadata(self._reporting_window)
+        return self._io.read_ods_metadata_files(input_paths)
 
     def _write_transfers(
         self,
@@ -82,6 +87,7 @@ class TransferClassifier:
         )
 
         spine_messages = self._read_spine_messages()
+        ods_metadata_monthly = self._read_ods_metadata()
 
         transfer_service = TransferService(
             message_stream=spine_messages,
@@ -107,8 +113,11 @@ class TransferClassifier:
             conversations_started_in_reporting_window = filter_conversations_by_day(
                 gp2gp_conversations, daily_start_datetime
             )
+            organisation_lookup = ods_metadata_monthly.get_lookup(
+                (daily_start_datetime.year, daily_start_datetime.month)
+            )
             transfers = transfer_service.convert_to_transfers(
-                conversations_started_in_reporting_window
+                conversations_started_in_reporting_window, organisation_lookup=organisation_lookup
             )
             self._write_transfers(
                 transfers=transfers,

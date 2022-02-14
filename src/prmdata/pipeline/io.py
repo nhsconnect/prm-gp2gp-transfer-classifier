@@ -53,7 +53,7 @@ class TransferClassifierS3UriResolver:
             self._s3_path(
                 self._ods_metadata_bucket,
                 self._ODS_METADATA_VERSION,
-                f"{date.year}/{date.month}/{date.day}",
+                f"{date.year}/{date.month}",
                 "organisationMetadata.json",
             )
             for date in reporting_window.get_dates()

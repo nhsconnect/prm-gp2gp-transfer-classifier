@@ -110,6 +110,13 @@ def _build_fake_s3_bucket(bucket_name: str, s3):
     return s3_fake_bucket
 
 
+def _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir):
+    organisation_metadata_file = str(datadir / "inputs" / "organisationMetadata.json")
+    input_ods_metadata_bucket.upload_file(
+        organisation_metadata_file, "v2/2019/12/organisationMetadata.json"
+    )
+
+
 def _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir):
 
     _upload_template_spine_data(
@@ -177,8 +184,10 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
         S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
     )
     input_spine_data_bucket = _build_fake_s3_bucket(S3_INPUT_SPINE_DATA_BUCKET_NAME, s3_client)
+    input_ods_metadata_bucket = _build_fake_s3_bucket(S3_INPUT_ODS_METADATA_BUCKET_NAME, s3_client)
 
     _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir)
+    _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir)
 
     try:
         environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
@@ -238,8 +247,10 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
         S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
     )
     input_spine_data_bucket = _build_fake_s3_bucket(S3_INPUT_SPINE_DATA_BUCKET_NAME, s3_client)
+    input_ods_metadata_bucket = _build_fake_s3_bucket(S3_INPUT_ODS_METADATA_BUCKET_NAME, s3_client)
 
     _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir)
+    _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir)
 
     try:
         main()

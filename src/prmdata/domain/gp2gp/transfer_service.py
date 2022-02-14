@@ -80,11 +80,10 @@ class TransferService:
         return gp2gp_conversations
 
     def convert_to_transfers(
-        self, conversations: Iterator[Gp2gpConversation]
+        self, conversations: Iterator[Gp2gpConversation], organisation_lookup: OrganisationLookup
     ) -> Iterator[Transfer]:
-        organisation_lookup = OrganisationLookup([], [])
         return (
-            self.derive_transfer(conversation, organisation_lookup=organisation_lookup)
+            self.derive_transfer(conversation, organisation_lookup)
             for conversation in conversations
         )
 

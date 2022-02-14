@@ -1,14 +1,6 @@
 {
-  "generated_on": "2020-02-24 16:51:21.353977",
+  "generated_on": "2019-12-01 16:51:21.353977",
   "practices": [
-    {
-      "ods_code": "A12345",
-      "name": "Test GP Practice with Integrations",
-      "asids": [
-        "987654321234",
-        "123456789123"
-      ]
-    },
     {
       "ods_code": "A12346",
       "name": "Test GP Practice with no Integrations",
@@ -21,6 +13,13 @@
       "asids": [
         "987654321240"
       ]
+    },
+        {
+      "ods_code": "B54332",
+      "name": "Test GP Practice with a failed transfer",
+      "asids": [
+        "1463547281290"
+      ]
     }
   ],
   "ccgs": [
@@ -29,14 +28,6 @@
       "name": "Test CCG",
       "practices": [
         "A12345"
-      ]
-    },
-    {
-      "ods_code": "11D",
-      "name": "Another Test CCG",
-      "practices": [
-        "A12346",
-        "A12347"
       ]
     }
   ]
