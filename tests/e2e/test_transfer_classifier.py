@@ -227,6 +227,7 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
                 "build-tag": "abc456",
                 "start-datetime": f"{year}-{month}-{day}T00:00:00+00:00",
                 "end-datetime": _end_datetime_metadata(year, data_month, data_day),
+                "ods-metadata-month": f"{year}-{month}",
             }
 
             assert actual_metadata == expected_metadata
@@ -261,6 +262,7 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
             "build-tag": "abc456",
             "start-datetime": "2019-12-31T00:00:00+00:00",
             "end-datetime": "2020-01-01T00:00:00+00:00",
+            "ods-metadata-month": "2019-12",
         }
         year = 2019
         month = 12

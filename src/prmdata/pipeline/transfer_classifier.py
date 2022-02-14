@@ -108,6 +108,7 @@ class TransferClassifier:
                 "end-datetime": convert_to_datetime_string(
                     daily_start_datetime + timedelta(days=1)
                 ),
+                "ods-metadata-month": f"{daily_start_datetime.year}-{daily_start_datetime.month}",
             }
 
             conversations_started_in_reporting_window = filter_conversations_by_day(
