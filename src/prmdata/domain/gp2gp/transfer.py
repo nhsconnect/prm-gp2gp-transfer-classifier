@@ -9,6 +9,7 @@ from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome
 class Practice:
     asid: str
     supplier: str
+    ods_code: Optional[str]
 
 
 class Transfer(NamedTuple):

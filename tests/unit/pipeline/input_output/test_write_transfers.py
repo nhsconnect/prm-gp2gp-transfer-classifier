@@ -23,8 +23,8 @@ def test_write_transfers_correctly_writes_all_fields():
     transfer = Transfer(
         conversation_id="1234",
         sla_duration=timedelta(days=1),
-        requesting_practice=Practice(asid="123", supplier="Supplier A"),
-        sending_practice=Practice(asid="456", supplier="Supplier B"),
+        requesting_practice=Practice(asid="123", supplier="Supplier A", ods_code="A12"),
+        sending_practice=Practice(asid="456", supplier="Supplier B", ods_code="B12"),
         sender_error_codes=[1, None],
         final_error_codes=[None, 32],
         intermediate_error_codes=[],

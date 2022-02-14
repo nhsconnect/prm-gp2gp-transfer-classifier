@@ -56,7 +56,7 @@ def test_sla_duration_is_converted_to_column_when_missing():
 
 def test_requesting_practice_asid_is_converted_to_column():
     transfer = build_transfer(
-        requesting_practice=Practice(asid="003212345678", supplier="supplier")
+        requesting_practice=Practice(asid="003212345678", supplier="supplier", ods_code="A12")
     )
 
     expected_asid_column = {"requesting_practice_asid": ["003212345678"]}
@@ -68,7 +68,9 @@ def test_requesting_practice_asid_is_converted_to_column():
 
 
 def test_sending_practice_asid_is_converted_to_column():
-    transfer = build_transfer(sending_practice=Practice(asid="001112345678", supplier="supplier"))
+    transfer = build_transfer(
+        sending_practice=Practice(asid="001112345678", supplier="supplier", ods_code="A12")
+    )
 
     expected_asid_column = {"sending_practice_asid": ["001112345678"]}
 

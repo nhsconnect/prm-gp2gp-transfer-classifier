@@ -5,6 +5,7 @@ from typing import Dict, Iterable, Iterator, List, Optional
 
 from prmdata.domain.gp2gp.transfer import Practice, Transfer
 from prmdata.domain.gp2gp.transfer_outcome import TransferOutcome
+from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
 from prmdata.domain.spine.conversation import Conversation
 from prmdata.domain.spine.gp2gp_conversation import (
     ConversationMissingStart,
@@ -81,22 +82,30 @@ class TransferService:
     def convert_to_transfers(
         self, conversations: Iterator[Gp2gpConversation]
     ) -> Iterator[Transfer]:
-        return (self.derive_transfer(conversation) for conversation in conversations)
+        organisation_lookup = OrganisationLookup([], [])
+        return (
+            self.derive_transfer(conversation, organisation_lookup=organisation_lookup)
+            for conversation in conversations
+        )
 
     def derive_transfer(
-        self,
-        conversation: Gp2gpConversation,
+        self, conversation: Gp2gpConversation, organisation_lookup: OrganisationLookup
     ) -> Transfer:
         sla_duration = _calculate_sla(conversation, self._probe)
+        requesting_practice_asid = conversation.requesting_practice_asid()
+        sending_practice_asid = conversation.sending_practice_asid()
         return Transfer(
             conversation_id=conversation.conversation_id(),
             sla_duration=sla_duration,
             requesting_practice=Practice(
-                asid=conversation.requesting_practice_asid(),
+                asid=requesting_practice_asid,
                 supplier=conversation.requesting_supplier(),
+                ods_code=organisation_lookup.practice_ods_code_from_asid(requesting_practice_asid),
             ),
             sending_practice=Practice(
-                asid=conversation.sending_practice_asid(), supplier=conversation.sending_supplier()
+                asid=sending_practice_asid,
+                supplier=conversation.sending_supplier(),
+                ods_code=organisation_lookup.practice_ods_code_from_asid(sending_practice_asid),
             ),
             sender_error_codes=conversation.sender_error_codes(),
             final_error_codes=conversation.final_error_codes(),

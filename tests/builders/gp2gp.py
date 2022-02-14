@@ -17,10 +17,12 @@ def build_transfer(**kwargs) -> Transfer:
         conversation_id=kwargs.get("conversation_id", a_string(36)),
         sla_duration=kwargs.get("sla_duration", a_duration()),
         requesting_practice=kwargs.get(
-            "requesting_practice", Practice(asid=a_string(12), supplier=a_string(12))
+            "requesting_practice",
+            Practice(asid=a_string(12), supplier=a_string(12), ods_code=a_string(4)),
         ),
         sending_practice=kwargs.get(
-            "sending_practice", Practice(asid=a_string(12), supplier=a_string(12))
+            "sending_practice",
+            Practice(asid=a_string(12), supplier=a_string(12), ods_code=a_string(4)),
         ),
         sender_error_codes=kwargs.get("sender_error_codes", []),
         final_error_codes=kwargs.get("final_error_codes", []),
