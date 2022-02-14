@@ -40,8 +40,8 @@ def test_convert_one_organisation_metadata_file_to_organisation_lookup():
 
     s3_manager.read_json.return_value = _ORGANISATION_METADATA_DICT_FIRST_MONTH
 
-    actual_metadata_lookup = transfer_classifier_io.read_ods_metadata_files(s3_uris=[_S3_URI])
-    actual_organisation_lookup = actual_metadata_lookup.get_month_lookup(_DATE_ANCHOR_YEAR_MONTH)
+    actual_metadatas = transfer_classifier_io.read_ods_metadata_files(s3_uris=[_S3_URI])
+    actual_organisation_lookup = actual_metadatas.get_lookup(_DATE_ANCHOR_YEAR_MONTH)
 
     expected_first_month_practices = [
         PracticeDetails(ods_code="ABC", name="A Practice", asids=["123"])
@@ -68,7 +68,7 @@ def test_convert_two_organisation_metadata_files_to_organisation_lookup_mapping(
         _ORGANISATION_METADATA_DICT_ADDITIONAL_MONTH,
     ]
 
-    actual_metadata_lookup = transfer_classifier_io.read_ods_metadata_files(
+    actual_metadatas = transfer_classifier_io.read_ods_metadata_files(
         s3_uris=[_S3_URI, _S3_URI_ADDITIONAL_MONTH]
     )
     expected_first_month_practices = [
@@ -79,9 +79,7 @@ def test_convert_two_organisation_metadata_files_to_organisation_lookup_mapping(
         expected_first_month_practices, expected_first_month_ccgs
     )
 
-    actual_first_organisation_lookup = actual_metadata_lookup.get_month_lookup(
-        _DATE_ANCHOR_YEAR_MONTH
-    )
+    actual_first_organisation_lookup = actual_metadatas.get_lookup(_DATE_ANCHOR_YEAR_MONTH)
 
     assert actual_first_organisation_lookup.practice_ods_code_from_asid(
         "123"
@@ -95,7 +93,7 @@ def test_convert_two_organisation_metadata_files_to_organisation_lookup_mapping(
         expected_second_month_practices, expected_second_month_ccgs
     )
 
-    actual_second_organisation_lookup = actual_metadata_lookup.get_month_lookup(
+    actual_second_organisation_lookup = actual_metadatas.get_lookup(
         _DATE_ANCHOR_ADDITIONAL_YEAR_MONTH
     )
 

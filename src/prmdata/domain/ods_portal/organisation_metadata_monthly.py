@@ -8,7 +8,7 @@ MonthNumber = int
 YearMonth = Tuple[YearNumber, MonthNumber]
 
 
-class OrganisationMetadataLookup:
+class OrganisationMetadataMonthly:
     def __init__(self, metadata_dict: Dict[YearMonth, OrganisationLookup]):
         self._metadata_dict = metadata_dict
 
@@ -25,5 +25,5 @@ class OrganisationMetadataLookup:
             metadata_dict[(year, month)] = organisation_lookup
         return cls(metadata_dict)
 
-    def get_month_lookup(self, year_month: YearMonth) -> OrganisationLookup:
+    def get_lookup(self, year_month: YearMonth) -> OrganisationLookup:
         return self._metadata_dict[year_month]
