@@ -30,6 +30,42 @@ def _int_list():
     return pa.list_(pa.int64())
 
 
+def _transfer_columns_deprecated():
+    return [
+        Column("conversation_id", pa.string(), lambda t: t.conversation_id),
+        Column("sla_duration", pa.uint64(), lambda t: t.sla_duration_seconds),
+        Column("requesting_practice_asid", pa.string(), lambda t: t.requesting_practice_asid),
+        Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice_asid),
+        Column("requesting_supplier", pa.string(), lambda t: t.requesting_supplier),
+        Column("sending_supplier", pa.string(), lambda t: t.sending_supplier),
+        Column("sender_error_codes", _int_list(), lambda t: t.sender_error_codes),
+        Column("final_error_codes", _int_list(), lambda t: t.final_error_codes),
+        Column("intermediate_error_codes", _int_list(), lambda t: t.intermediate_error_codes),
+        Column("status", pa.string(), lambda t: t.status_description),
+        Column("failure_reason", pa.string(), lambda t: t.failure_reason),
+        Column("date_requested", pa.timestamp("us"), lambda t: t.date_requested),
+        Column("date_completed", pa.timestamp("us"), lambda t: t.date_completed),
+        Column(
+            "last_sender_message_timestamp",
+            pa.timestamp("us"),
+            lambda t: t.last_sender_message_timestamp,
+        ),
+    ]
+
+
+def convert_transfers_to_table_deprecated(transfers: Iterable[Transfer]) -> Table:
+    columns = _transfer_columns_deprecated()
+
+    for transfer in transfers:
+        for column in columns:
+            column.add(transfer)
+
+    return pa.table(
+        data=dict(column.data() for column in columns),
+        schema=pa.schema(column.schema() for column in columns),
+    )
+
+
 def _new_transfer_columns():
     return [
         Column("conversation_id", pa.string(), lambda t: t.conversation_id),
@@ -57,7 +93,7 @@ def _new_transfer_columns():
     ]
 
 
-def convert_transfers_to_table_deprecated(transfers: Iterable[Transfer]) -> Table:
+def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
     columns = _new_transfer_columns()
 
     for transfer in transfers:

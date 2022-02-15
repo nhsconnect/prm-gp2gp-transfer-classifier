@@ -36,7 +36,7 @@ def test_write_transfers_correctly_writes_all_fields():
         last_sender_message_timestamp=None,
     )
 
-    io.write_transfers_deprecated(
+    io.write_transfers(
         transfers=[transfer], s3_uri="s3://a_bucket/some_data.parquet", metadata=_SOME_METADATA
     )
 
@@ -44,7 +44,9 @@ def test_write_transfers_correctly_writes_all_fields():
         "conversation_id": ["1234"],
         "sla_duration": [86400],
         "requesting_practice_asid": ["123"],
+        "requesting_practice_ods_code": ["A12"],
         "sending_practice_asid": ["456"],
+        "sending_practice_ods_code": ["B12"],
         "requesting_supplier": ["Supplier A"],
         "sending_supplier": ["Supplier B"],
         "sender_error_codes": [[1, None]],
@@ -73,7 +75,7 @@ def test_write_transfers_correctly_writes_multiple_rows():
         build_transfer(conversation_id="c"),
     ]
 
-    io.write_transfers_deprecated(
+    io.write_transfers(
         transfers=transfers, s3_uri="s3://a_bucket/multi_row.parquet", metadata=_SOME_METADATA
     )
 
@@ -97,7 +99,7 @@ def test_write_transfers_writes_metadata():
 
     io = TransferClassifierIO(s3_data_manager)
 
-    io.write_transfers_deprecated(
+    io.write_transfers(
         transfers=[build_transfer()], s3_uri="s3://a_bucket/some_data.parquet", metadata=metadata
     )
 

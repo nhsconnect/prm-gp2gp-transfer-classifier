@@ -49,6 +49,18 @@ class TransferClassifier:
         input_paths = self._uris.ods_metadata(self._reporting_window)
         return self._io.read_ods_metadata_files(input_paths)
 
+    def _write_transfers(
+        self,
+        transfers: Iterator[Transfer],
+        daily_start_datetime: datetime,
+        cutoff: timedelta,
+        metadata: Dict[str, str],
+    ):
+        output_path = self._uris.gp2gp_transfers(
+            daily_start_datetime=daily_start_datetime, cutoff=cutoff
+        )
+        self._io.write_transfers(transfers, output_path, metadata)
+
     def _write_transfers_deprecated(
         self,
         transfers: Iterator[Transfer],
@@ -120,7 +132,7 @@ class TransferClassifier:
             transfers = transfer_service.convert_to_transfers(
                 conversations_started_in_reporting_window, organisation_lookup=organisation_lookup
             )
-            self._write_transfers_deprecated(
+            self._write_transfers(
                 transfers=transfers,
                 daily_start_datetime=daily_start_datetime,
                 cutoff=self._config.conversation_cutoff,
