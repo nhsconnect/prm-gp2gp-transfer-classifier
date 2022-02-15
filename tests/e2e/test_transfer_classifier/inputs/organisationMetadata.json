@@ -29,7 +29,15 @@
       "ods_code": "10D",
       "name": "Test CCG",
       "practices": [
-        "A12345"
+        "A12345",
+        "A12346"
+      ]
+    },
+     {
+      "ods_code": "11B",
+      "name": "Another Test CCG",
+      "practices": [
+        "B54332"
       ]
     }
   ]

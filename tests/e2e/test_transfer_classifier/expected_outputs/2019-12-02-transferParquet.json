@@ -24,6 +24,9 @@
     "sending_practice_ods_code": [
         null
     ],
+     "sending_practice_ccg_ods_code": [
+        null
+    ],
     "sending_supplier": [""],
     "sla_duration": [311906],
     "status": [

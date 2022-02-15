@@ -93,6 +93,9 @@ class TransferService:
         sla_duration = _calculate_sla(conversation, self._probe)
         requesting_practice_asid = conversation.requesting_practice_asid()
         sending_practice_asid = conversation.sending_practice_asid()
+        sending_practice_ods_code = organisation_lookup.practice_ods_code_from_asid(
+            sending_practice_asid
+        )
         return Transfer(
             conversation_id=conversation.conversation_id(),
             sla_duration=sla_duration,
@@ -100,11 +103,15 @@ class TransferService:
                 asid=requesting_practice_asid,
                 supplier=conversation.requesting_supplier(),
                 ods_code=organisation_lookup.practice_ods_code_from_asid(requesting_practice_asid),
+                ccg_ods_code=None,
             ),
             sending_practice=Practice(
                 asid=sending_practice_asid,
                 supplier=conversation.sending_supplier(),
-                ods_code=organisation_lookup.practice_ods_code_from_asid(sending_practice_asid),
+                ods_code=sending_practice_ods_code,
+                ccg_ods_code=organisation_lookup.ccg_ods_code_from_practice_ods_code(
+                    sending_practice_ods_code
+                ),
             ),
             sender_error_codes=conversation.sender_error_codes(),
             final_error_codes=conversation.final_error_codes(),

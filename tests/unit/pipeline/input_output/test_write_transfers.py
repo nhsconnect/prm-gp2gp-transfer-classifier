@@ -23,8 +23,12 @@ def test_write_transfers_correctly_writes_all_fields():
     transfer = Transfer(
         conversation_id="1234",
         sla_duration=timedelta(days=1),
-        requesting_practice=Practice(asid="123", supplier="Supplier A", ods_code="A12"),
-        sending_practice=Practice(asid="456", supplier="Supplier B", ods_code="B12"),
+        requesting_practice=Practice(
+            asid="123", supplier="Supplier A", ods_code="A12", ccg_ods_code="11B"
+        ),
+        sending_practice=Practice(
+            asid="456", supplier="Supplier B", ods_code="B12", ccg_ods_code="10A"
+        ),
         sender_error_codes=[1, None],
         final_error_codes=[None, 32],
         intermediate_error_codes=[],
@@ -47,6 +51,7 @@ def test_write_transfers_correctly_writes_all_fields():
         "requesting_practice_ods_code": ["A12"],
         "sending_practice_asid": ["456"],
         "sending_practice_ods_code": ["B12"],
+        "sending_practice_ccg_ods_code": ["10A"],
         "requesting_supplier": ["Supplier A"],
         "sending_supplier": ["Supplier B"],
         "sender_error_codes": [[1, None]],
