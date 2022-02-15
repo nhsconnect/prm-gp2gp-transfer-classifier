@@ -49,14 +49,16 @@ class TransferClassifierS3UriResolver:
         ]
 
     def ods_metadata(self, reporting_window: ReportingWindow) -> List[str]:
+        reporting_window_months = [(date.year, date.month) for date in reporting_window.get_dates()]
+        deduplicated_reporting_months = list(dict.fromkeys(reporting_window_months))
         return [
             self._s3_path(
                 self._ods_metadata_bucket,
                 self._ODS_METADATA_VERSION,
-                f"{date.year}/{date.month}",
+                f"{year}/{month}",
                 "organisationMetadata.json",
             )
-            for date in reporting_window.get_dates()
+            for (year, month) in deduplicated_reporting_months
         ]
 
     def gp2gp_transfers(self, daily_start_datetime: datetime, cutoff: timedelta) -> str:

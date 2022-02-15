@@ -43,7 +43,7 @@ def test_returns_correct_ods_metadata_uris():
     ods_metadata_bucket = a_string()
     reporting_window = Mock()
     reporting_window.get_dates = Mock(
-        return_value=[datetime(year=2020, month=12, day=31), datetime(year=2021, month=1, day=1)]
+        return_value=[datetime(year=2020, month=12, day=31), datetime(year=2021, month=1, day=1), datetime(year=2021, month=1, day=2)]
     )
 
     uri_resolver = TransferClassifierS3UriResolver(
