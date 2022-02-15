@@ -57,7 +57,7 @@ def _new_transfer_columns():
     ]
 
 
-def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
+def convert_transfers_to_table_deprecated(transfers: Iterable[Transfer]) -> Table:
     columns = _new_transfer_columns()
 
     for transfer in transfers:
