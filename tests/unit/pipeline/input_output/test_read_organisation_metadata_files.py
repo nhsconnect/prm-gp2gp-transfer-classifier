@@ -13,12 +13,12 @@ _DATE_ANCHOR_YEAR_MONTH = (_DATE_ANCHOR_YEAR, _DATE_ANCHOR_MONTH)
 _DATE_ANCHOR_ADDITIONAL_YEAR_MONTH = (_DATE_ANCHOR_YEAR, _DATE_ANCHOR_ADDITIONAL_MONTH)
 
 _ORGANISATION_METADATA_DICT_FIRST_MONTH = {
-    "generated_on": "2021-01-01T00:00:00.000000+00:00",
+    "generated_on": "2021-02-15T00:00:00.000000+00:00",
     "practices": [{"ods_code": "ABC", "name": "A Practice", "asids": ["123"]}],
     "ccgs": [{"ods_code": "XYZ", "name": "A CCG", "practices": ["ABC"]}],
 }
 _ORGANISATION_METADATA_DICT_ADDITIONAL_MONTH = {
-    "generated_on": "2021-02-01T03:00:00",
+    "generated_on": "2021-03-15T03:00:00",
     "practices": [{"ods_code": "A12345", "name": "GP Practice", "asids": ["123456789123"]}],
     "ccgs": [{"ods_code": "22A", "name": "CCG", "practices": ["A12345"]}],
 }

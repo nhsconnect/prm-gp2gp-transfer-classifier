@@ -1,5 +1,7 @@
 from typing import Dict, Iterator, Tuple
 
+from dateutil.relativedelta import relativedelta
+
 from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
 from prmdata.domain.ods_portal.organisation_metadata import OrganisationMetadata
 
@@ -17,12 +19,17 @@ class OrganisationMetadataMonthly:
         metadata_dict = {}
         for data in datas:
             organisation_metadata = OrganisationMetadata.from_dict(data)
-            year = organisation_metadata.generated_on.year
-            month = organisation_metadata.generated_on.month
+            organisation_metadata_metric_month = organisation_metadata.generated_on - relativedelta(
+                months=1
+            )
+            year_month = (
+                organisation_metadata_metric_month.year,
+                organisation_metadata_metric_month.month,
+            )
             organisation_lookup = OrganisationLookup(
                 organisation_metadata.practices, organisation_metadata.ccgs
             )
-            metadata_dict[(year, month)] = organisation_lookup
+            metadata_dict[year_month] = organisation_lookup
         return cls(metadata_dict)
 
     def get_lookup(self, year_month: YearMonth) -> OrganisationLookup:

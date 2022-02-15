@@ -32,8 +32,8 @@ def test_from_list_of_data_returns_dict_of_organisation_metadata():
     )
 
     actual_metadatas = OrganisationMetadataMonthly.from_list(list_of_data)
-    actual_first_month_lookup = actual_metadatas.get_lookup((2020, 7))
-    actual_second_month_lookup = actual_metadatas.get_lookup((2020, 8))
+    actual_first_month_lookup = actual_metadatas.get_lookup((2020, 6))
+    actual_second_month_lookup = actual_metadatas.get_lookup((2020, 7))
 
     assert actual_first_month_lookup.practice_ods_code_from_asid(
         "123456789123"
