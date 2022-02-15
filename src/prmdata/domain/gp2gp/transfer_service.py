@@ -32,6 +32,16 @@ class TransferObservabilityProbe:
             },
         )
 
+    def record_no_ods_code_for_asid(self, conversation_id: str, asid: str):
+        self._logger.warning(
+            "Unknown ODS Code for conversation",
+            extra={
+                "event": "UNKNOWN_ODS_CODE_FOR_CONVERSATION",
+                "conversation_id": conversation_id,
+                "unknown_asid": asid,
+            },
+        )
+
 
 class TransferService:
     def __init__(
@@ -87,31 +97,41 @@ class TransferService:
             for conversation in conversations
         )
 
+    def _create_practice(
+        self,
+        asid: str,
+        supplier: str,
+        conversation_id: str,
+        organisation_lookup: OrganisationLookup,
+    ):
+        if not organisation_lookup.has_asid_code(asid):
+            self._probe.record_no_ods_code_for_asid(conversation_id, asid)
+            return Practice(asid=asid, supplier=supplier, ods_code=None, ccg_ods_code=None)
+        ods_code = organisation_lookup.practice_ods_code_from_asid(asid)
+        ccg_ods_code = organisation_lookup.ccg_ods_code_from_practice_ods_code(ods_code)
+        return Practice(asid=asid, supplier=supplier, ods_code=ods_code, ccg_ods_code=ccg_ods_code)
+
     def derive_transfer(
         self, conversation: Gp2gpConversation, organisation_lookup: OrganisationLookup
     ) -> Transfer:
         sla_duration = _calculate_sla(conversation, self._probe)
         requesting_practice_asid = conversation.requesting_practice_asid()
         sending_practice_asid = conversation.sending_practice_asid()
-        sending_practice_ods_code = organisation_lookup.practice_ods_code_from_asid(
-            sending_practice_asid
-        )
+        conversation_id = conversation.conversation_id()
         return Transfer(
             conversation_id=conversation.conversation_id(),
             sla_duration=sla_duration,
-            requesting_practice=Practice(
+            requesting_practice=self._create_practice(
                 asid=requesting_practice_asid,
                 supplier=conversation.requesting_supplier(),
-                ods_code=organisation_lookup.practice_ods_code_from_asid(requesting_practice_asid),
-                ccg_ods_code=None,
+                conversation_id=conversation_id,
+                organisation_lookup=organisation_lookup,
             ),
-            sending_practice=Practice(
+            sending_practice=self._create_practice(
                 asid=sending_practice_asid,
                 supplier=conversation.sending_supplier(),
-                ods_code=sending_practice_ods_code,
-                ccg_ods_code=organisation_lookup.ccg_ods_code_from_practice_ods_code(
-                    sending_practice_ods_code
-                ),
+                conversation_id=conversation_id,
+                organisation_lookup=organisation_lookup,
             ),
             sender_error_codes=conversation.sender_error_codes(),
             final_error_codes=conversation.final_error_codes(),

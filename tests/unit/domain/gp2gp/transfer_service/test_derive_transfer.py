@@ -68,6 +68,40 @@ def test_logs_negative_sla_warning():
     mock_probe.record_negative_sla.assert_called_once_with(conversation)
 
 
+def test_logs_unknown_practice_for_transfer_warning_given_no_sending_practice_ods_code():
+    conversation_id = a_string()
+    mock_probe = Mock()
+    conversation = build_mock_gp2gp_conversation(
+        conversation_id=conversation_id, sending_practice_asid="314135442432"
+    )
+    mock_lookup = Mock()
+    mock_lookup.has_asid_code.return_value = False
+
+    transfer_service = TransferService(
+        message_stream=[], cutoff=timedelta(days=14), observability_probe=mock_probe
+    )
+    transfer_service.derive_transfer(conversation, mock_lookup)
+
+    mock_probe.record_no_ods_code_for_asid.assert_any_call(conversation_id, "314135442432")
+
+
+def test_logs_unknown_practice_for_transfer_warning_given_no_requesting_practice_ods_code():
+    conversation_id = a_string()
+    mock_probe = Mock()
+    conversation = build_mock_gp2gp_conversation(
+        conversation_id=conversation_id, requesting_practice_asid="12131413535"
+    )
+    mock_lookup = Mock()
+    mock_lookup.has_asid_code.return_value = False
+
+    transfer_service = TransferService(
+        message_stream=[], cutoff=timedelta(days=14), observability_probe=mock_probe
+    )
+    transfer_service.derive_transfer(conversation, mock_lookup)
+
+    mock_probe.record_no_ods_code_for_asid.assert_any_call(conversation_id, "12131413535")
+
+
 def test_negative_sla_duration_clamped_to_zero():
     conversation = build_mock_gp2gp_conversation(
         request_completed_time=a_datetime(year=2021, month=1, day=5),
