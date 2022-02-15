@@ -43,7 +43,11 @@ def test_returns_correct_ods_metadata_uris():
     ods_metadata_bucket = a_string()
     reporting_window = Mock()
     reporting_window.get_dates = Mock(
-        return_value=[datetime(year=2020, month=12, day=31), datetime(year=2021, month=1, day=1), datetime(year=2021, month=1, day=2)]
+        return_value=[
+            datetime(year=2020, month=12, day=31),
+            datetime(year=2021, month=1, day=1),
+            datetime(year=2021, month=1, day=2),
+        ]
     )
 
     uri_resolver = TransferClassifierS3UriResolver(
@@ -76,7 +80,7 @@ def test_returns_correct_transfers_uri():
 
     expected_filename = "2021-01-03-transfers.parquet"
     expected = (
-        f"s3://{transfers_bucket}/v7/cutoff-{cutoff_number_of_days}/2021/01/03/{expected_filename}"
+        f"s3://{transfers_bucket}/v8/cutoff-{cutoff_number_of_days}/2021/01/03/{expected_filename}"
     )
 
     actual = uri_resolver.gp2gp_transfers(daily_start_datetime, cutoff=conversation_cutoff)

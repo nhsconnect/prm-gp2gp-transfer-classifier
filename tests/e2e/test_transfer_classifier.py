@@ -214,7 +214,7 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
                 )
 
             s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
-            s3_output_path = f"v7/cutoff-14/{year}/{month}/{day}/{s3_filename}"
+            s3_output_path = f"v8/cutoff-14/{year}/{month}/{day}/{s3_filename}"
 
             actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 
@@ -273,7 +273,7 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
         )
 
         s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
-        s3_output_path = f"v7/cutoff-0/{year}/{month}/{day}/{s3_filename}"
+        s3_output_path = f"v8/cutoff-0/{year}/{month}/{day}/{s3_filename}"
 
         actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 
