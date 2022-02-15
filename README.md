@@ -31,14 +31,15 @@ Example of ISO-8601 datetime that is specified for START_DATETIME or END_DATETIM
 Configuration is achieved via the following environment variables:
 
 
-| Environment variable        | Description                                                                                                        | 
-|-----------------------------|--------------------------------------------------------------------------------------------------------------------|
-| OUTPUT_TRANSFER_DATA_BUCKET | Bucket to write categorised transfers.                                                                             |
-| INPUT_SPINE_DATA_BUCKET     | Bucket to read raw spine logs from.                                                                                |
-| START_DATETIME              | Optional ISO-8601 datetime specifying start of date range of transfer classification, on a daily basis.            |
-| END_DATETIME                | Optional ISO-8601 datetime specifying end of date range of transfer classification, on a daily basis.              |
-| S3_ENDPOINT_URL             | Optional argument specifying which S3 to connect to.                                                               |
-| CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer. Defaults to 0 (which means there is no cutoff). |
+| Environment variable        | Description                                                                                                            | 
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------|
+| OUTPUT_TRANSFER_DATA_BUCKET | Bucket to write categorised transfers.                                                                                 |
+| INPUT_SPINE_DATA_BUCKET     | Bucket to read raw spine logs from.                                                                                    |
+| START_DATETIME              | Optional ISO-8601 datetime specifying start of date range of transfer classification, on a daily basis.                |
+| END_DATETIME                | Optional ISO-8601 datetime specifying end of date range of transfer classification, on a daily basis.                  |
+| S3_ENDPOINT_URL             | Optional argument specifying which S3 to connect to.                                                                   |
+| CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer. Defaults to 0 (which means there is no cutoff).     |
+| ADD_ODS_CODES               | Optional argument specifying whether to add ODS Codes to the transfer output. Defaults to 0 (don't add), pass 1 to add |
 
 
 ## Developing

@@ -1,0 +1,8 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2019-12-31 18:02:29.985 UTC","completed-within-3-days--A12347","completed-within-3-days--A12347","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",987654321240,003456789123,NotProvided,NONE,SupplierB,SupplierC
+"2019-12-31 18:03:21.908 UTC","completed-within-3-days--A12347","completed-within-3-days_1--A12347","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,987654321240,NotProvided,NONE,SupplierC,SupplierB
+"2019-12-31 18:03:23.982 UTC","completed-within-3-days--A12347","completed-within-3-days_2--A12347","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,987654321240,"completed-within-3-days--A12347",NONE,SupplierC,SupplierB
+"2019-12-31 18:03:24.982 UTC","completed-within-3-days--A12347","completed-within-3-days_3--A12347","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",987654321240,003456789123,"completed-within-3-days_1--A12347",NONE,SupplierB,SupplierC
+"2019-12-31 19:02:29.985 UTC","multiple-sender-errors--A12347","multiple-sender-errors--A12347","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",987654321240,003456789123,NotProvided,NONE,SupplierB,SupplierC
+"2019-12-31 19:03:21.908 UTC","multiple-sender-errors--A12347","multiple-sender-errors_1--A12347","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,987654321240,"multiple-sender-errors--A12347",23,SupplierC,SupplierB
+"2019-12-31 19:03:21.908 UTC","multiple-sender-errors--A12347","multiple-sender-errors_1--A12347","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,987654321240,"multiple-sender-errors--A12347",99,SupplierC,SupplierB

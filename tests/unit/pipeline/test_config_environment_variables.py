@@ -16,6 +16,7 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
         "CONVERSATION_CUTOFF_DAYS": "28",
         "S3_ENDPOINT_URL": "a_url",
         "BUILD_TAG": "12345",
+        "ADD_ODS_CODES": "1",
     }
 
     expected_config = TransferClassifierConfig(
@@ -31,6 +32,7 @@ def test_reads_from_environment_variables_and_converts_to_required_format():
         conversation_cutoff=timedelta(days=28),
         s3_endpoint_url="a_url",
         build_tag="12345",
+        add_ods_codes=1,
     )
 
     actual_config = TransferClassifierConfig.from_environment_variables(environment)
@@ -55,6 +57,7 @@ def test_read_config_from_environment_when_optional_parameters_are_not_set():
         s3_endpoint_url=None,
         conversation_cutoff=timedelta(days=0),
         build_tag="12345",
+        add_ods_codes=0,
     )
 
     actual_config = TransferClassifierConfig.from_environment_variables(environment)
@@ -94,6 +97,7 @@ def test_returns_valid_config_given_environment_variable_cutoff_is_0():
         s3_endpoint_url=None,
         conversation_cutoff=timedelta(days=0),
         build_tag="12345",
+        add_ods_codes=0,
     )
 
     actual_config = TransferClassifierConfig.from_environment_variables(environment)

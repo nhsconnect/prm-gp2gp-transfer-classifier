@@ -193,7 +193,6 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
         environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
         environ["END_DATETIME"] = "2020-01-01T00:00:00Z"
         environ["CONVERSATION_CUTOFF_DAYS"] = "14"
-        environ["ADD_ODS_CODES"] = "1"
 
         main()
 
@@ -215,7 +214,7 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
                 )
 
             s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
-            s3_output_path = f"v8/cutoff-14/{year}/{month}/{day}/{s3_filename}"
+            s3_output_path = f"v7/cutoff-14/{year}/{month}/{day}/{s3_filename}"
 
             actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 
@@ -255,7 +254,6 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
     _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir)
 
     try:
-        environ["ADD_ODS_CODES"] = "1"
         main()
 
         expected_transfers_output_key = "transfers.parquet"
@@ -275,7 +273,7 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
         )
 
         s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
-        s3_output_path = f"v8/cutoff-0/{year}/{month}/{day}/{s3_filename}"
+        s3_output_path = f"v7/cutoff-0/{year}/{month}/{day}/{s3_filename}"
 
         actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 

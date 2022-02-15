@@ -37,6 +37,9 @@ class EnvConfig:
     def read_optional_str(self, name: str) -> Optional[str]:
         return self._read_env(name, optional=True)
 
+    def read_optional_int(self, name: str, default: int) -> int:
+        return self._read_env(name, optional=True, converter=int, default=default)
+
     def read_optional_timedelta_days(self, name: str, default: timedelta) -> timedelta:
         return self._read_env(
             name,
@@ -59,6 +62,7 @@ class TransferClassifierConfig:
     build_tag: str
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
+    add_ods_codes: int
 
     @classmethod
     def from_environment_variables(cls, env_vars):
@@ -74,4 +78,5 @@ class TransferClassifierConfig:
                 "CONVERSATION_CUTOFF_DAYS", timedelta(days=0)
             ),
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),
+            add_ods_codes=env.read_optional_int("ADD_ODS_CODES", 0),
         )

@@ -1,0 +1,2 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2020-01-01 08:41:48.337 UTC","completed-within-3-days-in-jan--A12345","completed-within-3-days-in-jan_3--A12345","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,003456789123,"completed-within-3-days-in-jan_1--A12345",NONE,SupplierB,SupplierC

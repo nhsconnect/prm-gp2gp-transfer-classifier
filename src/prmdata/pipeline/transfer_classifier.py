@@ -68,7 +68,7 @@ class TransferClassifier:
         cutoff: timedelta,
         metadata: Dict[str, str],
     ):
-        output_path = self._uris.gp2gp_transfers(
+        output_path = self._uris.gp2gp_transfers_deprecated(
             daily_start_datetime=daily_start_datetime, cutoff=cutoff
         )
         self._io.write_transfers_deprecated(transfers, output_path, metadata)
@@ -132,12 +132,20 @@ class TransferClassifier:
             transfers = transfer_service.convert_to_transfers(
                 conversations_started_in_reporting_window, organisation_lookup=organisation_lookup
             )
-            self._write_transfers(
-                transfers=transfers,
-                daily_start_datetime=daily_start_datetime,
-                cutoff=self._config.conversation_cutoff,
-                metadata=metadata,
-            )
+            if self._config.add_ods_codes == 1:
+                self._write_transfers(
+                    transfers=transfers,
+                    daily_start_datetime=daily_start_datetime,
+                    cutoff=self._config.conversation_cutoff,
+                    metadata=metadata,
+                )
+            else:
+                self._write_transfers_deprecated(
+                    transfers=transfers,
+                    daily_start_datetime=daily_start_datetime,
+                    cutoff=self._config.conversation_cutoff,
+                    metadata=metadata,
+                )
 
         logger.info(
             "Successfully classified conversations for a date range",

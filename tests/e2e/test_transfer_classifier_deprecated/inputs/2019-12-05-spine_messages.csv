@@ -1,0 +1,7 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2019-12-05 18:02:29.985 UTC","integrated-beyond-8-days--A12345","integrated-beyond-8-days--A12345","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,SupplierA,SupplierC
+"2019-12-05 18:03:21.908 UTC","integrated-beyond-8-days--A12345","integrated-beyond-8-days_1--A12345","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,SupplierC,SupplierA
+"2019-12-05 18:03:23.982 UTC","integrated-beyond-8-days--A12345","integrated-beyond-8-days_2--A12345","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"integrated-beyond-8-days--A12345",NONE,SupplierC,SupplierA
+"2019-12-05 18:02:29.985 UTC","concluded-beyond-14-day-conversation-cutoff--A12345","concluded-beyond-14-day-conversation-cutoff--A12345","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,SupplierA,SupplierC
+"2019-12-05 18:03:21.908 UTC","concluded-beyond-14-day-conversation-cutoff--A12345","concluded-beyond-14-day-conversation-cutoff-days_1--A12345","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,SupplierC,SupplierA
+"2019-12-05 18:03:23.982 UTC","concluded-beyond-14-day-conversation-cutoff--A12345","integrated-beyond-8-days_2-1--A12345","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"concluded-beyond-14-day-conversation-cutoff--A12345",NONE,SupplierC,SupplierA

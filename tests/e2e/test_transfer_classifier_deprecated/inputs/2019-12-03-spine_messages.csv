@@ -1,0 +1,4 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2019-12-03 18:02:29.985 UTC","integrated-within-8-days--A12347","integrated-within-8-days--A12347","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",987654321240,003456789123,NotProvided,NONE,,
+"2019-12-03 18:03:21.908 UTC","integrated-within-8-days--A12347","integrated-within-8-days_1--A12347","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,987654321240,NotProvided,NONE,,
+"2019-12-03 18:03:23.982 UTC","integrated-within-8-days--A12347","integrated-within-8-days_2--A12347","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,987654321240,"integrated-within-8-days--A12347",NONE,,

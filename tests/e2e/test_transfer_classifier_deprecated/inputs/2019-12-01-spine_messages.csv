@@ -1,0 +1,5 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2019-12-01 18:02:29.985 UTC","started-outside-of-window--A12345","started-outside-of-window--A12345","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,,
+"2019-12-01 18:03:21.908 UTC","started-outside-of-window--A12345","started-outside-of-window_1--A12345","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,,
+"2019-12-01 18:03:23.982 UTC","started-outside-of-window--A12345","started-outside-of-window_2--A12345","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"started-outside-of-window--A12345",NONE,,
+"2019-12-01 19:41:48.337 UTC","started-outside-of-window--A12345","started-outside-of-window_3--A12345","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,003456789123,"started-outside-of-window_1--A12345",NONE,,

@@ -1,0 +1,17 @@
+{
+    "conversation_id": [],
+    "date_completed": [],
+    "date_requested": [],
+    "final_error_codes": [],
+    "intermediate_error_codes": [],
+    "requesting_practice_asid": [],
+    "requesting_supplier": [],
+    "sender_error_codes": [],
+    "sending_practice_asid": [],
+    "sending_supplier": [],
+    "sla_duration": [],
+    "status": [],
+    "failure_reason": [],
+     "last_sender_message_timestamp": []
+}
+
