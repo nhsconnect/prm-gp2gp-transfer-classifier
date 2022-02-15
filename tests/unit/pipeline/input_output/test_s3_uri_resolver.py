@@ -53,8 +53,8 @@ def test_returns_correct_ods_metadata_uris():
     )
 
     expected = [
-        f"s3://{ods_metadata_bucket}/v2/2020/12/organisationMetadata.json",
-        f"s3://{ods_metadata_bucket}/v2/2021/1/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v3/2020/12/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v3/2021/1/organisationMetadata.json",
     ]
 
     actual = uri_resolver.ods_metadata(reporting_window)

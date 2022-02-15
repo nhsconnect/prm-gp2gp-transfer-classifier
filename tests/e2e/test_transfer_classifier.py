@@ -113,7 +113,7 @@ def _build_fake_s3_bucket(bucket_name: str, s3):
 def _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir):
     organisation_metadata_file = str(datadir / "inputs" / "organisationMetadata.json")
     input_ods_metadata_bucket.upload_file(
-        organisation_metadata_file, "v2/2019/12/organisationMetadata.json"
+        organisation_metadata_file, "v3/2019/12/organisationMetadata.json"
     )
 
 

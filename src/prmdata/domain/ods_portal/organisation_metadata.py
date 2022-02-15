@@ -22,6 +22,8 @@ class CcgDetails:
 @dataclass
 class OrganisationMetadata:
     generated_on: datetime
+    year: int
+    month: int
     practices: List[PracticeDetails]
     ccgs: List[CcgDetails]
 
@@ -29,6 +31,8 @@ class OrganisationMetadata:
     def from_dict(cls, data):
         return OrganisationMetadata(
             generated_on=parser.isoparse(data["generated_on"]),
+            year=data["year"],
+            month=data["month"],
             practices=[
                 PracticeDetails(
                     asids=practice["asids"], ods_code=practice["ods_code"], name=practice["name"]

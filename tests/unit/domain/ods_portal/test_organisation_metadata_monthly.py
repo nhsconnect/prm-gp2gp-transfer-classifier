@@ -6,11 +6,15 @@ from prmdata.domain.ods_portal.organisation_metadata_monthly import Organisation
 def test_from_list_of_data_returns_dict_of_organisation_metadata():
     first_month_data = {
         "generated_on": "2020-07-23T00:00:00",
+        "year": 2020,
+        "month": 6,
         "practices": [{"ods_code": "A12345", "name": "GP Practice", "asids": ["123456789123"]}],
         "ccgs": [{"ods_code": "12A", "name": "CCG", "practices": ["A12345"]}],
     }
     second_month_data = {
         "generated_on": "2020-08-23T00:00:00",
+        "year": 2020,
+        "month": 7,
         "practices": [{"ods_code": "ABC543", "name": "GP Practice", "asids": ["123456789123"]}],
         "ccgs": [{"ods_code": "22A", "name": "CCG", "practices": ["A12345"]}],
     }
