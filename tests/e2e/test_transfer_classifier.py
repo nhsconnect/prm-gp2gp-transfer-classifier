@@ -111,9 +111,17 @@ def _build_fake_s3_bucket(bucket_name: str, s3):
 
 
 def _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir):
-    organisation_metadata_file = str(datadir / "inputs" / "organisationMetadata.json")
+    organisation_metadata_file_dec = str(
+        datadir / "inputs" / "organisation_metadata" / "2019-12-organisationMetadata.json"
+    )
+    organisation_metadata_file_jan = str(
+        datadir / "inputs" / "organisation_metadata" / "2020-01-organisationMetadata.json"
+    )
     input_ods_metadata_bucket.upload_file(
-        organisation_metadata_file, "v3/2019/12/organisationMetadata.json"
+        organisation_metadata_file_dec, "v3/2019/12/organisationMetadata.json"
+    )
+    input_ods_metadata_bucket.upload_file(
+        organisation_metadata_file_jan, "v3/2020/1/organisationMetadata.json"
     )
 
 
@@ -122,18 +130,19 @@ def _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir):
     _upload_template_spine_data(
         datadir, input_spine_data_bucket, year=2019, data_month=12, time_range=range(1, 32)
     )
+    _upload_template_spine_data(
+        datadir, input_spine_data_bucket, year=2020, data_month=1, time_range=range(1, 18)
+    )
 
-    for day in [1, 2, 3, 5, 6, 7, 15, 19, 20, 30, 31]:
+    for day in [1, 2, 3, 5, 6, 7, 15, 20, 30, 31]:
         _override_day_spine_messages(
             datadir, input_spine_data_bucket, year=2019, data_month=12, data_day=day
         )
 
-    _upload_template_spine_data(
-        datadir, input_spine_data_bucket, year=2020, data_month=1, time_range=range(1, 15)
-    )
-    _override_day_spine_messages(
-        datadir, input_spine_data_bucket, year=2020, data_month=1, data_day=1
-    )
+    for day in [1, 2, 10]:
+        _override_day_spine_messages(
+            datadir, input_spine_data_bucket, year=2020, data_month=1, data_day=day
+        )
 
 
 def _get_s3_path(year, month, day):
@@ -191,21 +200,24 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
 
     try:
         environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
-        environ["END_DATETIME"] = "2020-01-01T00:00:00Z"
+        environ["END_DATETIME"] = "2020-01-04T00:00:00Z"
         environ["CONVERSATION_CUTOFF_DAYS"] = "14"
         environ["ADD_ODS_CODES"] = "1"
 
         main()
 
-        days_with_data = [2, 3, 5, 19, 20, 30, 31]
-        expected_days = [(2019, 12, day) for day in range(2, 32)]
+        days_with_data = [2, 3, 5, 20, 30, 31]
+        days_with_data_year = [(2019, 12, day) for day in days_with_data] + [(2020, 1, 2)]
+        expected_days = [(2019, 12, day) for day in range(2, 32)] + [
+            (2020, 1, day) for day in range(1, 4)
+        ]
         expected_transfers_output_key = "transfers.parquet"
 
         for (year, data_month, data_day) in expected_days:
             month = add_leading_zero(data_month)
             day = add_leading_zero(data_day)
 
-            if data_day in days_with_data:
+            if (year, data_month, data_day) in days_with_data_year:
                 expected_transfers = _read_parquet_columns_json(
                     datadir / "expected_outputs" / f"{year}-{month}-{day}-transferParquet.json"
                 )
@@ -228,7 +240,7 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
                 "build-tag": "abc456",
                 "start-datetime": f"{year}-{month}-{day}T00:00:00+00:00",
                 "end-datetime": _end_datetime_metadata(year, data_month, data_day),
-                "ods-metadata-month": f"{year}-{month}",
+                "ods-metadata-month": f"{year}-{data_month}",
             }
 
             assert actual_metadata == expected_metadata

@@ -3,10 +3,10 @@
         "failed--A12345"
     ],
     "date_completed": [
-        "2019-12-20T08:41:48.337000"
+        "2020-01-10T08:41:48.337000"
     ],
     "date_requested": [
-        "2019-12-19T18:02:29.985000"
+        "2020-01-02T18:02:29.985000"
     ],
     "final_error_codes": [
         [30]
@@ -42,7 +42,7 @@
         "Unknown"
     ],
     "sla_duration": [
-        52706
+        657506
     ],
     "status": [
         "Technical failure"
@@ -51,7 +51,7 @@
         "Final error"
     ],
      "last_sender_message_timestamp": [
-         "2019-12-19T18:03:23.982000"
+         "2020-01-02T18:03:23.982000"
      ]
 }
 
