@@ -78,5 +78,5 @@ class TransferClassifierConfig:
                 "CONVERSATION_CUTOFF_DAYS", timedelta(days=0)
             ),
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),
-            add_ods_codes=env.read_optional_int("ADD_ODS_CODES", 0),
+            add_ods_codes=env.read_optional_int("ADD_ODS_CODES", 1),
         )
