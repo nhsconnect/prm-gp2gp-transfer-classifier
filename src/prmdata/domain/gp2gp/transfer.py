@@ -42,6 +42,10 @@ class Transfer(NamedTuple):
         return self.requesting_practice.ods_code
 
     @property
+    def requesting_practice_ccg_ods_code(self) -> Optional[str]:
+        return self.requesting_practice.ccg_ods_code
+
+    @property
     def requesting_supplier(self) -> str:
         return self.requesting_practice.supplier
 

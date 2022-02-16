@@ -99,6 +99,21 @@ def test_requesting_practice_ods_is_converted_to_column():
     assert actual_ods_column == expected_ods_column
 
 
+def test_requesting_practice_ccg_ods_is_converted_to_column():
+    transfer = build_transfer(
+        requesting_practice=Practice(
+            asid="001112345678", supplier="supplier", ods_code="A12", ccg_ods_code="14A"
+        )
+    )
+
+    expected_ods_column = {"requesting_practice_ccg_ods_code": ["14A"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_ods_column = table.select(["requesting_practice_ccg_ods_code"]).to_pydict()
+
+    assert actual_ods_column == expected_ods_column
+
+
 def test_sending_practice_ods_is_converted_to_column():
     transfer = build_transfer(
         sending_practice=Practice(
@@ -269,6 +284,7 @@ def test_table_has_correct_schema():
             ("sla_duration", pa.uint64()),
             ("requesting_practice_asid", pa.string()),
             ("requesting_practice_ods_code", pa.string()),
+            ("requesting_practice_ccg_ods_code", pa.string()),
             ("sending_practice_asid", pa.string()),
             ("sending_practice_ods_code", pa.string()),
             ("sending_practice_ccg_ods_code", pa.string()),

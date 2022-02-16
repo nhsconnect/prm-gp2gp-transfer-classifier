@@ -49,6 +49,7 @@ def test_write_transfers_correctly_writes_all_fields():
         "sla_duration": [86400],
         "requesting_practice_asid": ["123"],
         "requesting_practice_ods_code": ["A12"],
+        "requesting_practice_ccg_ods_code": ["11B"],
         "sending_practice_asid": ["456"],
         "sending_practice_ods_code": ["B12"],
         "sending_practice_ccg_ods_code": ["10A"],
