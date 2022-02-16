@@ -126,55 +126,58 @@ def _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir):
 
 
 def _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir):
-
-    _upload_template_spine_data(
-        datadir, input_spine_data_bucket, year=2019, data_month=12, time_range=range(1, 32)
-    )
-    _upload_template_spine_data(
-        datadir, input_spine_data_bucket, year=2020, data_month=1, time_range=range(1, 18)
-    )
-
-    for day in [1, 2, 3, 5, 6, 7, 15, 20, 30, 31]:
-        _override_day_spine_messages(
-            datadir, input_spine_data_bucket, year=2019, data_month=12, data_day=day
-        )
-
-    for day in [1, 2, 10]:
-        _override_day_spine_messages(
-            datadir, input_spine_data_bucket, year=2020, data_month=1, data_day=day
-        )
+    list_dates = [(2019, 12, day) for day in range(1, 32)] + [
+        (2020, 1, day) for day in range(1, 18)
+    ]
+    _upload_template_spine_data(datadir, input_spine_data_bucket, list_dates)
+    list_dates_with_data = [(2019, 12, day) for day in [1, 2, 3, 5, 6, 7, 15, 20, 30, 31]] + [
+        (2020, 1, day) for day in [1, 2, 10]
+    ]
+    _override_day_spine_messages(datadir, input_spine_data_bucket, list_dates_with_data)
 
 
 def _get_s3_path(year, month, day):
     return f"v3/{year}/{month}/{day}/{year}-{month}-{day}_spine_messages.csv.gz"
 
 
-def _override_day_spine_messages(
-    datadir, input_spine_data_bucket, year: int, data_month: int, data_day: int
-):
-    day = add_leading_zero(data_day)
-    month = add_leading_zero(data_month)
+def _override_day_spine_messages(datadir, input_spine_data_bucket, list_dates):
+    for (year, month, day) in list_dates:
+        day = add_leading_zero(day)
+        month = add_leading_zero(month)
 
-    input_csv_gz = read_file_to_gzip_buffer(
-        datadir / "inputs" / f"{year}-{month}-{day}-spine_messages.csv"
-    )
-    input_spine_data_bucket.upload_fileobj(
-        input_csv_gz,
-        _get_s3_path(year, month, day),
-    )
+        input_csv_gz = read_file_to_gzip_buffer(
+            datadir / "inputs" / f"{year}-{month}-{day}-spine_messages.csv"
+        )
+        input_spine_data_bucket.upload_fileobj(
+            input_csv_gz,
+            _get_s3_path(year, month, day),
+        )
 
 
-def _upload_template_spine_data(
-    datadir, input_spine_data_bucket, year: int, data_month: int, time_range: range
-):
-    for data_day in time_range:
+def _upload_template_spine_data(datadir, input_spine_data_bucket, list_dates):
+    for (year, month, day) in list_dates:
         empty_spine_messages = read_file_to_gzip_buffer(
             datadir / "inputs" / "template-spine_messages.csv"
         )
-        day = add_leading_zero(data_day)
-        month = add_leading_zero(data_month)
+        day = add_leading_zero(day)
+        month = add_leading_zero(month)
 
         input_spine_data_bucket.upload_fileobj(empty_spine_messages, _get_s3_path(year, month, day))
+
+
+def _get_expected_transfers(datadir, expected_date):
+    days_with_data = [(2019, 12, day) for day in [2, 3, 5, 20, 30, 31]] + [(2020, 1, 2)]
+    (year, data_month, data_day) = expected_date
+    month = add_leading_zero(data_month)
+    day = add_leading_zero(data_day)
+    if expected_date in days_with_data:
+        return _read_parquet_columns_json(
+            datadir / "expected_outputs" / f"{year}-{month}-{day}-transferParquet.json"
+        )
+    else:
+        return _read_parquet_columns_json(
+            datadir / "expected_outputs" / "template-transferParquet.json"
+        )
 
 
 def _end_datetime_metadata(year: int, data_month: int, data_day: int) -> str:
@@ -206,27 +209,17 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
 
         main()
 
-        days_with_data = [2, 3, 5, 20, 30, 31]
-        days_with_data_year = [(2019, 12, day) for day in days_with_data] + [(2020, 1, 2)]
         expected_days = [(2019, 12, day) for day in range(2, 32)] + [
             (2020, 1, day) for day in range(1, 4)
         ]
-        expected_transfers_output_key = "transfers.parquet"
 
         for (year, data_month, data_day) in expected_days:
             month = add_leading_zero(data_month)
             day = add_leading_zero(data_day)
 
-            if (year, data_month, data_day) in days_with_data_year:
-                expected_transfers = _read_parquet_columns_json(
-                    datadir / "expected_outputs" / f"{year}-{month}-{day}-transferParquet.json"
-                )
-            else:
-                expected_transfers = _read_parquet_columns_json(
-                    datadir / "expected_outputs" / "template-transferParquet.json"
-                )
+            expected_transfers = _get_expected_transfers(datadir, (year, data_month, data_day))
 
-            s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
+            s3_filename = f"{year}-{month}-{day}-transfers.parquet"
             s3_output_path = f"v8/cutoff-14/{year}/{month}/{day}/{s3_filename}"
 
             actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
