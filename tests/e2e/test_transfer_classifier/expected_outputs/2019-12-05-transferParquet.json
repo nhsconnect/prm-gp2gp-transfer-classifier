@@ -24,12 +24,12 @@
         "123456789123"
     ],
     "requesting_practice_ods_code": [
-        null,
-        null
+        "H49524",
+        "H49524"
     ],
     "requesting_practice_ccg_ods_code": [
-        null,
-        null
+        "11B",
+        "11B"
     ],
     "requesting_supplier": [
         "SupplierC",
@@ -44,12 +44,12 @@
         "003456789123"
     ],
     "sending_practice_ods_code": [
-        null,
-        null
+        "B34232",
+        "B34232"
     ],
       "sending_practice_ccg_ods_code": [
-        null,
-        null
+        "3D",
+        "3D"
     ],
     "sending_supplier": [
         "SupplierA",
