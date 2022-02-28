@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from unittest.mock import Mock
 
-from prmdata.pipeline.io import TransferClassifierS3UriResolver
+from prmdata.pipeline.s3_uri_resolver import TransferClassifierS3UriResolver
 from tests.builders.common import a_datetime, a_string
 
 

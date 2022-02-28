@@ -15,7 +15,8 @@ from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_day
 from prmdata.domain.spine.message import Message
 from prmdata.pipeline.config import TransferClassifierConfig
-from prmdata.pipeline.io import TransferClassifierIO, TransferClassifierS3UriResolver
+from prmdata.pipeline.io import TransferClassifierIO
+from prmdata.pipeline.s3_uri_resolver import TransferClassifierS3UriResolver
 from prmdata.utils.date_converter import convert_to_datetime_string, convert_to_datetimes_string
 from prmdata.utils.input_output.s3 import S3DataManager
 
