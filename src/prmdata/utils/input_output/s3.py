@@ -11,6 +11,11 @@ from pyarrow import PythonFile, Table, parquet
 logger = logging.getLogger(__name__)
 
 
+class JsonFileNotFoundException(Exception):
+    def __init__(self, object_uri: str):
+        super().__init__("Unable to locate JSON file in S3 uri: " + object_uri)
+
+
 class S3DataManager:
     def __init__(self, client):
         self._client = client
@@ -37,7 +42,7 @@ class S3DataManager:
 
         except self._client.meta.client.exceptions.NoSuchKey:
             logger.error(
-                f"File not found: {object_uri}, exiting...",
+                f"CSV file not found: {object_uri}, exiting...",
                 extra={"event": "FILE_NOT_FOUND_IN_S3", "object_uri": object_uri},
             )
             sys.exit(1)
@@ -53,10 +58,10 @@ class S3DataManager:
             response = s3_object.get()
         except self._client.meta.client.exceptions.NoSuchKey:
             logger.error(
-                f"File not found: {object_uri}, exiting...",
+                f"JSON file not found: {object_uri}, exiting...",
                 extra={"event": "FILE_NOT_FOUND_IN_S3", "object_uri": object_uri},
             )
-            sys.exit(1)
+            raise JsonFileNotFoundException(object_uri)
 
         body = response["Body"].read()
         return json.loads(body.decode("utf8"))
