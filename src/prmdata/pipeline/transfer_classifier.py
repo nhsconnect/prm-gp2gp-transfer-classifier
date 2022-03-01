@@ -18,7 +18,7 @@ from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.pipeline.s3_uri_resolver import TransferClassifierS3UriResolver
 from prmdata.utils.date_converter import convert_to_datetime_string, convert_to_datetimes_string
-from prmdata.utils.input_output.s3 import S3DataManager
+from prmdata.utils.input_output.s3 import JsonFileNotFoundException, S3DataManager
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +46,15 @@ class TransferClassifier:
         input_paths = self._uris.spine_messages(self._reporting_window)
         return self._io.read_spine_messages(input_paths)
 
-    def _read_ods_metadata(self) -> OrganisationMetadataMonthly:
-        input_paths = self._uris.ods_metadata(self._reporting_window)
-        return self._io.read_ods_metadata_files(input_paths)
+    def _read_most_recent_ods_metadata(self) -> OrganisationMetadataMonthly:
+        try:
+            input_paths = self._uris.ods_metadata(self._reporting_window.get_dates())
+            return self._io.read_ods_metadata_files(input_paths)
+        except JsonFileNotFoundException:
+            input_paths = self._uris.ods_metadata_using_previous_month(
+                self._reporting_window.get_dates()
+            )
+            return self._io.read_ods_metadata_files(input_paths)
 
     def _write_transfers(
         self,
@@ -100,7 +106,7 @@ class TransferClassifier:
         )
 
         spine_messages = self._read_spine_messages()
-        ods_metadata_monthly = self._read_ods_metadata()
+        ods_metadata_monthly = self._read_most_recent_ods_metadata()
 
         transfer_service = TransferService(
             message_stream=spine_messages,

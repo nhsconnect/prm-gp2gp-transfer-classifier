@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from typing import List
 
+from dateutil.relativedelta import relativedelta
+
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.utils.add_leading_zero import add_leading_zero
 
@@ -41,8 +43,8 @@ class TransferClassifierS3UriResolver:
             for date in dates
         ]
 
-    def ods_metadata(self, reporting_window: ReportingWindow) -> List[str]:
-        reporting_window_months = [(date.year, date.month) for date in reporting_window.get_dates()]
+    def ods_metadata(self, reporting_window_dates: List[datetime]) -> List[str]:
+        reporting_window_months = [(date.year, date.month) for date in reporting_window_dates]
         deduplicated_reporting_months = list(dict.fromkeys(reporting_window_months))
         return [
             self._s3_path(
@@ -53,6 +55,17 @@ class TransferClassifierS3UriResolver:
             )
             for (year, month) in deduplicated_reporting_months
         ]
+
+    def ods_metadata_using_previous_month(
+        self, reporting_window_dates: List[datetime]
+    ) -> List[str]:
+        if len(reporting_window_dates) == 1:
+            reporting_window_for_previous_month = [
+                date - relativedelta(months=1) for date in reporting_window_dates
+            ]
+            return self.ods_metadata(reporting_window_for_previous_month)
+        else:
+            return self.ods_metadata(reporting_window_dates)[:-1]
 
     def gp2gp_transfers(self, daily_start_datetime: datetime, cutoff: timedelta) -> str:
         year = add_leading_zero(daily_start_datetime.year)

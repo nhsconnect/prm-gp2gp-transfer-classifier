@@ -41,14 +41,11 @@ def test_returns_correct_spine_messages_uris():
 
 def test_returns_correct_ods_metadata_uris():
     ods_metadata_bucket = a_string()
-    reporting_window = Mock()
-    reporting_window.get_dates = Mock(
-        return_value=[
-            datetime(year=2020, month=12, day=31),
-            datetime(year=2021, month=1, day=1),
-            datetime(year=2021, month=1, day=2),
-        ]
-    )
+    reporting_window_dates = [
+        datetime(year=2020, month=12, day=31),
+        datetime(year=2021, month=1, day=1),
+        datetime(year=2021, month=1, day=2),
+    ]
 
     uri_resolver = TransferClassifierS3UriResolver(
         gp2gp_spine_bucket=a_string(),
@@ -61,7 +58,7 @@ def test_returns_correct_ods_metadata_uris():
         f"s3://{ods_metadata_bucket}/v3/2021/1/organisationMetadata.json",
     ]
 
-    actual = uri_resolver.ods_metadata(reporting_window)
+    actual = uri_resolver.ods_metadata(reporting_window_dates)
 
     assert actual == expected
 
@@ -84,5 +81,52 @@ def test_returns_correct_transfers_uri():
     )
 
     actual = uri_resolver.gp2gp_transfers(daily_start_datetime, cutoff=conversation_cutoff)
+
+    assert actual == expected
+
+
+def test_returns_correct_ods_uri_metadata_for_previous_month_when_missing_metadata():
+    ods_metadata_bucket = a_string()
+    reporting_window_dates = [
+        datetime(year=2021, month=1, day=1),
+    ]
+
+    uri_resolver = TransferClassifierS3UriResolver(
+        gp2gp_spine_bucket=a_string(),
+        transfers_bucket=a_string(),
+        ods_metadata_bucket=ods_metadata_bucket,
+    )
+
+    expected = [
+        f"s3://{ods_metadata_bucket}/v3/2020/12/organisationMetadata.json",
+    ]
+
+    actual = uri_resolver.ods_metadata_using_previous_month(reporting_window_dates)
+
+    assert actual == expected
+
+
+def test_returns_correct_ods_uris_metadata_for_previous_months_when_missing_metadata():
+    ods_metadata_bucket = a_string()
+    reporting_window_dates = [
+        datetime(year=2020, month=12, day=31),
+        datetime(year=2021, month=1, day=1),
+        datetime(year=2021, month=2, day=1),
+        datetime(year=2021, month=3, day=1),
+    ]
+
+    uri_resolver = TransferClassifierS3UriResolver(
+        gp2gp_spine_bucket=a_string(),
+        transfers_bucket=a_string(),
+        ods_metadata_bucket=ods_metadata_bucket,
+    )
+
+    expected = [
+        f"s3://{ods_metadata_bucket}/v3/2020/12/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v3/2021/1/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v3/2021/2/organisationMetadata.json",
+    ]
+
+    actual = uri_resolver.ods_metadata_using_previous_month(reporting_window_dates)
 
     assert actual == expected
