@@ -111,18 +111,26 @@ def _build_fake_s3_bucket(bucket_name: str, s3):
 
 
 def _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir):
-    organisation_metadata_file_dec = str(
-        datadir / "inputs" / "organisation_metadata" / "2019-12-organisationMetadata.json"
+    _upload_file_to_ods_metadata_bucket(
+        input_ods_metadata_bucket,
+        "2019-12-organisationMetadata.json",
+        "v3/2019/12/organisationMetadata.json",
+        datadir,
     )
-    organisation_metadata_file_jan = str(
-        datadir / "inputs" / "organisation_metadata" / "2020-01-organisationMetadata.json"
+    _upload_file_to_ods_metadata_bucket(
+        input_ods_metadata_bucket,
+        "2020-01-organisationMetadata.json",
+        "v3/2020/1/organisationMetadata.json",
+        datadir,
     )
-    input_ods_metadata_bucket.upload_file(
-        organisation_metadata_file_dec, "v3/2019/12/organisationMetadata.json"
-    )
-    input_ods_metadata_bucket.upload_file(
-        organisation_metadata_file_jan, "v3/2020/1/organisationMetadata.json"
-    )
+
+
+def _upload_file_to_ods_metadata_bucket(
+    input_ods_metadata_bucket, file_name, s3_upload_key, datadir
+):
+    organisation_metadata_file = str(datadir / "inputs" / "organisation_metadata" / file_name)
+
+    input_ods_metadata_bucket.upload_file(organisation_metadata_file, s3_upload_key)
 
 
 def _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir):
@@ -279,6 +287,72 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
 
         s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
         s3_output_path = f"v8/cutoff-0/{year}/{month}/{day}/{s3_filename}"
+
+        actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
+
+        assert actual_transfers == expected_transfers
+
+        actual_metadata = _read_s3_metadata(output_transfer_data_bucket, s3_output_path)
+
+        assert actual_metadata == expected_metadata
+
+    finally:
+        output_transfer_data_bucket.objects.all().delete()
+        output_transfer_data_bucket.delete()
+        fake_s3.stop()
+        environ.clear()
+
+
+def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir):
+    fake_s3, s3_client = _setup()
+    fake_s3.start()
+
+    output_transfer_data_bucket = _build_fake_s3_bucket(
+        S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
+    )
+    input_spine_data_bucket = _build_fake_s3_bucket(S3_INPUT_SPINE_DATA_BUCKET_NAME, s3_client)
+    input_ods_metadata_bucket = _build_fake_s3_bucket(S3_INPUT_ODS_METADATA_BUCKET_NAME, s3_client)
+
+    _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir)
+    # _upload_file_to_ods_metadata_bucket(
+    #     input_ods_metadata_bucket,
+    #     "2019-12-organisationMetadata.json",
+    #     "v3/2019/12/organisationMetadata.json",
+    #     datadir,
+    # )
+
+    _upload_file_to_ods_metadata_bucket(
+        input_ods_metadata_bucket,
+        "2020-01-organisationMetadata.json",
+        "v3/2020/1/organisationMetadata.json",
+        datadir,
+    )
+
+    try:
+        environ["START_DATETIME"] = "2020-01-02T00:00:00Z"
+        environ["END_DATETIME"] = "2020-01-03T00:00:00Z"
+        environ["CONVERSATION_CUTOFF_DAYS"] = "14"
+
+        main()
+
+        expected_transfers_output_key = "transfers.parquet"
+        expected_metadata = {
+            "cutoff-days": "14",
+            "build-tag": "abc456",
+            "start-datetime": "2020-01-02T00:00:00+00:00",
+            "end-datetime": "2020-01-03T00:00:00+00:00",
+            "ods-metadata-month": "2020-1",
+        }
+        year = "2020"
+        month = "01"
+        day = "02"
+
+        expected_transfers = _read_parquet_columns_json(
+            datadir / "expected_outputs" / f"{year}-{month}-{day}-transferParquet.json"
+        )
+
+        s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
+        s3_output_path = f"v8/cutoff-14/{year}/{month}/{day}/{s3_filename}"
 
         actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 

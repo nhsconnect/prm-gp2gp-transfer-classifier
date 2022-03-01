@@ -1,4 +1,7 @@
+from datetime import datetime
 from typing import Dict, Iterator, Tuple
+
+from dateutil.relativedelta import relativedelta
 
 from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
 from prmdata.domain.ods_portal.organisation_metadata import OrganisationMetadata
@@ -25,4 +28,11 @@ class OrganisationMetadataMonthly:
         return cls(metadata_dict)
 
     def get_lookup(self, year_month: YearMonth) -> OrganisationLookup:
-        return self._metadata_dict[year_month]
+        try:
+            return self._metadata_dict[year_month]
+        except KeyError:
+            previous_month_datetime = datetime(
+                year=year_month[0], month=year_month[1], day=1
+            ) - relativedelta(months=1)
+            previous_year_month = (previous_month_datetime.year, previous_month_datetime.month)
+            return self._metadata_dict[previous_year_month]

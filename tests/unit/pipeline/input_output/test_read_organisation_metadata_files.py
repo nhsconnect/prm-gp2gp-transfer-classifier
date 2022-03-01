@@ -39,21 +39,37 @@ _S3_URI_ADDITIONAL_MONTH = (
 
 def test_convert_one_organisation_metadata_file_to_organisation_lookup():
     s3_manager = Mock()
+    s3_manager.read_json.return_value = _ORGANISATION_METADATA_DICT_FIRST_MONTH
 
     transfer_classifier_io = TransferClassifierIO(s3_data_manager=s3_manager)
-
-    s3_manager.read_json.return_value = _ORGANISATION_METADATA_DICT_FIRST_MONTH
 
     actual_metadatas = transfer_classifier_io.read_ods_metadata_files(s3_uris=[_S3_URI])
     actual_organisation_lookup = actual_metadatas.get_lookup(_DATE_ANCHOR_YEAR_MONTH)
 
-    expected_first_month_practices = [
-        PracticeDetails(ods_code="ABC", name="A Practice", asids=["123"])
-    ]
-    expected_first_month_ccgs = [CcgDetails(ods_code="XYZ", name="A CCG", practices=["ABC"])]
-    expected_organisation_lookup = OrganisationLookup(
-        expected_first_month_practices, expected_first_month_ccgs
-    )
+    expected_practices = [PracticeDetails(ods_code="ABC", name="A Practice", asids=["123"])]
+    expected_ccgs = [CcgDetails(ods_code="XYZ", name="A CCG", practices=["ABC"])]
+    expected_organisation_lookup = OrganisationLookup(expected_practices, expected_ccgs)
+
+    assert actual_organisation_lookup.practice_ods_code_from_asid(
+        "123"
+    ) == expected_organisation_lookup.practice_ods_code_from_asid("123")
+
+    s3_manager.read_json.assert_called_once_with(_S3_URI)
+
+
+def test_convert_previous_month_organisation_metadata_file_to_organisation_lookup():
+    s3_manager = Mock()
+    s3_manager.read_json.return_value = _ORGANISATION_METADATA_DICT_FIRST_MONTH
+
+    transfer_classifier_io = TransferClassifierIO(s3_data_manager=s3_manager)
+
+    actual_metadatas = transfer_classifier_io.read_ods_metadata_files(s3_uris=[_S3_URI])
+    NEXT_MONTH_DATE_ANCHOR = (2021, 2)
+    actual_organisation_lookup = actual_metadatas.get_lookup(NEXT_MONTH_DATE_ANCHOR)
+
+    expected_practices = [PracticeDetails(ods_code="ABC", name="A Practice", asids=["123"])]
+    expected_ccgs = [CcgDetails(ods_code="XYZ", name="A CCG", practices=["ABC"])]
+    expected_organisation_lookup = OrganisationLookup(expected_practices, expected_ccgs)
 
     assert actual_organisation_lookup.practice_ods_code_from_asid(
         "123"
@@ -64,17 +80,13 @@ def test_convert_one_organisation_metadata_file_to_organisation_lookup():
 
 def test_convert_two_organisation_metadata_files_to_organisation_lookup_mapping():
     s3_manager = Mock()
-
-    transfer_classifier_io = TransferClassifierIO(s3_data_manager=s3_manager)
-
     s3_manager.read_json.side_effect = [
         _ORGANISATION_METADATA_DICT_FIRST_MONTH,
         _ORGANISATION_METADATA_DICT_ADDITIONAL_MONTH,
     ]
 
-    actual_metadatas = transfer_classifier_io.read_ods_metadata_files(
-        s3_uris=[_S3_URI, _S3_URI_ADDITIONAL_MONTH]
-    )
+    transfer_classifier_io = TransferClassifierIO(s3_data_manager=s3_manager)
+
     expected_first_month_practices = [
         PracticeDetails(ods_code="ABC", name="A Practice", asids=["123"])
     ]
@@ -83,6 +95,9 @@ def test_convert_two_organisation_metadata_files_to_organisation_lookup_mapping(
         expected_first_month_practices, expected_first_month_ccgs
     )
 
+    actual_metadatas = transfer_classifier_io.read_ods_metadata_files(
+        s3_uris=[_S3_URI, _S3_URI_ADDITIONAL_MONTH]
+    )
     actual_first_organisation_lookup = actual_metadatas.get_lookup(_DATE_ANCHOR_YEAR_MONTH)
 
     assert actual_first_organisation_lookup.practice_ods_code_from_asid(

@@ -47,6 +47,7 @@ class TransferClassifier:
         return self._io.read_spine_messages(input_paths)
 
     def _read_most_recent_ods_metadata(self) -> OrganisationMetadataMonthly:
+        input_paths = []
         try:
             input_paths = self._uris.ods_metadata(self._reporting_window.get_dates())
             return self._io.read_ods_metadata_files(input_paths)
@@ -55,6 +56,8 @@ class TransferClassifier:
                 self._reporting_window.get_dates()
             )
             return self._io.read_ods_metadata_files(input_paths)
+        finally:
+            self._ods_metadata_input_paths = input_paths
 
     def _write_transfers(
         self,
@@ -158,6 +161,7 @@ class TransferClassifier:
             "Successfully classified conversations for a date range",
             extra={
                 "event": "CLASSIFIED_CONVERSATIONS_FOR_A_DATE_RANGE",
+                "ods_metadata_s3_paths_used": self._ods_metadata_input_paths,
                 **log_date_range_info,
             },
         )
