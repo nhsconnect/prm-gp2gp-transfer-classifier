@@ -54,3 +54,9 @@ def test_throws_json_file_not_found_exception_when_unable_to_read_file_from_s3()
     with pytest.raises(JsonFileNotFoundException) as e:
         s3_manager.read_json(object_uri)
     assert str(e.value) == "Unable to locate JSON file in S3 uri: " + object_uri
+
+
+def test_json_file_not_found_exception_missing_json_uri_property_returns_uri():
+    object_uri = "s3://test_bucket/test_object.json"
+    actual_exception = JsonFileNotFoundException(object_uri)
+    assert actual_exception.missing_json_uri == object_uri

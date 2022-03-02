@@ -56,6 +56,15 @@ class RunnerObservabilityProbe:
             },
         )
 
+    def log_using_previous_month_ods_metadata(self, missing_json_uri: str):
+        self._logger.info(
+            "Current month ODS metadata not found, falling back to previous month ODS metadata",
+            extra={
+                "event": "USING_PREVIOUS_MONTH_ODS_METADATA",
+                "missing_json_uri": missing_json_uri,
+            },
+        )
+
     def log_successfully_classified(self, ods_metadata_input_paths: List[str]):
         module_logger.info(
             "Successfully classified conversations for a date range",
@@ -102,6 +111,8 @@ class TransferClassifier:
             input_paths = self._uris.ods_metadata_using_previous_month(
                 self._reporting_window.get_dates()
             )
+            missing_json_uri = str(JsonFileNotFoundException.missing_json_uri)
+            self._runner_observability_probe.log_using_previous_month_ods_metadata(missing_json_uri)
             return self._io.read_ods_metadata_files(input_paths)
         finally:
             self._ods_metadata_input_paths = input_paths

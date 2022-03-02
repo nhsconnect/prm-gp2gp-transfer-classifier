@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 
 class JsonFileNotFoundException(Exception):
     def __init__(self, object_uri: str):
+        self._object_uri = object_uri
         super().__init__("Unable to locate JSON file in S3 uri: " + object_uri)
+
+    @property
+    def missing_json_uri(self) -> str:
+        return self._object_uri
 
 
 class S3DataManager:
