@@ -1,15 +1,11 @@
-import logging
 from datetime import datetime, timedelta
-from typing import Dict, Iterator
+from logging import Logger, getLogger
+from typing import Dict, Iterator, List
 
 import boto3
 
 from prmdata.domain.gp2gp.transfer import Transfer
-from prmdata.domain.gp2gp.transfer_service import (
-    TransferObservabilityProbe,
-    TransferService,
-    module_logger,
-)
+from prmdata.domain.gp2gp.transfer_service import TransferService, TransferServiceObservabilityProbe
 from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_day
@@ -20,7 +16,55 @@ from prmdata.pipeline.s3_uri_resolver import TransferClassifierS3UriResolver
 from prmdata.utils.date_converter import convert_to_datetime_string, convert_to_datetimes_string
 from prmdata.utils.input_output.s3 import JsonFileNotFoundException, S3DataManager
 
-logger = logging.getLogger(__name__)
+module_logger = getLogger(__name__)
+
+
+class RunnerObservabilityProbe:
+    def __init__(
+        self,
+        config: TransferClassifierConfig,
+        reporting_window: ReportingWindow,
+        logger: Logger = module_logger,
+    ):
+        self._logger = logger
+        self._log_date_range_info = self._construct_json_log_date_range_info(
+            config, reporting_window
+        )
+
+    @staticmethod
+    def _construct_json_log_date_range_info(
+        config: TransferClassifierConfig, reporting_window: ReportingWindow
+    ) -> dict:
+        reporting_window_dates = reporting_window.get_dates()
+        reporting_window_overflow_dates = reporting_window.get_overflow_dates()
+        return {
+            "config_start_datetime": convert_to_datetime_string(config.start_datetime),
+            "config_end_datetime": convert_to_datetime_string(config.end_datetime),
+            "conversation_cutoff": str(config.conversation_cutoff),
+            "reporting_window_dates": convert_to_datetimes_string(reporting_window_dates),
+            "reporting_window_overflow_dates": convert_to_datetimes_string(
+                reporting_window_overflow_dates
+            ),
+        }
+
+    def log_attempting_to_classify(self):
+        self._logger.info(
+            "Attempting to classify conversations for a date range",
+            extra={
+                "event": "ATTEMPTING_CLASSIFY_CONVERSATIONS_FOR_A_DATE_RANGE",
+                **self._log_date_range_info,
+            },
+        )
+
+    def log_successfully_classified(self, ods_metadata_input_paths: List[str]):
+        module_logger.info(
+            "Successfully classified conversations for a date range",
+            extra={
+                "event": "CLASSIFIED_CONVERSATIONS_FOR_A_DATE_RANGE",
+                "ods_metadata_s3_paths_used": ods_metadata_input_paths,
+                **self._log_date_range_info,
+            },
+        )
 
 
 class TransferClassifier:
@@ -41,6 +85,9 @@ class TransferClassifier:
         )
 
         self._io = TransferClassifierIO(s3_manager)
+        self._runner_observability_probe = RunnerObservabilityProbe(
+            self._config, self._reporting_window
+        )
 
     def _read_spine_messages(self) -> Iterator[Message]:
         input_paths = self._uris.spine_messages(self._reporting_window)
@@ -83,38 +130,19 @@ class TransferClassifier:
         )
         self._io.write_transfers_deprecated(transfers, output_path, metadata)
 
-    def _construct_json_log_date_range_info(self) -> dict:
-        reporting_window_dates = self._reporting_window.get_dates()
-        reporting_window_overflow_dates = self._reporting_window.get_overflow_dates()
-        return {
-            "config_start_datetime": convert_to_datetime_string(self._config.start_datetime),
-            "config_end_datetime": convert_to_datetime_string(self._config.end_datetime),
-            "conversation_cutoff": str(self._config.conversation_cutoff),
-            "reporting_window_dates": convert_to_datetimes_string(reporting_window_dates),
-            "reporting_window_overflow_dates": convert_to_datetimes_string(
-                reporting_window_overflow_dates
-            ),
-        }
-
     def run(self):
-        transfer_observability_probe = TransferObservabilityProbe(logger=module_logger)
-
-        log_date_range_info = self._construct_json_log_date_range_info()
-        logger.info(
-            "Attempting to classify conversations for a date range",
-            extra={
-                "event": "ATTEMPTING_CLASSIFY_CONVERSATIONS_FOR_A_DATE_RANGE",
-                **log_date_range_info,
-            },
-        )
+        self._runner_observability_probe.log_attempting_to_classify()
 
         spine_messages = self._read_spine_messages()
         ods_metadata_monthly = self._read_most_recent_ods_metadata()
 
+        transfer_service_observability_probe = TransferServiceObservabilityProbe(
+            logger=module_logger
+        )
         transfer_service = TransferService(
             message_stream=spine_messages,
             cutoff=self._config.conversation_cutoff,
-            observability_probe=transfer_observability_probe,
+            observability_probe=transfer_service_observability_probe,
         )
 
         conversations = transfer_service.group_into_conversations()
@@ -157,12 +185,6 @@ class TransferClassifier:
                     cutoff=self._config.conversation_cutoff,
                     metadata=metadata,
                 )
-
-        logger.info(
-            "Successfully classified conversations for a date range",
-            extra={
-                "event": "CLASSIFIED_CONVERSATIONS_FOR_A_DATE_RANGE",
-                "ods_metadata_s3_paths_used": self._ods_metadata_input_paths,
-                **log_date_range_info,
-            },
+        self._runner_observability_probe.log_successfully_classified(
+            ods_metadata_input_paths=self._ods_metadata_input_paths
         )

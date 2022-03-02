@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from prmdata.domain.gp2gp.transfer_service import TransferObservabilityProbe
+from prmdata.domain.gp2gp.transfer_service import TransferServiceObservabilityProbe
 from tests.builders.common import a_datetime, a_string
 from tests.builders.spine import build_mock_gp2gp_conversation
 
@@ -16,7 +16,7 @@ def test_probe_should_log_warning_given_negative_sla():
     )
     mock_logger = Mock()
 
-    probe = TransferObservabilityProbe(logger=mock_logger)
+    probe = TransferServiceObservabilityProbe(logger=mock_logger)
     probe.record_negative_sla(conversation)
 
     mock_logger.warning.assert_called_once_with(

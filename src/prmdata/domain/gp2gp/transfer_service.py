@@ -17,7 +17,7 @@ from prmdata.domain.spine.message import Message
 module_logger = getLogger(__name__)
 
 
-class TransferObservabilityProbe:
+class TransferServiceObservabilityProbe:
     def __init__(self, logger: Logger = module_logger):
         self._logger = logger
 
@@ -48,7 +48,7 @@ class TransferService:
         self,
         message_stream: Iterable[Message],
         cutoff: timedelta,
-        observability_probe: TransferObservabilityProbe,
+        observability_probe: TransferServiceObservabilityProbe,
     ):
         self._probe = observability_probe
         self._message_stream = message_stream
@@ -153,7 +153,7 @@ def _ignore_messages_sent_after(cutoff: timedelta, messages: List[Message]) -> L
 
 
 def _calculate_sla(
-    conversation: Gp2gpConversation, probe: TransferObservabilityProbe
+    conversation: Gp2gpConversation, probe: TransferServiceObservabilityProbe
 ) -> Optional[timedelta]:
     final_acknowledgement_time = conversation.effective_final_acknowledgement_time()
     request_completed_time = conversation.effective_request_completed_time()
