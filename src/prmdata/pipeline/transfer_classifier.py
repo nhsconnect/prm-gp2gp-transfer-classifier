@@ -115,12 +115,13 @@ class TransferClassifier:
         try:
             input_paths = self._uris.ods_metadata(self._reporting_window.get_dates())
             return self._io.read_ods_metadata_files(input_paths)
-        except JsonFileNotFoundException:
+        except JsonFileNotFoundException as e:
             input_paths = self._uris.ods_metadata_using_previous_month(
                 self._reporting_window.get_dates()
             )
-            missing_json_uri = str(JsonFileNotFoundException.missing_json_uri)
-            self._runner_observability_probe.log_using_previous_month_ods_metadata(missing_json_uri)
+            self._runner_observability_probe.log_using_previous_month_ods_metadata(
+                e.missing_json_uri
+            )
             return self._io.read_ods_metadata_files(input_paths)
         finally:
             self._ods_metadata_input_paths = input_paths
@@ -155,7 +156,9 @@ class TransferClassifier:
         spine_messages = self._read_spine_messages()
         ods_metadata_monthly = self._read_most_recent_ods_metadata()
 
-        conversations = self._transfer_service.group_into_conversations(message_stream=spine_messages)
+        conversations = self._transfer_service.group_into_conversations(
+            message_stream=spine_messages
+        )
         gp2gp_conversations = self._transfer_service.parse_conversations_into_gp2gp_conversations(
             conversations
         )
