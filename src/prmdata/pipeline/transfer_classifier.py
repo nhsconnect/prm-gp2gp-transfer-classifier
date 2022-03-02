@@ -98,6 +98,14 @@ class TransferClassifier:
             self._config, self._reporting_window
         )
 
+        transfer_service_observability_probe = TransferServiceObservabilityProbe(
+            logger=module_logger
+        )
+        self._transfer_service = TransferService(
+            cutoff=self._config.conversation_cutoff,
+            observability_probe=transfer_service_observability_probe,
+        )
+
     def _read_spine_messages(self) -> Iterator[Message]:
         input_paths = self._uris.spine_messages(self._reporting_window)
         return self._io.read_spine_messages(input_paths)
@@ -147,16 +155,8 @@ class TransferClassifier:
         spine_messages = self._read_spine_messages()
         ods_metadata_monthly = self._read_most_recent_ods_metadata()
 
-        transfer_service_observability_probe = TransferServiceObservabilityProbe(
-            logger=module_logger
-        )
-        transfer_service = TransferService(
-            cutoff=self._config.conversation_cutoff,
-            observability_probe=transfer_service_observability_probe,
-        )
-
-        conversations = transfer_service.group_into_conversations(message_stream=spine_messages)
-        gp2gp_conversations = transfer_service.parse_conversations_into_gp2gp_conversations(
+        conversations = self._transfer_service.group_into_conversations(message_stream=spine_messages)
+        gp2gp_conversations = self._transfer_service.parse_conversations_into_gp2gp_conversations(
             conversations
         )
 
@@ -167,7 +167,7 @@ class TransferClassifier:
             organisation_lookup = ods_metadata_monthly.get_lookup(
                 (daily_start_datetime.year, daily_start_datetime.month)
             )
-            transfers = transfer_service.convert_to_transfers(
+            transfers = self._transfer_service.convert_to_transfers(
                 conversations_started_in_reporting_window, organisation_lookup=organisation_lookup
             )
 
