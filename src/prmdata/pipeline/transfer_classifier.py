@@ -123,16 +123,6 @@ class TransferClassifier:
         )
 
         for daily_start_datetime in self._reporting_window.get_dates():
-            metadata = {
-                "cutoff-days": str(self._config.conversation_cutoff.days),
-                "build-tag": self._config.build_tag,
-                "start-datetime": convert_to_datetime_string(daily_start_datetime),
-                "end-datetime": convert_to_datetime_string(
-                    daily_start_datetime + timedelta(days=1)
-                ),
-                "ods-metadata-month": f"{daily_start_datetime.year}-{daily_start_datetime.month}",
-            }
-
             conversations_started_in_reporting_window = filter_conversations_by_day(
                 gp2gp_conversations, daily_start_datetime
             )
@@ -142,6 +132,17 @@ class TransferClassifier:
             transfers = transfer_service.convert_to_transfers(
                 conversations_started_in_reporting_window, organisation_lookup=organisation_lookup
             )
+
+            metadata = {
+                "cutoff-days": str(self._config.conversation_cutoff.days),
+                "build-tag": self._config.build_tag,
+                "start-datetime": convert_to_datetime_string(daily_start_datetime),
+                "end-datetime": convert_to_datetime_string(
+                    daily_start_datetime + timedelta(days=1)
+                ),
+                "ods-metadata-month": f"{organisation_lookup.year}-{organisation_lookup.month}",
+            }
+
             if self._config.add_ods_codes == 1:
                 self._write_transfers(
                     transfers=transfers,

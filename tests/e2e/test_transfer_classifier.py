@@ -345,7 +345,7 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
             "build-tag": "abc456",
             "start-datetime": "2020-02-04T00:00:00+00:00",
             "end-datetime": "2020-02-05T00:00:00+00:00",
-            "ods-metadata-month": "2020-2",
+            "ods-metadata-month": "2020-1",
         }
 
         expected_transfers = _read_parquet_columns_json(
