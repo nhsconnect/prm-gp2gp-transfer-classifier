@@ -1,0 +1,5 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2020-02-04 18:02:29.985 UTC","failed--A12345-second","failed--2","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,1463547281290,NotProvided,NONE,Unknown,SupplierB
+"2020-02-04 18:03:21.908 UTC","failed--A12345-second","failed_1--2","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",1463547281290,123456789123,NotProvided,NONE,SupplierB,Unknown
+"2020-02-04 18:03:23.982 UTC","failed--A12345-second","failed_2--2","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",1463547281290,123456789123,"failed--2",NONE,SupplierB,Unknown
+"2020-02-04 19:41:48.337 UTC","failed--A12345-second","failed_3--2","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,1463547281290,"failed_1--2",30,Unknown,SupplierB

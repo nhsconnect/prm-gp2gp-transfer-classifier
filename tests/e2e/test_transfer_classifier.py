@@ -313,13 +313,17 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
     input_spine_data_bucket = _build_fake_s3_bucket(S3_INPUT_SPINE_DATA_BUCKET_NAME, s3_client)
     input_ods_metadata_bucket = _build_fake_s3_bucket(S3_INPUT_ODS_METADATA_BUCKET_NAME, s3_client)
 
-    _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir)
-    # _upload_file_to_ods_metadata_bucket(
-    #     input_ods_metadata_bucket,
-    #     "2019-12-organisationMetadata.json",
-    #     "v3/2019/12/organisationMetadata.json",
-    #     datadir,
-    # )
+    year = "2020"
+    month = "02"
+    day = "04"
+
+    input_csv_gz = read_file_to_gzip_buffer(
+        datadir / "inputs" / f"{year}-{month}-{day}-spine_messages.csv"
+    )
+    input_spine_data_bucket.upload_fileobj(
+        input_csv_gz,
+        _get_s3_path(year, month, day),
+    )
 
     _upload_file_to_ods_metadata_bucket(
         input_ods_metadata_bucket,
@@ -329,30 +333,27 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
     )
 
     try:
-        environ["START_DATETIME"] = "2020-01-02T00:00:00Z"
-        environ["END_DATETIME"] = "2020-01-03T00:00:00Z"
-        environ["CONVERSATION_CUTOFF_DAYS"] = "14"
+        environ["START_DATETIME"] = "2020-02-04T00:00:00Z"
+        environ["END_DATETIME"] = "2020-02-05T00:00:00Z"
+        environ["CONVERSATION_CUTOFF_DAYS"] = "0"
 
         main()
 
         expected_transfers_output_key = "transfers.parquet"
         expected_metadata = {
-            "cutoff-days": "14",
+            "cutoff-days": "0",
             "build-tag": "abc456",
-            "start-datetime": "2020-01-02T00:00:00+00:00",
-            "end-datetime": "2020-01-03T00:00:00+00:00",
-            "ods-metadata-month": "2020-1",
+            "start-datetime": "2020-02-04T00:00:00+00:00",
+            "end-datetime": "2020-02-05T00:00:00+00:00",
+            "ods-metadata-month": "2020-2",
         }
-        year = "2020"
-        month = "01"
-        day = "02"
 
         expected_transfers = _read_parquet_columns_json(
             datadir / "expected_outputs" / f"{year}-{month}-{day}-transferParquet.json"
         )
 
         s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
-        s3_output_path = f"v8/cutoff-14/{year}/{month}/{day}/{s3_filename}"
+        s3_output_path = f"v8/cutoff-0/{year}/{month}/{day}/{s3_filename}"
 
         actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 
