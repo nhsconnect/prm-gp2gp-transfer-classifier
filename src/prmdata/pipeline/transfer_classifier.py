@@ -151,12 +151,11 @@ class TransferClassifier:
             logger=module_logger
         )
         transfer_service = TransferService(
-            message_stream=spine_messages,
             cutoff=self._config.conversation_cutoff,
             observability_probe=transfer_service_observability_probe,
         )
 
-        conversations = transfer_service.group_into_conversations()
+        conversations = transfer_service.group_into_conversations(message_stream=spine_messages)
         gp2gp_conversations = transfer_service.parse_conversations_into_gp2gp_conversations(
             conversations
         )

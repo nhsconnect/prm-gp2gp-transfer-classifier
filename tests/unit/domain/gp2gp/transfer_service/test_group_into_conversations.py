@@ -18,11 +18,10 @@ def test_produces_correct_conversations():
     expected = [Conversation("abc", [message_one]), Conversation("xyz", [message_two])]
 
     transfer_service = TransferService(
-        message_stream=messages,
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
-    actual = transfer_service.group_into_conversations()
+    actual = transfer_service.group_into_conversations(message_stream=messages)
 
     assert list(actual) == expected
 
@@ -35,11 +34,10 @@ def test_produces_correct_messages_within_conversations():
     expected = [Conversation("abc", [message_one, message_two])]
 
     transfer_service = TransferService(
-        message_stream=messages,
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
-    actual = transfer_service.group_into_conversations()
+    actual = transfer_service.group_into_conversations(message_stream=messages)
 
     assert list(actual) == expected
 
@@ -52,11 +50,10 @@ def test_sorts_messages_within_conversations():
     expected = [Conversation("abc", [message_two, message_one])]
 
     transfer_service = TransferService(
-        message_stream=messages,
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
-    actual = transfer_service.group_into_conversations()
+    actual = transfer_service.group_into_conversations(message_stream=messages)
 
     assert list(actual) == expected
 
@@ -78,11 +75,10 @@ def test_rejects_messages_after_cutoff(cutoff_interval, expected_message_ids):
     ]
 
     transfer_service = TransferService(
-        message_stream=messages,
         cutoff=cutoff_interval,
         observability_probe=mock_transfer_observability_probe,
     )
-    conversations = transfer_service.group_into_conversations()
+    conversations = transfer_service.group_into_conversations(message_stream=messages)
 
     actual_message_ids = [m.guid for m in next(conversations).messages]
 

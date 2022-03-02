@@ -46,18 +46,16 @@ class TransferServiceObservabilityProbe:
 class TransferService:
     def __init__(
         self,
-        message_stream: Iterable[Message],
         cutoff: timedelta,
         observability_probe: TransferServiceObservabilityProbe,
     ):
         self._probe = observability_probe
-        self._message_stream = message_stream
         self._cutoff = cutoff
 
-    def group_into_conversations(self) -> Iterator[Conversation]:
+    def group_into_conversations(self, message_stream: Iterable[Message]) -> Iterator[Conversation]:
         conversations: Dict[str, List[Message]] = defaultdict(list)
 
-        for message in self._message_stream:
+        for message in message_stream:
             conversations[message.conversation_id].append(message)
 
         for conversation_id, unordered_messages in conversations.items():

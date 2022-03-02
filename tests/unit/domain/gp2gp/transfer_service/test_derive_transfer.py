@@ -16,7 +16,6 @@ def test_extracts_conversation_id():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -37,7 +36,6 @@ def test_produces_sla_of_successful_conversation():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -59,9 +57,7 @@ def test_logs_negative_sla_warning():
     )
     mock_lookup = Mock()
 
-    transfer_service = TransferService(
-        message_stream=[], cutoff=timedelta(days=14), observability_probe=mock_probe
-    )
+    transfer_service = TransferService(cutoff=timedelta(days=14), observability_probe=mock_probe)
 
     transfer_service.derive_transfer(conversation, mock_lookup)
 
@@ -77,9 +73,7 @@ def test_logs_unknown_practice_for_transfer_warning_given_no_sending_practice_od
     mock_lookup = Mock()
     mock_lookup.has_asid_code.return_value = False
 
-    transfer_service = TransferService(
-        message_stream=[], cutoff=timedelta(days=14), observability_probe=mock_probe
-    )
+    transfer_service = TransferService(cutoff=timedelta(days=14), observability_probe=mock_probe)
     transfer_service.derive_transfer(conversation, mock_lookup)
 
     mock_probe.record_no_ods_code_for_asid.assert_any_call(conversation_id, "314135442432")
@@ -94,9 +88,7 @@ def test_logs_unknown_practice_for_transfer_warning_given_no_requesting_practice
     mock_lookup = Mock()
     mock_lookup.has_asid_code.return_value = False
 
-    transfer_service = TransferService(
-        message_stream=[], cutoff=timedelta(days=14), observability_probe=mock_probe
-    )
+    transfer_service = TransferService(cutoff=timedelta(days=14), observability_probe=mock_probe)
     transfer_service.derive_transfer(conversation, mock_lookup)
 
     mock_probe.record_no_ods_code_for_asid.assert_any_call(conversation_id, "12131413535")
@@ -112,7 +104,6 @@ def test_negative_sla_duration_clamped_to_zero():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -130,7 +121,6 @@ def test_produces_no_sla_given_no_request_completed_time():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -150,7 +140,6 @@ def test_produces_no_sla_given_no_final_acknowledgement_time():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -170,7 +159,6 @@ def test_produces_no_sla_given_acks_with_only_duplicate_error():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -201,7 +189,6 @@ def test_produces_sla_given_integration_with_conflicting_acks_and_duplicate_ehrs
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -230,7 +217,6 @@ def test_produces_sla_given_suppression_with_conflicting_acks_and_duplicate_ehrs
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -259,7 +245,6 @@ def test_produces_sla_given_failure_with_conflicting_acks_and_duplicate_ehrs():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -289,7 +274,6 @@ def test_produces_sla_given_integration_with_conflicting_duplicate_and_error_ack
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -319,7 +303,6 @@ def test_produces_sla_given_suppression_with_conflicting_duplicate_and_error_ack
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -344,7 +327,6 @@ def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_trans
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -368,7 +350,6 @@ def test_produces_last_sender_message_timestamp_given_an_integrated_ontime_trans
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -390,7 +371,6 @@ def test_produces_last_sender_message_timestamp_given_core_ehr_sent():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -412,7 +392,6 @@ def test_produces_last_sender_message_timestamp_given_copc_fragment_failure():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -432,7 +411,6 @@ def test_produces_none_as_last_sender_message_timestamp_given_request_made():
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -454,7 +432,6 @@ def test_produces_last_sender_message_timestamp_given_request_acked_successfully
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -478,7 +455,6 @@ def test_produces_last_sender_message_timestamp_from_request_completed_before_in
     mock_lookup = Mock()
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -496,7 +472,6 @@ def test_produces_sending_practice_ods_code_using_organisation_lookup():
     mock_lookup.practice_ods_code_from_asid.return_value = "AB123"
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -514,7 +489,6 @@ def test_produces_requesting_practice_ods_code_using_organisation_lookup():
     mock_lookup.practice_ods_code_from_asid.return_value = "AB123"
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -532,7 +506,6 @@ def test_produces_no_practice_ods_code_using_organisation_lookup_when_no_ods_map
     mock_lookup.practice_ods_code_from_asid.return_value = None
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
@@ -552,7 +525,6 @@ def test_produces_sending_practice_ccg_ods_code_using_organisation_lookup():
     mock_lookup.ccg_ods_code_from_practice_ods_code.return_value = "10A"
 
     transfer_service = TransferService(
-        message_stream=[],
         cutoff=timedelta(days=14),
         observability_probe=mock_transfer_observability_probe,
     )
