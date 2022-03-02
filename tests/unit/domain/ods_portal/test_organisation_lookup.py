@@ -6,10 +6,30 @@ from tests.builders.common import a_string
 from tests.builders.ods_portal import build_ccg_details, build_practice_details
 
 
+def test_year_property_returns_the_year_of_data():
+    organisation_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
+
+    expected = 2020
+
+    actual = organisation_lookup.year
+
+    assert actual == expected
+
+
+def test_month_property_returns_the_month_of_data():
+    organisation_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
+
+    expected = 1
+
+    actual = organisation_lookup.month
+
+    assert actual == expected
+
+
 def test_has_asid_code_returns_false_given_no_matching_practice():
     practices = [build_practice_details(asids=["123"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[])
+    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
     expected = False
 
@@ -21,7 +41,7 @@ def test_has_asid_code_returns_false_given_no_matching_practice():
 def test_has_asid_code_returns_true_given_a_matching_practice():
     practices = [build_practice_details(asids=["123"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[])
+    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
     expected = True
 
@@ -33,7 +53,7 @@ def test_has_asid_code_returns_true_given_a_matching_practice():
 def test_has_asid_code_returns_true_given_a_matching_practice_with_multiple_asid():
     practices = [build_practice_details(asids=["123", "456"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[])
+    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
     expected = True
 
@@ -45,7 +65,7 @@ def test_has_asid_code_returns_true_given_a_matching_practice_with_multiple_asid
 def test_has_asid_code_returns_true_given_multiple_practices():
     practices = [build_practice_details(asids=["123"]), build_practice_details(asids=["456"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[])
+    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
     expected = True
 
@@ -56,7 +76,7 @@ def test_has_asid_code_returns_true_given_multiple_practices():
 
 def test_practice_ods_code_from_asid_returns_none_given_no_practices():
     practices: List[PracticeDetails] = []
-    organisation_lookup = OrganisationLookup(practices, ccgs=[])
+    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
     expected = None
 
@@ -67,7 +87,7 @@ def test_practice_ods_code_from_asid_returns_none_given_no_practices():
 
 def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_with_a_single_asid():
     practice = build_practice_details(asids=["123"], ods_code="ABC")
-    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[])
+    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[], year_month=(2020, 1))
 
     expected = "ABC"
 
@@ -78,7 +98,7 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_wi
 
 def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_with_multiple_asids():
     practice = build_practice_details(asids=["123", "456"], ods_code="ABC")
-    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[])
+    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[], year_month=(2020, 1))
 
     expected = "ABC"
 
@@ -90,7 +110,9 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_wi
 def test_practice_ods_code_from_asid_returns_matching_practice_given_multiple_practices():
     practice_one = build_practice_details(asids=["123"])
     practice_two = build_practice_details(asids=["456"], ods_code="ABC")
-    organisation_lookup = OrganisationLookup(practices=[practice_one, practice_two], ccgs=[])
+    organisation_lookup = OrganisationLookup(
+        practices=[practice_one, practice_two], ccgs=[], year_month=(2020, 1)
+    )
 
     expected = "ABC"
 
@@ -100,7 +122,7 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_multiple_pr
 
 
 def test_ccg_ods_code_from_practice_ods_code_returns_none_given_no_ccgs():
-    practice_lookup = OrganisationLookup(practices=[], ccgs=[])
+    practice_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
 
     expected = None
 
@@ -111,7 +133,7 @@ def test_ccg_ods_code_from_practice_ods_code_returns_none_given_no_ccgs():
 
 def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg():
     ccg = build_ccg_details(practices=["A123"], ods_code="12A")
-    practice_lookup = OrganisationLookup(practices=[], ccgs=[ccg])
+    practice_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
 
     expected = "12A"
 
@@ -122,7 +144,7 @@ def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg():
 
 def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg_with_multiple_practices():
     ccg = build_ccg_details(practices=["B3432", a_string(), a_string()], ods_code="3W")
-    practice_lookup = OrganisationLookup(practices=[], ccgs=[ccg])
+    practice_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
 
     expected = "3W"
 
@@ -134,7 +156,7 @@ def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg_with_multiple_
 def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg_given_multiple_ccgs():
     ccg = build_ccg_details(practices=["A2431"], ods_code="42C")
     practice_lookup = OrganisationLookup(
-        practices=[], ccgs=[build_ccg_details(), build_ccg_details(), ccg]
+        practices=[], ccgs=[build_ccg_details(), build_ccg_details(), ccg], year_month=(2020, 1)
     )
 
     expected = "42C"

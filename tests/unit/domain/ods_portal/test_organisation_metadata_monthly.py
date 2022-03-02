@@ -29,19 +29,15 @@ def test_from_list_of_data_returns_dict_of_organisation_metadata():
     expected_first_month_ccgs = [CcgDetails(ods_code="12A", name="CCG", practices=["A12345"])]
     expected_second_month_ccgs = [CcgDetails(ods_code="22A", name="CCG", practices=["A12345"])]
     expected_first_month_lookup = OrganisationLookup(
-        expected_first_month_practices, expected_first_month_ccgs
+        expected_first_month_practices, expected_first_month_ccgs, year_month=(2020, 6)
     )
     expected_second_month_lookup = OrganisationLookup(
-        expected_second_month_practices, expected_second_month_ccgs
+        expected_second_month_practices, expected_second_month_ccgs, year_month=(2020, 7)
     )
 
     actual_metadatas = OrganisationMetadataMonthly.from_list(list_of_data)
     actual_first_month_lookup = actual_metadatas.get_lookup((2020, 6))
     actual_second_month_lookup = actual_metadatas.get_lookup((2020, 7))
 
-    assert actual_first_month_lookup.practice_ods_code_from_asid(
-        "123456789123"
-    ) == expected_first_month_lookup.practice_ods_code_from_asid("123456789123")
-    assert actual_second_month_lookup.practice_ods_code_from_asid(
-        "123456789123"
-    ) == expected_second_month_lookup.practice_ods_code_from_asid("123456789123")
+    assert actual_first_month_lookup.month == expected_first_month_lookup.month
+    assert actual_second_month_lookup.month == expected_second_month_lookup.month

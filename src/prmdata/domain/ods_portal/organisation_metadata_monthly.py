@@ -1,14 +1,10 @@
 from datetime import datetime
-from typing import Dict, Iterator, Tuple
+from typing import Dict, Iterator
 
 from dateutil.relativedelta import relativedelta
 
-from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
+from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup, YearMonth
 from prmdata.domain.ods_portal.organisation_metadata import OrganisationMetadata
-
-YearNumber = int
-MonthNumber = int
-YearMonth = Tuple[YearNumber, MonthNumber]
 
 
 class OrganisationMetadataMonthly:
@@ -22,7 +18,7 @@ class OrganisationMetadataMonthly:
             organisation_metadata = OrganisationMetadata.from_dict(data)
             year_month = (organisation_metadata.year, organisation_metadata.month)
             organisation_lookup = OrganisationLookup(
-                organisation_metadata.practices, organisation_metadata.ccgs
+                organisation_metadata.practices, organisation_metadata.ccgs, year_month=year_month
             )
             metadata_dict[year_month] = organisation_lookup
         return cls(metadata_dict)
