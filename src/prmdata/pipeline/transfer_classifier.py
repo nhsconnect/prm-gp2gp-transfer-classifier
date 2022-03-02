@@ -57,7 +57,7 @@ class RunnerObservabilityProbe:
         )
 
     def log_using_previous_month_ods_metadata(self, missing_json_uri: str):
-        self._logger.info(
+        self._logger.warning(
             "Current month ODS metadata not found, falling back to previous month ODS metadata",
             extra={
                 "event": "USING_PREVIOUS_MONTH_ODS_METADATA",
@@ -66,7 +66,7 @@ class RunnerObservabilityProbe:
         )
 
     def log_successfully_classified(self, ods_metadata_input_paths: List[str]):
-        module_logger.info(
+        self._logger.info(
             "Successfully classified conversations for a date range",
             extra={
                 "event": "CLASSIFIED_CONVERSATIONS_FOR_A_DATE_RANGE",
