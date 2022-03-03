@@ -4,7 +4,7 @@ from typing import Dict, Iterable, Iterator, List
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
-from prmdata.pipeline.arrow import convert_transfers_to_table, convert_transfers_to_table_deprecated
+from prmdata.pipeline.arrow import convert_transfers_to_table
 from prmdata.utils.input_output.s3 import S3DataManager
 
 logger = logging.getLogger(__name__)
@@ -22,15 +22,6 @@ class TransferClassifierIO:
     def write_transfers(self, transfers: Iterable[Transfer], s3_uri: str, metadata: Dict[str, str]):
         self._s3_manager.write_parquet(
             table=convert_transfers_to_table(transfers),
-            object_uri=s3_uri,
-            metadata=metadata,
-        )
-
-    def write_transfers_deprecated(
-        self, transfers: Iterable[Transfer], s3_uri: str, metadata: Dict[str, str]
-    ):
-        self._s3_manager.write_parquet(
-            table=convert_transfers_to_table_deprecated(transfers),
             object_uri=s3_uri,
             metadata=metadata,
         )
