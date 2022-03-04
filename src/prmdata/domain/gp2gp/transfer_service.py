@@ -112,21 +112,19 @@ class TransferService:
     def derive_transfer(
         self, conversation: Gp2gpConversation, organisation_lookup: OrganisationLookup
     ) -> Transfer:
-        sla_duration = _calculate_sla(conversation, self._probe)
-        requesting_practice_asid = conversation.requesting_practice_asid()
-        sending_practice_asid = conversation.sending_practice_asid()
         conversation_id = conversation.conversation_id()
+        sla_duration = _calculate_sla(conversation, self._probe)
         return Transfer(
-            conversation_id=conversation.conversation_id(),
+            conversation_id=conversation_id,
             sla_duration=sla_duration,
             requesting_practice=self._create_practice(
-                asid=requesting_practice_asid,
+                asid=conversation.requesting_practice_asid(),
                 supplier=conversation.requesting_supplier(),
                 conversation_id=conversation_id,
                 organisation_lookup=organisation_lookup,
             ),
             sending_practice=self._create_practice(
-                asid=sending_practice_asid,
+                asid=conversation.sending_practice_asid(),
                 supplier=conversation.sending_supplier(),
                 conversation_id=conversation_id,
                 organisation_lookup=organisation_lookup,
