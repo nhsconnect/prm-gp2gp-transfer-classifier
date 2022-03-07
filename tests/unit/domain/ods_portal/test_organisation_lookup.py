@@ -121,6 +121,20 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_multiple_pr
     assert actual == expected
 
 
+def test_returns_practice_from_asid():
+    practice_one = build_practice_metadata(asids=["123"])
+    practice_two = build_practice_metadata(asids=["456"], ods_code="ABC", name="Practice 2")
+    organisation_lookup = OrganisationLookup(
+        practices=[practice_one, practice_two], ccgs=[], year_month=(2020, 1)
+    )
+
+    expected = practice_two.name
+
+    actual = organisation_lookup.practice_name_from_asid("456")
+
+    assert actual == expected
+
+
 def test_ccg_ods_code_from_practice_ods_code_returns_none_given_no_ccgs():
     practice_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
 
