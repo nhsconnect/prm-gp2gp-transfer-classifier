@@ -1,9 +1,9 @@
 from typing import List
 
 from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
-from prmdata.domain.ods_portal.organisation_metadata import PracticeDetails
+from prmdata.domain.ods_portal.organisation_metadata import PracticeMetadata
 from tests.builders.common import a_string
-from tests.builders.ods_portal import build_ccg_details, build_practice_details
+from tests.builders.ods_portal import build_ccg_details, build_practice_metadata
 
 
 def test_year_property_returns_the_year_of_data():
@@ -27,7 +27,7 @@ def test_month_property_returns_the_month_of_data():
 
 
 def test_has_asid_code_returns_false_given_no_matching_practice():
-    practices = [build_practice_details(asids=["123"])]
+    practices = [build_practice_metadata(asids=["123"])]
 
     organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
@@ -39,7 +39,7 @@ def test_has_asid_code_returns_false_given_no_matching_practice():
 
 
 def test_has_asid_code_returns_true_given_a_matching_practice():
-    practices = [build_practice_details(asids=["123"])]
+    practices = [build_practice_metadata(asids=["123"])]
 
     organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
@@ -51,7 +51,7 @@ def test_has_asid_code_returns_true_given_a_matching_practice():
 
 
 def test_has_asid_code_returns_true_given_a_matching_practice_with_multiple_asid():
-    practices = [build_practice_details(asids=["123", "456"])]
+    practices = [build_practice_metadata(asids=["123", "456"])]
 
     organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
@@ -63,7 +63,7 @@ def test_has_asid_code_returns_true_given_a_matching_practice_with_multiple_asid
 
 
 def test_has_asid_code_returns_true_given_multiple_practices():
-    practices = [build_practice_details(asids=["123"]), build_practice_details(asids=["456"])]
+    practices = [build_practice_metadata(asids=["123"]), build_practice_metadata(asids=["456"])]
 
     organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
@@ -75,7 +75,7 @@ def test_has_asid_code_returns_true_given_multiple_practices():
 
 
 def test_practice_ods_code_from_asid_returns_none_given_no_practices():
-    practices: List[PracticeDetails] = []
+    practices: List[PracticeMetadata] = []
     organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
 
     expected = None
@@ -86,7 +86,7 @@ def test_practice_ods_code_from_asid_returns_none_given_no_practices():
 
 
 def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_with_a_single_asid():
-    practice = build_practice_details(asids=["123"], ods_code="ABC")
+    practice = build_practice_metadata(asids=["123"], ods_code="ABC")
     organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[], year_month=(2020, 1))
 
     expected = "ABC"
@@ -97,7 +97,7 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_wi
 
 
 def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_with_multiple_asids():
-    practice = build_practice_details(asids=["123", "456"], ods_code="ABC")
+    practice = build_practice_metadata(asids=["123", "456"], ods_code="ABC")
     organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[], year_month=(2020, 1))
 
     expected = "ABC"
@@ -108,8 +108,8 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_wi
 
 
 def test_practice_ods_code_from_asid_returns_matching_practice_given_multiple_practices():
-    practice_one = build_practice_details(asids=["123"])
-    practice_two = build_practice_details(asids=["456"], ods_code="ABC")
+    practice_one = build_practice_metadata(asids=["123"])
+    practice_two = build_practice_metadata(asids=["456"], ods_code="ABC")
     organisation_lookup = OrganisationLookup(
         practices=[practice_one, practice_two], ccgs=[], year_month=(2020, 1)
     )
@@ -121,7 +121,7 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_multiple_pr
     assert actual == expected
 
 
-def test_returns_practice_from_asid():
+def test_returns_practice_name_from_asid():
     practice_one = build_practice_metadata(asids=["123"])
     practice_two = build_practice_metadata(asids=["456"], ods_code="ABC", name="Practice 2")
     organisation_lookup = OrganisationLookup(

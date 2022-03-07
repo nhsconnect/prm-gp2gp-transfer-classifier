@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from prmdata.domain.ods_portal.organisation_metadata import (
-    CcgDetails,
+    CcgMetadata,
     OrganisationMetadata,
-    PracticeDetails,
+    PracticeMetadata,
 )
 
 
@@ -49,9 +49,9 @@ def test_from_dict_returns_list_with_one_practice_and_one_ccg():
     }
 
     expected_practices = [
-        PracticeDetails(asids=["123456789123"], ods_code="A12345", name="GP Practice")
+        PracticeMetadata(asids=["123456789123"], ods_code="A12345", name="GP Practice")
     ]
-    expected_ccgs = [CcgDetails(ods_code="12A", name="CCG", practices=["A12345"])]
+    expected_ccgs = [CcgMetadata(ods_code="12A", name="CCG", practices=["A12345"])]
     actual = OrganisationMetadata.from_dict(data)
 
     assert actual.practices == expected_practices
@@ -76,14 +76,14 @@ def test_from_dict_returns_list_with_multiple_practices_and_ccgs():
     }
 
     expected_practices = [
-        PracticeDetails(asids=["223456789123"], ods_code="A12345", name="GP Practice"),
-        PracticeDetails(asids=["323456789123"], ods_code="B12345", name="GP Practice 2"),
-        PracticeDetails(asids=["423456789123"], ods_code="C12345", name="GP Practice 3"),
+        PracticeMetadata(asids=["223456789123"], ods_code="A12345", name="GP Practice"),
+        PracticeMetadata(asids=["323456789123"], ods_code="B12345", name="GP Practice 2"),
+        PracticeMetadata(asids=["423456789123"], ods_code="C12345", name="GP Practice 3"),
     ]
     expected_ccgs = [
-        CcgDetails(ods_code="12A", name="CCG", practices=["A12345"]),
-        CcgDetails(ods_code="34A", name="CCG 2", practices=["B12345"]),
-        CcgDetails(ods_code="56A", name="CCG 3", practices=["C12345"]),
+        CcgMetadata(ods_code="12A", name="CCG", practices=["A12345"]),
+        CcgMetadata(ods_code="34A", name="CCG 2", practices=["B12345"]),
+        CcgMetadata(ods_code="56A", name="CCG 3", practices=["C12345"]),
     ]
     actual = OrganisationMetadata.from_dict(data)
 

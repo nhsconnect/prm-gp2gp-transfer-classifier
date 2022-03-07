@@ -1,6 +1,7 @@
 from typing import List, Optional, Tuple
 
-from prmdata.domain.ods_portal.organisation_metadata import CcgDetails, PracticeDetails
+from prmdata.domain.gp2gp.transfer import Practice
+from prmdata.domain.ods_portal.organisation_metadata import CcgMetadata, PracticeMetadata
 
 YearNumber = int
 MonthNumber = int
@@ -9,7 +10,7 @@ YearMonth = Tuple[YearNumber, MonthNumber]
 
 class OrganisationLookup:
     def __init__(
-        self, practices: List[PracticeDetails], ccgs: List[CcgDetails], year_month: YearMonth
+        self, practices: List[PracticeMetadata], ccgs: List[CcgMetadata], year_month: YearMonth
     ):
         self._asid_to_practice_ods_mapping = {
             asid: practice.ods_code for practice in practices for asid in practice.asids

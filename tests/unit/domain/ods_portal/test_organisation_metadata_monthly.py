@@ -1,5 +1,5 @@
 from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
-from prmdata.domain.ods_portal.organisation_metadata import CcgDetails, PracticeDetails
+from prmdata.domain.ods_portal.organisation_metadata import CcgMetadata, PracticeMetadata
 from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 
 
@@ -21,13 +21,13 @@ def test_from_list_of_data_returns_dict_of_organisation_metadata():
     list_of_data = iter([first_month_data, second_month_data])
 
     expected_first_month_practices = [
-        PracticeDetails(ods_code="A12345", name="GP Practice", asids=["123456789123"])
+        PracticeMetadata(ods_code="A12345", name="GP Practice", asids=["123456789123"])
     ]
     expected_second_month_practices = [
-        PracticeDetails(ods_code="ABC543", name="GP Practice", asids=["123456789123"])
+        PracticeMetadata(ods_code="ABC543", name="GP Practice", asids=["123456789123"])
     ]
-    expected_first_month_ccgs = [CcgDetails(ods_code="12A", name="CCG", practices=["A12345"])]
-    expected_second_month_ccgs = [CcgDetails(ods_code="22A", name="CCG", practices=["A12345"])]
+    expected_first_month_ccgs = [CcgMetadata(ods_code="12A", name="CCG", practices=["A12345"])]
+    expected_second_month_ccgs = [CcgMetadata(ods_code="22A", name="CCG", practices=["A12345"])]
     expected_first_month_lookup = OrganisationLookup(
         expected_first_month_practices, expected_first_month_ccgs, year_month=(2020, 6)
     )
