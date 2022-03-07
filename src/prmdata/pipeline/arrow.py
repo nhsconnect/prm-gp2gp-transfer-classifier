@@ -81,6 +81,7 @@ def _transfer_columns():
         ),
         Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice.asid),
         Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice.ods_code),
+        Column("sending_practice_name", pa.string(), lambda t: t.sending_practice.name),
         Column(
             "sending_practice_ccg_ods_code", pa.string(), lambda t: t.sending_practice.ccg_ods_code
         ),

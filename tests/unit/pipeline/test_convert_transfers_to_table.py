@@ -278,6 +278,7 @@ def test_table_has_correct_schema():
             ("requesting_practice_ccg_ods_code", pa.string()),
             ("sending_practice_asid", pa.string()),
             ("sending_practice_ods_code", pa.string()),
+            ("sending_practice_name", pa.string()),
             ("sending_practice_ccg_ods_code", pa.string()),
             ("requesting_supplier", pa.string()),
             ("sending_supplier", pa.string()),

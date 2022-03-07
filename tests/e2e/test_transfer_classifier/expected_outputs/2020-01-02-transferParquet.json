@@ -38,6 +38,9 @@
     "sending_practice_ods_code": [
         "A32452"
     ],
+    "sending_practice_name": [
+        "Test GP Practice with a failed transfer"
+    ],
     "sending_practice_ccg_ods_code": [
         null
     ],
