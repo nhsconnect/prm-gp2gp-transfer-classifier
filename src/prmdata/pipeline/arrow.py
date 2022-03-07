@@ -79,12 +79,18 @@ def _transfer_columns():
             pa.string(),
             lambda t: t.requesting_practice.ccg_ods_code,
         ),
+        Column(
+            "requesting_practice_ccg_name",
+            pa.string(),
+            lambda t: t.requesting_practice.ccg_name,
+        ),
         Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice.asid),
         Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice.ods_code),
         Column("sending_practice_name", pa.string(), lambda t: t.sending_practice.name),
         Column(
             "sending_practice_ccg_ods_code", pa.string(), lambda t: t.sending_practice.ccg_ods_code
         ),
+        Column("sending_practice_ccg_name", pa.string(), lambda t: t.sending_practice.ccg_name),
         Column("requesting_supplier", pa.string(), lambda t: t.requesting_practice.supplier),
         Column("sending_supplier", pa.string(), lambda t: t.sending_practice.supplier),
         Column("sender_error_codes", _int_list(), lambda t: t.sender_error_codes),

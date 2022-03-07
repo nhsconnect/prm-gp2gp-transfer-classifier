@@ -56,19 +56,19 @@
         "G54637"
       ]
     },
-        {
-      "ods_code": "3D",
-      "name": "Test CCG",
-      "practices": [
-        "B34232"
-      ]
-    },
      {
       "ods_code": "11B",
       "name": "Another Test CCG",
       "practices": [
         "B54332",
         "H49524"
+      ]
+    },
+    {
+      "ods_code": "3D",
+      "name": "Test CCG 3",
+      "practices": [
+        "B34232"
       ]
     }
   ]

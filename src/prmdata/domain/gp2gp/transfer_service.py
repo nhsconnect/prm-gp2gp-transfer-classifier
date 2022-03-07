@@ -105,13 +105,24 @@ class TransferService:
         if not organisation_lookup.has_asid_code(asid):
             self._probe.record_no_ods_code_for_asid(conversation_id, asid)
             return Practice(
-                asid=asid, supplier=supplier, ods_code=None, ccg_ods_code=None, name=None
+                asid=asid,
+                supplier=supplier,
+                ods_code=None,
+                ccg_ods_code=None,
+                name=None,
+                ccg_name=None,
             )
         ods_code = organisation_lookup.practice_ods_code_from_asid(asid)
         name = organisation_lookup.practice_name_from_asid(asid)
         ccg_ods_code = organisation_lookup.ccg_ods_code_from_practice_ods_code(ods_code)
+        ccg_name = organisation_lookup.ccg_name_from_ods_code(ods_code)
         return Practice(
-            asid=asid, supplier=supplier, ods_code=ods_code, ccg_ods_code=ccg_ods_code, name=name
+            asid=asid,
+            supplier=supplier,
+            ods_code=ods_code,
+            ccg_ods_code=ccg_ods_code,
+            name=name,
+            ccg_name=ccg_name,
         )
 
     def derive_transfer(

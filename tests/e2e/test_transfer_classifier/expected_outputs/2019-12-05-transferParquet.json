@@ -35,6 +35,10 @@
         "11B",
         "11B"
     ],
+    "requesting_practice_ccg_name": [
+        "Another Test CCG",
+        "Another Test CCG"
+    ],
     "requesting_supplier": [
         "SupplierC",
         "SupplierC"
@@ -55,9 +59,13 @@
         "Test GP Practice B",
         "Test GP Practice B"
     ],
-      "sending_practice_ccg_ods_code": [
+    "sending_practice_ccg_ods_code": [
         "3D",
         "3D"
+    ],
+    "sending_practice_ccg_name": [
+        "Test CCG 3",
+        "Test CCG 3"
     ],
     "sending_supplier": [
         "SupplierA",

@@ -26,6 +26,9 @@
     "requesting_practice_ccg_ods_code": [
         "10D"
     ],
+    "requesting_practice_ccg_name": [
+        "Test CCG"
+    ],
     "requesting_supplier": [
         ""
     ],
@@ -41,8 +44,11 @@
     "sending_practice_ods_code": [
         "B34232"
     ],
-      "sending_practice_ccg_ods_code": [
+    "sending_practice_ccg_ods_code": [
         "3D"
+    ],
+    "sending_practice_ccg_name": [
+        "Test CCG 3"
     ],
     "sending_supplier": [
         ""

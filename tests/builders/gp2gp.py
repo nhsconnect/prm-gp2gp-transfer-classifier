@@ -19,6 +19,7 @@ def build_practice(**kwargs) -> Practice:
         ods_code=kwargs.get("ods_code", a_string(4)),
         name=kwargs.get("name", a_string(15)),
         ccg_ods_code=kwargs.get("ccg_ods_code", a_string(4)),
+        ccg_name=kwargs.get("ccg_name", a_string(15)),
     )
 
 

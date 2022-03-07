@@ -26,6 +26,9 @@
     "requesting_practice_ccg_ods_code": [
         "11B"
     ],
+    "requesting_practice_ccg_name": [
+        "Another Test CCG"
+    ],
     "requesting_supplier": [
         "SupplierA"
     ],
@@ -43,6 +46,9 @@
     ],
     "sending_practice_ccg_ods_code": [
         "3D"
+    ],
+    "sending_practice_ccg_name": [
+        "Test CCG 3"
     ],
     "sending_supplier": [
         "SupplierB"

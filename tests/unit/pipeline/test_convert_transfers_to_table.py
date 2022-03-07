@@ -112,6 +112,17 @@ def test_requesting_practice_ccg_ods_is_converted_to_column():
     assert actual_ods_column == expected_ods_column
 
 
+def test_requesting_practice_ccg_name_is_converted_to_column():
+    transfer = build_transfer(requesting_practice=build_practice(ccg_name="Testing CCG Name"))
+
+    expected_ccg_name_column = {"requesting_practice_ccg_name": ["Testing CCG Name"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_ods_column = table.select(["requesting_practice_ccg_name"]).to_pydict()
+
+    assert actual_ods_column == expected_ccg_name_column
+
+
 def test_sending_practice_ods_is_converted_to_column():
     transfer = build_transfer(sending_practice=build_practice(ods_code="A12"))
 
@@ -132,6 +143,17 @@ def test_sending_practice_ccg_ods_is_converted_to_column():
     actual_ods_column = table.select(["sending_practice_ccg_ods_code"]).to_pydict()
 
     assert actual_ods_column == expected_ods_column
+
+
+def test_sending_practice_ccg_name_is_converted_to_column():
+    transfer = build_transfer(sending_practice=build_practice(ccg_name="Testing CCG Name"))
+
+    expected_ccg_name_column = {"sending_practice_ccg_name": ["Testing CCG Name"]}
+
+    table = convert_transfers_to_table([transfer])
+    actual_ods_column = table.select(["sending_practice_ccg_name"]).to_pydict()
+
+    assert actual_ods_column == expected_ccg_name_column
 
 
 def test_sender_error_codes_are_converted_to_column():
@@ -276,10 +298,12 @@ def test_table_has_correct_schema():
             ("requesting_practice_ods_code", pa.string()),
             ("requesting_practice_name", pa.string()),
             ("requesting_practice_ccg_ods_code", pa.string()),
+            ("requesting_practice_ccg_name", pa.string()),
             ("sending_practice_asid", pa.string()),
             ("sending_practice_ods_code", pa.string()),
             ("sending_practice_name", pa.string()),
             ("sending_practice_ccg_ods_code", pa.string()),
+            ("sending_practice_ccg_name", pa.string()),
             ("requesting_supplier", pa.string()),
             ("sending_supplier", pa.string()),
             ("sender_error_codes", pa.list_(pa.int64())),

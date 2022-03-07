@@ -26,6 +26,9 @@
     "requesting_practice_ccg_ods_code": [
         null
     ],
+    "requesting_practice_ccg_name": [
+        null
+    ],
     "requesting_supplier": [
         "SupplierB"
     ],
@@ -42,6 +45,9 @@
         "Test GP Practice with a failed transfer"
     ],
     "sending_practice_ccg_ods_code": [
+        null
+    ],
+    "sending_practice_ccg_name": [
         null
     ],
     "sending_supplier": [

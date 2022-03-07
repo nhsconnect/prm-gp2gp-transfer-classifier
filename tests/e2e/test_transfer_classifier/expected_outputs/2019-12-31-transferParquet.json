@@ -35,6 +35,10 @@
         "10D",
         "10D"
     ],
+    "requesting_practice_ccg_name": [
+        "Test CCG",
+        "Test CCG"
+    ],
     "requesting_supplier": [
         "SupplierC",
         "SupplierC"
@@ -58,6 +62,10 @@
     "sending_practice_ccg_ods_code": [
         "3D",
         "3D"
+    ],
+    "sending_practice_ccg_name": [
+        "Test CCG 3",
+        "Test CCG 3"
     ],
     "sending_supplier": [
         "SupplierB",
