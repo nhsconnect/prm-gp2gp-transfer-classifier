@@ -1,0 +1,15 @@
+{
+  "generated_on": "2022-01-15T16:51:21.353977+00:00",
+  "year": 2020,
+  "month": 1,
+  "practices": [
+      {
+      "ods_code": "A32452",
+      "name": "Test GP Practice with a failed transfer",
+      "asids": [
+        "1463547281290"
+      ]
+    }
+  ],
+  "ccgs": []
+}

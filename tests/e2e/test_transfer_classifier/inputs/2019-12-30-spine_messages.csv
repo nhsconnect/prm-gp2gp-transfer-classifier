@@ -1,0 +1,4 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2019-12-30 18:02:29.985 UTC","completed-within-3-days-in-jan--A12345","completed-within-3-days-in-jan--A12345","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,SupplierB,SupplierC
+"2019-12-30 18:03:21.908 UTC","completed-within-3-days-in-jan--A12345","completed-within-3-days-in-jan_1--A12345","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,SupplierC,SupplierB
+"2019-12-30 18:03:23.982 UTC","completed-within-3-days-in-jan--A12345","completed-within-3-days-in-jan_2--A12345","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"completed-within-3-days-in-jan--A12345",NONE,SupplierC,SupplierB

@@ -1,0 +1,60 @@
+{
+    "conversation_id": [
+        "failed--A12345"
+    ],
+    "date_completed": [
+        "2020-01-10T08:41:48.337000"
+    ],
+    "date_requested": [
+        "2020-01-02T18:02:29.985000"
+    ],
+    "final_error_codes": [
+        [30]
+    ],
+    "intermediate_error_codes": [
+        []
+    ],
+    "requesting_practice_asid": [
+        "123456789123"
+    ],
+    "requesting_practice_name": [
+        null
+    ],
+    "requesting_practice_ods_code": [
+        null
+    ],
+    "requesting_practice_ccg_ods_code": [
+        null
+    ],
+    "requesting_supplier": [
+        "SupplierB"
+    ],
+    "sender_error_codes": [
+        [null]
+    ],
+    "sending_practice_asid": [
+        "1463547281290"
+    ],
+    "sending_practice_ods_code": [
+        "A32452"
+    ],
+    "sending_practice_ccg_ods_code": [
+        null
+    ],
+    "sending_supplier": [
+        "Unknown"
+    ],
+    "sla_duration": [
+        657506
+    ],
+    "status": [
+        "Technical failure"
+    ],
+    "failure_reason": [
+        "Final error"
+    ],
+     "last_sender_message_timestamp": [
+         "2020-01-02T18:03:23.982000"
+     ]
+}
+

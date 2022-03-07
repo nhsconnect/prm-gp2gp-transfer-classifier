@@ -108,9 +108,10 @@ class TransferService:
                 asid=asid, supplier=supplier, ods_code=None, ccg_ods_code=None, name=None
             )
         ods_code = organisation_lookup.practice_ods_code_from_asid(asid)
+        name = organisation_lookup.practice_name_from_asid(asid)
         ccg_ods_code = organisation_lookup.ccg_ods_code_from_practice_ods_code(ods_code)
         return Practice(
-            asid=asid, supplier=supplier, ods_code=ods_code, ccg_ods_code=ccg_ods_code, name=None
+            asid=asid, supplier=supplier, ods_code=ods_code, ccg_ods_code=ccg_ods_code, name=name
         )
 
     def derive_transfer(

@@ -1,0 +1,5 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2019-12-20 08:41:48.337 UTC","concluded-beyond-14-day-conversation-cutoff--A12345","integrated-beyond-8-days_3-1--A12345","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,003456789123,"concluded-beyond-14-day-conversation-cutoff-days_1--A12345",NONE,SupplierA,SupplierC
+"2019-12-20 18:02:29.985 UTC","awaiting-integration--A12345","awaiting","urn:nhs:names:services:gp2gp/RCMR_IN010000UK05",123456789123,003456789123,NotProvided,NONE,SupplierB,SupplierA
+"2019-12-20 18:02:30.985 UTC","awaiting-integration--A12345","awaiting-1","urn:nhs:names:services:gp2gp/RCMR_IN030000UK06",003456789123,123456789123,NotProvided,NONE,SupplierA,SupplierB
+"2019-12-20 18:02:31.985 UTC","awaiting-integration--A12345","awaiting-2","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",003456789123,123456789123,"awaiting",NONE,SupplierA,SupplierB

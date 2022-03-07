@@ -138,6 +138,18 @@ class TransferClassifier:
         )
         self._io.write_transfers_deprecated(transfers, output_path, metadata)
 
+    def _write_transfers(
+        self,
+        transfers: Iterator[Transfer],
+        daily_start_datetime: datetime,
+        cutoff: timedelta,
+        metadata: Dict[str, str],
+    ):
+        output_path = self._uris.gp2gp_transfers(
+            daily_start_datetime=daily_start_datetime, cutoff=cutoff
+        )
+        self._io.write_transfers(transfers, output_path, metadata)
+
     def run(self):
         self._runner_observability_probe.log_attempting_to_classify()
 
@@ -172,12 +184,20 @@ class TransferClassifier:
                 "ods-metadata-month": f"{organisation_lookup.year}-{organisation_lookup.month}",
             }
 
-            self._write_transfers_deprecated(
-                transfers=transfers,
-                daily_start_datetime=daily_start_datetime,
-                cutoff=self._config.conversation_cutoff,
-                metadata=metadata,
-            )
+            if self._config.add_name_columns == 1:
+                self._write_transfers(
+                    transfers=transfers,
+                    daily_start_datetime=daily_start_datetime,
+                    cutoff=self._config.conversation_cutoff,
+                    metadata=metadata,
+                )
+            else:
+                self._write_transfers_deprecated(
+                    transfers=transfers,
+                    daily_start_datetime=daily_start_datetime,
+                    cutoff=self._config.conversation_cutoff,
+                    metadata=metadata,
+                )
 
         self._runner_observability_probe.log_successfully_classified(
             ods_metadata_input_paths=self._ods_metadata_input_paths

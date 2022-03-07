@@ -1,0 +1,2 @@
+"_time",conversationID,GUID,interactionID,messageSender,messageRecipient,messageRef,jdiEvent,toSystem,fromSystem
+"2020-01-10 08:41:48.337 UTC","failed--A12345","failed_3","urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",123456789123,1463547281290,"failed_1",30,Unknown,SupplierB
