@@ -104,10 +104,14 @@ class TransferService:
     ):
         if not organisation_lookup.has_asid_code(asid):
             self._probe.record_no_ods_code_for_asid(conversation_id, asid)
-            return Practice(asid=asid, supplier=supplier, ods_code=None, ccg_ods_code=None)
+            return Practice(
+                asid=asid, supplier=supplier, ods_code=None, ccg_ods_code=None, name=None
+            )
         ods_code = organisation_lookup.practice_ods_code_from_asid(asid)
         ccg_ods_code = organisation_lookup.ccg_ods_code_from_practice_ods_code(ods_code)
-        return Practice(asid=asid, supplier=supplier, ods_code=ods_code, ccg_ods_code=ccg_ods_code)
+        return Practice(
+            asid=asid, supplier=supplier, ods_code=ods_code, ccg_ods_code=ccg_ods_code, name=None
+        )
 
     def derive_transfer(
         self, conversation: Gp2gpConversation, organisation_lookup: OrganisationLookup

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from prmdata.domain.gp2gp.transfer import Practice, Transfer
+from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.gp2gp.transfer_outcome import (
     TransferFailureReason,
     TransferOutcome,
@@ -9,7 +9,7 @@ from prmdata.domain.gp2gp.transfer_outcome import (
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.utils.input_output.s3 import S3DataManager
 from tests.builders.common import a_string
-from tests.builders.gp2gp import build_transfer
+from tests.builders.gp2gp import build_practice, build_transfer
 from tests.builders.s3 import MockS3
 
 _SOME_METADATA: dict[str, str] = {}
@@ -23,10 +23,10 @@ def test_write_transfers_correctly_writes_all_fields():
     transfer = Transfer(
         conversation_id="1234",
         sla_duration=timedelta(days=1),
-        requesting_practice=Practice(
+        requesting_practice=build_practice(
             asid="123", supplier="Supplier A", ods_code="A12", ccg_ods_code="11B"
         ),
-        sending_practice=Practice(
+        sending_practice=build_practice(
             asid="456", supplier="Supplier B", ods_code="B12", ccg_ods_code="10A"
         ),
         sender_error_codes=[1, None],

@@ -11,6 +11,7 @@ class Practice:
     supplier: str
     ods_code: Optional[str]
     ccg_ods_code: Optional[str]
+    name: Optional[str]
 
 
 class Transfer(NamedTuple):
@@ -40,6 +41,10 @@ class Transfer(NamedTuple):
     @property
     def requesting_practice_ods_code(self) -> Optional[str]:
         return self.requesting_practice.ods_code
+
+    @property
+    def requesting_practice_name(self) -> Optional[str]:
+        return self.requesting_practice.name
 
     @property
     def requesting_practice_ccg_ods_code(self) -> Optional[str]:

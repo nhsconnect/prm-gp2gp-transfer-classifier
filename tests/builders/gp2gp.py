@@ -12,28 +12,22 @@ THREE_DAYS_IN_SECONDS = 259200
 EIGHT_DAYS_IN_SECONDS = 691200
 
 
+def build_practice(**kwargs) -> Practice:
+    return Practice(
+        asid=kwargs.get("asid", a_string(12)),
+        supplier=kwargs.get("supplier", a_string(12)),
+        ods_code=kwargs.get("ods_code", a_string(4)),
+        name=kwargs.get("name", a_string(15)),
+        ccg_ods_code=kwargs.get("ccg_ods_code", a_string(4)),
+    )
+
+
 def build_transfer(**kwargs) -> Transfer:
     return Transfer(
         conversation_id=kwargs.get("conversation_id", a_string(36)),
         sla_duration=kwargs.get("sla_duration", a_duration()),
-        requesting_practice=kwargs.get(
-            "requesting_practice",
-            Practice(
-                asid=a_string(12),
-                supplier=a_string(12),
-                ods_code=a_string(4),
-                ccg_ods_code=a_string(3),
-            ),
-        ),
-        sending_practice=kwargs.get(
-            "sending_practice",
-            Practice(
-                asid=a_string(12),
-                supplier=a_string(12),
-                ods_code=a_string(4),
-                ccg_ods_code=a_string(3),
-            ),
-        ),
+        requesting_practice=kwargs.get("requesting_practice", build_practice()),
+        sending_practice=kwargs.get("sending_practice", build_practice()),
         sender_error_codes=kwargs.get("sender_error_codes", []),
         final_error_codes=kwargs.get("final_error_codes", []),
         intermediate_error_codes=kwargs.get("intermediate_error_codes", []),
