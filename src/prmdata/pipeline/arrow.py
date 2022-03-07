@@ -34,22 +34,22 @@ def _transfer_columns_deprecated():
     return [
         Column("conversation_id", pa.string(), lambda t: t.conversation_id),
         Column("sla_duration", pa.uint64(), lambda t: t.sla_duration_seconds),
-        Column("requesting_practice_asid", pa.string(), lambda t: t.requesting_practice_asid),
+        Column("requesting_practice_asid", pa.string(), lambda t: t.requesting_practice.asid),
         Column(
-            "requesting_practice_ods_code", pa.string(), lambda t: t.requesting_practice_ods_code
+            "requesting_practice_ods_code", pa.string(), lambda t: t.requesting_practice.ods_code
         ),
         Column(
             "requesting_practice_ccg_ods_code",
             pa.string(),
-            lambda t: t.requesting_practice_ccg_ods_code,
+            lambda t: t.requesting_practice.ccg_ods_code,
         ),
-        Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice_asid),
-        Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice_ods_code),
+        Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice.asid),
+        Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice.ods_code),
         Column(
-            "sending_practice_ccg_ods_code", pa.string(), lambda t: t.sending_practice_ccg_ods_code
+            "sending_practice_ccg_ods_code", pa.string(), lambda t: t.sending_practice.ccg_ods_code
         ),
-        Column("requesting_supplier", pa.string(), lambda t: t.requesting_supplier),
-        Column("sending_supplier", pa.string(), lambda t: t.sending_supplier),
+        Column("requesting_supplier", pa.string(), lambda t: t.requesting_practice.supplier),
+        Column("sending_supplier", pa.string(), lambda t: t.sending_practice.supplier),
         Column("sender_error_codes", _int_list(), lambda t: t.sender_error_codes),
         Column("final_error_codes", _int_list(), lambda t: t.final_error_codes),
         Column("intermediate_error_codes", _int_list(), lambda t: t.intermediate_error_codes),
@@ -69,23 +69,23 @@ def _transfer_columns():
     return [
         Column("conversation_id", pa.string(), lambda t: t.conversation_id),
         Column("sla_duration", pa.uint64(), lambda t: t.sla_duration_seconds),
-        Column("requesting_practice_asid", pa.string(), lambda t: t.requesting_practice_asid),
+        Column("requesting_practice_asid", pa.string(), lambda t: t.requesting_practice.asid),
         Column(
-            "requesting_practice_ods_code", pa.string(), lambda t: t.requesting_practice_ods_code
+            "requesting_practice_ods_code", pa.string(), lambda t: t.requesting_practice.ods_code
         ),
-        Column("requesting_practice_name", pa.string(), lambda t: t.requesting_practice_name),
+        Column("requesting_practice_name", pa.string(), lambda t: t.requesting_practice.name),
         Column(
             "requesting_practice_ccg_ods_code",
             pa.string(),
-            lambda t: t.requesting_practice_ccg_ods_code,
+            lambda t: t.requesting_practice.ccg_ods_code,
         ),
-        Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice_asid),
-        Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice_ods_code),
+        Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice.asid),
+        Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice.ods_code),
         Column(
-            "sending_practice_ccg_ods_code", pa.string(), lambda t: t.sending_practice_ccg_ods_code
+            "sending_practice_ccg_ods_code", pa.string(), lambda t: t.sending_practice.ccg_ods_code
         ),
-        Column("requesting_supplier", pa.string(), lambda t: t.requesting_supplier),
-        Column("sending_supplier", pa.string(), lambda t: t.sending_supplier),
+        Column("requesting_supplier", pa.string(), lambda t: t.requesting_practice.supplier),
+        Column("sending_supplier", pa.string(), lambda t: t.sending_practice.supplier),
         Column("sender_error_codes", _int_list(), lambda t: t.sender_error_codes),
         Column("final_error_codes", _int_list(), lambda t: t.final_error_codes),
         Column("intermediate_error_codes", _int_list(), lambda t: t.intermediate_error_codes),

@@ -35,42 +35,6 @@ class Transfer(NamedTuple):
             return None
 
     @property
-    def requesting_practice_asid(self) -> str:
-        return self.requesting_practice.asid
-
-    @property
-    def requesting_practice_ods_code(self) -> Optional[str]:
-        return self.requesting_practice.ods_code
-
-    @property
-    def requesting_practice_name(self) -> Optional[str]:
-        return self.requesting_practice.name
-
-    @property
-    def requesting_practice_ccg_ods_code(self) -> Optional[str]:
-        return self.requesting_practice.ccg_ods_code
-
-    @property
-    def requesting_supplier(self) -> str:
-        return self.requesting_practice.supplier
-
-    @property
-    def sending_practice_asid(self) -> str:
-        return self.sending_practice.asid
-
-    @property
-    def sending_practice_ods_code(self) -> Optional[str]:
-        return self.sending_practice.ods_code
-
-    @property
-    def sending_practice_ccg_ods_code(self) -> Optional[str]:
-        return self.sending_practice.ccg_ods_code
-
-    @property
-    def sending_supplier(self) -> str:
-        return self.sending_practice.supplier
-
-    @property
     def status_description(self) -> str:
         return self.outcome.status.value
 
