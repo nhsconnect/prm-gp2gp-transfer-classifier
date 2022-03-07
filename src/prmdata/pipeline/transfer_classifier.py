@@ -133,7 +133,7 @@ class TransferClassifier:
         cutoff: timedelta,
         metadata: Dict[str, str],
     ):
-        output_path = self._uris.gp2gp_transfers(
+        output_path = self._uris.gp2gp_transfers_deprecated(
             daily_start_datetime=daily_start_datetime, cutoff=cutoff
         )
         self._io.write_transfers(transfers, output_path, metadata)

@@ -63,7 +63,7 @@ def test_returns_correct_ods_metadata_uris():
     assert actual == expected
 
 
-def test_returns_correct_transfers_uri():
+def test_returns_correct_transfers_uri_deprecated():
     transfers_bucket = a_string()
     daily_start_datetime = a_datetime(year=2021, month=1, day=3)
     cutoff_number_of_days = 2
@@ -78,6 +78,28 @@ def test_returns_correct_transfers_uri():
     expected_filename = "2021-01-03-transfers.parquet"
     expected = (
         f"s3://{transfers_bucket}/v8/cutoff-{cutoff_number_of_days}/2021/01/03/{expected_filename}"
+    )
+
+    actual = uri_resolver.gp2gp_transfers_deprecated(daily_start_datetime, cutoff=conversation_cutoff)
+
+    assert actual == expected
+
+
+def test_returns_correct_transfers_uri():
+    transfers_bucket = a_string()
+    daily_start_datetime = a_datetime(year=2021, month=1, day=3)
+    cutoff_number_of_days = 2
+    conversation_cutoff = timedelta(days=cutoff_number_of_days)
+
+    uri_resolver = TransferClassifierS3UriResolver(
+        gp2gp_spine_bucket=a_string(),
+        transfers_bucket=transfers_bucket,
+        ods_metadata_bucket=a_string(),
+    )
+
+    expected_filename = "2021-01-03-transfers.parquet"
+    expected = (
+        f"s3://{transfers_bucket}/v9/cutoff-{cutoff_number_of_days}/2021/01/03/{expected_filename}"
     )
 
     actual = uri_resolver.gp2gp_transfers(daily_start_datetime, cutoff=conversation_cutoff)
