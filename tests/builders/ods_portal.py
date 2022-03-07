@@ -16,7 +16,7 @@ def build_practice_metadata(**kwargs) -> PracticeMetadata:
     )
 
 
-def build_ccg_details(**kwargs) -> CcgMetadata:
+def build_ccg_metadata(**kwargs) -> CcgMetadata:
     return CcgMetadata(
         ods_code=kwargs.get("ods_code", a_string()),
         name=kwargs.get("name", a_string()),

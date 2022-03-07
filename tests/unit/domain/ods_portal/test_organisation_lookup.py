@@ -3,7 +3,7 @@ from typing import List
 from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
 from prmdata.domain.ods_portal.organisation_metadata import PracticeMetadata
 from tests.builders.common import a_string
-from tests.builders.ods_portal import build_ccg_details, build_practice_metadata
+from tests.builders.ods_portal import build_ccg_metadata, build_practice_metadata
 
 
 def test_year_property_returns_the_year_of_data():
@@ -135,46 +135,58 @@ def test_returns_practice_name_from_asid():
     assert actual == expected
 
 
+def test_returns_ccg_name_from_asid():
+    practice = build_practice_metadata(asids=["456"], ods_code="A123", name="Practice 2")
+    ccg = build_ccg_metadata(practices=["A123"], ods_code="12A", name="A CCG")
+    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[ccg], year_month=(2020, 1))
+
+    expected = ccg.name
+
+    actual = organisation_lookup.ccg_name_from_ods_code("A123")
+
+    assert actual == expected
+
+
 def test_ccg_ods_code_from_practice_ods_code_returns_none_given_no_ccgs():
-    practice_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
 
     expected = None
 
-    actual = practice_lookup.ccg_ods_code_from_practice_ods_code("A123")
+    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("A123")
 
     assert actual == expected
 
 
 def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg():
-    ccg = build_ccg_details(practices=["A123"], ods_code="12A")
-    practice_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
+    ccg = build_ccg_metadata(practices=["A123"], ods_code="12A")
+    organisation_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
 
     expected = "12A"
 
-    actual = practice_lookup.ccg_ods_code_from_practice_ods_code("A123")
+    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("A123")
 
     assert actual == expected
 
 
 def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg_with_multiple_practices():
-    ccg = build_ccg_details(practices=["B3432", a_string(), a_string()], ods_code="3W")
-    practice_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
+    ccg = build_ccg_metadata(practices=["B3432", a_string(), a_string()], ods_code="3W")
+    organisation_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
 
     expected = "3W"
 
-    actual = practice_lookup.ccg_ods_code_from_practice_ods_code("B3432")
+    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("B3432")
 
     assert actual == expected
 
 
 def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg_given_multiple_ccgs():
-    ccg = build_ccg_details(practices=["A2431"], ods_code="42C")
-    practice_lookup = OrganisationLookup(
-        practices=[], ccgs=[build_ccg_details(), build_ccg_details(), ccg], year_month=(2020, 1)
+    ccg = build_ccg_metadata(practices=["A2431"], ods_code="42C")
+    organisation_lookup = OrganisationLookup(
+        practices=[], ccgs=[build_ccg_metadata(), build_ccg_metadata(), ccg], year_month=(2020, 1)
     )
 
     expected = "42C"
 
-    actual = practice_lookup.ccg_ods_code_from_practice_ods_code("A2431")
+    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("A2431")
 
     assert actual == expected
