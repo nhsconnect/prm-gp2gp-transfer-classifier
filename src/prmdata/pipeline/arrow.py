@@ -30,7 +30,7 @@ def _int_list():
     return pa.list_(pa.int64())
 
 
-def _new_transfer_columns():
+def _transfer_columns_deprecated():
     return [
         Column("conversation_id", pa.string(), lambda t: t.conversation_id),
         Column("sla_duration", pa.uint64(), lambda t: t.sla_duration_seconds),
@@ -65,8 +65,8 @@ def _new_transfer_columns():
     ]
 
 
-def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
-    columns = _new_transfer_columns()
+def convert_transfers_to_table_deprecated(transfers: Iterable[Transfer]) -> Table:
+    columns = _transfer_columns_deprecated()
 
     for transfer in transfers:
         for column in columns:

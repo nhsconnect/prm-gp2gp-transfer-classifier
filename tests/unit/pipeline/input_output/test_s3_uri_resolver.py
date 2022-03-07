@@ -80,7 +80,9 @@ def test_returns_correct_transfers_uri_deprecated():
         f"s3://{transfers_bucket}/v8/cutoff-{cutoff_number_of_days}/2021/01/03/{expected_filename}"
     )
 
-    actual = uri_resolver.gp2gp_transfers_deprecated(daily_start_datetime, cutoff=conversation_cutoff)
+    actual = uri_resolver.gp2gp_transfers_deprecated(
+        daily_start_datetime, cutoff=conversation_cutoff
+    )
 
     assert actual == expected
 

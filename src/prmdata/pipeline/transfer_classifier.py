@@ -126,7 +126,7 @@ class TransferClassifier:
         finally:
             self._ods_metadata_input_paths = input_paths
 
-    def _write_transfers(
+    def _write_transfers_deprecated(
         self,
         transfers: Iterator[Transfer],
         daily_start_datetime: datetime,
@@ -136,7 +136,7 @@ class TransferClassifier:
         output_path = self._uris.gp2gp_transfers_deprecated(
             daily_start_datetime=daily_start_datetime, cutoff=cutoff
         )
-        self._io.write_transfers(transfers, output_path, metadata)
+        self._io.write_transfers_deprecated(transfers, output_path, metadata)
 
     def run(self):
         self._runner_observability_probe.log_attempting_to_classify()
@@ -172,7 +172,7 @@ class TransferClassifier:
                 "ods-metadata-month": f"{organisation_lookup.year}-{organisation_lookup.month}",
             }
 
-            self._write_transfers(
+            self._write_transfers_deprecated(
                 transfers=transfers,
                 daily_start_datetime=daily_start_datetime,
                 cutoff=self._config.conversation_cutoff,

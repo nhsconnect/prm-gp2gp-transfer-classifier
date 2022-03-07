@@ -40,7 +40,7 @@ def test_write_transfers_correctly_writes_all_fields():
         last_sender_message_timestamp=None,
     )
 
-    io.write_transfers(
+    io.write_transfers_deprecated(
         transfers=[transfer], s3_uri="s3://a_bucket/some_data.parquet", metadata=_SOME_METADATA
     )
 
@@ -81,7 +81,7 @@ def test_write_transfers_correctly_writes_multiple_rows():
         build_transfer(conversation_id="c"),
     ]
 
-    io.write_transfers(
+    io.write_transfers_deprecated(
         transfers=transfers, s3_uri="s3://a_bucket/multi_row.parquet", metadata=_SOME_METADATA
     )
 
@@ -105,7 +105,7 @@ def test_write_transfers_writes_metadata():
 
     io = TransferClassifierIO(s3_data_manager)
 
-    io.write_transfers(
+    io.write_transfers_deprecated(
         transfers=[build_transfer()], s3_uri="s3://a_bucket/some_data.parquet", metadata=metadata
     )
 
