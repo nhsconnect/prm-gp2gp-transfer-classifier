@@ -34,7 +34,7 @@ class OrganisationLookup:
     def practice_name_from_asid(self, asid: str) -> Optional[str]:
         return self._asid_to_practice_name_mapping.get(asid)
 
-    def ccg_name_from_ods_code(self, ods_code: str) -> Optional[str]:
+    def ccg_name_from_practice_ods_code(self, ods_code: str) -> Optional[str]:
         return self._ods_to_ccg_name_mapping.get(ods_code)
 
     def ccg_ods_code_from_practice_ods_code(self, ods_code: str) -> Optional[str]:

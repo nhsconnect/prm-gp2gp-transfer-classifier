@@ -135,14 +135,14 @@ def test_returns_practice_name_from_asid():
     assert actual == expected
 
 
-def test_returns_ccg_name_from_asid():
+def test_returns_ccg_name_from_ods_code():
     practice = build_practice_metadata(asids=["456"], ods_code="A123", name="Practice 2")
     ccg = build_ccg_metadata(practices=["A123"], ods_code="12A", name="A CCG")
     organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[ccg], year_month=(2020, 1))
 
     expected = ccg.name
 
-    actual = organisation_lookup.ccg_name_from_ods_code("A123")
+    actual = organisation_lookup.ccg_name_from_practice_ods_code("A123")
 
     assert actual == expected
 

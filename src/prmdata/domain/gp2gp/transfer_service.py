@@ -115,7 +115,7 @@ class TransferService:
         ods_code = organisation_lookup.practice_ods_code_from_asid(asid)
         name = organisation_lookup.practice_name_from_asid(asid)
         ccg_ods_code = organisation_lookup.ccg_ods_code_from_practice_ods_code(ods_code)
-        ccg_name = organisation_lookup.ccg_name_from_ods_code(ods_code)
+        ccg_name = organisation_lookup.ccg_name_from_practice_ods_code(ods_code)
         return Practice(
             asid=asid,
             supplier=supplier,
