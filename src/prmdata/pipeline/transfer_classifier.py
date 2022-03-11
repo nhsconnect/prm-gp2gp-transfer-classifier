@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime, timedelta
 from logging import Logger, getLogger
 from typing import Dict, Iterator, List
@@ -75,6 +76,15 @@ class RunnerObservabilityProbe:
             },
         )
 
+    def log_previous_month_ods_metadata_not_found(self, missing_json_uri: str):
+        self._logger.error(
+            f"Previous month ODS metadata not found: {missing_json_uri}, exiting...",
+            extra={
+                "event": "MISSING_PREVIOUS_MONTH_ODS_METADATA",
+                "missing_json_uri": missing_json_uri,
+            },
+        )
+
 
 class TransferClassifier:
     def __init__(self, config: TransferClassifierConfig):
@@ -106,25 +116,33 @@ class TransferClassifier:
             observability_probe=transfer_service_observability_probe,
         )
 
+    def _read_previous_month_ods_metadata(
+        self, missing_json_uri: str
+    ) -> OrganisationMetadataMonthly:
+        try:
+            input_paths = self._uris.ods_metadata_using_previous_month(
+                self._reporting_window.get_dates()
+            )
+            self._ods_metadata_input_paths = input_paths
+            self._runner_observability_probe.log_using_previous_month_ods_metadata(missing_json_uri)
+            return self._io.read_ods_metadata_files(input_paths)
+        except JsonFileNotFoundException as e:
+            self._runner_observability_probe.log_previous_month_ods_metadata_not_found(
+                e.missing_json_uri
+            )
+            sys.exit(1)
+
     def _read_spine_messages(self) -> Iterator[Message]:
         input_paths = self._uris.spine_messages(self._reporting_window)
         return self._io.read_spine_messages(input_paths)
 
     def _read_most_recent_ods_metadata(self) -> OrganisationMetadataMonthly:
-        input_paths = []
         try:
             input_paths = self._uris.ods_metadata(self._reporting_window.get_dates())
+            self._ods_metadata_input_paths = input_paths
             return self._io.read_ods_metadata_files(input_paths)
         except JsonFileNotFoundException as e:
-            input_paths = self._uris.ods_metadata_using_previous_month(
-                self._reporting_window.get_dates()
-            )
-            self._runner_observability_probe.log_using_previous_month_ods_metadata(
-                e.missing_json_uri
-            )
-            return self._io.read_ods_metadata_files(input_paths)
-        finally:
-            self._ods_metadata_input_paths = input_paths
+            return self._read_previous_month_ods_metadata(e.missing_json_uri)
 
     def _write_transfers_deprecated(
         self,
