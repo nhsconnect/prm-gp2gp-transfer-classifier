@@ -198,6 +198,11 @@ def _end_datetime_metadata(year: int, data_month: int, data_day: int) -> str:
     return f"{end_datetime_year}-{end_datetime_month}-{end_datetime_day}T00:00:00+00:00"
 
 
+def _delete_bucket_with_objects(s3_bucket):
+    s3_bucket.objects.all().delete()
+    s3_bucket.delete()
+
+
 def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(datadir):
     fake_s3, s3_client = _setup()
     fake_s3.start()
@@ -248,8 +253,9 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
             assert actual_metadata == expected_metadata
 
     finally:
-        output_transfer_data_bucket.objects.all().delete()
-        output_transfer_data_bucket.delete()
+        _delete_bucket_with_objects(output_transfer_data_bucket)
+        _delete_bucket_with_objects(input_spine_data_bucket)
+        _delete_bucket_with_objects(input_ods_metadata_bucket)
         fake_s3.stop()
         environ.clear()
 
@@ -299,8 +305,9 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
         assert actual_metadata == expected_metadata
 
     finally:
-        output_transfer_data_bucket.objects.all().delete()
-        output_transfer_data_bucket.delete()
+        _delete_bucket_with_objects(output_transfer_data_bucket)
+        _delete_bucket_with_objects(input_spine_data_bucket)
+        _delete_bucket_with_objects(input_ods_metadata_bucket)
         fake_s3.stop()
         environ.clear()
 
@@ -366,7 +373,8 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
         assert actual_metadata == expected_metadata
 
     finally:
-        output_transfer_data_bucket.objects.all().delete()
-        output_transfer_data_bucket.delete()
+        _delete_bucket_with_objects(output_transfer_data_bucket)
+        _delete_bucket_with_objects(input_spine_data_bucket)
+        _delete_bucket_with_objects(input_ods_metadata_bucket)
         fake_s3.stop()
         environ.clear()
