@@ -39,7 +39,6 @@ Configuration is achieved via the following environment variables:
 | END_DATETIME                | Optional ISO-8601 datetime specifying end of date range of transfer classification, on a daily basis.                                                             |
 | S3_ENDPOINT_URL             | Optional argument specifying which S3 to connect to.                                                                                                              |
 | CONVERSATION_CUTOFF_DAYS    | Optional argument specifying how many days to classify a transfer. Defaults to 0 (which means there is no cutoff).                                                |
-| ADD_NAME_COLUMNS            | Optional argument specifying whether to add CCG name and Practice name columns to the output. Default is 1 (add and output v9), specify 0 to not add (output v8). | 
 
 
 ## Developing

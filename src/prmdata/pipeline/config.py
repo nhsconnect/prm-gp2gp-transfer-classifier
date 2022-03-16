@@ -62,7 +62,6 @@ class TransferClassifierConfig:
     build_tag: str
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
-    add_name_columns: int
 
     @classmethod
     def from_environment_variables(cls, env_vars):
@@ -78,5 +77,4 @@ class TransferClassifierConfig:
                 "CONVERSATION_CUTOFF_DAYS", timedelta(days=0)
             ),
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),
-            add_name_columns=env.read_optional_int("ADD_NAME_COLUMNS", 1),
         )

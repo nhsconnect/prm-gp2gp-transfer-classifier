@@ -11,7 +11,6 @@ class TransferClassifierS3UriResolver:
     _SPINE_MESSAGES_VERSION = "v3"
     _ODS_METADATA_VERSION = "v3"
     _TRANSFERS_PARQUET_VERSION = "v9"
-    _TRANSFERS_PARQUET_VERSION_DEPRECATED = "v8"
 
     def __init__(self, gp2gp_spine_bucket: str, transfers_bucket: str, ods_metadata_bucket: str):
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
@@ -66,18 +65,6 @@ class TransferClassifierS3UriResolver:
             return self.ods_metadata(reporting_window_for_previous_month)
         else:
             return self.ods_metadata(reporting_window_dates)[:-1]
-
-    def gp2gp_transfers_deprecated(self, daily_start_datetime: datetime, cutoff: timedelta) -> str:
-        year = add_leading_zero(daily_start_datetime.year)
-        month = add_leading_zero(daily_start_datetime.month)
-        day = add_leading_zero(daily_start_datetime.day)
-        return self._s3_path(
-            self._transfers_bucket,
-            self._TRANSFERS_PARQUET_VERSION_DEPRECATED,
-            f"cutoff-{cutoff.days}",
-            f"{year}/{month}/{day}",
-            f"{year}-{month}-{day}-transfers.parquet",
-        )
 
     def gp2gp_transfers(self, daily_start_datetime: datetime, cutoff: timedelta) -> str:
         year = add_leading_zero(daily_start_datetime.year)

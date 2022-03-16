@@ -30,41 +30,6 @@ def _int_list():
     return pa.list_(pa.int64())
 
 
-def _transfer_columns_deprecated():
-    return [
-        Column("conversation_id", pa.string(), lambda t: t.conversation_id),
-        Column("sla_duration", pa.uint64(), lambda t: t.sla_duration_seconds),
-        Column("requesting_practice_asid", pa.string(), lambda t: t.requesting_practice.asid),
-        Column(
-            "requesting_practice_ods_code", pa.string(), lambda t: t.requesting_practice.ods_code
-        ),
-        Column(
-            "requesting_practice_ccg_ods_code",
-            pa.string(),
-            lambda t: t.requesting_practice.ccg_ods_code,
-        ),
-        Column("sending_practice_asid", pa.string(), lambda t: t.sending_practice.asid),
-        Column("sending_practice_ods_code", pa.string(), lambda t: t.sending_practice.ods_code),
-        Column(
-            "sending_practice_ccg_ods_code", pa.string(), lambda t: t.sending_practice.ccg_ods_code
-        ),
-        Column("requesting_supplier", pa.string(), lambda t: t.requesting_practice.supplier),
-        Column("sending_supplier", pa.string(), lambda t: t.sending_practice.supplier),
-        Column("sender_error_codes", _int_list(), lambda t: t.sender_error_codes),
-        Column("final_error_codes", _int_list(), lambda t: t.final_error_codes),
-        Column("intermediate_error_codes", _int_list(), lambda t: t.intermediate_error_codes),
-        Column("status", pa.string(), lambda t: t.status_description),
-        Column("failure_reason", pa.string(), lambda t: t.failure_reason),
-        Column("date_requested", pa.timestamp("us"), lambda t: t.date_requested),
-        Column("date_completed", pa.timestamp("us"), lambda t: t.date_completed),
-        Column(
-            "last_sender_message_timestamp",
-            pa.timestamp("us"),
-            lambda t: t.last_sender_message_timestamp,
-        ),
-    ]
-
-
 def _transfer_columns():
     return [
         Column("conversation_id", pa.string(), lambda t: t.conversation_id),
@@ -106,19 +71,6 @@ def _transfer_columns():
             lambda t: t.last_sender_message_timestamp,
         ),
     ]
-
-
-def convert_transfers_to_table_deprecated(transfers: Iterable[Transfer]) -> Table:
-    columns = _transfer_columns_deprecated()
-
-    for transfer in transfers:
-        for column in columns:
-            column.add(transfer)
-
-    return pa.table(
-        data=dict(column.data() for column in columns),
-        schema=pa.schema(column.schema() for column in columns),
-    )
 
 
 def convert_transfers_to_table(transfers: Iterable[Transfer]) -> Table:
