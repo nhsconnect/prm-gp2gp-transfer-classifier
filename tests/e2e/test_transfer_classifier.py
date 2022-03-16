@@ -66,8 +66,6 @@ def _setup():
     environ["S3_ENDPOINT_URL"] = FAKE_AWS_URL
     environ["BUILD_TAG"] = "abc456"
 
-    environ["ADD_NAME_COLUMNS"] = "1"
-
     fake_s3 = _build_fake_s3(FAKE_AWS_HOST, FAKE_AWS_PORT)
     return fake_s3, s3_client
 
