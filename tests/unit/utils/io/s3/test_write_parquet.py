@@ -54,6 +54,14 @@ def test_will_log_writing_table_events():
                         "object_uri": object_uri,
                     },
                 ),
+                mock.call(
+                    f"Transfer classifier row count for: {object_uri}",
+                    extra={
+                        "event": "TRANSFER_CLASSIFIER_ROW_COUNT",
+                        "object_uri": object_uri,
+                        "row_count": 2,
+                    },
+                ),
             ]
         )
 

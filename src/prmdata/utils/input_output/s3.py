@@ -89,3 +89,12 @@ class S3DataManager:
             f"Successfully uploaded to: {object_uri}",
             extra={"event": "SUCCESSFULLY_UPLOADED_PARQUET_TO_S3", "object_uri": object_uri},
         )
+
+        logger.info(
+            f"Transfer classifier row count for: {object_uri}",
+            extra={
+                "event": "TRANSFER_CLASSIFIER_ROW_COUNT",
+                "object_uri": object_uri,
+                "row_count": table.num_rows,
+            },
+        )
