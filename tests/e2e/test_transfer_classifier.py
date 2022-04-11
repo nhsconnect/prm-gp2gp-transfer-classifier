@@ -14,7 +14,7 @@ from freezegun import freeze_time
 from moto.server import DomainDispatcherApplication, create_backend_app
 from werkzeug.serving import make_server
 
-from prmdata.pipeline.main import main, logger
+from prmdata.pipeline.main import logger, main
 from prmdata.utils.add_leading_zero import add_leading_zero
 from tests.builders.file import read_file_to_gzip_buffer
 from tests.builders.s3 import read_s3_parquet

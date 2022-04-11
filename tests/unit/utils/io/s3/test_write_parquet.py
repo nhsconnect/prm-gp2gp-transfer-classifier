@@ -45,13 +45,18 @@ def test_will_log_writing_table_events():
             [
                 mock.call(
                     f"Attempting to upload: {object_uri}",
-                    extra={"event": "ATTEMPTING_UPLOAD_PARQUET_TO_S3", "object_uri": object_uri},
+                    extra={
+                        "event": "ATTEMPTING_UPLOAD_PARQUET_TO_S3",
+                        "object_uri": object_uri,
+                        "metadata": SOME_METADATA,
+                    },
                 ),
                 mock.call(
                     f"Successfully uploaded to: {object_uri}",
                     extra={
                         "event": "SUCCESSFULLY_UPLOADED_PARQUET_TO_S3",
                         "object_uri": object_uri,
+                        "metadata": SOME_METADATA,
                     },
                 ),
                 mock.call(
@@ -60,6 +65,7 @@ def test_will_log_writing_table_events():
                         "event": "TRANSFER_CLASSIFIER_ROW_COUNT",
                         "object_uri": object_uri,
                         "row_count": 2,
+                        "metadata": SOME_METADATA,
                     },
                 ),
             ]

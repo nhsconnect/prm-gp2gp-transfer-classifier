@@ -74,7 +74,11 @@ class S3DataManager:
     def write_parquet(self, table: Table, object_uri: str, metadata: dict[str, str]):
         logger.info(
             f"Attempting to upload: {object_uri}",
-            extra={"event": "ATTEMPTING_UPLOAD_PARQUET_TO_S3", "object_uri": object_uri},
+            extra={
+                "event": "ATTEMPTING_UPLOAD_PARQUET_TO_S3",
+                "object_uri": object_uri,
+                "metadata": metadata,
+            },
         )
 
         s3_object = self._object_from_uri(object_uri)
@@ -87,7 +91,11 @@ class S3DataManager:
 
         logger.info(
             f"Successfully uploaded to: {object_uri}",
-            extra={"event": "SUCCESSFULLY_UPLOADED_PARQUET_TO_S3", "object_uri": object_uri},
+            extra={
+                "event": "SUCCESSFULLY_UPLOADED_PARQUET_TO_S3",
+                "object_uri": object_uri,
+                "metadata": metadata,
+            },
         )
 
         logger.info(
@@ -96,5 +104,6 @@ class S3DataManager:
                 "event": "TRANSFER_CLASSIFIER_ROW_COUNT",
                 "object_uri": object_uri,
                 "row_count": table.num_rows,
+                "metadata": metadata,
             },
         )
