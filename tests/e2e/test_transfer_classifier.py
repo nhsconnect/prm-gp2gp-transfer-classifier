@@ -1,9 +1,11 @@
 import json
-import logging
+import sys
 from datetime import datetime, timedelta
 from io import BytesIO
 from os import environ
 from threading import Thread
+from unittest import mock
+from unittest.mock import ANY
 
 import boto3
 from botocore.config import Config
@@ -12,12 +14,10 @@ from freezegun import freeze_time
 from moto.server import DomainDispatcherApplication, create_backend_app
 from werkzeug.serving import make_server
 
-from prmdata.pipeline.main import main
+from prmdata.pipeline.main import main, logger
 from prmdata.utils.add_leading_zero import add_leading_zero
 from tests.builders.file import read_file_to_gzip_buffer
 from tests.builders.s3 import read_s3_parquet
-
-logger = logging.getLogger(__name__)
 
 
 class ThreadedServer:
@@ -376,3 +376,16 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
         _delete_bucket_with_objects(input_ods_metadata_bucket)
         fake_s3.stop()
         environ.clear()
+
+
+def test_exception_in_main():
+    with mock.patch.object(sys, "exit") as exitSpy:
+        with mock.patch.object(logger, "error") as mock_log_error:
+            main()
+
+    mock_log_error.assert_called_with(
+        ANY,
+        extra={"event": "FAILED_TO_RUN_MAIN"},
+    )
+
+    exitSpy.assert_called_with("Failed to run main")
