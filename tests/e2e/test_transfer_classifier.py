@@ -385,7 +385,7 @@ def test_exception_in_main():
 
     mock_log_error.assert_called_with(
         ANY,
-        extra={"event": "FAILED_TO_RUN_MAIN"},
+        extra={"event": "FAILED_TO_RUN_MAIN", "config": {}},
     )
 
     exitSpy.assert_called_with("Failed to run main")

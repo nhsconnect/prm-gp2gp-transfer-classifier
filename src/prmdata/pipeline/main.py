@@ -18,12 +18,13 @@ def _setup_logger():
 
 
 def main():
+    config = {}
     try:
         _setup_logger()
         config = TransferClassifierConfig.from_environment_variables(environ)
         TransferClassifier(config).run()
     except Exception as ex:
-        logger.error(str(ex), extra={"event": "FAILED_TO_RUN_MAIN"})
+        logger.error(str(ex), extra={"event": "FAILED_TO_RUN_MAIN", "config": config})
         sys.exit("Failed to run main")
 
 
