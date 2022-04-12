@@ -63,6 +63,9 @@ class TransferClassifierConfig:
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
 
+    def __str__(self):
+        return str(self.__dict__)
+
     @classmethod
     def from_environment_variables(cls, env_vars):
         env = EnvConfig(env_vars)
