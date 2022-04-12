@@ -181,7 +181,6 @@ class TransferClassifier:
 
             metadata = {
                 "cutoff-days": str(self._config.conversation_cutoff.days),
-                "cutoffdays": str(self._config.conversation_cutoff.days),
                 "build-tag": self._config.build_tag,
                 "start-datetime": convert_to_datetime_string(daily_start_datetime),
                 "end-datetime": convert_to_datetime_string(
