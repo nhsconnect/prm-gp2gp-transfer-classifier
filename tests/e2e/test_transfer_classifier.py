@@ -242,6 +242,7 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
 
             expected_metadata = {
                 "cutoff-days": "14",
+                "cutoffdays": "14",
                 "build-tag": "abc456",
                 "start-datetime": f"{year}-{month}-{day}T00:00:00+00:00",
                 "end-datetime": _end_datetime_metadata(year, data_month, data_day),
@@ -278,6 +279,7 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
         expected_transfers_output_key = "transfers.parquet"
         expected_metadata = {
             "cutoff-days": "0",
+            "cutoffdays": "0",
             "build-tag": "abc456",
             "start-datetime": "2019-12-31T00:00:00+00:00",
             "end-datetime": "2020-01-01T00:00:00+00:00",
@@ -349,6 +351,7 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
         expected_transfers_output_key = "transfers.parquet"
         expected_metadata = {
             "cutoff-days": "0",
+            "cutoffdays": "0",
             "build-tag": "abc456",
             "start-datetime": "2020-02-04T00:00:00+00:00",
             "end-datetime": "2020-02-05T00:00:00+00:00",
