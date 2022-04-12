@@ -44,12 +44,12 @@ class S3DataManager:
                 input_csv = csv.DictReader(f)
                 yield from input_csv
 
-        except self._client.meta.client.exceptions.NoSuchKey:
+        except self._client.meta.client.exceptions.NoSuchKey as e:
             logger.error(
                 f"CSV file not found: {object_uri}, exiting...",
                 extra={"event": "FILE_NOT_FOUND_IN_S3", "object_uri": object_uri},
             )
-            pass
+            raise e
 
     def read_json(self, object_uri: str):
         logger.info(

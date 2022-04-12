@@ -129,7 +129,7 @@ class TransferClassifier:
             self._runner_observability_probe.log_previous_month_ods_metadata_not_found(
                 e.missing_json_uri
             )
-            pass
+            raise e
 
     def _read_spine_messages(self) -> Iterator[Message]:
         input_paths = self._uris.spine_messages(self._reporting_window)
