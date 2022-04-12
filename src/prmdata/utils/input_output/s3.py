@@ -2,7 +2,6 @@ import csv
 import gzip
 import json
 import logging
-import sys
 from io import BytesIO
 from urllib.parse import urlparse
 
@@ -50,7 +49,7 @@ class S3DataManager:
                 f"CSV file not found: {object_uri}, exiting...",
                 extra={"event": "FILE_NOT_FOUND_IN_S3", "object_uri": object_uri},
             )
-            sys.exit(1)
+            pass
 
     def read_json(self, object_uri: str):
         logger.info(
