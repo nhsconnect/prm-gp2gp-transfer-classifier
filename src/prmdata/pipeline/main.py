@@ -24,7 +24,12 @@ def main():
         config = TransferClassifierConfig.from_environment_variables(environ)
         TransferClassifier(config).run()
     except Exception as ex:
+        logger.error("Failed to run main", extra={"event": "FAILED_TO_RUN_MAIN", "config": config})
+        logger.error("Failed to run main with config: " + str(config))
         logger.error(str(ex), extra={"event": "FAILED_TO_RUN_MAIN", "config": config})
+        logger.info("Exiting main")
+        logging.info("Logging with logging")
+        logging.info("Logging with logging", config)
         sys.exit("Failed to run main")
 
 
