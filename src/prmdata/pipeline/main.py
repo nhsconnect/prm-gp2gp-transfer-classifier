@@ -25,7 +25,7 @@ def main():
         TransferClassifier(config).run()
     except Exception as ex:
         logger.error(str(ex), extra={"event": "FAILED_TO_RUN_MAIN", "config": config.__str__()})
-        sys.exit("Failed to run main")
+        sys.exit("Failed to run main, exiting...")
 
 
 if __name__ == "__main__":
