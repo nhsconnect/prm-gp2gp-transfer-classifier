@@ -9,8 +9,8 @@ from prmdata.utils.add_leading_zero import add_leading_zero
 
 class TransferClassifierS3UriResolver:
     _SPINE_MESSAGES_VERSION = "v3"
-    _ODS_METADATA_VERSION = "v3"
-    _TRANSFERS_PARQUET_VERSION = "v9"
+    _ODS_METADATA_VERSION = "v4"
+    _TRANSFERS_PARQUET_VERSION = "v10"
 
     def __init__(self, gp2gp_spine_bucket: str, transfers_bucket: str, ods_metadata_bucket: str):
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
