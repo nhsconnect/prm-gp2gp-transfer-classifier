@@ -10,6 +10,7 @@ from prmdata.utils.add_leading_zero import add_leading_zero
 class TransferClassifierS3UriResolver:
     _SPINE_MESSAGES_VERSION = "v3"
     _ODS_METADATA_VERSION = "v4"
+    _MI_EVENTS_VERSION = "v1"
     _TRANSFERS_PARQUET_VERSION = "v10"
 
     def __init__(
@@ -85,14 +86,12 @@ class TransferClassifierS3UriResolver:
             f"{year}-{month}-{day}-transfers.parquet",
         )
 
-    def mi_events(self, start_date: datetime) -> List[str]:
+    def mi_events(self, start_date: datetime) -> str:
         year = add_leading_zero(start_date.year)
         month = add_leading_zero(start_date.month)
         day = add_leading_zero(start_date.day)
-        return [
-            self._s3_path(
-                self._mi_bucket,
-                "v1",
-                f"{year}/{month}/{day}",
-            )
-        ]
+        return self._s3_path(
+            self._mi_bucket,
+            self._MI_EVENTS_VERSION,
+            f"{year}/{month}/{day}",
+        )

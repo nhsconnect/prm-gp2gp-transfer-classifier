@@ -142,7 +142,7 @@ def test_returns_correct_mi_event_uris():
         mi_bucket=mi_bucket,
     )
 
-    expected = [f"s3://{mi_bucket}/v1/2020/01/01"]
+    expected = f"s3://{mi_bucket}/v1/2020/01/01"
 
     actual = uri_resolver.mi_events(datetime(year=2020, month=1, day=1))
 
