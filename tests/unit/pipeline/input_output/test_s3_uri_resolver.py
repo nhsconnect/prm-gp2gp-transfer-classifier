@@ -130,3 +130,20 @@ def test_returns_correct_ods_uris_metadata_for_previous_months_when_missing_meta
     actual = uri_resolver.ods_metadata_using_previous_month(reporting_window_dates)
 
     assert actual == expected
+
+
+def test_returns_correct_mi_event_uris():
+    mi_bucket = a_string()
+
+    uri_resolver = TransferClassifierS3UriResolver(
+        gp2gp_spine_bucket=a_string(),
+        transfers_bucket=a_string(),
+        ods_metadata_bucket=a_string(),
+        mi_bucket=mi_bucket,
+    )
+
+    expected = [f"s3://{mi_bucket}/v1/2020/01/01"]
+
+    actual = uri_resolver.mi_events(datetime(year=2020, month=1, day=1))
+
+    assert actual == expected

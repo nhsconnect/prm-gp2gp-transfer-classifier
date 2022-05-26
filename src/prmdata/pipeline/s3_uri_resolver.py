@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 
 from dateutil.relativedelta import relativedelta
 
@@ -12,10 +12,17 @@ class TransferClassifierS3UriResolver:
     _ODS_METADATA_VERSION = "v4"
     _TRANSFERS_PARQUET_VERSION = "v10"
 
-    def __init__(self, gp2gp_spine_bucket: str, transfers_bucket: str, ods_metadata_bucket: str):
+    def __init__(
+        self,
+        gp2gp_spine_bucket: str,
+        transfers_bucket: str,
+        ods_metadata_bucket: str,
+        mi_bucket: Optional[str] = None,
+    ):
         self._gp2gp_spine_bucket = gp2gp_spine_bucket
         self._transfers_bucket = transfers_bucket
         self._ods_metadata_bucket = ods_metadata_bucket
+        self._mi_bucket = mi_bucket
 
     @staticmethod
     def _s3_path(*fragments):
@@ -77,3 +84,15 @@ class TransferClassifierS3UriResolver:
             f"{year}/{month}/{day}",
             f"{year}-{month}-{day}-transfers.parquet",
         )
+
+    def mi_events(self, start_date: datetime) -> List[str]:
+        year = add_leading_zero(start_date.year)
+        month = add_leading_zero(start_date.month)
+        day = add_leading_zero(start_date.day)
+        return [
+            self._s3_path(
+                self._mi_bucket,
+                "v1",
+                f"{year}/{month}/{day}",
+            )
+        ]
