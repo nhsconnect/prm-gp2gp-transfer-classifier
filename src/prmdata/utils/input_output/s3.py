@@ -108,7 +108,7 @@ class S3DataManager:
             },
         )
 
-    def get_json_files_from_path(self, s3_path: str) -> List[dict]:
+    def _read_json_files(self, s3_path: str) -> List[dict]:
         object_url = urlparse(s3_path)
         bucket_name = object_url.netloc
         s3_key = object_url.path.lstrip("/")
@@ -117,3 +117,9 @@ class S3DataManager:
         s3_files = s3_bucket.objects.filter(Prefix=s3_key).all()
 
         return [json.load(s3_file.get()["Body"]) for s3_file in s3_files]
+
+    def read_json_files_from_paths(self, s3_paths: List[str]) -> List[dict]:
+        paths = []
+        for path in s3_paths:
+            paths.extend(self._read_json_files(path))
+        return paths
