@@ -3,6 +3,7 @@ import gzip
 import json
 import logging
 from io import BytesIO
+from typing import List
 from urllib.parse import urlparse
 
 from pyarrow import PythonFile, Table, parquet
@@ -106,3 +107,9 @@ class S3DataManager:
                 "metadata": metadata,
             },
         )
+
+    def gets_files_in_path(self, bucket_name: str, s3_path: str) -> List[str]:
+        s3_bucket = self._client.Bucket(bucket_name)
+        s3_files = s3_bucket.objects.filter(Prefix=s3_path).all()
+
+        return [f"s3://{s3_file.bucket_name}/{s3_file.key}" for s3_file in s3_files]
