@@ -86,12 +86,15 @@ class TransferClassifierS3UriResolver:
             f"{year}-{month}-{day}-transfers.parquet",
         )
 
-    def mi_events(self, start_date: datetime) -> str:
-        year = add_leading_zero(start_date.year)
-        month = add_leading_zero(start_date.month)
-        day = add_leading_zero(start_date.day)
-        return self._s3_path(
-            self._mi_bucket,
-            self._MI_EVENTS_VERSION,
-            f"{year}/{month}/{day}",
-        )
+    def mi_events(self, reporting_window: ReportingWindow) -> List[str]:
+        dates = reporting_window.get_dates() + reporting_window.get_overflow_dates()
+        return [
+            self._s3_path(
+                self._mi_bucket,
+                self._MI_EVENTS_VERSION,
+                f"{add_leading_zero(date.year)}",
+                f"{add_leading_zero(date.month)}",
+                f"{add_leading_zero(date.day)}",
+            )
+            for date in dates
+        ]

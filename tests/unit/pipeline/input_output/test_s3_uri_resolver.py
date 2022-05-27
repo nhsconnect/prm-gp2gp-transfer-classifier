@@ -135,6 +135,20 @@ def test_returns_correct_ods_uris_metadata_for_previous_months_when_missing_meta
 def test_returns_correct_mi_event_uris():
     mi_bucket = a_string()
 
+    reporting_window = Mock()
+    reporting_window.get_dates = Mock(
+        return_value=[
+            datetime(year=2020, month=12, day=1),
+            datetime(year=2020, month=12, day=2),
+        ]
+    )
+    reporting_window.get_overflow_dates = Mock(
+        return_value=[
+            datetime(year=2021, month=1, day=1),
+            datetime(year=2021, month=1, day=2),
+        ]
+    )
+
     uri_resolver = TransferClassifierS3UriResolver(
         gp2gp_spine_bucket=a_string(),
         transfers_bucket=a_string(),
@@ -142,8 +156,13 @@ def test_returns_correct_mi_event_uris():
         mi_bucket=mi_bucket,
     )
 
-    expected = f"s3://{mi_bucket}/v1/2020/01/01"
+    expected = [
+        f"s3://{mi_bucket}/v1/2020/12/01",
+        f"s3://{mi_bucket}/v1/2020/12/02",
+        f"s3://{mi_bucket}/v1/2021/01/01",
+        f"s3://{mi_bucket}/v1/2021/01/02",
+    ]
 
-    actual = uri_resolver.mi_events(datetime(year=2020, month=1, day=1))
+    actual = uri_resolver.mi_events(reporting_window)
 
     assert actual == expected
