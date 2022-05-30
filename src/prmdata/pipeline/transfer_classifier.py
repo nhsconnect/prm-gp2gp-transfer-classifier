@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from logging import Logger, getLogger
 from typing import Dict, Iterator, List
@@ -8,8 +9,6 @@ from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.gp2gp.transfer_service import TransferService, TransferServiceObservabilityProbe
 from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 from prmdata.domain.reporting_window import ReportingWindow
-from prmdata.domain.spine.gp2gp_conversation import filter_conversations_by_day
-from prmdata.domain.spine.message import Message
 from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.pipeline.s3_uri_resolver import TransferClassifierS3UriResolver
@@ -85,7 +84,7 @@ class RunnerObservabilityProbe:
         )
 
 
-class TransferClassifier:
+class TransferClassifier(ABC):
     def __init__(self, config: TransferClassifierConfig):
         s3 = boto3.resource("s3", endpoint_url=config.s3_endpoint_url)
         s3_manager = S3DataManager(s3)
@@ -131,10 +130,6 @@ class TransferClassifier:
             )
             raise e
 
-    def _read_spine_messages(self) -> Iterator[Message]:
-        input_paths = self._uris.spine_messages(self._reporting_window)
-        return self._io.read_spine_messages(input_paths)
-
     def _read_most_recent_ods_metadata(self) -> OrganisationMetadataMonthly:
         try:
             input_paths = self._uris.ods_metadata(self._reporting_window.get_dates())
@@ -155,47 +150,6 @@ class TransferClassifier:
         )
         self._io.write_transfers(transfers, output_path, metadata)
 
+    @abstractmethod
     def run(self):
-        self._runner_observability_probe.log_attempting_to_classify()
-
-        spine_messages = self._read_spine_messages()
-        ods_metadata_monthly = self._read_most_recent_ods_metadata()
-
-        conversations = self._transfer_service.group_into_conversations(
-            message_stream=spine_messages
-        )
-        gp2gp_conversations = self._transfer_service.parse_conversations_into_gp2gp_conversations(
-            conversations
-        )
-
-        for daily_start_datetime in self._reporting_window.get_dates():
-            conversations_started_in_reporting_window = filter_conversations_by_day(
-                gp2gp_conversations, daily_start_datetime
-            )
-            organisation_lookup = ods_metadata_monthly.get_lookup(
-                (daily_start_datetime.year, daily_start_datetime.month)
-            )
-            transfers = self._transfer_service.convert_to_transfers(
-                conversations_started_in_reporting_window, organisation_lookup=organisation_lookup
-            )
-
-            metadata = {
-                "cutoff-days": str(self._config.conversation_cutoff.days),
-                "build-tag": self._config.build_tag,
-                "start-datetime": convert_to_datetime_string(daily_start_datetime),
-                "end-datetime": convert_to_datetime_string(
-                    daily_start_datetime + timedelta(days=1)
-                ),
-                "ods-metadata-month": f"{organisation_lookup.year}-{organisation_lookup.month}",
-            }
-
-            self._write_transfers(
-                transfers=transfers,
-                daily_start_datetime=daily_start_datetime,
-                cutoff=self._config.conversation_cutoff,
-                metadata=metadata,
-            )
-
-        self._runner_observability_probe.log_successfully_classified(
-            ods_metadata_input_paths=self._ods_metadata_input_paths
-        )
+        pass
