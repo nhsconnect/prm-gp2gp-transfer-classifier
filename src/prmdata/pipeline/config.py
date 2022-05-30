@@ -51,6 +51,11 @@ class EnvConfig:
     def read_optional_datetime(self, name: str) -> datetime:
         return self._read_env(name, optional=True, converter=isoparse)
 
+    def read_optional_bool(self, name: str, default: bool) -> bool:
+        return self._read_env(
+            name, optional=True, converter=lambda string: string.lower() == "true", default=default
+        )
+
 
 @dataclass
 class TransferClassifierConfig:
@@ -63,6 +68,7 @@ class TransferClassifierConfig:
     build_tag: str
     conversation_cutoff: timedelta
     s3_endpoint_url: Optional[str]
+    classify_mi_events: Optional[bool]
 
     def __str__(self):
         return str(self.__dict__)
@@ -82,4 +88,5 @@ class TransferClassifierConfig:
                 "CONVERSATION_CUTOFF_DAYS", timedelta(days=0)
             ),
             s3_endpoint_url=env.read_optional_str("S3_ENDPOINT_URL"),
+            classify_mi_events=env.read_optional_bool("CLASSIFY_MI_EVENTS", default=False),
         )
