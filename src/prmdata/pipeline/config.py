@@ -74,7 +74,7 @@ class TransferClassifierConfig:
         return str(self.__dict__)
 
     @classmethod
-    def from_environment_variables(cls, env_vars):
+    def from_environment_variables(cls, env_vars: object):
         env = EnvConfig(env_vars)
         return TransferClassifierConfig(
             output_transfer_data_bucket=env.read_str("OUTPUT_TRANSFER_DATA_BUCKET"),

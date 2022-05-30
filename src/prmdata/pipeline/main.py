@@ -3,6 +3,7 @@ import sys
 from os import environ
 
 from prmdata.pipeline.config import TransferClassifierConfig
+from prmdata.pipeline.mi_runner import MiRunner
 from prmdata.pipeline.spine_runner import SpineRunner
 from prmdata.utils.input_output.json_formatter import JsonFormatter
 
@@ -18,11 +19,14 @@ def _setup_logger():
 
 
 def main():
-    config = {}
+    config = None
     try:
-        _setup_logger()
         config = TransferClassifierConfig.from_environment_variables(environ)
-        SpineRunner(config).run()
+        _setup_logger()
+        if config.classify_mi_events is not False:  # flake8: noqa
+            MiRunner(config).run()
+        else:
+            SpineRunner(config).run()
     except Exception as ex:
         logger.error(str(ex), extra={"event": "FAILED_TO_RUN_MAIN", "config": config.__str__()})
         sys.exit("Failed to run main, exiting...")
