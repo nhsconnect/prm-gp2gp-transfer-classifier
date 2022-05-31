@@ -23,7 +23,7 @@ def main():
     try:
         config = TransferClassifierConfig.from_environment_variables(environ)
         _setup_logger()
-        if config.classify_mi_events is not False:  # flake8: noqa
+        if config.classify_mi_events is not False:
             MiRunner(config).run()
         else:
             SpineRunner(config).run()

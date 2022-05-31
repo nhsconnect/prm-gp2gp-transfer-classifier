@@ -42,6 +42,7 @@ FAKE_S3_REGION = "us-west-1"
 
 S3_INPUT_SPINE_DATA_BUCKET_NAME = "input-spine-data-bucket"
 S3_INPUT_ODS_METADATA_BUCKET_NAME = "input-ods-metadata-bucket"
+S3_INPUT_MI_DATA_BUCKET_NAME = "input-mi-data-bucket"
 S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME = "output-transfer-data-bucket"
 
 
@@ -61,6 +62,7 @@ def _setup():
 
     environ["INPUT_SPINE_DATA_BUCKET"] = S3_INPUT_SPINE_DATA_BUCKET_NAME
     environ["INPUT_ODS_METADATA_BUCKET"] = S3_INPUT_ODS_METADATA_BUCKET_NAME
+    environ["INPUT_MI_DATA_BUCKET"] = S3_INPUT_MI_DATA_BUCKET_NAME
     environ["OUTPUT_TRANSFER_DATA_BUCKET"] = S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME
 
     environ["S3_ENDPOINT_URL"] = FAKE_AWS_URL
@@ -142,6 +144,16 @@ def _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir):
         (2020, 1, day) for day in [1, 2, 10]
     ]
     _override_day_spine_messages(datadir, input_spine_data_bucket, list_dates_with_data)
+
+
+def _upload_json_files_to_mi_events_data_bucket(input_mi_data_bucket, datadir):
+    json_file_location = str(datadir / "inputs" / "test-event.json")
+    upload_location = "v1/2019/12/02"
+
+    input_mi_data_bucket.upload_fileobj(
+        open(json_file_location, "rb"),
+        upload_location,
+    )
 
 
 def _get_s3_path(year, month, day):
@@ -254,6 +266,35 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
         _delete_bucket_with_objects(output_transfer_data_bucket)
         _delete_bucket_with_objects(input_spine_data_bucket)
         _delete_bucket_with_objects(input_ods_metadata_bucket)
+        fake_s3.stop()
+        environ.clear()
+
+
+def test_mi_events(datadir):
+    fake_s3, s3_client = _setup()
+    fake_s3.start()
+
+    output_transfer_data_bucket = _build_fake_s3_bucket(
+        S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
+    )
+    input_mi_data_bucket = _build_fake_s3_bucket(S3_INPUT_MI_DATA_BUCKET_NAME, s3_client)
+    _upload_json_files_to_mi_events_data_bucket(input_mi_data_bucket, datadir)
+
+    try:
+        environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
+        environ["END_DATETIME"] = "2019-12-03T00:00:00Z"
+        environ["CONVERSATION_CUTOFF_DAYS"] = "0"
+        environ["CLASSIFY_MI_EVENTS"] = "True"
+
+        main()
+
+        # s3_files = input_mi_data_bucket.objects.filter(Prefix=str(datadir / "v1" / "2019" / "12" / "02")).all()
+        # s3_files_contents = [json.load(s3_file.get()["Body"]) for s3_file in s3_files]
+        # logger.info({"s3_files_contents": s3_files_contents})
+
+    finally:
+        _delete_bucket_with_objects(output_transfer_data_bucket)
+        _delete_bucket_with_objects(input_mi_data_bucket)
         fake_s3.stop()
         environ.clear()
 

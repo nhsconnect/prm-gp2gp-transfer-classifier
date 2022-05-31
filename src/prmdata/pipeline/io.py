@@ -32,3 +32,6 @@ class TransferClassifierIO:
 
     def read_ods_metadata_files(self, s3_uris: List[str]) -> OrganisationMetadataMonthly:
         return OrganisationMetadataMonthly.from_list(self._read_ods_metadata(s3_uris))
+
+    def read_json_files_from_paths(self, s3_paths: List[str]) -> List[dict]:
+        return self._s3_manager.read_json_files_from_paths(s3_paths)

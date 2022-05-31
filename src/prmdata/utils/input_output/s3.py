@@ -119,7 +119,8 @@ class S3DataManager:
         return [json.load(s3_file.get()["Body"]) for s3_file in s3_files]
 
     def read_json_files_from_paths(self, s3_paths: List[str]) -> List[dict]:
-        paths = []
+        mi_events = []
+
         for path in s3_paths:
-            paths.extend(self._read_json_files(path))
-        return paths
+            mi_events.extend(self._read_json_files(path))
+        return mi_events
