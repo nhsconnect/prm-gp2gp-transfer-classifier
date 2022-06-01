@@ -23,6 +23,11 @@ def main():
     try:
         config = TransferClassifierConfig.from_environment_variables(environ)
         _setup_logger()
+        logger.info(
+            "Running transfer classifier",
+            extra={"event": "RUNNING_TRANSFER_CLASSIFIER", "config": config.__str__()},
+        )
+
         if config.classify_mi_events is not False:
             MiRunner(config).run()
         else:
