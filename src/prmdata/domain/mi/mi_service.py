@@ -6,6 +6,8 @@ from typing import List
 class MiMessage:
     conversation_id: str
     event_id: str
+    event_type: str
+    transfer_protocol: str
     event_generated_datetime: str
     reporting_system_supplier: str
     reporting_practice_ods_code: str
@@ -19,6 +21,8 @@ class MiService:
             MiMessage(
                 conversation_id=event["conversationId"],
                 event_id=event["eventId"],
+                event_type=event["eventType"],
+                transfer_protocol=event["transferProtocol"],
                 event_generated_datetime=event["eventGeneratedDateTime"],
                 reporting_system_supplier=event["reportingSystemSupplier"],
                 reporting_practice_ods_code=event["reportingPracticeOdsCode"],
