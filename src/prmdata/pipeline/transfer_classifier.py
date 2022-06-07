@@ -89,7 +89,7 @@ class RunnerObservabilityProbe:
             "Attempting to classify conversations for a date range",
             extra={
                 "event": "SUCCESSFULLY_CONSTRUCTED_MI_MESSAGES_FROM_MI_EVENTS",
-                "messages": mi_events,
+                "messages": str(mi_events),
                 **self._log_date_range_info,
             },
         )
