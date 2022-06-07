@@ -1,4 +1,10 @@
 {
   "eventId": "1234-5678-8765-4321",
-  "conversationId": "1111-1111-1111-1111"
+  "conversationId": "1111-1111-1111-1111",
+  "eventType": "REGISTRATION_STARTED",
+  "transferProtocol": "PRE_TRANSFER",
+  "eventGeneratedDateTime": "2022-01-22T00:00:00Z",
+  "reportingSystemSupplier": "supplierOne",
+  "reportingPracticeOdsCode": "ABC1234",
+  "transferEventDateTime": "2022-01-22T00:00:00Z"
 }

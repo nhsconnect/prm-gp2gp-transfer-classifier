@@ -7,6 +7,7 @@ import boto3
 
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.gp2gp.transfer_service import TransferService, TransferServiceObservabilityProbe
+from prmdata.domain.mi.mi_service import MiMessage
 from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.pipeline.config import TransferClassifierConfig
@@ -80,6 +81,16 @@ class RunnerObservabilityProbe:
             extra={
                 "event": "MISSING_PREVIOUS_MONTH_ODS_METADATA",
                 "missing_json_uri": missing_json_uri,
+            },
+        )
+
+    def log_successfully_constructed_mi_messages(self, mi_events: List[MiMessage]):
+        self._logger.info(
+            "Attempting to classify conversations for a date range",
+            extra={
+                "event": "SUCCESSFULLY_CONSTRUCTED_MI_MESSAGES_FROM_MI_EVENTS",
+                "messages": mi_events,
+                **self._log_date_range_info,
             },
         )
 
