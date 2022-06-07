@@ -14,6 +14,9 @@ class MiMessage:
     transfer_event_datetime: str
 
 
+GroupedMiMessages = dict[str, List[MiMessage]]
+
+
 class MiService:
     @staticmethod
     def construct_mi_messages_from_mi_events(mi_events: List[dict]) -> List[MiMessage]:
@@ -30,3 +33,16 @@ class MiService:
             )
             for event in mi_events
         ]
+
+    @staticmethod
+    def group_mi_messages_by_conversation_id(
+        mi_messages: List[MiMessage],
+    ) -> GroupedMiMessages:
+        grouped_mi_messages: GroupedMiMessages = {}
+        for mi_message in mi_messages:
+            if mi_message.conversation_id not in grouped_mi_messages:
+                grouped_mi_messages[mi_message.conversation_id] = []
+
+            grouped_mi_messages[mi_message.conversation_id].append(mi_message)
+
+        return grouped_mi_messages

@@ -20,6 +20,10 @@ class MiRunner(TransferClassifier):
 
         mi_events = self._read_mi_events()
         logger.info({"event": "SUCCESSFULLY_READ_MI_EVENTS", "events": mi_events})
+        mi_service = MiService()
 
-        mi_messages = MiService.construct_mi_messages_from_mi_events(mi_events)
+        mi_messages = mi_service.construct_mi_messages_from_mi_events(mi_events)
         self._runner_observability_probe.log_successfully_constructed_mi_messages(mi_messages)
+
+        grouped_mi_messages = mi_service.group_mi_messages_by_conversation_id(mi_messages)
+        self._runner_observability_probe.log_successfully_grouped_mi_messages(grouped_mi_messages)

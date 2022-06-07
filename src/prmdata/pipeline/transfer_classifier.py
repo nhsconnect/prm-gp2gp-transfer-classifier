@@ -86,10 +86,20 @@ class RunnerObservabilityProbe:
 
     def log_successfully_constructed_mi_messages(self, mi_events: List[MiMessage]):
         self._logger.info(
-            "Attempting to classify conversations for a date range",
+            "Successfully constructed mi messages from mi events",
             extra={
                 "event": "SUCCESSFULLY_CONSTRUCTED_MI_MESSAGES_FROM_MI_EVENTS",
-                "messages": str(mi_events),
+                "mi_messages": str(mi_events),
+                **self._log_date_range_info,
+            },
+        )
+
+    def log_successfully_grouped_mi_messages(self, grouped_mi_events: List[MiMessage]):
+        self._logger.info(
+            "Successfully grouped my messages by conversation ID",
+            extra={
+                "event": "SUCCESSFULLY_GROUPED_MI_MESSAGES_BY_CONVERSATION_ID",
+                "grouped_mi_messages": str(grouped_mi_events),
                 **self._log_date_range_info,
             },
         )
