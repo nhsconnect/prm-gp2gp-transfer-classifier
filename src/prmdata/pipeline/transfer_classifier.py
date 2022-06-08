@@ -84,22 +84,32 @@ class RunnerObservabilityProbe:
             },
         )
 
-    def log_successfully_constructed_mi_messages(self, mi_events: List[MiMessage]):
+    def log_successfully_read_mi_events(self, mi_events: List[List[dict]]):
         self._logger.info(
             "Successfully constructed mi messages from mi events",
             extra={
-                "event": "SUCCESSFULLY_CONSTRUCTED_MI_MESSAGES_FROM_MI_EVENTS",
-                "mi_messages": str(mi_events),
+                "event": "SUCCESSFULLY_READ_MI_EVENTS",
+                "events": str(mi_events),
                 **self._log_date_range_info,
             },
         )
 
-    def log_successfully_grouped_mi_messages(self, grouped_mi_events: List[MiMessage]):
+    def log_successfully_constructed_mi_messages(self, mi_messages: List[MiMessage]):
+        self._logger.info(
+            "Successfully constructed mi messages from mi events",
+            extra={
+                "event": "SUCCESSFULLY_CONSTRUCTED_MI_MESSAGES_FROM_MI_EVENTS",
+                "mi_messages": str(mi_messages),
+                **self._log_date_range_info,
+            },
+        )
+
+    def log_successfully_grouped_mi_messages(self, grouped_mi_messages: List[MiMessage]):
         self._logger.info(
             "Successfully grouped my messages by conversation ID",
             extra={
                 "event": "SUCCESSFULLY_GROUPED_MI_MESSAGES_BY_CONVERSATION_ID",
-                "grouped_mi_messages": str(grouped_mi_events),
+                "grouped_mi_messages": str(grouped_mi_messages),
                 **self._log_date_range_info,
             },
         )
