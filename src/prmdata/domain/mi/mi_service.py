@@ -1,5 +1,18 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
+
+
+@dataclass
+class MiMessagePayloadRegistration:
+    registrationStartedDateTime: Optional[str]
+    registrationType: Optional[str]
+    requestingPracticeOdsCode: Optional[str]
+    sendingPracticeOdsCode: Optional[str]
+
+
+@dataclass
+class MiMessagePayload:
+    registration: Optional[MiMessagePayloadRegistration]
 
 
 @dataclass
@@ -12,6 +25,7 @@ class MiMessage:
     reporting_system_supplier: str
     reporting_practice_ods_code: str
     transfer_event_datetime: str
+    payload: MiMessagePayload
 
 
 GroupedMiMessages = dict[str, List[MiMessage]]
@@ -30,6 +44,22 @@ class MiService:
                 reporting_system_supplier=event["reportingSystemSupplier"],
                 reporting_practice_ods_code=event["reportingPracticeOdsCode"],
                 transfer_event_datetime=event["transferEventDateTime"],
+                payload=MiMessagePayload(
+                    registration=MiMessagePayloadRegistration(
+                        registrationStartedDateTime=event.get("payload", {})
+                        .get("registration", {})
+                        .get("registrationStartedDateTime"),
+                        registrationType=event.get("payload", {})
+                        .get("registration", {})
+                        .get("registrationType"),
+                        requestingPracticeOdsCode=event.get("payload", {})
+                        .get("registration", {})
+                        .get("requestingPracticeOdsCode"),
+                        sendingPracticeOdsCode=event.get("payload", {})
+                        .get("registration", {})
+                        .get("sendingPracticeOdsCode"),
+                    )
+                ),
             )
             for event in mi_events
         ]

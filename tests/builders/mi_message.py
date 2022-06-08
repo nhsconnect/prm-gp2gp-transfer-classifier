@@ -12,4 +12,5 @@ def build_mi_message(**kwargs) -> MiMessage:
         reporting_system_supplier=kwargs.get("reporting_system_supplier", a_string(8)),
         reporting_practice_ods_code=kwargs.get("reporting_practice_ods_code", a_string(8)),
         transfer_event_datetime=kwargs.get("transfer_event_datetime", a_datetime()),
+        payload=kwargs.get("payload", None),
     )
