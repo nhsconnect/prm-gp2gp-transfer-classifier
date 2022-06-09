@@ -7,6 +7,7 @@ from moto import mock_s3
 from prmdata.domain.mi.mi_service import (
     MiMessage,
     MiMessagePayload,
+    MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     MiService,
 )
@@ -79,7 +80,8 @@ def test_transfer_classifier_spine_runner_abstract_class():
                     registrationType=None,
                     requestingPracticeOdsCode=None,
                     sendingPracticeOdsCode=None,
-                )
+                ),
+                integration=MiMessagePayloadIntegration(integrationStatus=None, reason=None),
             ),
         )
     ]

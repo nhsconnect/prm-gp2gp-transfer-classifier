@@ -1,6 +1,7 @@
 from prmdata.domain.mi.mi_service import (
     MiMessage,
     MiMessagePayload,
+    MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     MiService,
 )
@@ -19,6 +20,8 @@ def test_construct_mi_messages_from_mi_events():
     another_ods_code = a_string()
     another_datetime = a_datetime()
     a_registration_type = "newRegistrant"
+    a_status = "MERGED"
+    a_reason = "reason"
 
     mi_events = [
         {
@@ -36,7 +39,8 @@ def test_construct_mi_messages_from_mi_events():
                     "registrationType": a_registration_type,
                     "requestingPracticeOdsCode": an_ods_code,
                     "sendingPracticeOdsCode": another_ods_code,
-                }
+                },
+                "integration": {"integrationStatus": a_status, "reason": a_reason},
             },
         }
     ]
@@ -57,7 +61,10 @@ def test_construct_mi_messages_from_mi_events():
                     registrationType=a_registration_type,
                     requestingPracticeOdsCode=an_ods_code,
                     sendingPracticeOdsCode=another_ods_code,
-                )
+                ),
+                integration=MiMessagePayloadIntegration(
+                    integrationStatus=a_status, reason=a_reason
+                ),
             ),
         )
     ]
@@ -87,7 +94,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
             "reportingSystemSupplier": a_supplier,
             "reportingPracticeOdsCode": an_ods_code,
             "transferEventDateTime": another_datetime,
-            "payload": {"registration": {}},
+            "payload": {"registration": {}, "integration": {}},
         }
     ]
 
@@ -107,7 +114,8 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
                     registrationType=None,
                     requestingPracticeOdsCode=None,
                     sendingPracticeOdsCode=None,
-                )
+                ),
+                integration=MiMessagePayloadIntegration(integrationStatus=None, reason=None),
             ),
         )
     ]

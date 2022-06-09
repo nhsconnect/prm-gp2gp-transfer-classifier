@@ -11,8 +11,15 @@ class MiMessagePayloadRegistration:
 
 
 @dataclass
+class MiMessagePayloadIntegration:
+    integrationStatus: str
+    reason: str
+
+
+@dataclass
 class MiMessagePayload:
     registration: Optional[MiMessagePayloadRegistration]
+    integration: Optional[MiMessagePayloadIntegration]
 
 
 @dataclass
@@ -58,7 +65,13 @@ class MiService:
                         sendingPracticeOdsCode=event.get("payload", {})
                         .get("registration", {})
                         .get("sendingPracticeOdsCode"),
-                    )
+                    ),
+                    integration=MiMessagePayloadIntegration(
+                        integrationStatus=event.get("payload", {})
+                        .get("integration", {})
+                        .get("integrationStatus"),
+                        reason=event.get("payload", {}).get("integration", {}).get("reason"),
+                    ),
                 ),
             )
             for event in mi_events
