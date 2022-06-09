@@ -1,5 +1,4 @@
-from datetime import timedelta
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock
 
 from prmdata.domain.mi.mi_service import (
     MiMessage,
@@ -8,15 +7,13 @@ from prmdata.domain.mi.mi_service import (
     MiMessagePayloadRegistration,
     MiService,
 )
-from prmdata.pipeline.config import TransferClassifierConfig
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.pipeline.mi_runner import MiRunner
 from prmdata.pipeline.transfer_classifier import RunnerObservabilityProbe
-from tests.builders.common import a_datetime
+from tests.builders.config import build_config
 
 
 def test_transfer_classifier_spine_runner_abstract_class():
-    bucket_name = "test_bucket"
     an_event_id = "1234"
     a_conversation_id = "1111-1111-1111-1111"
     an_event_type = "SOME_EVENT"
@@ -43,71 +40,46 @@ def test_transfer_classifier_spine_runner_abstract_class():
         },
     }
 
+    mi_messages = [
+        MiMessage(
+            conversation_id=a_conversation_id,
+            event_id=an_event_id,
+            event_type=an_event_type,
+            transfer_protocol=a_transfer_protocol,
+            event_generated_datetime=a_random_datetime,
+            reporting_system_supplier=a_reporting_system_supplier,
+            reporting_practice_ods_code=a_reporting_practice_ods_code,
+            transfer_event_datetime=a_random_datetime,
+            payload=MiMessagePayload(
+                registration=MiMessagePayloadRegistration(
+                    registrationStartedDateTime=None,
+                    registrationType=None,
+                    requestingPracticeOdsCode=None,
+                    sendingPracticeOdsCode=None,
+                ),
+                integration=MiMessagePayloadIntegration(
+                    integrationStatus=an_integration_status, reason=an_integration_reason
+                ),
+            ),
+        )
+    ]
+
     TransferClassifierIO.read_json_files_from_paths = MagicMock(return_value=[an_event])
 
-    config = TransferClassifierConfig(
-        input_mi_data_bucket=bucket_name,
-        input_spine_data_bucket=bucket_name,
-        output_transfer_data_bucket=bucket_name,
-        input_ods_metadata_bucket=bucket_name,
-        start_datetime=a_datetime(year=2022, month=1, day=1, hour=0, minute=0, second=0),
-        end_datetime=a_datetime(year=2022, month=1, day=2, hour=0, minute=0, second=0),
-        s3_endpoint_url=None,
-        conversation_cutoff=timedelta(days=0),
-        build_tag="12345",
-        classify_mi_events=True,
-    )
+    MiService.construct_mi_messages_from_mi_events = Mock(return_value=mi_messages)
+    MiService.group_mi_messages_by_conversation_id = Mock()
 
-    with patch.object(
-        MiService, "construct_mi_messages_from_mi_events"
-    ) as mock_construct_mi_messages_from_mi_events:
-        MiRunner(config).run()
-        mock_construct_mi_messages_from_mi_events.assert_called_with([an_event])
+    RunnerObservabilityProbe.log_attempting_to_classify = Mock()
+    RunnerObservabilityProbe.log_successfully_grouped_mi_messages = Mock()
+    RunnerObservabilityProbe.log_successfully_read_mi_events = Mock()
+    RunnerObservabilityProbe.log_successfully_constructed_mi_messages = Mock()
 
-    with patch.object(
-        MiService, "group_mi_messages_by_conversation_id"
-    ) as mock_group_mi_messages_by_conversation_id:
-        expected_mi_messages = [
-            MiMessage(
-                conversation_id=a_conversation_id,
-                event_id=an_event_id,
-                event_type=an_event_type,
-                transfer_protocol=a_transfer_protocol,
-                event_generated_datetime=a_random_datetime,
-                reporting_system_supplier=a_reporting_system_supplier,
-                reporting_practice_ods_code=a_reporting_practice_ods_code,
-                transfer_event_datetime=a_random_datetime,
-                payload=MiMessagePayload(
-                    registration=MiMessagePayloadRegistration(
-                        registrationStartedDateTime=None,
-                        registrationType=None,
-                        requestingPracticeOdsCode=None,
-                        sendingPracticeOdsCode=None,
-                    ),
-                    integration=MiMessagePayloadIntegration(
-                        integrationStatus=an_integration_status, reason=an_integration_reason
-                    ),
-                ),
-            )
-        ]
+    MiRunner(build_config()).run()
 
-        MiRunner(config).run()
-        mock_group_mi_messages_by_conversation_id.assert_called_with(expected_mi_messages)
+    MiService.construct_mi_messages_from_mi_events.assert_called_with([an_event])
+    MiService.group_mi_messages_by_conversation_id.assert_called_with(mi_messages)
 
-    with patch.object(
-        RunnerObservabilityProbe, "log_successfully_read_mi_events"
-    ) as mock_log_successfully_read_mi_events:
-        MiRunner(config).run()
-        mock_log_successfully_read_mi_events.assert_called()
-
-    with patch.object(
-        RunnerObservabilityProbe, "log_successfully_constructed_mi_messages"
-    ) as mock_log_successfully_constructed_mi_messages:
-        MiRunner(config).run()
-        mock_log_successfully_constructed_mi_messages.assert_called()
-
-    with patch.object(
-        RunnerObservabilityProbe, "log_successfully_grouped_mi_messages"
-    ) as mock_log_successfully_grouped_mi_messages:
-        MiRunner(config).run()
-        mock_log_successfully_grouped_mi_messages.assert_called()
+    RunnerObservabilityProbe.log_attempting_to_classify.assert_called()
+    RunnerObservabilityProbe.log_successfully_grouped_mi_messages.assert_called()
+    RunnerObservabilityProbe.log_successfully_read_mi_events.assert_called()
+    RunnerObservabilityProbe.log_successfully_constructed_mi_messages.assert_called()
