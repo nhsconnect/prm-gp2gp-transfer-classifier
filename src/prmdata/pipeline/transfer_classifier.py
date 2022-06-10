@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from logging import Logger, getLogger
@@ -109,7 +110,9 @@ class RunnerObservabilityProbe:
             "Successfully grouped my messages by conversation ID",
             extra={
                 "event": "SUCCESSFULLY_GROUPED_MI_MESSAGES_BY_CONVERSATION_ID",
-                "grouped_mi_messages": str(grouped_mi_messages),
+                "grouped_mi_messages": json.dumps(
+                    grouped_mi_messages, default=lambda o: o.__dict__, sort_keys=True
+                ),
                 **self._log_date_range_info,
             },
         )
