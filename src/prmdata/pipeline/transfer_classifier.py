@@ -87,7 +87,7 @@ class RunnerObservabilityProbe:
 
     def log_successfully_read_mi_events(self, mi_events: List[List[dict]]):
         self._logger.info(
-            "Successfully constructed mi messages from mi events",
+            "Successfully read mi events from s3",
             extra={
                 "event": "SUCCESSFULLY_READ_MI_EVENTS",
                 "events": str(mi_events),
