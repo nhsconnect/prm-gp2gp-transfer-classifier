@@ -8,7 +8,7 @@ import boto3
 
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.gp2gp.transfer_service import TransferService, TransferServiceObservabilityProbe
-from prmdata.domain.mi.mi_service import MiMessage
+from prmdata.domain.mi.mi_message import MiMessage
 from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.pipeline.config import TransferClassifierConfig

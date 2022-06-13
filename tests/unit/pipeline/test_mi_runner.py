@@ -1,12 +1,13 @@
 from unittest.mock import MagicMock, Mock
 
-from prmdata.domain.mi.mi_service import (
+from prmdata.domain.mi.mi_message import (
     MiMessage,
     MiMessagePayload,
+    MiMessagePayloadEhr,
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
-    MiService,
 )
+from prmdata.domain.mi.mi_service import MiService
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.pipeline.mi_runner import MiRunner
 from prmdata.pipeline.transfer_classifier import RunnerObservabilityProbe
@@ -59,6 +60,13 @@ def test_transfer_classifier_spine_runner_abstract_class():
                 ),
                 integration=MiMessagePayloadIntegration(
                     integrationStatus=an_integration_status, reason=an_integration_reason
+                ),
+                ehr=MiMessagePayloadEhr(
+                    ehr_total_size_bytes=None,
+                    ehr_structured_size_bytes=None,
+                    degrade=[],
+                    attachment=[],
+                    placeholder=[],
                 ),
             ),
         )

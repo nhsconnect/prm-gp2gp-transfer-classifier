@@ -17,6 +17,7 @@ class MiRunner(TransferClassifier):
 
         mi_events = self._read_mi_events()
         self._runner_observability_probe.log_successfully_read_mi_events(mi_events)
+
         mi_service = MiService()
 
         mi_messages = mi_service.construct_mi_messages_from_mi_events(mi_events)

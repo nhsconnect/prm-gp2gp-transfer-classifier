@@ -1,4 +1,4 @@
-from prmdata.domain.mi.mi_service import (
+from prmdata.domain.mi.mi_message import (
     MiMessage,
     MiMessagePayload,
     MiMessagePayloadIntegration,
@@ -25,6 +25,7 @@ def build_mi_message_payload(**kwargs) -> MiMessagePayload:
     return MiMessagePayload(
         registration=kwargs.get("registration", build_mi_message_payload_registration(**kwargs)),
         integration=kwargs.get("integration", build_mi_message_payload_integration(**kwargs)),
+        ehr=None,
     )
 
 

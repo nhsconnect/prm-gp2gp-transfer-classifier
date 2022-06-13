@@ -1,11 +1,16 @@
-from prmdata.domain.mi.mi_service import (
+from prmdata.domain.mi.mi_message import (
+    Attachment,
+    Coding,
+    Degrade,
     MiMessage,
     MiMessagePayload,
+    MiMessagePayloadEhr,
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
-    MiService,
+    Placeholder,
 )
-from tests.builders.common import a_datetime, a_string
+from prmdata.domain.mi.mi_service import MiService
+from tests.builders.common import a_datetime, a_string, an_integer
 from tests.builders.mi_message import build_mi_message
 
 
@@ -22,6 +27,26 @@ def test_construct_mi_messages_from_mi_events():
     a_registration_type = "newRegistrant"
     a_status = "MERGED"
     a_reason = "reason"
+    ehr_size = an_integer()
+    ehr_structured_size = an_integer()
+    a_type = "core_ehr"
+    some_metadata = "metadata"
+    a_code = an_integer()
+    some_system = a_string()
+    an_attachment_id = an_integer()
+    a_clinician_type = a_string()
+    a_mime_type = "application"
+    some_size_bytes = an_integer()
+    a_placeholder_id = a_string()
+    another_attachment_id = an_integer()
+    some_generated_by = a_string()
+    a_reason_code = an_integer()
+    another_mime_type = "audio"
+    another_placeholder_id = a_string()
+    another_another_attachment_id = an_integer()
+    another_generated_by = a_string()
+    another_reason_code = an_integer()
+    another_another_mime_type = "audio"
 
     mi_events = [
         {
@@ -41,6 +66,41 @@ def test_construct_mi_messages_from_mi_events():
                     "sendingPracticeOdsCode": another_ods_code,
                 },
                 "integration": {"integrationStatus": a_status, "reason": a_reason},
+                "ehr": {
+                    "ehrTotalSizeBytes": ehr_size,
+                    "ehrStructuredSizeBytes": ehr_structured_size,
+                    "degrade": [
+                        {
+                            "type": a_type,
+                            "metadata": some_metadata,
+                            "code": {"coding": [{"code": a_code, "system": some_system}]},
+                        }
+                    ],
+                    "attachment": [
+                        {
+                            "attachmentId": an_attachment_id,
+                            "clinicalType": a_clinician_type,
+                            "mimeType": a_mime_type,
+                            "sizeBytes": some_size_bytes,
+                        }
+                    ],
+                    "placeholder": [
+                        {
+                            "placeholderId": a_placeholder_id,
+                            "attachmentId": another_attachment_id,
+                            "generatedBy": some_generated_by,
+                            "reason": a_reason_code,
+                            "originalMimeType": another_mime_type,
+                        },
+                        {
+                            "placeholderId": another_placeholder_id,
+                            "attachmentId": another_another_attachment_id,
+                            "generatedBy": another_generated_by,
+                            "reason": another_reason_code,
+                            "originalMimeType": another_another_mime_type,
+                        },
+                    ],
+                },
             },
         }
     ]
@@ -65,11 +125,46 @@ def test_construct_mi_messages_from_mi_events():
                 integration=MiMessagePayloadIntegration(
                     integrationStatus=a_status, reason=a_reason
                 ),
+                ehr=MiMessagePayloadEhr(
+                    ehr_total_size_bytes=ehr_size,
+                    ehr_structured_size_bytes=ehr_structured_size,
+                    degrade=[
+                        Degrade(
+                            type=a_type,
+                            metadata=some_metadata,
+                            code=[Coding(code=a_code, system=some_system)],
+                        )
+                    ],
+                    attachment=[
+                        Attachment(
+                            attachment_id=an_attachment_id,
+                            clinical_type=a_clinician_type,
+                            mime_type=a_mime_type,
+                            size_bytes=some_size_bytes,
+                        )
+                    ],
+                    placeholder=[
+                        Placeholder(
+                            placeholder_id=a_placeholder_id,
+                            attachment_id=another_attachment_id,
+                            generated_by=some_generated_by,
+                            reason=a_reason_code,
+                            original_mime_type=another_mime_type,
+                        ),
+                        Placeholder(
+                            placeholder_id=another_placeholder_id,
+                            attachment_id=another_another_attachment_id,
+                            generated_by=another_generated_by,
+                            reason=another_reason_code,
+                            original_mime_type=another_another_mime_type,
+                        ),
+                    ],
+                ),
             ),
         )
     ]
 
-    actual = MiService.construct_mi_messages_from_mi_events(mi_events)
+    actual = MiService().construct_mi_messages_from_mi_events(mi_events=mi_events)
 
     assert actual == expected
 
@@ -94,7 +189,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
             "reportingSystemSupplier": a_supplier,
             "reportingPracticeOdsCode": an_ods_code,
             "transferEventDateTime": another_datetime,
-            "payload": {"registration": {}, "integration": {}},
+            "payload": {},
         }
     ]
 
@@ -116,11 +211,18 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
                     sendingPracticeOdsCode=None,
                 ),
                 integration=MiMessagePayloadIntegration(integrationStatus=None, reason=None),
+                ehr=MiMessagePayloadEhr(
+                    ehr_total_size_bytes=None,
+                    ehr_structured_size_bytes=None,
+                    degrade=[],
+                    attachment=[],
+                    placeholder=[],
+                ),
             ),
         )
     ]
 
-    actual = MiService.construct_mi_messages_from_mi_events(mi_events)
+    actual = MiService().construct_mi_messages_from_mi_events(mi_events)
 
     assert actual == expected
 
@@ -143,6 +245,6 @@ def test_group_mi_messages_by_conversation_id():
         conversation_id_three: [mi_message_four],
     }
 
-    actual = MiService.group_mi_messages_by_conversation_id(mi_events)
+    actual = MiService().group_mi_messages_by_conversation_id(mi_events)
 
     assert actual == expected

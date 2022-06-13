@@ -1,46 +1,78 @@
-from dataclasses import dataclass
 from typing import List, Optional
 
-
-@dataclass
-class MiMessagePayloadRegistration:
-    registrationStartedDateTime: Optional[str]
-    registrationType: Optional[str]
-    requestingPracticeOdsCode: Optional[str]
-    sendingPracticeOdsCode: Optional[str]
-
-
-@dataclass
-class MiMessagePayloadIntegration:
-    integrationStatus: str
-    reason: str
-
-
-@dataclass
-class MiMessagePayload:
-    registration: Optional[MiMessagePayloadRegistration]
-    integration: Optional[MiMessagePayloadIntegration]
-
-
-@dataclass
-class MiMessage:
-    conversation_id: str
-    event_id: str
-    event_type: str
-    transfer_protocol: str
-    event_generated_datetime: str
-    reporting_system_supplier: str
-    reporting_practice_ods_code: str
-    transfer_event_datetime: str
-    payload: MiMessagePayload
-
+from prmdata.domain.mi.mi_message import (
+    Attachment,
+    Coding,
+    Degrade,
+    MiMessage,
+    MiMessagePayload,
+    MiMessagePayloadEhr,
+    MiMessagePayloadIntegration,
+    MiMessagePayloadRegistration,
+    Placeholder,
+)
 
 GroupedMiMessages = dict[str, List[MiMessage]]
 
 
 class MiService:
+    def __init__(self):
+        pass
+
     @staticmethod
-    def construct_mi_messages_from_mi_events(mi_events: List[dict]) -> List[MiMessage]:
+    def _get_payload_ehr(event: dict) -> dict:
+        return event.get("payload", {}).get("ehr", {})
+
+    @staticmethod
+    def _create_attachment(
+        attachment_list: List[dict],
+    ) -> Optional[List[Attachment]]:
+
+        return [
+            Attachment(
+                attachment_id=attachment.get("attachmentId"),
+                clinical_type=attachment.get("clinicalType"),
+                mime_type=attachment.get("mimeType"),
+                size_bytes=attachment.get("sizeBytes"),
+            )
+            for attachment in attachment_list
+        ]
+
+    @staticmethod
+    def _create_placeholder(
+        placeholder_list: List[dict],
+    ) -> Optional[List[Placeholder]]:
+
+        return [
+            Placeholder(
+                placeholder_id=placeholder.get("placeholderId"),
+                attachment_id=placeholder.get("attachmentId"),
+                generated_by=placeholder.get("generatedBy"),
+                reason=placeholder.get("reason"),
+                original_mime_type=placeholder.get("originalMimeType"),
+            )
+            for placeholder in placeholder_list
+        ]
+
+    @staticmethod
+    def _create_coding(degrade: dict) -> List[Coding]:
+        return [
+            Coding(code=coding.get("code"), system=coding.get("system"))
+            for coding in degrade.get("code", []).get("coding")
+        ]
+
+    def _create_degrade(self, degrade_list: List[dict]) -> Optional[List[Degrade]]:
+
+        return [
+            Degrade(
+                type=degrade.get("type"),
+                metadata=degrade.get("metadata"),
+                code=self._create_coding(degrade),
+            )
+            for degrade in degrade_list
+        ]
+
+    def construct_mi_messages_from_mi_events(self, mi_events: List[dict]) -> List[MiMessage]:
         return [
             MiMessage(
                 conversation_id=event["conversationId"],
@@ -71,6 +103,21 @@ class MiService:
                         .get("integration", {})
                         .get("integrationStatus"),
                         reason=event.get("payload", {}).get("integration", {}).get("reason"),
+                    ),
+                    ehr=MiMessagePayloadEhr(
+                        ehr_total_size_bytes=self._get_payload_ehr(event).get("ehrTotalSizeBytes"),
+                        ehr_structured_size_bytes=self._get_payload_ehr(event).get(
+                            "ehrStructuredSizeBytes"
+                        ),
+                        degrade=self._create_degrade(
+                            self._get_payload_ehr(event).get("degrade", [])
+                        ),
+                        attachment=self._create_attachment(
+                            self._get_payload_ehr(event).get("attachment", [])
+                        ),
+                        placeholder=self._create_placeholder(
+                            self._get_payload_ehr(event).get("placeholder", [])
+                        ),
                     ),
                 ),
             )
