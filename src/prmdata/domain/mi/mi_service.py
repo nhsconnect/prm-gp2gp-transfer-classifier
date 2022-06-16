@@ -85,9 +85,6 @@ class MiService:
                 transfer_event_datetime=event["transferEventDateTime"],
                 payload=MiMessagePayload(
                     registration=MiMessagePayloadRegistration(
-                        registrationStartedDateTime=event.get("payload", {})
-                        .get("registration", {})
-                        .get("registrationStartedDateTime"),
                         registrationType=event.get("payload", {})
                         .get("registration", {})
                         .get("registrationType"),

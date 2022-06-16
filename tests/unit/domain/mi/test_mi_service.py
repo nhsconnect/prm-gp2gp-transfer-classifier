@@ -61,7 +61,6 @@ def test_construct_mi_messages_from_mi_events():
             "transferEventDateTime": another_datetime,
             "payload": {
                 "registration": {
-                    "registrationStartedDateTime": a_random_datetime,
                     "registrationType": a_registration_type,
                     "requestingPracticeOdsCode": an_ods_code,
                     "sendingPracticeOdsCode": another_ods_code,
@@ -118,7 +117,6 @@ def test_construct_mi_messages_from_mi_events():
             transfer_event_datetime=another_datetime,
             payload=MiMessagePayload(
                 registration=MiMessagePayloadRegistration(
-                    registrationStartedDateTime=a_random_datetime,
                     registrationType=a_registration_type,
                     requestingPracticeOdsCode=an_ods_code,
                     sendingPracticeOdsCode=another_ods_code,
@@ -206,7 +204,6 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
             transfer_event_datetime=another_datetime,
             payload=MiMessagePayload(
                 registration=MiMessagePayloadRegistration(
-                    registrationStartedDateTime=None,
                     registrationType=None,
                     requestingPracticeOdsCode=None,
                     sendingPracticeOdsCode=None,

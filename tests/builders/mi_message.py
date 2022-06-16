@@ -31,7 +31,6 @@ def build_mi_message_payload(**kwargs) -> MiMessagePayload:
 
 def build_mi_message_payload_registration(**kwargs) -> MiMessagePayloadRegistration:
     return MiMessagePayloadRegistration(
-        registrationStartedDateTime=kwargs.get("registrationStartedDateTime", a_datetime()),
         registrationType=kwargs.get("registrationType", a_string()),
         requestingPracticeOdsCode=kwargs.get("requestingPracticeOdsCode", a_string()),
         sendingPracticeOdsCode=kwargs.get("sendingPracticeOdsCode", a_string()),

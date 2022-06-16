@@ -4,7 +4,6 @@ from typing import List, Optional
 
 @dataclass
 class MiMessagePayloadRegistration:
-    registrationStartedDateTime: Optional[str]
     registrationType: Optional[str]
     requestingPracticeOdsCode: Optional[str]
     sendingPracticeOdsCode: Optional[str]

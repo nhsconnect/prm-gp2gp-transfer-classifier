@@ -53,7 +53,6 @@ def test_transfer_classifier_spine_runner_abstract_class():
             transfer_event_datetime=a_random_datetime,
             payload=MiMessagePayload(
                 registration=MiMessagePayloadRegistration(
-                    registrationStartedDateTime=None,
                     registrationType=None,
                     requestingPracticeOdsCode=None,
                     sendingPracticeOdsCode=None,

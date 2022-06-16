@@ -9,7 +9,6 @@
   "transferEventDateTime": "2022-02-23T14:00:12",
   "payload": {
     "registration": {
-      "registrationStartedDateTime": "2022-02-23T14:00:12",
       "requestingPracticeOdsCode": "ABC1234",
       "registrationType": "newRegistrant"
     }
