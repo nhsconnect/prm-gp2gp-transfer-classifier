@@ -1,0 +1,20 @@
+{
+  "eventId": "3333-1111-1111-1111",
+  "eventGeneratedDateTime": "2022-02-23T14:00:12",
+  "eventType": "ERROR",
+  "transferProtocol": "GP2GP",
+  "reportingSystemSupplier": "supplierOne",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "3333-1111-1111-1111",
+  "transferEventDateTime": "2022-02-23T14:00:12",
+  "payload": {
+    "registration": {
+      "requestingPracticeOdsCode": "ABC1234",
+      "sendingPracticeOdsCode": "XYZ4567"
+    },
+    "error": {
+      "errorCode": "15",
+      "errorDescription": "Duplicate"
+    }
+  }
+}

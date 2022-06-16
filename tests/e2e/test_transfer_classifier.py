@@ -9,6 +9,7 @@ from unittest.mock import ANY
 
 import boto3
 from botocore.config import Config
+from coverage.annotate import os
 from dateutil.tz import UTC
 from freezegun import freeze_time
 from moto.server import DomainDispatcherApplication, create_backend_app
@@ -147,13 +148,15 @@ def _upload_files_to_spine_data_bucket(input_spine_data_bucket, datadir):
 
 
 def _upload_json_files_to_mi_events_data_bucket(input_mi_data_bucket, datadir):
-    json_file_location = str(datadir / "inputs" / "test-event.json")
+    mi_json_files_location = str(datadir / "inputs" / "mi_events")
     upload_location = "v1/2019/12/02"
+    mi_event_file_names = os.listdir(mi_json_files_location)
 
-    input_mi_data_bucket.upload_fileobj(
-        open(json_file_location, "rb"),
-        upload_location,
-    )
+    for mi_event_file_name in mi_event_file_names:
+        input_mi_data_bucket.upload_fileobj(
+            open(f"{mi_json_files_location}/{mi_event_file_name}", "rb"),
+            f"{upload_location}/{mi_event_file_name}",
+        )
 
 
 def _get_s3_path(year, month, day):
@@ -288,9 +291,9 @@ def test_mi_events(datadir):
 
         main()
 
-        # s3_files = input_mi_data_bucket.objects.filter(Prefix=str(datadir / "v1" / "2019" / "12" / "02")).all()
-        # s3_files_contents = [json.load(s3_file.get()["Body"]) for s3_file in s3_files]
-        # logger.info({"s3_files_contents": s3_files_contents})
+        s3_files = input_mi_data_bucket.objects.all()
+        s3_files_contents = [json.load(s3_file.get()["Body"]) for s3_file in s3_files]
+        logger.info({"s3_files_contents": s3_files_contents})
 
     finally:
         _delete_bucket_with_objects(output_transfer_data_bucket)

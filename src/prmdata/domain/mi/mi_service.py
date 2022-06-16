@@ -3,6 +3,7 @@ from typing import List, Optional
 from prmdata.domain.mi.mi_message import (
     Attachment,
     Coding,
+    Codings,
     Degrade,
     MiMessage,
     MiMessagePayload,
@@ -58,16 +59,15 @@ class MiService:
     def _create_coding(degrade: dict) -> List[Coding]:
         return [
             Coding(code=coding.get("code"), system=coding.get("system"))
-            for coding in degrade.get("code", []).get("coding")
+            for coding in degrade.get("code", {}).get("coding")
         ]
 
     def _create_degrade(self, degrade_list: List[dict]) -> Optional[List[Degrade]]:
-
         return [
             Degrade(
                 type=degrade.get("type"),
                 metadata=degrade.get("metadata"),
-                code=self._create_coding(degrade),
+                code=Codings(coding=self._create_coding(degrade)),
             )
             for degrade in degrade_list
         ]

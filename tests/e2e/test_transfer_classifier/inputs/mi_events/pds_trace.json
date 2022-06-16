@@ -1,0 +1,17 @@
+{
+  "eventId": "3333-1111-1111-1111-pdsTrace",
+  "eventGeneratedDateTime": "2022-02-23T14:00:12",
+  "eventType": "PDS_TRACE",
+  "transferProtocol": "PRE_TRANSFER",
+  "reportingSystemSupplier": "supplierOne",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "3333-1111-1111-1111",
+  "transferEventDateTime": "2022-02-23T14:00:12",
+  "payload": {
+    "demographicTraceStatus": {
+      "status": "FAILURE",
+      "reason": "patient not found"
+    },
+    "smartcardPresent": true
+  }
+}

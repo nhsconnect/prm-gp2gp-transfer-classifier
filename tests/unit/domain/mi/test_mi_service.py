@@ -1,6 +1,7 @@
 from prmdata.domain.mi.mi_message import (
     Attachment,
     Coding,
+    Codings,
     Degrade,
     MiMessage,
     MiMessagePayload,
@@ -132,7 +133,7 @@ def test_construct_mi_messages_from_mi_events():
                         Degrade(
                             type=a_type,
                             metadata=some_metadata,
-                            code=[Coding(code=a_code, system=some_system)],
+                            code=Codings(coding=[Coding(code=a_code, system=some_system)]),
                         )
                     ],
                     attachment=[

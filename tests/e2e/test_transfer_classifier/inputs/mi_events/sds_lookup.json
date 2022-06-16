@@ -1,0 +1,16 @@
+{
+  "eventId": "3333-1111-1111-1111-sdsLookup",
+  "eventGeneratedDateTime": "2022-02-23T14:00:12",
+  "eventType": "SDS_LOOKUP",
+  "transferProtocol": "PRE_TRANSFER",
+  "reportingSystemSupplier": "supplierOne",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "3333-1111-1111-1111",
+  "transferEventDateTime": "2022-02-23T14:00:12",
+  "payload": {
+    "transferCompatibilityStatus": {
+      "status": "SUCCESS",
+      "reason": null
+    }
+  }
+}

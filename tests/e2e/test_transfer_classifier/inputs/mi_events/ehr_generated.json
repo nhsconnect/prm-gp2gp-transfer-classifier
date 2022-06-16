@@ -1,0 +1,50 @@
+{
+  "eventId": "3333-1111-1111-1111-ehrGenerated",
+  "eventGeneratedDateTime": "2022-02-23T14:00:12",
+  "eventType": "EHR_GENERATED",
+  "transferProtocol": "GP2GP",
+  "reportingSystemSupplier": "supplierOne",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "3333-1111-1111-1111",
+  "transferEventDateTime": "2022-02-23T14:00:12",
+  "payload": {
+    "registration": {
+      "requestingPracticeOdsCode": "ABC1234",
+      "sendingPracticeOdsCode": "XYZ4567"
+    },
+    "ehr": {
+      "ehrTotalSizeBytes": 5699433,
+      "ehrStructuredSizeBytes": 4096,
+      "attachment": [
+        {
+          "attachmentId": "3424-342456-3424-342456",
+          "clinicalType": "Scanned document",
+          "mimeType": "application/pdf",
+          "sizeBytes": 3084322
+        },
+        {
+          "attachmentId": "1323-132345-1323-132345",
+          "clinicalType": null,
+          "mimeType": "audio/mpeg",
+          "sizeBytes": 24352346
+        }
+      ],
+      "placeholder": [
+        {
+          "placeholderId": "9876-987654-9876-987654",
+          "attachmentId": "1323-132345-1323-132345",
+          "generatedBy": "XYZ4567",
+          "reason": 1,
+          "originalMimeType": "audio/mpeg"
+        }
+      ]
+    },
+    "unsupportedDataItem": [
+      {
+        "type": "allergy/flag",
+        "uniqueIdentifier": "1323-132345-1323-132345",
+        "reason": "reason for being unsupported / why is it unsupported in gp2gp / what would have to change in gp2gp to express this"
+      }
+    ]
+  }
+}

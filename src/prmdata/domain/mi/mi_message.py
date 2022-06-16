@@ -23,10 +23,15 @@ class Coding:
 
 
 @dataclass
+class Codings:
+    coding: List[Coding]
+
+
+@dataclass
 class Degrade:
     type: str
     metadata: str
-    code: List[Coding]
+    code: Codings
 
 
 @dataclass
