@@ -67,6 +67,7 @@ def test_transfer_classifier_mi_runner_abstract_class():
                     attachment=[],
                     placeholder=[],
                     unsupported_data_item=[],
+                    error=[],
                 ),
             ),
         )

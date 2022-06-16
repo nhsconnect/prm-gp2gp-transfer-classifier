@@ -3,6 +3,7 @@ from prmdata.domain.mi.mi_message import (
     Coding,
     Codings,
     Degrade,
+    Error,
     MiMessage,
     MiMessagePayload,
     MiMessagePayloadEhr,
@@ -52,6 +53,8 @@ def test_construct_mi_messages_from_mi_events():
     an_unsupported_type = a_string()
     an_unsupported_unique_identifier = a_string()
     an_unsupported_reason = a_string()
+    an_error_code = an_integer()
+    an_error_description = a_string()
 
     mi_events = [
         {
@@ -110,6 +113,9 @@ def test_construct_mi_messages_from_mi_events():
                             "uniqueIdentifier": an_unsupported_unique_identifier,
                             "reason": an_unsupported_reason,
                         }
+                    ],
+                    "error": [
+                        {"errorCode": an_error_code, "errorDescription": an_error_description}
                     ],
                 },
             },
@@ -176,6 +182,7 @@ def test_construct_mi_messages_from_mi_events():
                             reason=an_unsupported_reason,
                         )
                     ],
+                    error=[Error(error_code=an_error_code, error_description=an_error_description)],
                 ),
             ),
         )
@@ -234,6 +241,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
                     attachment=[],
                     placeholder=[],
                     unsupported_data_item=[],
+                    error=[],
                 ),
             ),
         )

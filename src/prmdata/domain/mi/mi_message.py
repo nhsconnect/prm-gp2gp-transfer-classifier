@@ -51,6 +51,12 @@ class Placeholder:
 
 
 @dataclass
+class Error:
+    error_code: int
+    error_description: str
+
+
+@dataclass
 class UnsupportedDataItem:
     type: str
     unique_identifier: str
@@ -65,6 +71,7 @@ class MiMessagePayloadEhr:
     attachment: Optional[List[Attachment]]
     placeholder: Optional[List[Placeholder]]
     unsupported_data_item: Optional[List[UnsupportedDataItem]]
+    error: Optional[List[Error]]
 
 
 @dataclass

@@ -5,6 +5,7 @@ from prmdata.domain.mi.mi_message import (
     Coding,
     Codings,
     Degrade,
+    Error,
     MiMessage,
     MiMessagePayload,
     MiMessagePayloadEhr,
@@ -27,23 +28,34 @@ class MiService:
 
     @staticmethod
     def _create_unsupported_data_item(
-        unsupported_data_item: List[dict],
+        unsupported_data_item_list: List[dict],
     ) -> Optional[List[UnsupportedDataItem]]:
 
         return [
             UnsupportedDataItem(
-                type=placeholder.get("type"),
-                unique_identifier=placeholder.get("uniqueIdentifier"),
-                reason=placeholder.get("reason"),
+                type=unsupported_data_item.get("type"),
+                unique_identifier=unsupported_data_item.get("uniqueIdentifier"),
+                reason=unsupported_data_item.get("reason"),
             )
-            for placeholder in unsupported_data_item
+            for unsupported_data_item in unsupported_data_item_list
+        ]
+
+    @staticmethod
+    def _create_error(
+        error_list: List[dict],
+    ) -> Optional[List[Error]]:
+        return [
+            Error(
+                error_code=error.get("errorCode"),
+                error_description=error.get("errorDescription"),
+            )
+            for error in error_list
         ]
 
     @staticmethod
     def _create_attachment(
         attachment_list: List[dict],
     ) -> Optional[List[Attachment]]:
-
         return [
             Attachment(
                 attachment_id=attachment.get("attachmentId"),
@@ -58,7 +70,6 @@ class MiService:
     def _create_placeholder(
         placeholder_list: List[dict],
     ) -> Optional[List[Placeholder]]:
-
         return [
             Placeholder(
                 placeholder_id=placeholder.get("placeholderId"),
@@ -133,6 +144,7 @@ class MiService:
                         unsupported_data_item=self._create_unsupported_data_item(
                             self._get_payload_ehr(event).get("unsupportedDataItem", [])
                         ),
+                        error=self._create_error(self._get_payload_ehr(event).get("error", [])),
                     ),
                 ),
             )
