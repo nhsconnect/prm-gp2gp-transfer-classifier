@@ -4,14 +4,14 @@ from typing import List, Optional
 
 @dataclass
 class MiMessagePayloadRegistration:
-    registrationType: Optional[str]
-    requestingPracticeOdsCode: Optional[str]
-    sendingPracticeOdsCode: Optional[str]
+    registration_type: Optional[str]
+    requesting_practice_ods_code: Optional[str]
+    sending_practice_ods_code: Optional[str]
 
 
 @dataclass
 class MiMessagePayloadIntegration:
-    integrationStatus: str
+    integration_status: str
     reason: str
 
 

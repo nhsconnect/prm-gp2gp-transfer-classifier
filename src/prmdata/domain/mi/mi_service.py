@@ -85,20 +85,20 @@ class MiService:
                 transfer_event_datetime=event["transferEventDateTime"],
                 payload=MiMessagePayload(
                     registration=MiMessagePayloadRegistration(
-                        registrationType=event.get("payload", {})
+                        registration_type=event.get("payload", {})
                         .get("registration", {})
-                        .get("registrationType"),
-                        requestingPracticeOdsCode=event.get("payload", {})
+                        .get("registration_type"),
+                        requesting_practice_ods_code=event.get("payload", {})
                         .get("registration", {})
-                        .get("requestingPracticeOdsCode"),
-                        sendingPracticeOdsCode=event.get("payload", {})
+                        .get("requesting_practice_ods_code"),
+                        sending_practice_ods_code=event.get("payload", {})
                         .get("registration", {})
-                        .get("sendingPracticeOdsCode"),
+                        .get("sending_practice_ods_code"),
                     ),
                     integration=MiMessagePayloadIntegration(
-                        integrationStatus=event.get("payload", {})
+                        integration_status=event.get("payload", {})
                         .get("integration", {})
-                        .get("integrationStatus"),
+                        .get("integration_status"),
                         reason=event.get("payload", {}).get("integration", {}).get("reason"),
                     ),
                     ehr=MiMessagePayloadEhr(

@@ -61,11 +61,11 @@ def test_construct_mi_messages_from_mi_events():
             "transferEventDateTime": another_datetime,
             "payload": {
                 "registration": {
-                    "registrationType": a_registration_type,
-                    "requestingPracticeOdsCode": an_ods_code,
-                    "sendingPracticeOdsCode": another_ods_code,
+                    "registration_type": a_registration_type,
+                    "requesting_practice_ods_code": an_ods_code,
+                    "sending_practice_ods_code": another_ods_code,
                 },
-                "integration": {"integrationStatus": a_status, "reason": a_reason},
+                "integration": {"integration_status": a_status, "reason": a_reason},
                 "ehr": {
                     "ehrTotalSizeBytes": ehr_size,
                     "ehrStructuredSizeBytes": ehr_structured_size,
@@ -117,12 +117,12 @@ def test_construct_mi_messages_from_mi_events():
             transfer_event_datetime=another_datetime,
             payload=MiMessagePayload(
                 registration=MiMessagePayloadRegistration(
-                    registrationType=a_registration_type,
-                    requestingPracticeOdsCode=an_ods_code,
-                    sendingPracticeOdsCode=another_ods_code,
+                    registration_type=a_registration_type,
+                    requesting_practice_ods_code=an_ods_code,
+                    sending_practice_ods_code=another_ods_code,
                 ),
                 integration=MiMessagePayloadIntegration(
-                    integrationStatus=a_status, reason=a_reason
+                    integration_status=a_status, reason=a_reason
                 ),
                 ehr=MiMessagePayloadEhr(
                     ehr_total_size_bytes=ehr_size,
@@ -204,11 +204,11 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
             transfer_event_datetime=another_datetime,
             payload=MiMessagePayload(
                 registration=MiMessagePayloadRegistration(
-                    registrationType=None,
-                    requestingPracticeOdsCode=None,
-                    sendingPracticeOdsCode=None,
+                    registration_type=None,
+                    requesting_practice_ods_code=None,
+                    sending_practice_ods_code=None,
                 ),
-                integration=MiMessagePayloadIntegration(integrationStatus=None, reason=None),
+                integration=MiMessagePayloadIntegration(integration_status=None, reason=None),
                 ehr=MiMessagePayloadEhr(
                     ehr_total_size_bytes=None,
                     ehr_structured_size_bytes=None,

@@ -53,12 +53,12 @@ def test_transfer_classifier_spine_runner_abstract_class():
             transfer_event_datetime=a_random_datetime,
             payload=MiMessagePayload(
                 registration=MiMessagePayloadRegistration(
-                    registrationType=None,
-                    requestingPracticeOdsCode=None,
-                    sendingPracticeOdsCode=None,
+                    registration_type=None,
+                    requesting_practice_ods_code=None,
+                    sending_practice_ods_code=None,
                 ),
                 integration=MiMessagePayloadIntegration(
-                    integrationStatus=an_integration_status, reason=an_integration_reason
+                    integration_status=an_integration_status, reason=an_integration_reason
                 ),
                 ehr=MiMessagePayloadEhr(
                     ehr_total_size_bytes=None,

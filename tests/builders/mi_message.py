@@ -31,14 +31,14 @@ def build_mi_message_payload(**kwargs) -> MiMessagePayload:
 
 def build_mi_message_payload_registration(**kwargs) -> MiMessagePayloadRegistration:
     return MiMessagePayloadRegistration(
-        registrationType=kwargs.get("registrationType", a_string()),
-        requestingPracticeOdsCode=kwargs.get("requestingPracticeOdsCode", a_string()),
-        sendingPracticeOdsCode=kwargs.get("sendingPracticeOdsCode", a_string()),
+        registration_type=kwargs.get("registration_type", a_string()),
+        requesting_practice_ods_code=kwargs.get("requesting_practice_ods_code", a_string()),
+        sending_practice_ods_code=kwargs.get("sending_practice_ods_code", a_string()),
     )
 
 
 def build_mi_message_payload_integration(**kwargs) -> MiMessagePayloadIntegration:
     return MiMessagePayloadIntegration(
-        integrationStatus=kwargs.get("integrationStatus", a_string()),
+        integration_status=kwargs.get("integration_status", a_string()),
         reason=kwargs.get("reason", a_string()),
     )
