@@ -11,6 +11,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     Placeholder,
+    UnsupportedDataItem,
 )
 
 GroupedMiMessages = dict[str, List[MiMessage]]
@@ -23,6 +24,20 @@ class MiService:
     @staticmethod
     def _get_payload_ehr(event: dict) -> dict:
         return event.get("payload", {}).get("ehr", {})
+
+    @staticmethod
+    def _create_unsupported_data_item(
+        unsupported_data_item: List[dict],
+    ) -> Optional[List[UnsupportedDataItem]]:
+
+        return [
+            UnsupportedDataItem(
+                type=placeholder.get("type"),
+                unique_identifier=placeholder.get("uniqueIdentifier"),
+                reason=placeholder.get("reason"),
+            )
+            for placeholder in unsupported_data_item
+        ]
 
     @staticmethod
     def _create_attachment(
@@ -114,6 +129,9 @@ class MiService:
                         ),
                         placeholder=self._create_placeholder(
                             self._get_payload_ehr(event).get("placeholder", [])
+                        ),
+                        unsupported_data_item=self._create_unsupported_data_item(
+                            self._get_payload_ehr(event).get("unsupportedDataItem", [])
                         ),
                     ),
                 ),

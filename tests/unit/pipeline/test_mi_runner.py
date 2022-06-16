@@ -14,7 +14,7 @@ from prmdata.pipeline.transfer_classifier import RunnerObservabilityProbe
 from tests.builders.config import build_config
 
 
-def test_transfer_classifier_spine_runner_abstract_class():
+def test_transfer_classifier_mi_runner_abstract_class():
     an_event_id = "1234"
     a_conversation_id = "1111-1111-1111-1111"
     an_event_type = "SOME_EVENT"
@@ -66,6 +66,7 @@ def test_transfer_classifier_spine_runner_abstract_class():
                     degrade=[],
                     attachment=[],
                     placeholder=[],
+                    unsupported_data_item=[],
                 ),
             ),
         )

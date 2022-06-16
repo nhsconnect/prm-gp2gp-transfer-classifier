@@ -51,12 +51,20 @@ class Placeholder:
 
 
 @dataclass
+class UnsupportedDataItem:
+    type: str
+    unique_identifier: str
+    reason: str
+
+
+@dataclass
 class MiMessagePayloadEhr:
     ehr_total_size_bytes: Optional[int]
     ehr_structured_size_bytes: Optional[int]
     degrade: Optional[List[Degrade]]
     attachment: Optional[List[Attachment]]
     placeholder: Optional[List[Placeholder]]
+    unsupported_data_item: Optional[List[UnsupportedDataItem]]
 
 
 @dataclass

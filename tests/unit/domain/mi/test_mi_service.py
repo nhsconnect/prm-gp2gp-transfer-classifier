@@ -9,6 +9,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     Placeholder,
+    UnsupportedDataItem,
 )
 from prmdata.domain.mi.mi_service import MiService
 from tests.builders.common import a_datetime, a_string, an_integer
@@ -48,6 +49,9 @@ def test_construct_mi_messages_from_mi_events():
     another_generated_by = a_string()
     another_reason_code = an_integer()
     another_another_mime_type = "audio"
+    an_unsupported_type = a_string()
+    an_unsupported_unique_identifier = a_string()
+    an_unsupported_reason = a_string()
 
     mi_events = [
         {
@@ -99,6 +103,13 @@ def test_construct_mi_messages_from_mi_events():
                             "reason": another_reason_code,
                             "originalMimeType": another_another_mime_type,
                         },
+                    ],
+                    "unsupportedDataItem": [
+                        {
+                            "type": an_unsupported_type,
+                            "uniqueIdentifier": an_unsupported_unique_identifier,
+                            "reason": an_unsupported_reason,
+                        }
                     ],
                 },
             },
@@ -158,6 +169,13 @@ def test_construct_mi_messages_from_mi_events():
                             original_mime_type=another_another_mime_type,
                         ),
                     ],
+                    unsupported_data_item=[
+                        UnsupportedDataItem(
+                            type=an_unsupported_type,
+                            unique_identifier=an_unsupported_unique_identifier,
+                            reason=an_unsupported_reason,
+                        )
+                    ],
                 ),
             ),
         )
@@ -215,6 +233,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
                     degrade=[],
                     attachment=[],
                     placeholder=[],
+                    unsupported_data_item=[],
                 ),
             ),
         )
