@@ -69,6 +69,7 @@ def test_transfer_classifier_mi_runner_abstract_class():
                     unsupported_data_item=[],
                     error=[],
                 ),
+                transfer_compatibility_status=None,
             ),
         )
     ]

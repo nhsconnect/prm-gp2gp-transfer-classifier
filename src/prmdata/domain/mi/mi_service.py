@@ -12,6 +12,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     Placeholder,
+    TransferCompatibilityStatus,
     UnsupportedDataItem,
 )
 
@@ -145,6 +146,14 @@ class MiService:
                             self._get_payload_ehr(event).get("unsupportedDataItem", [])
                         ),
                         error=self._create_error(self._get_payload_ehr(event).get("error", [])),
+                    ),
+                    transfer_compatibility_status=TransferCompatibilityStatus(
+                        status=event.get("payload", {})
+                        .get("transferCompatibilityStatus", {})
+                        .get("status"),
+                        reason=event.get("payload", {})
+                        .get("transferCompatibilityStatus", {})
+                        .get("reason"),
                     ),
                 ),
             )

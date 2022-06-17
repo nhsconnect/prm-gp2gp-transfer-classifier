@@ -26,6 +26,7 @@ def build_mi_message_payload(**kwargs) -> MiMessagePayload:
         registration=kwargs.get("registration", build_mi_message_payload_registration(**kwargs)),
         integration=kwargs.get("integration", build_mi_message_payload_integration(**kwargs)),
         ehr=None,
+        transfer_compatibility_status=None,
     )
 
 

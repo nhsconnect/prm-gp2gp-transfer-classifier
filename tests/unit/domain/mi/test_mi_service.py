@@ -10,6 +10,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     Placeholder,
+    TransferCompatibilityStatus,
     UnsupportedDataItem,
 )
 from prmdata.domain.mi.mi_service import MiService
@@ -55,6 +56,8 @@ def test_construct_mi_messages_from_mi_events():
     an_unsupported_reason = a_string()
     an_error_code = an_integer()
     an_error_description = a_string()
+    a_transfer_compatibility_status = a_string()
+    a_transfer_compatibility_reason = a_string()
 
     mi_events = [
         {
@@ -117,6 +120,10 @@ def test_construct_mi_messages_from_mi_events():
                     "error": [
                         {"errorCode": an_error_code, "errorDescription": an_error_description}
                     ],
+                },
+                "transferCompatibilityStatus": {
+                    "status": a_transfer_compatibility_status,
+                    "reason": a_transfer_compatibility_reason,
                 },
             },
         }
@@ -184,6 +191,9 @@ def test_construct_mi_messages_from_mi_events():
                     ],
                     error=[Error(error_code=an_error_code, error_description=an_error_description)],
                 ),
+                transfer_compatibility_status=TransferCompatibilityStatus(
+                    status=a_transfer_compatibility_status, reason=a_transfer_compatibility_reason
+                ),
             ),
         )
     ]
@@ -243,6 +253,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
                     unsupported_data_item=[],
                     error=[],
                 ),
+                transfer_compatibility_status=TransferCompatibilityStatus(status=None, reason=None),
             ),
         )
     ]
