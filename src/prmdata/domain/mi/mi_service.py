@@ -5,6 +5,7 @@ from prmdata.domain.mi.mi_message import (
     Coding,
     Codings,
     Degrade,
+    DemographicTraceStatus,
     Error,
     MiMessage,
     MiMessagePayload,
@@ -155,6 +156,15 @@ class MiService:
                         .get("transferCompatibilityStatus", {})
                         .get("reason"),
                     ),
+                    demographic_trace_status=DemographicTraceStatus(
+                        status=event.get("payload", {})
+                        .get("demographicTraceStatus", {})
+                        .get("status"),
+                        reason=event.get("payload", {})
+                        .get("demographicTraceStatus", {})
+                        .get("reason"),
+                    ),
+                    smartcard_present=event.get("payload", {}).get("smartcardPresent"),
                 ),
             )
             for event in mi_events

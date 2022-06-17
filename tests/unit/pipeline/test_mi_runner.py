@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, Mock
 
 from prmdata.domain.mi.mi_message import (
+    DemographicTraceStatus,
     MiMessage,
     MiMessagePayload,
     MiMessagePayloadEhr,
@@ -70,6 +71,8 @@ def test_transfer_classifier_mi_runner_abstract_class():
                     error=[],
                 ),
                 transfer_compatibility_status=None,
+                demographic_trace_status=DemographicTraceStatus(status=None, reason=None),
+                smartcard_present=None,
             ),
         )
     ]

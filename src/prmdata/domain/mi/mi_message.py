@@ -70,6 +70,12 @@ class TransferCompatibilityStatus:
 
 
 @dataclass
+class DemographicTraceStatus:
+    status: str
+    reason: str
+
+
+@dataclass
 class MiMessagePayloadEhr:
     ehr_total_size_bytes: Optional[int]
     ehr_structured_size_bytes: Optional[int]
@@ -86,6 +92,8 @@ class MiMessagePayload:
     integration: Optional[MiMessagePayloadIntegration]
     ehr: Optional[MiMessagePayloadEhr]
     transfer_compatibility_status: Optional[TransferCompatibilityStatus]
+    demographic_trace_status: Optional[DemographicTraceStatus]
+    smartcard_present: Optional[bool]
 
 
 @dataclass

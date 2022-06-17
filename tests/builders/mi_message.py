@@ -27,6 +27,8 @@ def build_mi_message_payload(**kwargs) -> MiMessagePayload:
         integration=kwargs.get("integration", build_mi_message_payload_integration(**kwargs)),
         ehr=None,
         transfer_compatibility_status=None,
+        demographic_trace_status=None,
+        smartcard_present=None,
     )
 
 
