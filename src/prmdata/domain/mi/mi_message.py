@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List, Optional
 
 
@@ -102,8 +103,8 @@ class MiMessage:
     event_id: str
     event_type: str
     transfer_protocol: str
-    event_generated_datetime: str
+    event_generated_datetime: datetime
     reporting_system_supplier: str
     reporting_practice_ods_code: str
-    transfer_event_datetime: str
+    transfer_event_datetime: datetime
     payload: MiMessagePayload

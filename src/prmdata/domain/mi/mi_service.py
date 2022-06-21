@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from prmdata.domain.mi.mi_message import (
@@ -107,10 +108,14 @@ class MiService:
                 event_id=event["eventId"],
                 event_type=event["eventType"],
                 transfer_protocol=event["transferProtocol"],
-                event_generated_datetime=event["eventGeneratedDateTime"],
+                event_generated_datetime=datetime.strptime(
+                    event["eventGeneratedDateTime"], "%Y-%m-%dT%H:%M:%S%z"
+                ),
                 reporting_system_supplier=event["reportingSystemSupplier"],
                 reporting_practice_ods_code=event["reportingPracticeOdsCode"],
-                transfer_event_datetime=event["transferEventDateTime"],
+                transfer_event_datetime=datetime.strptime(
+                    event["transferEventDateTime"], "%Y-%m-%dT%H:%M:%S%z"
+                ),
                 payload=MiMessagePayload(
                     registration=MiMessagePayloadRegistration(
                         registration_type=event.get("payload", {})

@@ -69,10 +69,10 @@ def test_construct_mi_messages_from_mi_events():
             "eventId": an_event_id,
             "eventType": an_event_type,
             "transferProtocol": a_protocol,
-            "eventGeneratedDateTime": a_random_datetime,
+            "eventGeneratedDateTime": a_random_datetime.isoformat(),
             "reportingSystemSupplier": a_supplier,
             "reportingPracticeOdsCode": an_ods_code,
-            "transferEventDateTime": another_datetime,
+            "transferEventDateTime": another_datetime.isoformat(),
             "payload": {
                 "registration": {
                     "registration_type": a_registration_type,
@@ -232,10 +232,10 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
             "eventId": an_event_id,
             "eventType": an_event_type,
             "transferProtocol": a_protocol,
-            "eventGeneratedDateTime": a_random_datetime,
+            "eventGeneratedDateTime": a_random_datetime.isoformat(),
             "reportingSystemSupplier": a_supplier,
             "reportingPracticeOdsCode": an_ods_code,
-            "transferEventDateTime": another_datetime,
+            "transferEventDateTime": another_datetime.isoformat(),
             "payload": {},
         }
     ]
