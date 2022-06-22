@@ -15,6 +15,7 @@ from prmdata.domain.mi.mi_message import (
     UnsupportedDataItem,
 )
 from prmdata.domain.mi.mi_service import MiService
+from prmdata.domain.mi.mi_transfer import EventSummary, MiTransfer
 from tests.builders.common import a_datetime, a_string, an_integer
 from tests.builders.mi_message import build_mi_message
 
@@ -297,5 +298,77 @@ def test_group_mi_messages_by_conversation_id():
     }
 
     actual = MiService().group_mi_messages_by_conversation_id(mi_events)
+
+    assert actual == expected
+
+
+def test_convert_to_mi_transfers():
+    conversation_id_one = a_string()
+    event_id_one_a = a_string()
+    event_type_one_a = a_string()
+    event_generated_datetime_one_a = a_datetime()
+    event_id_one_b = a_string()
+    event_type_one_b = a_string()
+    event_generated_datetime_one_b = a_datetime()
+
+    conversation_id_two = a_string()
+    event_id_two = a_string()
+    event_type_two = a_string()
+    event_generated_datetime_two = a_datetime()
+
+    grouped_messages = {
+        conversation_id_one: [
+            build_mi_message(
+                conversation_id=conversation_id_one,
+                event_id=event_id_one_a,
+                event_type=event_type_one_a,
+                event_generated_datetime=event_generated_datetime_one_a,
+            ),
+            build_mi_message(
+                conversation_id=conversation_id_one,
+                event_id=event_id_one_b,
+                event_type=event_type_one_b,
+                event_generated_datetime=event_generated_datetime_one_b,
+            ),
+        ],
+        conversation_id_two: [
+            build_mi_message(
+                conversation_id=conversation_id_two,
+                event_id=event_id_two,
+                event_type=event_type_two,
+                event_generated_datetime=event_generated_datetime_two,
+            )
+        ],
+    }
+
+    expected = [
+        MiTransfer(
+            conversation_id=conversation_id_one,
+            events=[
+                EventSummary(
+                    event_generated_datetime=event_generated_datetime_one_a,
+                    event_type=event_type_one_a,
+                    event_id=event_id_one_a,
+                ),
+                EventSummary(
+                    event_generated_datetime=event_generated_datetime_one_b,
+                    event_type=event_type_one_b,
+                    event_id=event_id_one_b,
+                ),
+            ],
+        ),
+        MiTransfer(
+            conversation_id=conversation_id_two,
+            events=[
+                EventSummary(
+                    event_generated_datetime=event_generated_datetime_two,
+                    event_type=event_type_two,
+                    event_id=event_id_two,
+                )
+            ],
+        ),
+    ]
+
+    actual = MiService().convert_to_mi_transfers(grouped_messages)
 
     assert actual == expected

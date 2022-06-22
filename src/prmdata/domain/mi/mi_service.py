@@ -17,6 +17,7 @@ from prmdata.domain.mi.mi_message import (
     TransferCompatibilityStatus,
     UnsupportedDataItem,
 )
+from prmdata.domain.mi.mi_transfer import EventSummary, MiTransfer
 
 GroupedMiMessages = dict[str, List[MiMessage]]
 
@@ -187,3 +188,22 @@ class MiService:
             grouped_mi_messages[mi_message.conversation_id].append(mi_message)
 
         return grouped_mi_messages
+
+    @staticmethod
+    def convert_to_mi_transfers(grouped_messages: GroupedMiMessages) -> List[MiTransfer]:
+        mi_transfers: List[MiTransfer] = []
+        for messages in grouped_messages.values():
+            mi_transfers.append(
+                MiTransfer(
+                    conversation_id=messages[0].conversation_id,
+                    events=[
+                        EventSummary(
+                            event_generated_datetime=message.event_generated_datetime,
+                            event_type=message.event_type,
+                            event_id=message.event_id,
+                        )
+                        for message in messages
+                    ],
+                )
+            )
+        return mi_transfers
