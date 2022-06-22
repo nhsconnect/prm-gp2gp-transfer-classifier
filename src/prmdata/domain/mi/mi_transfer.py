@@ -1,13 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
 class MiPractice:
-    supplier: str
+    supplier: Optional[str]  # deduced by subsequent events
     ods_code: str
-    name: str
 
 
 @dataclass
@@ -21,5 +20,5 @@ class EventSummary:
 class MiTransfer:
     conversation_id: str
     events: List[EventSummary]
-    # requesting_practice: MiPractice
-    # sending_practice: MiPractice
+    requesting_practice: MiPractice
+    sending_practice: MiPractice

@@ -17,7 +17,7 @@ from prmdata.domain.mi.mi_message import (
     TransferCompatibilityStatus,
     UnsupportedDataItem,
 )
-from prmdata.domain.mi.mi_transfer import EventSummary, MiTransfer
+from prmdata.domain.mi.mi_transfer import EventSummary, MiPractice, MiTransfer
 
 GroupedMiMessages = dict[str, List[MiMessage]]
 
@@ -189,10 +189,16 @@ class MiService:
 
         return grouped_mi_messages
 
-    @staticmethod
-    def convert_to_mi_transfers(grouped_messages: GroupedMiMessages) -> List[MiTransfer]:
+    def convert_to_mi_transfers(self, grouped_messages: GroupedMiMessages) -> List[MiTransfer]:
         mi_transfers: List[MiTransfer] = []
+
         for messages in grouped_messages.values():
+            requesting_supplier = messages[0].reporting_system_supplier
+
+            sending_supplier = None
+            if len(messages) > 1:
+                sending_supplier = messages[1].reporting_system_supplier
+
             mi_transfers.append(
                 MiTransfer(
                     conversation_id=messages[0].conversation_id,
@@ -204,6 +210,14 @@ class MiService:
                         )
                         for message in messages
                     ],
+                    requesting_practice=MiPractice(
+                        supplier=requesting_supplier,
+                        ods_code=messages[0].payload.registration.requesting_practice_ods_code,
+                    ),
+                    sending_practice=MiPractice(
+                        sending_supplier,
+                        ods_code=messages[0].payload.registration.sending_practice_ods_code,
+                    ),
                 )
             )
         return mi_transfers

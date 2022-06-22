@@ -15,9 +15,13 @@ from prmdata.domain.mi.mi_message import (
     UnsupportedDataItem,
 )
 from prmdata.domain.mi.mi_service import MiService
-from prmdata.domain.mi.mi_transfer import EventSummary, MiTransfer
+from prmdata.domain.mi.mi_transfer import EventSummary, MiPractice, MiTransfer
 from tests.builders.common import a_datetime, a_string, an_integer
-from tests.builders.mi_message import build_mi_message
+from tests.builders.mi_message import (
+    build_mi_message,
+    build_mi_message_payload,
+    build_mi_message_payload_registration,
+)
 
 
 def test_construct_mi_messages_from_mi_events():
@@ -307,14 +311,22 @@ def test_convert_to_mi_transfers():
     event_id_one_a = a_string()
     event_type_one_a = a_string()
     event_generated_datetime_one_a = a_datetime()
+    requesting_practice_supplier_one_a = a_string()
+    requesting_practice_ods_code_one_a = a_string()
+
     event_id_one_b = a_string()
     event_type_one_b = a_string()
     event_generated_datetime_one_b = a_datetime()
+    sending_practice_supplier_one_b = a_string()
+    sending_practice_ods_code_one_b = a_string()
 
     conversation_id_two = a_string()
     event_id_two = a_string()
     event_type_two = a_string()
     event_generated_datetime_two = a_datetime()
+    requesting_practice_supplier_two = a_string()
+    requesting_practice_ods_code_two = a_string()
+    sending_practice_ods_code_two = a_string()
 
     grouped_messages = {
         conversation_id_one: [
@@ -323,12 +335,26 @@ def test_convert_to_mi_transfers():
                 event_id=event_id_one_a,
                 event_type=event_type_one_a,
                 event_generated_datetime=event_generated_datetime_one_a,
+                reporting_system_supplier=requesting_practice_supplier_one_a,
+                payload=build_mi_message_payload(
+                    registration=build_mi_message_payload_registration(
+                        requesting_practice_ods_code=requesting_practice_ods_code_one_a,
+                        sending_practice_ods_code=sending_practice_ods_code_one_b,
+                    )
+                ),
             ),
             build_mi_message(
                 conversation_id=conversation_id_one,
                 event_id=event_id_one_b,
                 event_type=event_type_one_b,
                 event_generated_datetime=event_generated_datetime_one_b,
+                reporting_system_supplier=sending_practice_supplier_one_b,
+                payload=build_mi_message_payload(
+                    registration=build_mi_message_payload_registration(
+                        requesting_practice_ods_code=requesting_practice_ods_code_one_a,
+                        sending_practice_ods_code=sending_practice_ods_code_one_b,
+                    )
+                ),
             ),
         ],
         conversation_id_two: [
@@ -337,6 +363,13 @@ def test_convert_to_mi_transfers():
                 event_id=event_id_two,
                 event_type=event_type_two,
                 event_generated_datetime=event_generated_datetime_two,
+                reporting_system_supplier=requesting_practice_supplier_two,
+                payload=build_mi_message_payload(
+                    registration=build_mi_message_payload_registration(
+                        requesting_practice_ods_code=requesting_practice_ods_code_two,
+                        sending_practice_ods_code=sending_practice_ods_code_two,
+                    )
+                ),
             )
         ],
     }
@@ -356,6 +389,13 @@ def test_convert_to_mi_transfers():
                     event_id=event_id_one_b,
                 ),
             ],
+            sending_practice=MiPractice(
+                supplier=sending_practice_supplier_one_b, ods_code=sending_practice_ods_code_one_b
+            ),
+            requesting_practice=MiPractice(
+                supplier=requesting_practice_supplier_one_a,
+                ods_code=requesting_practice_ods_code_one_a,
+            ),
         ),
         MiTransfer(
             conversation_id=conversation_id_two,
@@ -366,6 +406,10 @@ def test_convert_to_mi_transfers():
                     event_id=event_id_two,
                 )
             ],
+            sending_practice=MiPractice(supplier=None, ods_code=sending_practice_ods_code_two),
+            requesting_practice=MiPractice(
+                supplier=requesting_practice_supplier_two, ods_code=requesting_practice_ods_code_two
+            ),
         ),
     ]
 
