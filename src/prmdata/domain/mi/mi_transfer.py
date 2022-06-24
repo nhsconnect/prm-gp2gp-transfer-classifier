@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
+from prmdata.domain.mi.event_type import EventType
+
 
 @dataclass
 class MiPractice:
@@ -12,7 +14,7 @@ class MiPractice:
 @dataclass
 class EventSummary:
     event_generated_datetime: datetime
-    event_type: str
+    event_type: EventType
     event_id: str
 
 

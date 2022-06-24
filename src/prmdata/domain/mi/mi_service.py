@@ -1,6 +1,8 @@
-from datetime import datetime
 from typing import List, Optional
 
+from dateutil import parser
+
+from prmdata.domain.mi.event_type import EventType
 from prmdata.domain.mi.mi_message import (
     Attachment,
     Coding,
@@ -103,36 +105,38 @@ class MiService:
         ]
 
     def construct_mi_messages_from_mi_events(self, mi_events: List[dict]) -> List[MiMessage]:
+        timezone_info = {"BST": 1 * 3600, "UTC": 0 * 3600}
+
         return [
             MiMessage(
                 conversation_id=event["conversationId"],
                 event_id=event["eventId"],
-                event_type=event["eventType"],
+                event_type=EventType[event["eventType"]],
                 transfer_protocol=event["transferProtocol"],
-                event_generated_datetime=datetime.strptime(
-                    event["eventGeneratedDateTime"], "%Y-%m-%dT%H:%M:%S%z"
+                event_generated_datetime=parser.parse(
+                    event["eventGeneratedDateTime"], tzinfos=timezone_info
                 ),
                 reporting_system_supplier=event["reportingSystemSupplier"],
                 reporting_practice_ods_code=event["reportingPracticeOdsCode"],
-                transfer_event_datetime=datetime.strptime(
-                    event["transferEventDateTime"], "%Y-%m-%dT%H:%M:%S%z"
+                transfer_event_datetime=parser.parse(
+                    event["transferEventDateTime"], tzinfos=timezone_info
                 ),
                 payload=MiMessagePayload(
                     registration=MiMessagePayloadRegistration(
                         registration_type=event.get("payload", {})
                         .get("registration", {})
-                        .get("registration_type"),
+                        .get("registrationType"),
                         requesting_practice_ods_code=event.get("payload", {})
                         .get("registration", {})
-                        .get("requesting_practice_ods_code"),
+                        .get("requestingPracticeOdsCode"),
                         sending_practice_ods_code=event.get("payload", {})
                         .get("registration", {})
-                        .get("sending_practice_ods_code"),
+                        .get("sendingPracticeOdsCode"),
                     ),
                     integration=MiMessagePayloadIntegration(
                         integration_status=event.get("payload", {})
                         .get("integration", {})
-                        .get("integration_status"),
+                        .get("integrationStatus"),
                         reason=event.get("payload", {}).get("integration", {}).get("reason"),
                     ),
                     ehr=MiMessagePayloadEhr(

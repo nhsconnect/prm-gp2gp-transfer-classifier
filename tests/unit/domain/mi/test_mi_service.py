@@ -1,3 +1,4 @@
+from prmdata.domain.mi.event_type import EventType
 from prmdata.domain.mi.mi_message import (
     Attachment,
     Coding,
@@ -27,7 +28,7 @@ from tests.builders.mi_message import (
 def test_construct_mi_messages_from_mi_events():
     a_conversation_id = "1111-1111-1111-1111"
     an_event_id = "1234-5678-8765-4321"
-    an_event_type = "REGISTRATION_STARTED"
+    an_event_type = EventType.REGISTRATION_STARTED
     a_protocol = "PRE_TRANSFER"
     a_random_datetime = a_datetime()
     a_supplier = a_string()
@@ -72,7 +73,7 @@ def test_construct_mi_messages_from_mi_events():
         {
             "conversationId": a_conversation_id,
             "eventId": an_event_id,
-            "eventType": an_event_type,
+            "eventType": an_event_type.value,
             "transferProtocol": a_protocol,
             "eventGeneratedDateTime": a_random_datetime.isoformat(),
             "reportingSystemSupplier": a_supplier,
@@ -80,11 +81,11 @@ def test_construct_mi_messages_from_mi_events():
             "transferEventDateTime": another_datetime.isoformat(),
             "payload": {
                 "registration": {
-                    "registration_type": a_registration_type,
-                    "requesting_practice_ods_code": an_ods_code,
-                    "sending_practice_ods_code": another_ods_code,
+                    "registrationType": a_registration_type,
+                    "requestingPracticeOdsCode": an_ods_code,
+                    "sendingPracticeOdsCode": another_ods_code,
                 },
-                "integration": {"integration_status": a_status, "reason": a_reason},
+                "integration": {"integrationStatus": a_status, "reason": a_reason},
                 "ehr": {
                     "ehrTotalSizeBytes": ehr_size,
                     "ehrStructuredSizeBytes": ehr_structured_size,
@@ -224,7 +225,7 @@ def test_construct_mi_messages_from_mi_events():
 def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
     a_conversation_id = "1111-1111-1111-1111"
     an_event_id = "1234-5678-8765-4321"
-    an_event_type = "REGISTRATION_STARTED"
+    an_event_type = EventType.REGISTRATION_STARTED
     a_protocol = "PRE_TRANSFER"
     a_random_datetime = a_datetime()
     a_supplier = a_string()
@@ -235,7 +236,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
         {
             "conversationId": a_conversation_id,
             "eventId": an_event_id,
-            "eventType": an_event_type,
+            "eventType": an_event_type.value,
             "transferProtocol": a_protocol,
             "eventGeneratedDateTime": a_random_datetime.isoformat(),
             "reportingSystemSupplier": a_supplier,
@@ -309,20 +310,20 @@ def test_group_mi_messages_by_conversation_id():
 def test_convert_to_mi_transfers():
     conversation_id_one = a_string()
     event_id_one_a = a_string()
-    event_type_one_a = a_string()
+    event_type_one_a = EventType.EHR_REQUESTED
     event_generated_datetime_one_a = a_datetime()
     requesting_practice_supplier_one_a = a_string()
     requesting_practice_ods_code_one_a = a_string()
 
     event_id_one_b = a_string()
-    event_type_one_b = a_string()
+    event_type_one_b = EventType.REGISTRATION_STARTED
     event_generated_datetime_one_b = a_datetime()
     sending_practice_supplier_one_b = a_string()
     sending_practice_ods_code_one_b = a_string()
 
     conversation_id_two = a_string()
     event_id_two = a_string()
-    event_type_two = a_string()
+    event_type_two = EventType.EHR_GENERATED
     event_generated_datetime_two = a_datetime()
     requesting_practice_supplier_two = a_string()
     requesting_practice_ods_code_two = a_string()

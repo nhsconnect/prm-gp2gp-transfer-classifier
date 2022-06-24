@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
 
+from prmdata.domain.mi.event_type import EventType
+
 
 @dataclass
 class MiMessagePayloadRegistration:
@@ -101,7 +103,7 @@ class MiMessagePayload:
 class MiMessage:
     conversation_id: str
     event_id: str
-    event_type: str
+    event_type: EventType
     transfer_protocol: str
     event_generated_datetime: datetime
     reporting_system_supplier: str
