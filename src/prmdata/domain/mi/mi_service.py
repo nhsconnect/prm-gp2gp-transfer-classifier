@@ -216,11 +216,19 @@ class MiService:
                     ],
                     requesting_practice=MiPractice(
                         supplier=requesting_supplier,
-                        ods_code=messages[0].payload.registration.requesting_practice_ods_code,
+                        ods_code=next(
+                            message.payload.registration.requesting_practice_ods_code
+                            for message in messages
+                            if message.payload.registration.requesting_practice_ods_code is not None
+                        ),
                     ),
                     sending_practice=MiPractice(
                         sending_supplier,
-                        ods_code=messages[0].payload.registration.sending_practice_ods_code,
+                        ods_code=next(
+                            message.payload.registration.sending_practice_ods_code
+                            for message in messages
+                            if message.payload.registration.sending_practice_ods_code is not None
+                        ),
                     ),
                 )
             )
