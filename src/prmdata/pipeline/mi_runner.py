@@ -24,4 +24,7 @@ class MiRunner(TransferClassifier):
         self._runner_observability_probe.log_successfully_constructed_mi_messages(mi_messages)
 
         grouped_mi_messages = mi_service.group_mi_messages_by_conversation_id(mi_messages)
-        self._runner_observability_probe.log_successfully_grouped_mi_messages(grouped_mi_messages)
+        # self._runner_observability_probe.log_successfully_grouped_mi_messages(grouped_mi_messages)
+
+        transfers = mi_service.convert_to_mi_transfers(grouped_mi_messages)
+        logger.info(transfers)

@@ -92,7 +92,8 @@ def test_transfer_classifier_mi_runner_abstract_class():
     TransferClassifierIO.read_json_files_from_paths = MagicMock(return_value=[an_event])
 
     MiService.construct_mi_messages_from_mi_events = Mock(return_value=mi_messages)
-    MiService.group_mi_messages_by_conversation_id = Mock()
+    MiService.group_mi_messages_by_conversation_id = Mock(return_value=grouped_mi_messages)
+    MiService.convert_to_mi_transfers = Mock()
 
     RunnerObservabilityProbe.log_attempting_to_classify = Mock()
     RunnerObservabilityProbe.log_successfully_grouped_mi_messages = Mock()
@@ -103,8 +104,9 @@ def test_transfer_classifier_mi_runner_abstract_class():
 
     MiService.construct_mi_messages_from_mi_events.assert_called_with([an_event])
     MiService.group_mi_messages_by_conversation_id.assert_called_with(mi_messages)
+    MiService.convert_to_mi_transfers.assert_called_with(grouped_mi_messages)
 
     RunnerObservabilityProbe.log_attempting_to_classify.assert_called()
-    RunnerObservabilityProbe.log_successfully_grouped_mi_messages.assert_called()
+    # RunnerObservabilityProbe.log_successfully_grouped_mi_messages.assert_called()
     RunnerObservabilityProbe.log_successfully_read_mi_events.assert_called()
     RunnerObservabilityProbe.log_successfully_constructed_mi_messages.assert_called()
