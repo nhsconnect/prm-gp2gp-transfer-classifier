@@ -352,8 +352,8 @@ def test_convert_to_mi_transfers():
                 reporting_system_supplier=sending_practice_supplier_one_b,
                 payload=build_mi_message_payload(
                     registration=build_mi_message_payload_registration(
-                        requesting_practice_ods_code=requesting_practice_ods_code_one_a,
-                        sending_practice_ods_code=sending_practice_ods_code_one_b,
+                        requesting_practice_ods_code="non_used_ods_code",
+                        sending_practice_ods_code="non_used_ods_code",
                     )
                 ),
             ),
@@ -410,6 +410,79 @@ def test_convert_to_mi_transfers():
             sending_practice=MiPractice(supplier=None, ods_code=sending_practice_ods_code_two),
             requesting_practice=MiPractice(
                 supplier=requesting_practice_supplier_two, ods_code=requesting_practice_ods_code_two
+            ),
+        ),
+    ]
+
+    actual = MiService().convert_to_mi_transfers(grouped_messages)
+
+    assert actual == expected
+
+
+def test_convert_to_mi_transfers_continues_if_missing_requesting_practice_ods_code():
+    conversation_id_one = a_string()
+    event_id_one_a = a_string()
+    event_type_one_a = EventType.EHR_REQUESTED
+    event_generated_datetime_one_a = a_datetime()
+    requesting_practice_supplier_one_a = a_string()
+
+    event_id_one_b = a_string()
+    event_type_one_b = EventType.REGISTRATION_STARTED
+    event_generated_datetime_one_b = a_datetime()
+    sending_practice_supplier_one_b = a_string()
+
+    grouped_messages = {
+        conversation_id_one: [
+            build_mi_message(
+                conversation_id=conversation_id_one,
+                event_id=event_id_one_a,
+                event_type=event_type_one_a,
+                event_generated_datetime=event_generated_datetime_one_a,
+                reporting_system_supplier=requesting_practice_supplier_one_a,
+                payload=build_mi_message_payload(
+                    registration=MiMessagePayloadRegistration(
+                        registration_type=None,
+                        requesting_practice_ods_code=None,
+                        sending_practice_ods_code=None,
+                    )
+                ),
+            ),
+            build_mi_message(
+                conversation_id=conversation_id_one,
+                event_id=event_id_one_b,
+                event_type=event_type_one_b,
+                event_generated_datetime=event_generated_datetime_one_b,
+                reporting_system_supplier=sending_practice_supplier_one_b,
+                payload=build_mi_message_payload(
+                    registration=MiMessagePayloadRegistration(
+                        registration_type=None,
+                        requesting_practice_ods_code=None,
+                        sending_practice_ods_code=None,
+                    )
+                ),
+            ),
+        ],
+    }
+
+    expected = [
+        MiTransfer(
+            conversation_id=conversation_id_one,
+            events=[
+                EventSummary(
+                    event_generated_datetime=event_generated_datetime_one_a,
+                    event_type=event_type_one_a,
+                    event_id=event_id_one_a,
+                ),
+                EventSummary(
+                    event_generated_datetime=event_generated_datetime_one_b,
+                    event_type=event_type_one_b,
+                    event_id=event_id_one_b,
+                ),
+            ],
+            sending_practice=MiPractice(supplier=sending_practice_supplier_one_b, ods_code=None),
+            requesting_practice=MiPractice(
+                supplier=requesting_practice_supplier_one_a,
+                ods_code=None,
             ),
         ),
     ]

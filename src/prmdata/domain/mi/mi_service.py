@@ -20,6 +20,7 @@ from prmdata.domain.mi.mi_message import (
     UnsupportedDataItem,
 )
 from prmdata.domain.mi.mi_transfer import EventSummary, MiPractice, MiTransfer
+from prmdata.utils.filters import find_first
 
 GroupedMiMessages = dict[str, List[MiMessage]]
 
@@ -216,18 +217,28 @@ class MiService:
                     ],
                     requesting_practice=MiPractice(
                         supplier=requesting_supplier,
-                        ods_code=next(
-                            message.payload.registration.requesting_practice_ods_code
-                            for message in messages
-                            if message.payload.registration.requesting_practice_ods_code is not None
+                        ods_code=find_first(
+                            iterable=messages,
+                            condition=(
+                                lambda message: message.payload.registration.requesting_practice_ods_code
+                                is not None
+                            ),
+                            value=(
+                                lambda message: message.payload.registration.requesting_practice_ods_code
+                            ),
                         ),
                     ),
                     sending_practice=MiPractice(
                         sending_supplier,
-                        ods_code=next(
-                            message.payload.registration.sending_practice_ods_code
-                            for message in messages
-                            if message.payload.registration.sending_practice_ods_code is not None
+                        ods_code=find_first(
+                            iterable=messages,
+                            condition=(
+                                lambda message: message.payload.registration.sending_practice_ods_code
+                                is not None
+                            ),
+                            value=(
+                                lambda message: message.payload.registration.sending_practice_ods_code
+                            ),
                         ),
                     ),
                 )

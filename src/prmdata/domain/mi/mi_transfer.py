@@ -8,7 +8,7 @@ from prmdata.domain.mi.event_type import EventType
 @dataclass
 class MiPractice:
     supplier: Optional[str]  # deduced by subsequent events
-    ods_code: str
+    ods_code: Optional[str]
 
 
 @dataclass
