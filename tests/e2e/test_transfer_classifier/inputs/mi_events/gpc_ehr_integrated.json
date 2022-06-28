@@ -1,0 +1,20 @@
+{
+  "eventId": "004510ef-f16f-3b49-9a85-5d51b8f4aa28",
+  "eventGeneratedDateTime": "2022-01-02T00:00:00",
+  "eventType": "EHR_INTEGRATED",
+  "transferProtocol": "GP_CONNECT",
+  "reportingSystemSupplier": "SUPPLIER_SYSTEM",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "123e4567-e89b-12d3-a456-426614174000",
+  "transferEventDateTime": "2022-01-02T00:00:00",
+  "payload": {
+    "registration": {
+      "requestingPracticeOdsCode": "ABC1234",
+      "sendingPracticeOdsCode": "XYZ4567"
+    },
+    "integration": {
+      "integrationStatus": "filed as attachment/ suppressed/ merged/ rejected",
+      "reason": "Reason for integration status"
+    }
+  }
+}

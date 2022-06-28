@@ -24,3 +24,4 @@ class MiTransfer:
     events: List[EventSummary]
     requesting_practice: MiPractice
     sending_practice: MiPractice
+    slow_transfer: Optional[bool]

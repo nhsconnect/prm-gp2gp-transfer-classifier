@@ -1,0 +1,16 @@
+{
+  "eventId": "76823f10-5d19-3a44-9d6e-cb91a38e79da",
+  "eventGeneratedDateTime": "2022-01-02T00:00:00",
+  "eventType": "MIGRATE_STRUCTURED_RECORD_REQUEST",
+  "transferProtocol": "GP_CONNECT",
+  "reportingSystemSupplier": "SUPPLIER_SYSTEM",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "123e4567-e89b-12d3-a456-426614174000",
+  "transferEventDateTime": "2022-01-02T00:00:00",
+  "payload": {
+    "registration": {
+      "requestingPracticeOdsCode": "ABC1234",
+      "sendingPracticeOdsCode": "XYZ4567"
+    }
+  }
+}

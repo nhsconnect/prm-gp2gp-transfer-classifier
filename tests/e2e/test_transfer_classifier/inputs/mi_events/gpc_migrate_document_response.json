@@ -1,0 +1,26 @@
+{
+  "eventId": "b6f128e0-03cb-3735-973b-90674c1817cb",
+  "eventGeneratedDateTime": "2022-01-02T00:00:00",
+  "eventType": "MIGRATE_DOCUMENT_RESPONSE",
+  "transferProtocol": "GP_CONNECT",
+  "reportingSystemSupplier": "SUPPLIER_SYSTEM",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "123e4567-e89b-12d3-a456-426614174000",
+  "transferEventDateTime": "2022-01-02T00:00:00",
+  "payload": {
+    "registration": {
+      "requestingPracticeOdsCode": "ABC1234",
+      "sendingPracticeOdsCode": "XYZ4567"
+    },
+    "attachment": {
+      "attachmentId": "3424-342456-3424-342456",
+      "clinicalType": "Scanned document",
+      "mimeType": "application/pdf",
+      "sizeBytes": 3084322
+    },
+    "documentMigration": {
+      "status": "FAILURE",
+      "reason": "Large file size"
+    }
+  }
+}

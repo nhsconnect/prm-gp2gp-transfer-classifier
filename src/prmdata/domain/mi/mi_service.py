@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import List, Optional
 
 from dateutil import parser
@@ -104,6 +105,26 @@ class MiService:
             )
             for degrade in degrade_list
         ]
+
+    @staticmethod
+    def _calculate_slow_transfer(messages: List[MiMessage]) -> Optional[bool]:
+        transfer_requested_datetime = find_first(
+            iterable=messages,
+            value=lambda message: message.transfer_event_datetime,
+            condition=lambda message: message.event_type is EventType.EHR_REQUESTED
+            or message.event_type is EventType.EHR_READY_TO_INTEGRATE,
+        )
+        transfer_received_datetime = find_first(
+            iterable=messages,
+            value=lambda message: message.transfer_event_datetime,
+            condition=lambda message: message.event_type is EventType.EHR_VALIDATED
+            or message.event_type is EventType.MIGRATE_STRUCTURED_RECORD_REQUEST,
+        )
+
+        if transfer_requested_datetime is None or transfer_received_datetime is None:
+            return None
+
+        return (transfer_received_datetime - transfer_requested_datetime) > timedelta(days=1)
 
     def construct_mi_messages_from_mi_events(self, mi_events: List[dict]) -> List[MiMessage]:
         timezone_info = {"BST": 1 * 3600, "UTC": 0 * 3600}
@@ -241,6 +262,7 @@ class MiService:
                             ),
                         ),
                     ),
+                    slow_transfer=self._calculate_slow_transfer(messages),
                 )
             )
         return mi_transfers
