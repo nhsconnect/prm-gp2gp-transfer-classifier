@@ -10,6 +10,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadRegistration,
 )
 from prmdata.domain.mi.mi_service import MiService
+from prmdata.domain.mi.mi_transfer import MiTransfer
 from prmdata.pipeline.io import TransferClassifierIO
 from prmdata.pipeline.mi_runner import MiRunner
 from prmdata.pipeline.transfer_classifier import RunnerObservabilityProbe
@@ -89,16 +90,26 @@ def test_transfer_classifier_mi_runner_abstract_class():
 
     grouped_mi_messages = {a_conversation_id: [an_mi_message]}
 
+    transfers = [
+        MiTransfer(
+            conversation_id=a_conversation_id,
+            events=[],
+            requesting_practice=None,
+            sending_practice=None,
+        )
+    ]
+
     TransferClassifierIO.read_json_files_from_paths = MagicMock(return_value=[an_event])
 
     MiService.construct_mi_messages_from_mi_events = Mock(return_value=mi_messages)
     MiService.group_mi_messages_by_conversation_id = Mock(return_value=grouped_mi_messages)
-    MiService.convert_to_mi_transfers = Mock()
+    MiService.convert_to_mi_transfers = Mock(return_value=transfers)
 
     RunnerObservabilityProbe.log_attempting_to_classify = Mock()
     RunnerObservabilityProbe.log_successfully_grouped_mi_messages = Mock()
     RunnerObservabilityProbe.log_successfully_read_mi_events = Mock()
     RunnerObservabilityProbe.log_successfully_constructed_mi_messages = Mock()
+    RunnerObservabilityProbe.log_successfully_created_transfers_from_mi_events = Mock()
 
     MiRunner(build_config()).run()
 
@@ -110,3 +121,4 @@ def test_transfer_classifier_mi_runner_abstract_class():
     # RunnerObservabilityProbe.log_successfully_grouped_mi_messages.assert_called()
     RunnerObservabilityProbe.log_successfully_read_mi_events.assert_called()
     RunnerObservabilityProbe.log_successfully_constructed_mi_messages.assert_called()
+    RunnerObservabilityProbe.log_successfully_created_transfers_from_mi_events.assert_called()

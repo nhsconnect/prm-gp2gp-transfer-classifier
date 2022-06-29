@@ -9,6 +9,7 @@ import boto3
 from prmdata.domain.gp2gp.transfer import Transfer
 from prmdata.domain.gp2gp.transfer_service import TransferService, TransferServiceObservabilityProbe
 from prmdata.domain.mi.mi_message import MiMessage
+from prmdata.domain.mi.mi_transfer import MiTransfer
 from prmdata.domain.ods_portal.organisation_metadata_monthly import OrganisationMetadataMonthly
 from prmdata.domain.reporting_window import ReportingWindow
 from prmdata.pipeline.config import TransferClassifierConfig
@@ -113,6 +114,16 @@ class RunnerObservabilityProbe:
                 "grouped_mi_messages": json.dumps(
                     grouped_mi_messages, default=lambda o: o.__dict__, sort_keys=True
                 ),
+                **self._log_date_range_info,
+            },
+        )
+
+    def log_successfully_created_transfers_from_mi_events(self, mi_transfers: List[MiTransfer]):
+        self._logger.info(
+            "Successfully created transfers from mi events",
+            extra={
+                "event": "SUCCESSFULLY_CREATED_TRANSFERS_FROM_MI_EVENTS",
+                "transfers": json.dumps(mi_transfers, default=lambda o: o.__dict__, sort_keys=True),
                 **self._log_date_range_info,
             },
         )
