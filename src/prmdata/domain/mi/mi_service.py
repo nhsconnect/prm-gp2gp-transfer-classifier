@@ -230,7 +230,7 @@ class MiService:
                     conversation_id=messages[0].conversation_id,
                     events=[
                         EventSummary(
-                            event_generated_datetime=message.event_generated_datetime,
+                            event_generated_datetime=message.event_generated_datetime.isoformat(),
                             event_type=message.event_type,
                             event_id=message.event_id,
                         )

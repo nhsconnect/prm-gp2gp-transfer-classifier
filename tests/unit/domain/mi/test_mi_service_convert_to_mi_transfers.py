@@ -83,12 +83,12 @@ def test_convert_to_mi_transfers():
             conversation_id=conversation_id_one,
             events=[
                 EventSummary(
-                    event_generated_datetime=event_generated_datetime_one_a,
+                    event_generated_datetime=event_generated_datetime_one_a.isoformat(),
                     event_type=event_type_one_a,
                     event_id=event_id_one_a,
                 ),
                 EventSummary(
-                    event_generated_datetime=event_generated_datetime_one_b,
+                    event_generated_datetime=event_generated_datetime_one_b.isoformat(),
                     event_type=event_type_one_b,
                     event_id=event_id_one_b,
                 ),
@@ -106,7 +106,7 @@ def test_convert_to_mi_transfers():
             conversation_id=conversation_id_two,
             events=[
                 EventSummary(
-                    event_generated_datetime=event_generated_datetime_two,
+                    event_generated_datetime=event_generated_datetime_two.isoformat(),
                     event_type=event_type_two,
                     event_id=event_id_two,
                 )
@@ -174,12 +174,12 @@ def test_convert_to_mi_transfers_continues_if_missing_requesting_practice_ods_co
             conversation_id=conversation_id_one,
             events=[
                 EventSummary(
-                    event_generated_datetime=event_generated_datetime_one_a,
+                    event_generated_datetime=event_generated_datetime_one_a.isoformat(),
                     event_type=event_type_one_a,
                     event_id=event_id_one_a,
                 ),
                 EventSummary(
-                    event_generated_datetime=event_generated_datetime_one_b,
+                    event_generated_datetime=event_generated_datetime_one_b.isoformat(),
                     event_type=event_type_one_b,
                     event_id=event_id_one_b,
                 ),
@@ -293,12 +293,12 @@ def test_slow_transfer_returns_true_given_more_than_a_day_after_requested():
             conversation_id=conversation_id_one,
             events=[
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_one_a,
+                    event_generated_datetime=transfer_event_datetime_one_a.isoformat(),
                     event_type=event_type_one_a,
                     event_id=event_id_one_a,
                 ),
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_one_b,
+                    event_generated_datetime=transfer_event_datetime_one_b.isoformat(),
                     event_type=event_type_one_b,
                     event_id=event_id_one_b,
                 ),
@@ -316,12 +316,12 @@ def test_slow_transfer_returns_true_given_more_than_a_day_after_requested():
             conversation_id=conversation_id_two,
             events=[
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_two_a,
+                    event_generated_datetime=transfer_event_datetime_two_a.isoformat(),
                     event_type=event_type_two_a,
                     event_id=event_id_two_a,
                 ),
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_two_b,
+                    event_generated_datetime=transfer_event_datetime_two_b.isoformat(),
                     event_type=event_type_two_b,
                     event_id=event_id_two_b,
                 ),
@@ -437,12 +437,12 @@ def test_slow_transfer_returns_false_given_less_than_a_day_after_requested():
             conversation_id=conversation_id_one,
             events=[
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_one_a,
+                    event_generated_datetime=transfer_event_datetime_one_a.isoformat(),
                     event_type=event_type_one_a,
                     event_id=event_id_one_a,
                 ),
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_one_b,
+                    event_generated_datetime=transfer_event_datetime_one_b.isoformat(),
                     event_type=event_type_one_b,
                     event_id=event_id_one_b,
                 ),
@@ -460,12 +460,12 @@ def test_slow_transfer_returns_false_given_less_than_a_day_after_requested():
             conversation_id=conversation_id_two,
             events=[
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_two_a,
+                    event_generated_datetime=transfer_event_datetime_two_a.isoformat(),
                     event_type=event_type_two_a,
                     event_id=event_id_two_a,
                 ),
                 EventSummary(
-                    event_generated_datetime=transfer_event_datetime_two_b,
+                    event_generated_datetime=transfer_event_datetime_two_b.isoformat(),
                     event_type=event_type_two_b,
                     event_id=event_id_two_b,
                 ),
