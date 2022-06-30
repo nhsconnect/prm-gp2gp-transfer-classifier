@@ -101,7 +101,7 @@ class RunnerObservabilityProbe:
             "Successfully constructed mi messages from mi events",
             extra={
                 "event": "SUCCESSFULLY_CONSTRUCTED_MI_MESSAGES_FROM_MI_EVENTS",
-                "mi_messages": str(mi_messages),
+                # "mi_messages": str(mi_messages),
                 **self._log_date_range_info,
             },
         )
@@ -111,14 +111,23 @@ class RunnerObservabilityProbe:
             "Successfully grouped my messages by conversation ID",
             extra={
                 "event": "SUCCESSFULLY_GROUPED_MI_MESSAGES_BY_CONVERSATION_ID",
-                "grouped_mi_messages": json.dumps(
-                    grouped_mi_messages, default=lambda o: o.__dict__, sort_keys=True
-                ),
+                # "grouped_mi_messages": json.dumps(
+                #     grouped_mi_messages, default=lambda o: o.__dict__, sort_keys=True
+                # ),
                 **self._log_date_range_info,
             },
         )
 
     def log_successfully_created_transfers_from_mi_events(self, mi_transfers: List[MiTransfer]):
+        self._logger.info(
+            "Successfully created transfers from mi events",
+            extra={
+                "event": "SUCCESSFULLY_CREATED_TRANSFERS_FROM_MI_EVENTS",
+                # "transfers": json.dumps(mi_transfers, default=lambda o: o.__dict__, sort_keys=True),
+                **self._log_date_range_info,
+            },
+        )
+
         self._logger.info(
             "Successfully created transfers from mi events",
             extra={
