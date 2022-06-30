@@ -1,4 +1,3 @@
-import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from logging import Logger, getLogger
@@ -132,7 +131,7 @@ class RunnerObservabilityProbe:
             "Successfully created transfers from mi events",
             extra={
                 "event": "SUCCESSFULLY_CREATED_TRANSFERS_FROM_MI_EVENTS",
-                "transfers": json.dumps(mi_transfers, default=lambda o: o.__dict__, sort_keys=True),
+                "transfers": str(mi_transfers),
                 **self._log_date_range_info,
             },
         )
