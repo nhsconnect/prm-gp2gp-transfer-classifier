@@ -1,0 +1,20 @@
+{
+  "eventId": "c8dc0b5f-785b-3afe-b63b-c166d8249ba9",
+  "eventGeneratedDateTime": "2022-04-03T09:00:00",
+  "eventType": "INTERNAL_TRANSFER",
+  "transferProtocol": "INTERNAL_TRANSFER",
+  "reportingSystemSupplier": "SUPPLIER_SYSTEM",
+  "reportingPracticeOdsCode": "ABC1234",
+  "conversationId": "33333333-e89b-12d3-a456-426614174000",
+  "transferEventDateTime": "2022-04-03T09:00:00",
+  "payload": {
+    "registration": {
+      "requestingPracticeOdsCode": "ABC1234",
+      "sendingPracticeOdsCode": "XYZ4567"
+    },
+    "integration": {
+      "integrationStatus": "filed as attachment/ suppressed/ merged/ rejected",
+      "reason": "Reason for integration status"
+    }
+  }
+}
