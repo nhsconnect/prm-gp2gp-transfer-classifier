@@ -5,7 +5,7 @@
   "transferProtocol": "INTERNAL_TRANSFER",
   "reportingSystemSupplier": "SUPPLIER_SYSTEM",
   "reportingPracticeOdsCode": "ABC1234",
-  "conversationId": "33333333-e89b-12d3-a456-426614174000",
+  "conversationId": "33333333-12d3-12d3-a456-426614174000",
   "transferEventDateTime": "2022-04-03T09:00:00",
   "payload": {
     "registration": {

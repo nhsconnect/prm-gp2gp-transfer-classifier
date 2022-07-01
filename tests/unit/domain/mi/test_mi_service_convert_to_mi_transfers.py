@@ -214,13 +214,13 @@ def test_slow_transfer_returns_true_given_more_than_a_day_after_requested():
 
     conversation_id_two = a_string()
     event_id_two_a = a_string()
-    event_type_two_a = EventType.EHR_READY_TO_INTEGRATE
+    event_type_two_a = EventType.MIGRATE_STRUCTURED_RECORD_REQUEST
     transfer_event_datetime_two_a = a_datetime(year=2000, month=1, day=1)
     requesting_practice_supplier_two_a = a_string()
     requesting_practice_ods_code_two_a = a_string()
 
     event_id_two_b = a_string()
-    event_type_two_b = EventType.MIGRATE_STRUCTURED_RECORD_REQUEST
+    event_type_two_b = EventType.EHR_READY_TO_INTEGRATE
     transfer_event_datetime_two_b = a_datetime(year=2000, month=1, day=3)
     sending_practice_supplier_two_b = a_string()
     sending_practice_ods_code_two_b = a_string()

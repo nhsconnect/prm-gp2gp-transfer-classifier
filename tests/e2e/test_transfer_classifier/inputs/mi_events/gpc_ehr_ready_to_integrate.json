@@ -1,12 +1,12 @@
 {
   "eventId": "5275d522-b421-3fc3-9972-b7207097469d",
-  "eventGeneratedDateTime": "2022-01-02T00:00:00",
+  "eventGeneratedDateTime": "2022-01-05T00:00:00",
   "eventType": "EHR_READY_TO_INTEGRATE",
   "transferProtocol": "GP_CONNECT",
   "reportingSystemSupplier": "SUPPLIER_SYSTEM",
   "reportingPracticeOdsCode": "ABC1234",
-  "conversationId": "123e4567-e89b-12d3-a456-426614174000",
-  "transferEventDateTime": "2022-01-02T00:00:00",
+  "conversationId": "123e4567-slow-12d3-a456-426614174000",
+  "transferEventDateTime": "2022-01-05T00:00:00",
   "payload": {
     "registration": {
       "requestingPracticeOdsCode": "ABC1234",

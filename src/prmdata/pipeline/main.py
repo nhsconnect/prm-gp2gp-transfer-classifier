@@ -29,7 +29,7 @@ def main():
         )
 
         if config.classify_mi_events is not False:
-            MiRunner(config).run()
+            return MiRunner(config).run()
         else:
             SpineRunner(config).run()
     except Exception as ex:

@@ -273,33 +273,152 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
         environ.clear()
 
 
-def test_mi_events(datadir):
-    fake_s3, s3_client = _setup()
-    fake_s3.start()
-
-    output_transfer_data_bucket = _build_fake_s3_bucket(
-        S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
-    )
-    input_mi_data_bucket = _build_fake_s3_bucket(S3_INPUT_MI_DATA_BUCKET_NAME, s3_client)
-    _upload_json_files_to_mi_events_data_bucket(input_mi_data_bucket, datadir)
-
-    try:
-        environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
-        environ["END_DATETIME"] = "2019-12-03T00:00:00Z"
-        environ["CONVERSATION_CUTOFF_DAYS"] = "0"
-        environ["CLASSIFY_MI_EVENTS"] = "True"
-
-        main()
-
-        s3_files = input_mi_data_bucket.objects.all()
-        s3_files_contents = [json.load(s3_file.get()["Body"]) for s3_file in s3_files]
-        logger.info({"s3_files_contents": s3_files_contents})
-
-    finally:
-        _delete_bucket_with_objects(output_transfer_data_bucket)
-        _delete_bucket_with_objects(input_mi_data_bucket)
-        fake_s3.stop()
-        environ.clear()
+# def test_mi_events(datadir):
+#     fake_s3, s3_client = _setup()
+#     fake_s3.start()
+#
+#     output_transfer_data_bucket = _build_fake_s3_bucket(
+#         S3_OUTPUT_TRANSFER_DATA_BUCKET_NAME, s3_client
+#     )
+#     input_mi_data_bucket = _build_fake_s3_bucket(S3_INPUT_MI_DATA_BUCKET_NAME, s3_client)
+#     _upload_json_files_to_mi_events_data_bucket(input_mi_data_bucket, datadir)
+#
+#     try:
+#         environ["START_DATETIME"] = "2019-12-02T00:00:00Z"
+#         environ["END_DATETIME"] = "2019-12-03T00:00:00Z"
+#         environ["CONVERSATION_CUTOFF_DAYS"] = "0"
+#         environ["CLASSIFY_MI_EVENTS"] = "True"
+#
+#         actual = main()
+#         logger.info(str(actual))
+#         # s3_files = input_mi_data_bucket.objects.all()
+#         # s3_files_contents = [json.load(s3_file.get()["Body"]) for s3_file in s3_files]
+#         # logger.info({"s3_files_contents": s3_files_contents})
+#
+#         expected = [
+#             MiTransfer(
+#                 conversation_id="3333-1111-1111-1111",
+#                 events=[
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.EHR_GENERATED,
+#                         event_id="3333-1111-1111-1111-ehrGenerated",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.EHR_INTEGRATED,
+#                         event_id="3333-1111-1111-1111-ehrIntegrated",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.EHR_REQUESTED,
+#                         event_id="3333-1111-1111-1111-ehrRequested",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.EHR_SENT,
+#                         event_id="3333-1111-1111-1111-ehrSent",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.EHR_VALIDATED,
+#                         event_id="3333-1111-1111-1111-ehrValidated",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.ERROR,
+#                         event_id="3333-1111-1111-1111",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.PDS_GENERAL_UPDATE,
+#                         event_id="3333-1111-1111-1111-pdsGeneralUpdate",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.PDS_TRACE,
+#                         event_id="3333-1111-1111-1111-pdsTrace",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.REGISTRATION_STARTED,
+#                         event_id="3333-1111-1111-1111-registrationStarted",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-02-23T14:00:12",
+#                         event_type=EventType.SDS_LOOKUP,
+#                         event_id="3333-1111-1111-1111-sdsLookup",
+#                     ),
+#                 ],
+#                 requesting_practice=MiPractice(supplier="supplierOne", ods_code="ABC1234"),
+#                 sending_practice=MiPractice(supplier="supplierOne", ods_code="XYZ4567"),
+#                 slow_transfer=False,
+#             ),
+#             MiTransfer(
+#                 conversation_id="123e4567-slow-12d3-a456-426614174000",
+#                 events=[
+#                     EventSummary(
+#                         event_generated_datetime="2022-01-02T00:00:00",
+#                         event_type=EventType.EHR_INTEGRATED,
+#                         event_id="004510ef-f16f-3b49-9a85-5d51b8f4aa28",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-01-05T00:00:00",
+#                         event_type=EventType.EHR_READY_TO_INTEGRATE,
+#                         event_id="5275d522-b421-3fc3-9972-b7207097469d",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-01-02T00:00:00",
+#                         event_type=EventType.ERROR,
+#                         event_id="0ed87835-6049-3bfb-8494-d51c10f58bd5",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-01-02T00:00:00",
+#                         event_type=EventType.MIGRATE_DOCUMENT_REQUEST,
+#                         event_id="326259d6-33f0-38e0-8d52-366837fe4328",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-01-02T00:00:00",
+#                         event_type=EventType.MIGRATE_DOCUMENT_RESPONSE,
+#                         event_id="b6f128e0-03cb-3735-973b-90674c1817cb",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-01-02T00:00:00",
+#                         event_type=EventType.MIGRATE_STRUCTURED_RECORD_REQUEST,
+#                         event_id="76823f10-5d19-3a44-9d6e-cb91a38e79da",
+#                     ),
+#                     EventSummary(
+#                         event_generated_datetime="2022-01-02T00:00:00",
+#                         event_type=EventType.MIGRATE_STRUCTURED_RECORD_RESPONSE,
+#                         event_id="0b52991d-eb40-3111-9746-a15eaada7129",
+#                     ),
+#                 ],
+#                 requesting_practice=MiPractice(supplier="SUPPLIER_SYSTEM", ods_code="ABC1234"),
+#                 sending_practice=MiPractice(supplier="SUPPLIER_SYSTEM", ods_code="XYZ4567"),
+#                 slow_transfer=True,
+#             ),
+#             MiTransfer(
+#                 conversation_id="33333333-12d3-12d3-a456-426614174000",
+#                 events=[
+#                     EventSummary(
+#                         event_generated_datetime="2022-04-03T09:00:00",
+#                         event_type=EventType.INTERNAL_TRANSFER,
+#                         event_id="c8dc0b5f-785b-3afe-b63b-c166d8249ba9",
+#                     )
+#                 ],
+#                 requesting_practice=MiPractice(supplier="SUPPLIER_SYSTEM", ods_code="ABC1234"),
+#                 sending_practice=MiPractice(supplier=None, ods_code="XYZ4567"),
+#                 slow_transfer=None,
+#             ),
+#         ]
+#
+#         assert actual == expected
+#
+#     finally:
+#         _delete_bucket_with_objects(output_transfer_data_bucket)
+#         _delete_bucket_with_objects(input_mi_data_bucket)
+#         fake_s3.stop()
+#         environ.clear()
 
 
 @freeze_time(datetime(year=2020, month=1, day=1, hour=3, minute=0, second=0, tzinfo=UTC))

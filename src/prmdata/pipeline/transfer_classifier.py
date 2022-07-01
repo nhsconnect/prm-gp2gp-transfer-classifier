@@ -118,14 +118,14 @@ class RunnerObservabilityProbe:
         )
 
     def log_successfully_created_transfers_from_mi_events(self, mi_transfers: List[MiTransfer]):
-        self._logger.info(
-            "Successfully created transfers from mi events",
-            extra={
-                "event": "SUCCESSFULLY_CREATED_TRANSFERS_FROM_MI_EVENTS",
-                # "transfers": json.dumps(mi_transfers, default=lambda o: o.__dict__, sort_keys=True),
-                **self._log_date_range_info,
-            },
-        )
+        # self._logger.info(
+        #     "Successfully created transfers from mi events",
+        #     extra={
+        #         "event": "SUCCESSFULLY_CREATED_TRANSFERS_FROM_MI_EVENTS",
+        #         # "transfers": json.dumps(mi_transfers, default=lambda o: o.__dict__, sort_keys=True),
+        #         **self._log_date_range_info,
+        #     },
+        # )
 
         self._logger.info(
             "Successfully created transfers from mi events",

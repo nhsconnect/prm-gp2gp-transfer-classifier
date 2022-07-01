@@ -30,3 +30,5 @@ class MiRunner(TransferClassifier):
         self._runner_observability_probe.log_successfully_created_transfers_from_mi_events(
             transfers
         )
+
+        return transfers

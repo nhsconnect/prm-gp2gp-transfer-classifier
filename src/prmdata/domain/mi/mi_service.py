@@ -112,13 +112,13 @@ class MiService:
             iterable=messages,
             value=lambda message: message.transfer_event_datetime,
             condition=lambda message: message.event_type is EventType.EHR_REQUESTED
-            or message.event_type is EventType.EHR_READY_TO_INTEGRATE,
+            or message.event_type is EventType.MIGRATE_STRUCTURED_RECORD_REQUEST,
         )
         transfer_received_datetime = find_first(
             iterable=messages,
             value=lambda message: message.transfer_event_datetime,
             condition=lambda message: message.event_type is EventType.EHR_VALIDATED
-            or message.event_type is EventType.MIGRATE_STRUCTURED_RECORD_REQUEST,
+            or message.event_type is EventType.EHR_READY_TO_INTEGRATE,
         )
 
         if transfer_requested_datetime is None or transfer_received_datetime is None:

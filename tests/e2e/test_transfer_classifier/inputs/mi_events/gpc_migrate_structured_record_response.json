@@ -5,7 +5,7 @@
   "transferProtocol": "GP_CONNECT",
   "reportingSystemSupplier": "SUPPLIER_SYSTEM",
   "reportingPracticeOdsCode": "ABC1234",
-  "conversationId": "123e4567-e89b-12d3-a456-426614174000",
+  "conversationId": "123e4567-slow-12d3-a456-426614174000",
   "transferEventDateTime": "2022-01-02T00:00:00",
   "payload": {
     "registration": {
