@@ -3,11 +3,11 @@ from typing import List
 from prmdata.domain.ods_portal.organisation_lookup import OrganisationLookup
 from prmdata.domain.ods_portal.organisation_metadata import PracticeMetadata
 from tests.builders.common import a_string
-from tests.builders.ods_portal import build_ccg_metadata, build_practice_metadata
+from tests.builders.ods_portal import build_icb_metadata, build_practice_metadata
 
 
 def test_year_property_returns_the_year_of_data():
-    organisation_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices=[], icbs=[], year_month=(2020, 1))
 
     expected = 2020
 
@@ -17,7 +17,7 @@ def test_year_property_returns_the_year_of_data():
 
 
 def test_month_property_returns_the_month_of_data():
-    organisation_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices=[], icbs=[], year_month=(2020, 1))
 
     expected = 1
 
@@ -29,7 +29,7 @@ def test_month_property_returns_the_month_of_data():
 def test_has_asid_code_returns_false_given_no_matching_practice():
     practices = [build_practice_metadata(asids=["123"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices, icbs=[], year_month=(2020, 1))
 
     expected = False
 
@@ -41,7 +41,7 @@ def test_has_asid_code_returns_false_given_no_matching_practice():
 def test_has_asid_code_returns_true_given_a_matching_practice():
     practices = [build_practice_metadata(asids=["123"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices, icbs=[], year_month=(2020, 1))
 
     expected = True
 
@@ -53,7 +53,7 @@ def test_has_asid_code_returns_true_given_a_matching_practice():
 def test_has_asid_code_returns_true_given_a_matching_practice_with_multiple_asid():
     practices = [build_practice_metadata(asids=["123", "456"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices, icbs=[], year_month=(2020, 1))
 
     expected = True
 
@@ -65,7 +65,7 @@ def test_has_asid_code_returns_true_given_a_matching_practice_with_multiple_asid
 def test_has_asid_code_returns_true_given_multiple_practices():
     practices = [build_practice_metadata(asids=["123"]), build_practice_metadata(asids=["456"])]
 
-    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices, icbs=[], year_month=(2020, 1))
 
     expected = True
 
@@ -76,7 +76,7 @@ def test_has_asid_code_returns_true_given_multiple_practices():
 
 def test_practice_ods_code_from_asid_returns_none_given_no_practices():
     practices: List[PracticeMetadata] = []
-    organisation_lookup = OrganisationLookup(practices, ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices, icbs=[], year_month=(2020, 1))
 
     expected = None
 
@@ -87,7 +87,7 @@ def test_practice_ods_code_from_asid_returns_none_given_no_practices():
 
 def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_with_a_single_asid():
     practice = build_practice_metadata(asids=["123"], ods_code="ABC")
-    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices=[practice], icbs=[], year_month=(2020, 1))
 
     expected = "ABC"
 
@@ -98,7 +98,7 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_wi
 
 def test_practice_ods_code_from_asid_returns_matching_practice_given_practice_with_multiple_asids():
     practice = build_practice_metadata(asids=["123", "456"], ods_code="ABC")
-    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[], year_month=(2020, 1))
+    organisation_lookup = OrganisationLookup(practices=[practice], icbs=[], year_month=(2020, 1))
 
     expected = "ABC"
 
@@ -111,7 +111,7 @@ def test_practice_ods_code_from_asid_returns_matching_practice_given_multiple_pr
     practice_one = build_practice_metadata(asids=["123"])
     practice_two = build_practice_metadata(asids=["456"], ods_code="ABC")
     organisation_lookup = OrganisationLookup(
-        practices=[practice_one, practice_two], ccgs=[], year_month=(2020, 1)
+        practices=[practice_one, practice_two], icbs=[], year_month=(2020, 1)
     )
 
     expected = "ABC"
@@ -125,7 +125,7 @@ def test_returns_practice_name_from_asid():
     practice_one = build_practice_metadata(asids=["123"])
     practice_two = build_practice_metadata(asids=["456"], ods_code="ABC", name="Practice 2")
     organisation_lookup = OrganisationLookup(
-        practices=[practice_one, practice_two], ccgs=[], year_month=(2020, 1)
+        practices=[practice_one, practice_two], icbs=[], year_month=(2020, 1)
     )
 
     expected = practice_two.name
@@ -135,58 +135,58 @@ def test_returns_practice_name_from_asid():
     assert actual == expected
 
 
-def test_returns_ccg_name_from_ods_code():
+def test_returns_icb_name_from_ods_code():
     practice = build_practice_metadata(asids=["456"], ods_code="A123", name="Practice 2")
-    ccg = build_ccg_metadata(practices=["A123"], ods_code="12A", name="A CCG")
-    organisation_lookup = OrganisationLookup(practices=[practice], ccgs=[ccg], year_month=(2020, 1))
+    icb = build_icb_metadata(practices=["A123"], ods_code="12A", name="A ICB")
+    organisation_lookup = OrganisationLookup(practices=[practice], icbs=[icb], year_month=(2020, 1))
 
-    expected = ccg.name
+    expected = icb.name
 
-    actual = organisation_lookup.ccg_name_from_practice_ods_code("A123")
+    actual = organisation_lookup.icb_name_from_practice_ods_code("A123")
 
     assert actual == expected
 
 
-def test_ccg_ods_code_from_practice_ods_code_returns_none_given_no_ccgs():
-    organisation_lookup = OrganisationLookup(practices=[], ccgs=[], year_month=(2020, 1))
+def test_icb_ods_code_from_practice_ods_code_returns_none_given_no_icbs():
+    organisation_lookup = OrganisationLookup(practices=[], icbs=[], year_month=(2020, 1))
 
     expected = None
 
-    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("A123")
+    actual = organisation_lookup.icb_ods_code_from_practice_ods_code("A123")
 
     assert actual == expected
 
 
-def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg():
-    ccg = build_ccg_metadata(practices=["A123"], ods_code="12A")
-    organisation_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
+def test_icb_ods_code_from_practice_ods_code_returns_matching_icb():
+    icb = build_icb_metadata(practices=["A123"], ods_code="12A")
+    organisation_lookup = OrganisationLookup(practices=[], icbs=[icb], year_month=(2020, 1))
 
     expected = "12A"
 
-    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("A123")
+    actual = organisation_lookup.icb_ods_code_from_practice_ods_code("A123")
 
     assert actual == expected
 
 
-def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg_with_multiple_practices():
-    ccg = build_ccg_metadata(practices=["B3432", a_string(), a_string()], ods_code="3W")
-    organisation_lookup = OrganisationLookup(practices=[], ccgs=[ccg], year_month=(2020, 1))
+def test_icb_ods_code_from_practice_ods_code_returns_matching_icb_with_multiple_practices():
+    icb = build_icb_metadata(practices=["B3432", a_string(), a_string()], ods_code="3W")
+    organisation_lookup = OrganisationLookup(practices=[], icbs=[icb], year_month=(2020, 1))
 
     expected = "3W"
 
-    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("B3432")
+    actual = organisation_lookup.icb_ods_code_from_practice_ods_code("B3432")
 
     assert actual == expected
 
 
-def test_ccg_ods_code_from_practice_ods_code_returns_matching_ccg_given_multiple_ccgs():
-    ccg = build_ccg_metadata(practices=["A2431"], ods_code="42C")
+def test_icb_ods_code_from_practice_ods_code_returns_matching_icb_given_multiple_icbs():
+    icb = build_icb_metadata(practices=["A2431"], ods_code="42C")
     organisation_lookup = OrganisationLookup(
-        practices=[], ccgs=[build_ccg_metadata(), build_ccg_metadata(), ccg], year_month=(2020, 1)
+        practices=[], icbs=[build_icb_metadata(), build_icb_metadata(), icb], year_month=(2020, 1)
     )
 
     expected = "42C"
 
-    actual = organisation_lookup.ccg_ods_code_from_practice_ods_code("A2431")
+    actual = organisation_lookup.icb_ods_code_from_practice_ods_code("A2431")
 
     assert actual == expected

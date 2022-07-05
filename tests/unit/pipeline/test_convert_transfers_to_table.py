@@ -101,26 +101,26 @@ def test_requesting_practice_name_is_converted_to_column():
     assert actual_name_column == expected_name_column
 
 
-def test_requesting_practice_ccg_ods_is_converted_to_column():
-    transfer = build_transfer(requesting_practice=build_practice(ccg_ods_code="14A"))
+def test_requesting_practice_icb_ods_is_converted_to_column():
+    transfer = build_transfer(requesting_practice=build_practice(icb_ods_code="14A"))
 
-    expected_ods_column = {"requesting_practice_ccg_ods_code": ["14A"]}
+    expected_ods_column = {"requesting_practice_icb_ods_code": ["14A"]}
 
     table = convert_transfers_to_table([transfer])
-    actual_ods_column = table.select(["requesting_practice_ccg_ods_code"]).to_pydict()
+    actual_ods_column = table.select(["requesting_practice_icb_ods_code"]).to_pydict()
 
     assert actual_ods_column == expected_ods_column
 
 
-def test_requesting_practice_ccg_name_is_converted_to_column():
-    transfer = build_transfer(requesting_practice=build_practice(ccg_name="Testing CCG Name"))
+def test_requesting_practice_icb_name_is_converted_to_column():
+    transfer = build_transfer(requesting_practice=build_practice(icb_name="Testing ICB Name"))
 
-    expected_ccg_name_column = {"requesting_practice_ccg_name": ["Testing CCG Name"]}
+    expected_icb_name_column = {"requesting_practice_icb_name": ["Testing ICB Name"]}
 
     table = convert_transfers_to_table([transfer])
-    actual_ods_column = table.select(["requesting_practice_ccg_name"]).to_pydict()
+    actual_ods_column = table.select(["requesting_practice_icb_name"]).to_pydict()
 
-    assert actual_ods_column == expected_ccg_name_column
+    assert actual_ods_column == expected_icb_name_column
 
 
 def test_sending_practice_ods_is_converted_to_column():
@@ -134,26 +134,26 @@ def test_sending_practice_ods_is_converted_to_column():
     assert actual_ods_column == expected_ods_column
 
 
-def test_sending_practice_ccg_ods_is_converted_to_column():
-    transfer = build_transfer(sending_practice=build_practice(ccg_ods_code="10A"))
+def test_sending_practice_icb_ods_is_converted_to_column():
+    transfer = build_transfer(sending_practice=build_practice(icb_ods_code="10A"))
 
-    expected_ods_column = {"sending_practice_ccg_ods_code": ["10A"]}
+    expected_ods_column = {"sending_practice_icb_ods_code": ["10A"]}
 
     table = convert_transfers_to_table([transfer])
-    actual_ods_column = table.select(["sending_practice_ccg_ods_code"]).to_pydict()
+    actual_ods_column = table.select(["sending_practice_icb_ods_code"]).to_pydict()
 
     assert actual_ods_column == expected_ods_column
 
 
-def test_sending_practice_ccg_name_is_converted_to_column():
-    transfer = build_transfer(sending_practice=build_practice(ccg_name="Testing CCG Name"))
+def test_sending_practice_icb_name_is_converted_to_column():
+    transfer = build_transfer(sending_practice=build_practice(icb_name="Testing ICB Name"))
 
-    expected_ccg_name_column = {"sending_practice_ccg_name": ["Testing CCG Name"]}
+    expected_icb_name_column = {"sending_practice_icb_name": ["Testing ICB Name"]}
 
     table = convert_transfers_to_table([transfer])
-    actual_ods_column = table.select(["sending_practice_ccg_name"]).to_pydict()
+    actual_ods_column = table.select(["sending_practice_icb_name"]).to_pydict()
 
-    assert actual_ods_column == expected_ccg_name_column
+    assert actual_ods_column == expected_icb_name_column
 
 
 def test_sender_error_codes_are_converted_to_column():
@@ -297,13 +297,13 @@ def test_table_has_correct_schema():
             ("requesting_practice_asid", pa.string()),
             ("requesting_practice_ods_code", pa.string()),
             ("requesting_practice_name", pa.string()),
-            ("requesting_practice_ccg_ods_code", pa.string()),
-            ("requesting_practice_ccg_name", pa.string()),
+            ("requesting_practice_icb_ods_code", pa.string()),
+            ("requesting_practice_icb_name", pa.string()),
             ("sending_practice_asid", pa.string()),
             ("sending_practice_ods_code", pa.string()),
             ("sending_practice_name", pa.string()),
-            ("sending_practice_ccg_ods_code", pa.string()),
-            ("sending_practice_ccg_name", pa.string()),
+            ("sending_practice_icb_ods_code", pa.string()),
+            ("sending_practice_icb_name", pa.string()),
             ("requesting_supplier", pa.string()),
             ("sending_supplier", pa.string()),
             ("sender_error_codes", pa.list_(pa.int64())),

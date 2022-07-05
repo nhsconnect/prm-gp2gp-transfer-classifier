@@ -54,8 +54,8 @@ def test_returns_correct_ods_metadata_uris():
     )
 
     expected = [
-        f"s3://{ods_metadata_bucket}/v4/2020/12/organisationMetadata.json",
-        f"s3://{ods_metadata_bucket}/v4/2021/1/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v5/2020/12/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v5/2021/1/organisationMetadata.json",
     ]
 
     actual = uri_resolver.ods_metadata(reporting_window_dates)
@@ -77,7 +77,7 @@ def test_returns_correct_transfers_uri():
 
     expected_filename = "2021-01-03-transfers.parquet"
     expected = (
-        f"s3://{transfers_bucket}/v10/cutoff-{cutoff_number_of_days}/2021/01/03/{expected_filename}"
+        f"s3://{transfers_bucket}/v11/cutoff-{cutoff_number_of_days}/2021/01/03/{expected_filename}"
     )
 
     actual = uri_resolver.gp2gp_transfers(daily_start_datetime, cutoff=conversation_cutoff)
@@ -98,7 +98,7 @@ def test_returns_correct_ods_uri_metadata_for_previous_month_when_missing_metada
     )
 
     expected = [
-        f"s3://{ods_metadata_bucket}/v4/2020/12/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v5/2020/12/organisationMetadata.json",
     ]
 
     actual = uri_resolver.ods_metadata_using_previous_month(reporting_window_dates)
@@ -122,9 +122,9 @@ def test_returns_correct_ods_uris_metadata_for_previous_months_when_missing_meta
     )
 
     expected = [
-        f"s3://{ods_metadata_bucket}/v4/2020/12/organisationMetadata.json",
-        f"s3://{ods_metadata_bucket}/v4/2021/1/organisationMetadata.json",
-        f"s3://{ods_metadata_bucket}/v4/2021/2/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v5/2020/12/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v5/2021/1/organisationMetadata.json",
+        f"s3://{ods_metadata_bucket}/v5/2021/2/organisationMetadata.json",
     ]
 
     actual = uri_resolver.ods_metadata_using_previous_month(reporting_window_dates)

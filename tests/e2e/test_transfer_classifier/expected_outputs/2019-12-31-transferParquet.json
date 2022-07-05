@@ -31,13 +31,13 @@
         "Test GP Practice with some Integrations",
         "Test GP Practice with some Integrations"
     ],
-    "requesting_practice_ccg_ods_code": [
+    "requesting_practice_icb_ods_code": [
         "10D",
         "10D"
     ],
-    "requesting_practice_ccg_name": [
-        "Test CCG",
-        "Test CCG"
+    "requesting_practice_icb_name": [
+        "Test ICB",
+        "Test ICB"
     ],
     "requesting_supplier": [
         "SupplierC",
@@ -59,13 +59,13 @@
         "Test GP Practice B",
         "Test GP Practice B"
     ],
-    "sending_practice_ccg_ods_code": [
+    "sending_practice_icb_ods_code": [
         "3D",
         "3D"
     ],
-    "sending_practice_ccg_name": [
-        "Test CCG 3",
-        "Test CCG 3"
+    "sending_practice_icb_name": [
+        "Test ICB 3",
+        "Test ICB 3"
     ],
     "sending_supplier": [
         "SupplierB",

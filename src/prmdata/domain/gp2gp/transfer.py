@@ -11,8 +11,8 @@ class Practice:
     supplier: str
     ods_code: Optional[str]
     name: Optional[str]
-    ccg_ods_code: Optional[str]
-    ccg_name: Optional[str]
+    icb_ods_code: Optional[str]
+    icb_name: Optional[str]
 
 
 class Transfer(NamedTuple):

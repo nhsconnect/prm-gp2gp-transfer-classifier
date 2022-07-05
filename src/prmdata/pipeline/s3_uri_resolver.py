@@ -9,9 +9,9 @@ from prmdata.utils.add_leading_zero import add_leading_zero
 
 class TransferClassifierS3UriResolver:
     _SPINE_MESSAGES_VERSION = "v3"
-    _ODS_METADATA_VERSION = "v4"
+    _ODS_METADATA_VERSION = "v5"
     _MI_EVENTS_VERSION = "v1"
-    _TRANSFERS_PARQUET_VERSION = "v10"
+    _TRANSFERS_PARQUET_VERSION = "v11"
 
     def __init__(
         self,

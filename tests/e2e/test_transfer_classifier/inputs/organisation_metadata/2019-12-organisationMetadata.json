@@ -45,10 +45,10 @@
       ]
     }
   ],
-  "ccgs": [
+  "icbs": [
     {
       "ods_code": "10D",
-      "name": "Test CCG",
+      "name": "Test ICB",
       "practices": [
         "A12345",
         "A12346",
@@ -58,7 +58,7 @@
     },
      {
       "ods_code": "11B",
-      "name": "Another Test CCG",
+      "name": "Another Test ICB",
       "practices": [
         "B54332",
         "H49524"
@@ -66,7 +66,7 @@
     },
     {
       "ods_code": "3D",
-      "name": "Test CCG 3",
+      "name": "Test ICB 3",
       "practices": [
         "B34232"
       ]

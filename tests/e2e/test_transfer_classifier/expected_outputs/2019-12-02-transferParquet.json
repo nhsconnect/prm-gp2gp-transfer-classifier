@@ -19,11 +19,11 @@
     "requesting_practice_name": [
         "Test GP Practice H"
     ],
-    "requesting_practice_ccg_ods_code": [
+    "requesting_practice_icb_ods_code": [
         "11B"
     ],
-    "requesting_practice_ccg_name": [
-        "Another Test CCG"
+    "requesting_practice_icb_name": [
+        "Another Test ICB"
     ],
     "requesting_supplier": [""],
     "sender_error_codes": [[null]],
@@ -36,11 +36,11 @@
     "sending_practice_name": [
         "Test GP Practice B"
     ],
-     "sending_practice_ccg_ods_code": [
+     "sending_practice_icb_ods_code": [
         "3D"
     ],
-    "sending_practice_ccg_name": [
-        "Test CCG 3"
+    "sending_practice_icb_name": [
+        "Test ICB 3"
     ],
     "sending_supplier": [""],
     "sla_duration": [311906],

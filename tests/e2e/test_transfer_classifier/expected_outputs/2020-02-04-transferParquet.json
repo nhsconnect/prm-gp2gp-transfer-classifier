@@ -23,10 +23,10 @@
     "requesting_practice_name": [
         null
     ],
-    "requesting_practice_ccg_ods_code": [
+    "requesting_practice_icb_ods_code": [
         null
     ],
-    "requesting_practice_ccg_name": [
+    "requesting_practice_icb_name": [
         null
     ],
     "requesting_supplier": [
@@ -44,10 +44,10 @@
     "sending_practice_name": [
         "Test GP Practice with a failed transfer"
     ],
-    "sending_practice_ccg_ods_code": [
+    "sending_practice_icb_ods_code": [
         null
     ],
-    "sending_practice_ccg_name": [
+    "sending_practice_icb_name": [
         null
     ],
     "sending_supplier": [

@@ -13,7 +13,7 @@ class PracticeMetadata:
 
 
 @dataclass
-class CcgMetadata:
+class IcbMetadata:
     ods_code: str
     name: str
     practices: List[str]
@@ -25,7 +25,7 @@ class OrganisationMetadata:
     year: int
     month: int
     practices: List[PracticeMetadata]
-    ccgs: List[CcgMetadata]
+    icbs: List[IcbMetadata]
 
     @classmethod
     def from_dict(cls, data):
@@ -39,8 +39,8 @@ class OrganisationMetadata:
                 )
                 for practice in data["practices"]
             ],
-            ccgs=[
-                CcgMetadata(ods_code=ccg["ods_code"], name=ccg["name"], practices=ccg["practices"])
-                for ccg in data["ccgs"]
+            icbs=[
+                IcbMetadata(ods_code=icb["ods_code"], name=icb["name"], practices=icb["practices"])
+                for icb in data["icbs"]
             ],
         )

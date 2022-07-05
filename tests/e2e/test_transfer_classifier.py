@@ -117,13 +117,13 @@ def _upload_files_to_ods_metadata_bucket(input_ods_metadata_bucket, datadir):
     _upload_file_to_ods_metadata_bucket(
         input_ods_metadata_bucket,
         "2019-12-organisationMetadata.json",
-        "v4/2019/12/organisationMetadata.json",
+        "v5/2019/12/organisationMetadata.json",
         datadir,
     )
     _upload_file_to_ods_metadata_bucket(
         input_ods_metadata_bucket,
         "2020-01-organisationMetadata.json",
-        "v4/2020/1/organisationMetadata.json",
+        "v5/2020/1/organisationMetadata.json",
         datadir,
     )
 
@@ -247,7 +247,7 @@ def test_uploads_classified_transfers_given_start_and_end_datetime_and_cutoff(da
             expected_transfers = _get_expected_transfers(datadir, (year, data_month, data_day))
 
             s3_filename = f"{year}-{month}-{day}-transfers.parquet"
-            s3_output_path = f"v10/cutoff-14/{year}/{month}/{day}/{s3_filename}"
+            s3_output_path = f"v11/cutoff-14/{year}/{month}/{day}/{s3_filename}"
 
             actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 
@@ -455,7 +455,7 @@ def test_uploads_classified_transfers_given__no__start_and_end_datetimes_and_no_
         )
 
         s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
-        s3_output_path = f"v10/cutoff-0/{year}/{month}/{day}/{s3_filename}"
+        s3_output_path = f"v11/cutoff-0/{year}/{month}/{day}/{s3_filename}"
 
         actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 
@@ -498,7 +498,7 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
     _upload_file_to_ods_metadata_bucket(
         input_ods_metadata_bucket,
         "2020-01-organisationMetadata.json",
-        "v4/2020/1/organisationMetadata.json",
+        "v5/2020/1/organisationMetadata.json",
         datadir,
     )
 
@@ -523,7 +523,7 @@ def test_uploads_classified_transfers_using_previous_month_ods_metadata(datadir)
         )
 
         s3_filename = f"{year}-{month}-{day}-{expected_transfers_output_key}"
-        s3_output_path = f"v10/cutoff-0/{year}/{month}/{day}/{s3_filename}"
+        s3_output_path = f"v11/cutoff-0/{year}/{month}/{day}/{s3_filename}"
 
         actual_transfers = read_s3_parquet(output_transfer_data_bucket, s3_output_path)
 
