@@ -12,6 +12,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     Placeholder,
+    StructuredRecordMigration,
     TransferCompatibilityStatus,
     UnsupportedDataItem,
 )
@@ -63,6 +64,8 @@ def test_construct_mi_messages_from_mi_events():
     a_smartcard_present = True
     a_demographic_trace_status = "FAILURE"
     a_demographic_trace_reason = a_string()
+    a_structured_record_migration_status = "SUCCESS"
+    a_structured_record_migration_reason = a_string()
 
     mi_events = [
         {
@@ -135,6 +138,10 @@ def test_construct_mi_messages_from_mi_events():
                     "reason": a_demographic_trace_reason,
                 },
                 "smartcardPresent": a_smartcard_present,
+                "structuredRecordMigration": {
+                    "status": a_structured_record_migration_status,
+                    "reason": a_structured_record_migration_reason,
+                },
             },
         }
     ]
@@ -208,6 +215,10 @@ def test_construct_mi_messages_from_mi_events():
                     status=a_demographic_trace_status, reason=a_demographic_trace_reason
                 ),
                 smartcard_present=a_smartcard_present,
+                structured_record_migration=StructuredRecordMigration(
+                    status=a_structured_record_migration_status,
+                    reason=a_structured_record_migration_reason,
+                ),
             ),
         )
     ]
@@ -270,6 +281,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
                 transfer_compatibility_status=TransferCompatibilityStatus(status=None, reason=None),
                 demographic_trace_status=DemographicTraceStatus(status=None, reason=None),
                 smartcard_present=None,
+                structured_record_migration=StructuredRecordMigration(status=None, reason=None),
             ),
         )
     ]

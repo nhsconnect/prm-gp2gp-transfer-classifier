@@ -8,6 +8,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadEhr,
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
+    StructuredRecordMigration,
 )
 from prmdata.domain.mi.mi_service import MiService
 from prmdata.domain.mi.mi_transfer import MiTransfer
@@ -30,6 +31,8 @@ def test_transfer_classifier_mi_runner_abstract_class():
     a_reporting_practice_ods_code = "ABC123"
     a_demographic_status = "a status"
     a_demographic_reason = "some reason"
+    a_structured_record_migration_status = "a status"
+    a_structured_record_migration_reason = "a reason"
     an_event = {
         "eventId": an_event_id,
         "conversationId": a_conversation_id,
@@ -47,6 +50,10 @@ def test_transfer_classifier_mi_runner_abstract_class():
             "demographicTraceStatus": {
                 "status": a_demographic_status,
                 "reason": a_demographic_reason,
+            },
+            "structuredRecordMigration": {
+                "status": a_structured_record_migration_status,
+                "reason": a_structured_record_migration_reason,
             },
         },
     }
@@ -83,6 +90,10 @@ def test_transfer_classifier_mi_runner_abstract_class():
                 status=a_demographic_status, reason=a_demographic_reason
             ),
             smartcard_present=None,
+            structured_record_migration=StructuredRecordMigration(
+                status=a_structured_record_migration_status,
+                reason=a_structured_record_migration_reason,
+            ),
         ),
     )
 

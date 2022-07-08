@@ -17,6 +17,7 @@ from prmdata.domain.mi.mi_message import (
     MiMessagePayloadIntegration,
     MiMessagePayloadRegistration,
     Placeholder,
+    StructuredRecordMigration,
     TransferCompatibilityStatus,
     UnsupportedDataItem,
 )
@@ -198,6 +199,14 @@ class MiService:
                         .get("reason"),
                     ),
                     smartcard_present=event.get("payload", {}).get("smartcardPresent"),
+                    structured_record_migration=StructuredRecordMigration(
+                        status=event.get("payload", {})
+                        .get("structuredRecordMigration", {})
+                        .get("status"),
+                        reason=event.get("payload", {})
+                        .get("structuredRecordMigration", {})
+                        .get("reason"),
+                    ),
                 ),
             )
             for event in mi_events

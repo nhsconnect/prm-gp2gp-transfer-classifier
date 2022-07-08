@@ -29,6 +29,7 @@ def build_mi_message_payload(**kwargs) -> MiMessagePayload:
         transfer_compatibility_status=None,
         demographic_trace_status=None,
         smartcard_present=None,
+        structured_record_migration=None,
     )
 
 
