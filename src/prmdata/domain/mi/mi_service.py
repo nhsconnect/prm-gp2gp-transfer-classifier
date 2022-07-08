@@ -127,7 +127,8 @@ class MiService:
         return (transfer_received_datetime - transfer_requested_datetime) > timedelta(days=1)
 
     def construct_mi_messages_from_mi_events(self, mi_events: List[dict]) -> List[MiMessage]:
-        timezone_info = {"BST": 1 * 3600, "UTC": 0 * 3600}
+        one_hour_in_seconds = 3600
+        timezone_info = {"BST": one_hour_in_seconds, "UTC": 0}
 
         return [
             MiMessage(

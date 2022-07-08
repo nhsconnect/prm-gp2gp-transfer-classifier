@@ -50,7 +50,8 @@ def _parse_message_ref(ref):
 
 
 def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Message]:
-    timezone_info = {"BST": 1 * 3600, "UTC": 0 * 3600}
+    one_hour_in_seconds = 3600
+    timezone_info = {"BST": one_hour_in_seconds, "UTC": 0}
 
     for item in items:
         yield Message(
