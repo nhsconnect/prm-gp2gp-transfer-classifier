@@ -3,6 +3,8 @@
 This repo contains the transfer classifier (part of the data pipeline) responsible for deriving GP2GP transfer data.
 The transfer outcome is categorised by inferring the outcome of each GP2GP transfer using the logs produced by SPINE.
 
+SICBL = Sub Integrated Care Board Location
+
 ## Running
 
 The data pipeline can be installed via `python setup.py install`, or packaged into a docker container via `docker build`.

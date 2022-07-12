@@ -518,11 +518,11 @@ def test_produces_no_practice_ods_code_using_organisation_lookup_when_no_ods_map
     assert actual.sending_practice.ods_code == expected_sending_practice_ods_code
 
 
-def test_produces_sending_practice_icb_ods_code_using_organisation_lookup():
+def test_produces_sending_practice_sicbl_ods_code_using_organisation_lookup():
     conversation = build_mock_gp2gp_conversation(sending_practice_asid="100")
     mock_lookup = Mock()
     mock_lookup.practice_ods_code_from_asid.return_value = "AB123"
-    mock_lookup.icb_ods_code_from_practice_ods_code.return_value = "10A"
+    mock_lookup.sicbl_ods_code_from_practice_ods_code.return_value = "10A"
 
     transfer_service = TransferService(
         cutoff=timedelta(days=14),
@@ -530,8 +530,8 @@ def test_produces_sending_practice_icb_ods_code_using_organisation_lookup():
     )
 
     actual = transfer_service.derive_transfer(conversation, mock_lookup)
-    expected_sending_practice_icb_ods_code = "10A"
+    expected_sending_practice_sicbl_ods_code = "10A"
 
-    assert actual.sending_practice.icb_ods_code == expected_sending_practice_icb_ods_code
+    assert actual.sending_practice.sicbl_ods_code == expected_sending_practice_sicbl_ods_code
     mock_lookup.practice_ods_code_from_asid.assert_any_call("100")
-    mock_lookup.icb_ods_code_from_practice_ods_code.assert_any_call("AB123")
+    mock_lookup.sicbl_ods_code_from_practice_ods_code.assert_any_call("AB123")

@@ -18,7 +18,7 @@ class OrganisationMetadataMonthly:
             organisation_metadata = OrganisationMetadata.from_dict(data)
             year_month = (organisation_metadata.year, organisation_metadata.month)
             organisation_lookup = OrganisationLookup(
-                organisation_metadata.practices, organisation_metadata.icbs, year_month=year_month
+                organisation_metadata.practices, organisation_metadata.sicbls, year_month=year_month
             )
             metadata_dict[year_month] = organisation_lookup
         return cls(metadata_dict)

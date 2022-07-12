@@ -108,21 +108,21 @@ class TransferService:
                 asid=asid,
                 supplier=supplier,
                 ods_code=None,
-                icb_ods_code=None,
+                sicbl_ods_code=None,
                 name=None,
-                icb_name=None,
+                sicbl_name=None,
             )
         ods_code = organisation_lookup.practice_ods_code_from_asid(asid)
         name = organisation_lookup.practice_name_from_asid(asid)
-        icb_ods_code = organisation_lookup.icb_ods_code_from_practice_ods_code(ods_code)
-        icb_name = organisation_lookup.icb_name_from_practice_ods_code(ods_code)
+        sicbl_ods_code = organisation_lookup.sicbl_ods_code_from_practice_ods_code(ods_code)
+        sicbl_name = organisation_lookup.sicbl_name_from_practice_ods_code(ods_code)
         return Practice(
             asid=asid,
             supplier=supplier,
             ods_code=ods_code,
-            icb_ods_code=icb_ods_code,
+            sicbl_ods_code=sicbl_ods_code,
             name=name,
-            icb_name=icb_name,
+            sicbl_name=sicbl_name,
         )
 
     def derive_transfer(

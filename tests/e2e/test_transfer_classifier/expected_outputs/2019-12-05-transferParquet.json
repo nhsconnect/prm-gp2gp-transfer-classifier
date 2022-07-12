@@ -31,13 +31,13 @@
         "Test GP Practice H",
         "Test GP Practice H"
     ],
-    "requesting_practice_icb_ods_code": [
+    "requesting_practice_sicbl_ods_code": [
         "11B",
         "11B"
     ],
-    "requesting_practice_icb_name": [
-        "Another Test ICB",
-        "Another Test ICB"
+    "requesting_practice_sicbl_name": [
+        "Another Test SICBL",
+        "Another Test SICBL"
     ],
     "requesting_supplier": [
         "SupplierC",
@@ -59,13 +59,13 @@
         "Test GP Practice B",
         "Test GP Practice B"
     ],
-    "sending_practice_icb_ods_code": [
+    "sending_practice_sicbl_ods_code": [
         "3D",
         "3D"
     ],
-    "sending_practice_icb_name": [
-        "Test ICB 3",
-        "Test ICB 3"
+    "sending_practice_sicbl_name": [
+        "Test SICBL 3",
+        "Test SICBL 3"
     ],
     "sending_supplier": [
         "SupplierA",

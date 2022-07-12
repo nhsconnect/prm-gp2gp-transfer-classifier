@@ -16,14 +16,14 @@ _ORGANISATION_METADATA_DICT_FIRST_MONTH = {
     "year": 2021,
     "month": 1,
     "practices": [{"ods_code": "ABC", "name": "A Practice", "asids": ["123"]}],
-    "icbs": [{"ods_code": "XYZ", "name": "A ICB", "practices": ["ABC"]}],
+    "sicbls": [{"ods_code": "XYZ", "name": "A SICBL", "practices": ["ABC"]}],
 }
 _ORGANISATION_METADATA_DICT_ADDITIONAL_MONTH = {
     "generated_on": "2021-03-15T03:00:00",
     "year": 2021,
     "month": 2,
     "practices": [{"ods_code": "A12345", "name": "GP Practice", "asids": ["123456789123"]}],
-    "icbs": [{"ods_code": "22A", "name": "ICB", "practices": ["A12345"]}],
+    "sicbls": [{"ods_code": "22A", "name": "SICBL", "practices": ["A12345"]}],
 }
 
 _ODS_BUCKET = a_string()

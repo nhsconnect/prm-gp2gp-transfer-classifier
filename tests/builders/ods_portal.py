@@ -1,6 +1,6 @@
 from random import randrange
 
-from prmdata.domain.ods_portal.organisation_metadata import IcbMetadata, PracticeMetadata
+from prmdata.domain.ods_portal.organisation_metadata import PracticeMetadata, SicblMetadata
 from tests.builders.common import a_string
 
 
@@ -16,8 +16,8 @@ def build_practice_metadata(**kwargs) -> PracticeMetadata:
     )
 
 
-def build_icb_metadata(**kwargs) -> IcbMetadata:
-    return IcbMetadata(
+def build_sicbl_metadata(**kwargs) -> SicblMetadata:
+    return SicblMetadata(
         ods_code=kwargs.get("ods_code", a_string()),
         name=kwargs.get("name", a_string()),
         practices=kwargs.get("practices", _a_list_of_strings()),

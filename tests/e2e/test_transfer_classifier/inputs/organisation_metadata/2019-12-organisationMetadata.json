@@ -45,10 +45,10 @@
       ]
     }
   ],
-  "icbs": [
+  "sicbls": [
     {
       "ods_code": "10D",
-      "name": "Test ICB",
+      "name": "Test SICBL",
       "practices": [
         "A12345",
         "A12346",
@@ -58,7 +58,7 @@
     },
      {
       "ods_code": "11B",
-      "name": "Another Test ICB",
+      "name": "Another Test SICBL",
       "practices": [
         "B54332",
         "H49524"
@@ -66,7 +66,7 @@
     },
     {
       "ods_code": "3D",
-      "name": "Test ICB 3",
+      "name": "Test SICBL 3",
       "practices": [
         "B34232"
       ]

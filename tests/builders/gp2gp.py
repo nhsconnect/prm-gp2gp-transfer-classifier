@@ -18,8 +18,8 @@ def build_practice(**kwargs) -> Practice:
         supplier=kwargs.get("supplier", a_string(12)),
         ods_code=kwargs.get("ods_code", a_string(4)),
         name=kwargs.get("name", a_string(15)),
-        icb_ods_code=kwargs.get("icb_ods_code", a_string(4)),
-        icb_name=kwargs.get("icb_name", a_string(15)),
+        sicbl_ods_code=kwargs.get("sicbl_ods_code", a_string(4)),
+        sicbl_name=kwargs.get("sicbl_name", a_string(15)),
     )
 
 
