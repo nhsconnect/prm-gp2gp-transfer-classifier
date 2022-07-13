@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, Mock
 from prmdata.domain.mi.event_type import EventType
 from prmdata.domain.mi.mi_message import (
     DemographicTraceStatus,
+    DocumentMigration,
     MiMessage,
     MiMessagePayload,
     MiMessagePayloadEhr,
@@ -33,6 +34,9 @@ def test_transfer_classifier_mi_runner_abstract_class():
     a_demographic_reason = "some reason"
     a_structured_record_migration_status = "a status"
     a_structured_record_migration_reason = "a reason"
+    a_document_migration_status = "a status"
+    a_document_migration_reason = "a reason"
+
     an_event = {
         "eventId": an_event_id,
         "conversationId": a_conversation_id,
@@ -54,6 +58,10 @@ def test_transfer_classifier_mi_runner_abstract_class():
             "structuredRecordMigration": {
                 "status": a_structured_record_migration_status,
                 "reason": a_structured_record_migration_reason,
+            },
+            "documentMigration": {
+                "status": a_document_migration_status,
+                "reason": a_document_migration_reason,
             },
         },
     }
@@ -93,6 +101,10 @@ def test_transfer_classifier_mi_runner_abstract_class():
             structured_record_migration=StructuredRecordMigration(
                 status=a_structured_record_migration_status,
                 reason=a_structured_record_migration_reason,
+            ),
+            document_migration=DocumentMigration(
+                status=a_document_migration_status,
+                reason=a_document_migration_reason,
             ),
         ),
     )

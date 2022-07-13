@@ -5,6 +5,7 @@ from prmdata.domain.mi.mi_message import (
     Codings,
     Degrade,
     DemographicTraceStatus,
+    DocumentMigration,
     Error,
     MiMessage,
     MiMessagePayload,
@@ -66,6 +67,8 @@ def test_construct_mi_messages_from_mi_events():
     a_demographic_trace_reason = a_string()
     a_structured_record_migration_status = "SUCCESS"
     a_structured_record_migration_reason = a_string()
+    document_migration_status = "SUCCESS"
+    document_migration_reason = a_string()
 
     mi_events = [
         {
@@ -141,6 +144,10 @@ def test_construct_mi_messages_from_mi_events():
                 "structuredRecordMigration": {
                     "status": a_structured_record_migration_status,
                     "reason": a_structured_record_migration_reason,
+                },
+                "documentMigration": {
+                    "status": document_migration_status,
+                    "reason": document_migration_reason,
                 },
             },
         }
@@ -219,6 +226,9 @@ def test_construct_mi_messages_from_mi_events():
                     status=a_structured_record_migration_status,
                     reason=a_structured_record_migration_reason,
                 ),
+                document_migration=DocumentMigration(
+                    status=document_migration_status, reason=document_migration_reason
+                ),
             ),
         )
     ]
@@ -282,6 +292,7 @@ def test_handles_missing_fields_when_construct_mi_messages_from_mi_events():
                 demographic_trace_status=DemographicTraceStatus(status=None, reason=None),
                 smartcard_present=None,
                 structured_record_migration=StructuredRecordMigration(status=None, reason=None),
+                document_migration=DocumentMigration(status=None, reason=None),
             ),
         )
     ]

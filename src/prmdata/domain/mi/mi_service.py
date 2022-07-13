@@ -10,6 +10,7 @@ from prmdata.domain.mi.mi_message import (
     Codings,
     Degrade,
     DemographicTraceStatus,
+    DocumentMigration,
     Error,
     MiMessage,
     MiMessagePayload,
@@ -206,6 +207,10 @@ class MiService:
                         reason=event.get("payload", {})
                         .get("structuredRecordMigration", {})
                         .get("reason"),
+                    ),
+                    document_migration=DocumentMigration(
+                        status=event.get("payload", {}).get("documentMigration", {}).get("status"),
+                        reason=event.get("payload", {}).get("documentMigration", {}).get("reason"),
                     ),
                 ),
             )

@@ -85,6 +85,12 @@ class StructuredRecordMigration:
 
 
 @dataclass
+class DocumentMigration:
+    status: str
+    reason: str
+
+
+@dataclass
 class MiMessagePayloadEhr:
     ehr_total_size_bytes: Optional[int]
     ehr_structured_size_bytes: Optional[int]
@@ -104,6 +110,7 @@ class MiMessagePayload:
     demographic_trace_status: Optional[DemographicTraceStatus]
     smartcard_present: Optional[bool]
     structured_record_migration: Optional[StructuredRecordMigration]
+    document_migration: Optional[DocumentMigration]
 
 
 @dataclass
