@@ -49,11 +49,13 @@ class Message(NamedTuple):
 
 
 def _parse_error_code(error):
-    return None if error == "NONE" or error == "" else int(error)
+    # handle cases where it's falsy
+    return None if error == "NONE" or not error else int(error)
 
 
 def _parse_message_ref(ref):
-    return None if ref == "NotProvided" or ref == "" else ref
+    # handle cases where it's falsy
+    return None if ref == "NotProvided" or not ref else ref
 
 
 def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Message]:

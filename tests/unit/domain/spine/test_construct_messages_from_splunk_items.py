@@ -147,6 +147,17 @@ def test_handles_empty_fields():
             jdi_event="",
             raw="",
         ),
+        build_spine_item(
+            time="2019-12-31T23:37:55.334+0000",
+            conversation_id=None,
+            guid=None,
+            interaction_id=None,
+            message_sender=None,
+            message_recipient=None,
+            message_ref=None,
+            jdi_event=None,
+            raw=None,
+        ),
     ]
 
     expected = [
@@ -161,7 +172,19 @@ def test_handles_empty_fields():
             error_code=None,
             from_system=None,
             to_system=None,
-        )
+        ),
+        Message(
+            time=datetime(2019, 12, 31, 23, 37, 55, 334000, tzutc()),
+            conversation_id=None,
+            guid=None,
+            interaction_id=None,
+            from_party_asid=None,
+            to_party_asid=None,
+            message_ref=None,
+            error_code=None,
+            from_system=None,
+            to_system=None,
+        ),
     ]
 
     actual = construct_messages_from_splunk_items(items)
