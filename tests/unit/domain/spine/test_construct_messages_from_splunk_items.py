@@ -134,6 +134,41 @@ def test_returns_appropriate_time_given_time_with_british_timezones(time_input):
     assert actual_time == expected_time
 
 
+def test_handles_empty_fields():
+    items = [
+        build_spine_item(
+            time="2019-12-31T23:37:55.334+0000",
+            conversation_id="",
+            guid="",
+            interaction_id="",
+            message_sender="",
+            message_recipient="",
+            message_ref="",
+            jdi_event="",
+            raw="",
+        ),
+    ]
+
+    expected = [
+        Message(
+            time=datetime(2019, 12, 31, 23, 37, 55, 334000, tzutc()),
+            conversation_id="",
+            guid="",
+            interaction_id="",
+            from_party_asid="",
+            to_party_asid="",
+            message_ref=None,
+            error_code=None,
+            from_system=None,
+            to_system=None,
+        )
+    ]
+
+    actual = construct_messages_from_splunk_items(items)
+
+    assert list(actual) == expected
+
+
 def test_handles_invalid_data():
     a_time = "2019-07-01T09:10:00.334+0000"
     a_guid = "a_message_guid"
@@ -146,7 +181,7 @@ def test_handles_invalid_data():
             message_sender="123456789012",
             message_recipient="121212121212",
             message_ref="NotProvided",
-            jdi_event="",
+            jdi_event="INVALID",
             raw="",
         )
     ]
@@ -158,6 +193,6 @@ def test_handles_invalid_data():
     assert str(e.value) == str(
         FailedToConstructMessagesFromSplunkItemsError(
             f"Failed to construct_messages_from_splunk_items with message GUID: {a_guid} and time: {a_time}",
-            ValueError("invalid literal for int() with base 10: ''"),
+            ValueError("invalid literal for int() with base 10: 'INVALID'"),
         )
     )
