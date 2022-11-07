@@ -1,7 +1,10 @@
+import logging
 from datetime import datetime
 from typing import Iterable, Iterator, NamedTuple, Optional
 
 from dateutil import parser
+
+logger = logging.getLogger(__name__)
 
 EHR_REQUEST_STARTED = "urn:nhs:names:services:gp2gp/RCMR_IN010000UK05"
 EHR_REQUEST_COMPLETED = "urn:nhs:names:services:gp2gp/RCMR_IN030000UK06"
@@ -11,6 +14,10 @@ COMMON_POINT_TO_POINT = "urn:nhs:names:services:gp2gp/COPC_IN000001UK01"
 ERROR_SUPPRESSED = 15
 DUPLICATE_ERROR = 12
 FATAL_SENDER_ERROR_CODES = [6, 7, 10, 14, 23, 24, 99, 30]
+
+
+class FailedToConstructMessagesFromSplunkItemsError(Exception):
+    pass
 
 
 class Message(NamedTuple):
@@ -54,15 +61,24 @@ def construct_messages_from_splunk_items(items: Iterable[dict]) -> Iterator[Mess
     timezone_info = {"BST": one_hour_in_seconds, "UTC": 0}
 
     for item in items:
-        yield Message(
-            time=parser.parse(item["_time"], tzinfos=timezone_info),
-            conversation_id=item["conversationID"],
-            guid=item["GUID"],
-            interaction_id=item["interactionID"],
-            from_party_asid=item["messageSender"],
-            to_party_asid=item["messageRecipient"],
-            message_ref=_parse_message_ref(item["messageRef"]),
-            error_code=_parse_error_code(item["jdiEvent"]),
-            from_system=item.get("fromSystem"),
-            to_system=item.get("toSystem"),
-        )
+        try:
+            yield Message(
+                time=parser.parse(item["_time"], tzinfos=timezone_info),
+                conversation_id=item["conversationID"],
+                guid=item["GUID"],
+                interaction_id=item["interactionID"],
+                from_party_asid=item["messageSender"],
+                to_party_asid=item["messageRecipient"],
+                message_ref=_parse_message_ref(item["messageRef"]),
+                error_code=_parse_error_code(item["jdiEvent"]),
+                from_system=item.get("fromSystem"),
+                to_system=item.get("toSystem"),
+            )
+
+        except ValueError as e:
+            logger.error("Failed to parse messages when constructing messages from splunk")
+            raise FailedToConstructMessagesFromSplunkItemsError(
+                f"Failed to construct_messages_from_splunk_items with message GUID: {item['GUID']} "
+                + f"and time: {item['_time']}",
+                e,
+            )

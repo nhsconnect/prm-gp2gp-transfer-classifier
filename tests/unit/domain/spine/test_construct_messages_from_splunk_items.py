@@ -3,7 +3,11 @@ from datetime import datetime
 import pytest
 from dateutil.tz import tzutc
 
-from prmdata.domain.spine.message import Message, construct_messages_from_splunk_items
+from prmdata.domain.spine.message import (
+    FailedToConstructMessagesFromSplunkItemsError,
+    Message,
+    construct_messages_from_splunk_items,
+)
 from tests.builders.spine import build_spine_item
 
 
@@ -128,3 +132,32 @@ def test_returns_appropriate_time_given_time_with_british_timezones(time_input):
     actual_time = next(messages).time
 
     assert actual_time == expected_time
+
+
+def test_handles_invalid_data():
+    a_time = "2019-07-01T09:10:00.334+0000"
+    a_guid = "a_message_guid"
+    items = [
+        build_spine_item(
+            time=a_time,
+            conversation_id="convo_abc",
+            guid=a_guid,
+            interaction_id="urn:nhs:names:services:gp2gp/MCCI_IN010000UK13",
+            message_sender="123456789012",
+            message_recipient="121212121212",
+            message_ref="NotProvided",
+            jdi_event="",
+            raw="",
+        )
+    ]
+
+    with pytest.raises(FailedToConstructMessagesFromSplunkItemsError) as e:
+        messages = construct_messages_from_splunk_items(items)
+        next(messages)
+
+    assert str(e.value) == str(
+        FailedToConstructMessagesFromSplunkItemsError(
+            f"Failed to construct_messages_from_splunk_items with message GUID: {a_guid} and time: {a_time}",
+            ValueError("invalid literal for int() with base 10: ''"),
+        )
+    )
