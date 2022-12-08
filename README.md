@@ -124,7 +124,7 @@ This will run the validation commands in the same container used by the GoCD pip
 
 `./tasks check-deps`
 
-- If this fails when running outside of Dojo, see [troubleshooting section](### Troubleshooting)
+- If this fails when running outside of Dojo, see [troubleshooting section](#Troubleshooting)
 
 
 ### Troubleshooting
