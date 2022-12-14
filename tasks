@@ -24,7 +24,7 @@ do
         pipenv run typecheck
         ;;
     check-deps)
-        pipenv check
+        pipenv check --ignore 51457
         ;;
     clean)
         find ./tests -type f -name "*.pyc" -delete
