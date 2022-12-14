@@ -86,17 +86,26 @@ python -m pip install -U "pip>=21.1”
 
 #### Build a dev env
 
-In a new shell, in the project directory run.
+In a new shell, in the project directory run:
 
 ```
 ./tasks devenv
 ```
 
 This will create a python virtual environment containing all required dependencies.
-To find out the path of this new virtual environment (which can be useful for configuring IDEs) run:
+
+#### Configure SDK
+
+To find out the path of this new virtual environment, run:
+
 ```
 pipenv --venv
 ```
+
+Now you can configure the IDE. The steps for IntelliJ are following:
+1. Go to `File -> Project Structure -> SDK -> Add SDK -> Python SDK -> Existing environments`
+2. Click on three dots, paste the virtual environment path from before, and point to the python binary.
+   The path should look like this: `/Users/janeDoe/.local/share/virtualenvs/prm-spine-exporter-NTBCQ41T/bin/python3.9`
 
 ### Running the unit and integration tests
 
@@ -136,7 +145,7 @@ Ensure you have pyenv installed (use `brew install pyenv`).
 Perform the following steps:
 
 1. Run `brew uninstall pipenv`
-2. Run the steps listed under [Installing correct version of pip and python](#installing-correct-version-of-pip-and-python)
+2. Run the steps listed under [Install new python and set as default](#install-new-python-and-set-as-default) and [Installing pipenv and updating pip](#installing-pipenv-and-updating-pip)
 3. Now running `./tasks check-deps` should pass.
 
 #### Python virtual environments
