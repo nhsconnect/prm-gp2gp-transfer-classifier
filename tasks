@@ -23,6 +23,11 @@ do
     typecheck)
         pipenv run typecheck
         ;;
+    output-versions)
+      pip --version
+      python --version
+      pipenv --version
+      ;;
     check-deps)
         pipenv check --ignore 51457
         ;;
@@ -58,6 +63,7 @@ do
         docker push ${ecr_repo_uri}:${IMAGE_TAG}
         ;;
     dep)
+        ./tasks output-versions
         ./tasks check-deps > audit-output.txt
         ;;
     dojo-dep)
