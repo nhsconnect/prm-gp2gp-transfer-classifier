@@ -80,8 +80,8 @@ pyenv global 3.9.6
 
 In a new shell, run the following:
 ```
-python -m pip install pipenv
-python -m pip install -U "pip>=21.1”
+python -m pip install -U pipenv
+python -m pip install -U "pip>=22.3.1"
 ```
 
 #### Build a dev env
