@@ -29,7 +29,7 @@ do
       pipenv --version
       ;;
     check-deps)
-        pipenv check --ignore 51457
+        pipenv check
         ;;
     clean)
         find ./tests -type f -name "*.pyc" -delete
