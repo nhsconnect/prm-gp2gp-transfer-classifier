@@ -471,11 +471,11 @@
         },
         "gitpython": {
             "hashes": [
-                "sha256:26ac35c212d1f7b16036361ca5cff3ec66e11753a0d677fb6c48fa4e1a9dd8d6",
-                "sha256:fc8868f63a2e6d268fb25f481995ba185a85a66fcad126f039323ff6635669ee"
+                "sha256:769c2d83e13f5d938b7688479da374c4e3d49f71549aaf462b646db9602ea6f8",
+                "sha256:cd455b0000615c60e286208ba540271af9fe531fa6a87cc590a7298785ab2882"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.1.26"
+            "index": "pypi",
+            "version": "==3.1.30"
         },
         "graphql-core": {
             "hashes": [
