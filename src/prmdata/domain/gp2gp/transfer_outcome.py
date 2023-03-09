@@ -100,6 +100,6 @@ def _process_failure(reason: TransferFailureReason) -> Tuple[TransferStatus, Tra
 
 
 def _unclassified_failure(
-    reason: TransferFailureReason = None,
+    reason: Optional[TransferFailureReason] = None,
 ) -> Tuple[TransferStatus, Optional[TransferFailureReason]]:
     return TransferStatus.UNCLASSIFIED_FAILURE, reason
