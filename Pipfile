@@ -25,6 +25,7 @@ pytest-cov = "~=3.0"
 moto = {version = "~=4.1.4", extras = ["server"]}
 pytest = "~=6.2"
 boto3-stubs = {extras = ["s3"], version = "1.18"}
+urllib3 = "==1.26.18"
 
 [requires]
 python_version = "3.9"
